@@ -32,17 +32,8 @@ export default class Pad extends BITSMIST.v1.Component
 
 		if (this.getOption("resource"))
 		{
-			/*
-			if (this._options["resource"] in this._container["resources"])
-			{
-				this._resource = this._container["resources"][this._options["resource"]];
-			}
-			else
-			*/
-			{
-				let defaults = this._app.getSettings("defaults");
-				this._resource = new ResourceUtil(this.getOption("resource"), {"router":this._app.router, "baseUrl":defaults["apiBaseUrl"], "version":defaults["apiVersion"] + "-" + defaults["appVersion"], "settings":this._app.getSettings("ajaxUtil")});
-			}
+			let defaults = this.globalSettings["defaults"];
+			this._resource = new ResourceUtil(this.getOption("resource"), {"router":this.router, "baseUrl":defaults["apiBaseUrl"], "version":defaults["apiVersion"] + "-" + defaults["appVersion"], "settings":this.globalSettings["ajaxUtil"]});
 		}
 
 	}
