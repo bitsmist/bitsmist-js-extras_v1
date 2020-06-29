@@ -8,7 +8,7 @@ const config = {
 		"bitsmist-webview-extras_v1": path.resolve(__dirname, "./src/js/bundle.mjs"),
 	},
 	output: {
-		path: path.resolve(__dirname, "./public/js/"),
+		path: path.resolve(__dirname, "./dist/"),
 		filename: "[name].bundle.js"
 	},
 	module: {
