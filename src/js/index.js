@@ -1,10 +1,7 @@
-//import '@webcomponents/custom-elements';
-//import 'proxy-polyfill';
-
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
-// Error
+// Error Handler
 
 import AjaxErrorHandler from './error/ajax-error-handler';
 window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
