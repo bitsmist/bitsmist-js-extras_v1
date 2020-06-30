@@ -9,7 +9,7 @@
     "@rollup/plugin-commonjs": "^13.0.0",
     "@rollup/plugin-node-resolve": "^8.1.0",
     "rollup": "^2.18.1",
-    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-uglify": "^6.0.4"
   },
   "scripts": {
     "watch": "npx rollup -c -w --environment BUILD:mode dev",
