@@ -8,52 +8,35 @@
  */
 // =============================================================================
 
-//import Component from './component';
 import ResourceUtil from '../util/resource-util';
 
 // =============================================================================
 //	Pad class
 // =============================================================================
 
-export default class Pad extends BITSMIST.v1.Component
+// -----------------------------------------------------------------------------
+//  Constructor
+// -----------------------------------------------------------------------------
+
+/**
+ * Constructor.
+ */
+export default function Pad()
 {
 
-	// -------------------------------------------------------------------------
-	//  Constructor
-	// -------------------------------------------------------------------------
+	let _this = Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
-	/**
-     * Constructor.
-     */
-	constructor()
+	_this._masters = {};
+	_this._resource;
+
+	if (_this.getOption("resource"))
 	{
-
-		super();
-
-		if (this.getOption("resource"))
-		{
-			let defaults = this.globalSettings["defaults"];
-			this._resource = new ResourceUtil(this.getOption("resource"), {"router":this.router, "baseUrl":defaults["apiBaseUrl"], "version":defaults["apiVersion"] + "-" + defaults["appVersion"], "settings":this.globalSettings["ajaxUtil"]});
-		}
-
+		let defaults = _this.globalSettings["defaults"];
+		_this._resource = new ResourceUtil(_this.getOption("resource"), {"router":_this.router, "baseUrl":defaults["apiBaseUrl"], "version":defaults["apiVersion"] + "-" + defaults["appVersion"], "settings":_this.globalSettings["ajaxUtil"]});
 	}
 
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	// -------------------------------------------------------------------------
-	//  Callbacks
-	// -------------------------------------------------------------------------
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
+	return _this;
 
 }
 
-//customElements.define("bm-pad", Pad);
+BITSMIST.v1.LoaderUtil.inherit(Pad, BITSMIST.v1.Component);
