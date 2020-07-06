@@ -38,3 +38,6 @@ window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
 import MasterUtil from './util/master-util';
 window.BITSMIST.v1.MasterUtil = MasterUtil;
+
+import ResourceUtil from './util/resource-util';
+window.BITSMIST.v1.ResourceUtil = ResourceUtil;
