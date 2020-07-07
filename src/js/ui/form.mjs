@@ -283,6 +283,7 @@ Form.prototype.__initFormOnAppend = function(sender, e)
 			if (options)
 			{
 				let elements = this._element.querySelectorAll(options["rootNode"]);
+				elements = Array.prototype.slice.call(elements, 0);
 				elements.forEach((element) => {
 					this.addEventHandler(element, "click", handler, {"options":options});
 				});

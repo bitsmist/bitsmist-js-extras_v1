@@ -30,8 +30,9 @@ export default function FormUtil() {}
 FormUtil.setFields = function(rootNode, item, masters)
 {
 
-	//[].concat([rootNode],Array.from(rootNode.querySelectorAll("[data-bm-field]"))).forEach((element) => {
-	Array.prototype.concat([rootNode],Array.from(rootNode.querySelectorAll("[data-bm-field]"))).forEach((element) => {
+	let fields = rootNode.querySelectorAll("[data-bm-field]");
+	let elements = Array.prototype.concat([rootNode], Array.prototype.slice.call(fields, 0));
+	elements.forEach((element) => {
 		let fieldName = element.getAttribute("data-bm-field");
 		if (fieldName in item)
 		{
@@ -66,7 +67,9 @@ FormUtil.getFields = function(rootNode, target)
 	let item = {};
 	target = (target ? target : "");
 
-	rootNode.querySelectorAll(target + " [data-bm-formitem]").forEach((element) => {
+	let elements = rootNode.querySelectorAll(target + " [data-bm-formitem]");
+	elements = Array.prototype.slice.call(elements, 0);
+	elements.forEach((element) => {
 		let key = element.getAttribute("data-bm-field");
 		let value = this.getValue(element);
 
@@ -119,7 +122,9 @@ FormUtil.clearFields = function(rootNode, target)
 
 	target = (target ? target : "");
 
-	rootNode.querySelectorAll(target + " input").forEach((element) => {
+	let elements = rootNode.querySelectorAll(target + " input");
+	elements = Array.prototype.slice.call(elements, 0);
+	elements.forEach((element) => {
 		switch (element.type.toLowerCase())
 		{
 		case "search":
@@ -134,7 +139,9 @@ FormUtil.clearFields = function(rootNode, target)
 		}
 	});
 
-	rootNode.querySelectorAll(target + " select").forEach((element) => {
+	elements = rootNode.querySelectorAll(target + " select");
+	elements = Array.prototype.slice.call(elements, 0);
+	elements.forEach((element) => {
 		element.selectedIndex = -1;
 	});
 
@@ -152,7 +159,9 @@ FormUtil.clearFields = function(rootNode, target)
 FormUtil.buildFields = function(rootNode, fieldName, item)
 {
 
-	rootNode.querySelectorAll("[data-bm-field='" + fieldName + "']").forEach((element) => {
+	let elements = rootNode.querySelectorAll("[data-bm-field='" + fieldName + "']");
+	elements = Array.prototype.slice.call(elements, 0);
+	elements.forEach((element) => {
 		if (element.tagName.toLowerCase() == "select")
 		{
 			// Select
@@ -411,7 +420,9 @@ FormUtil.reportValidity = function(rootNode)
 
 	let ret = true;
 
-	rootNode.querySelectorAll("input").forEach((element) => {
+	let elements = rootNode.querySelectorAll("input")
+	elements = Array.prototype.slice.call(elements, 0);
+	elements.forEach((element) => {
 		let type = element.getAttribute("type");
 		switch (type)
 		{
