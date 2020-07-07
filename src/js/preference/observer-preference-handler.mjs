@@ -22,13 +22,38 @@ export default class ObserverPreferenceHandler
 	/**
      * Constructor.
      *
+	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(options)
+	constructor(componentName, options)
 	{
 
-		this.options = ( options ? options : {} );
-		this.targets = {};
+		this._name = componentName;
+		this._component = options["component"];
+		this._options = options;
+
+		this._targets = {};
+
+		this.events = [
+			"beforeSetup",
+		]
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load preference event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
+	beforeSetup(sender, e)
+	{
+
+		this.setup2(e.detail);
 
 	}
 
@@ -47,7 +72,7 @@ export default class ObserverPreferenceHandler
 	register(component, options)
 	{
 
-		this.targets[component.uniqueId] = {"object":component, "options":options};
+		this._targets[component.uniqueId] = {"object":component, "options":options};
 
 	}
 
@@ -60,16 +85,16 @@ export default class ObserverPreferenceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	setup(settings)
+	setup2(settings)
 	{
 
 		return new Promise((resolve, reject) => {
 			let promises = [];
 
-			Object.keys(this.targets).forEach((componentId) => {
-				if (this.__isTarget(settings, this.targets[componentId].options["register"]))
+			Object.keys(this._targets).forEach((componentId) => {
+				if (this.__isTarget(settings, this._targets[componentId].options["register"]))
 				{
-					promises.push(this.targets[componentId].object.setup(settings));
+					promises.push(this._targets[componentId].object.setup(settings));
 				}
 			});
 

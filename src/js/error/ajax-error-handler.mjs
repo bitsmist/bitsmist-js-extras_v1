@@ -8,13 +8,11 @@
  */
 // =============================================================================
 
-import BaseErrorHandler from './base-error-handler';
-
 // =============================================================================
 //	Ajax error handler class
 // =============================================================================
 
-export default class AjaxErrorHandler extends BaseErrorHandler
+export default class AjaxErrorHandler
 {
 
 	// -------------------------------------------------------------------------
@@ -24,14 +22,38 @@ export default class AjaxErrorHandler extends BaseErrorHandler
 	/**
      * Constructor.
      *
+	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(options)
+	constructor(componentName, options)
 	{
 
-		super(options);
+		this._name = componentName;
+		this._component = options["component"];
+		this._options = ( options ? options : {} );
 
-		this.target.push("AjaxError");
+		this.events = [
+			"error",
+		]
+
+//		this.target.push("AjaxError");
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Error event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
+	error(sender, e)
+	{
+
+		return this.handle(e.detail.error);
 
 	}
 
@@ -47,13 +69,15 @@ export default class AjaxErrorHandler extends BaseErrorHandler
 	handle(e)
 	{
 
+		if (e.name != "AjaxError") return;
+
 		let statusCode = e.object.status;
 
-		Object.keys(this.options["handlers"]["statusCode"]).forEach((code) => {
+		Object.keys(this._options["handlers"]["statusCode"]).forEach((code) => {
 			if (statusCode == code)
 			{
-				Object.keys(this.options["handlers"]["statusCode"][code]).forEach((command) => {
-					let options = this.options["handlers"]["statusCode"][code][command];
+				Object.keys(this._options["handlers"]["statusCode"][code]).forEach((command) => {
+					let options = this._options["handlers"]["statusCode"][code][command];
 					switch (command)
 					{
 						case "route":
@@ -65,27 +89,20 @@ export default class AjaxErrorHandler extends BaseErrorHandler
 							Object.keys(routeInfo["queryParameters"]).forEach((key) => {
 								routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@url@", location.href);
 							});
-							this._app.router.openRoute(routeInfo, {"jump":true});
+							this._options["component"].router.openRoute(routeInfo, {"jump":true});
 							break;
-							/*
-						case "transfer":
-							let urlToTransfer = this.options["handlers"]["statusCode"][code][command];
-							urlToTransfer = urlToTransfer.replace("@url@", location.href);
-							location.href = urlToTransfer;
-							break;
-						case "custom":
-							break;
-							*/
+						// case "transfer":
+						// 	let urlToTransfer = this._options["handlers"]["statusCode"][code][command];
+						// 	urlToTransfer = urlToTransfer.replace("@url@", location.href);
+						// 	location.href = urlToTransfer;
+						// 	break;
+						// case "custom":
+						// 	break;
 					}
 				});
 			}
 		});
 
-	}
-
-	load()
-	{
-		console.error("@@@@@@@@@@@@");
 	}
 
 }

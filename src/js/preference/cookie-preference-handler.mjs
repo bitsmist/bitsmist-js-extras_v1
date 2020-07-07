@@ -24,14 +24,55 @@ export default class CookiePreferenceHandler
 	/**
      * Constructor.
      *
+	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(options)
+	constructor(componentName, options)
 	{
 
-		this._options = ( options ? options : {} );
-		this.options = this._options;
-		this.cookie = new CookieUtil(this._options.options);
+		this._name = componentName;
+		this._component = options["component"];
+		this._options = options;
+
+		this.events = [
+			"init",
+			"setup",
+		]
+
+		this._cookie = new CookieUtil(this._options.options);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load preference event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
+	init(sender, e)
+	{
+
+		let settings = this.load();
+		this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Save preference event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
+	setup(sender, e)
+	{
+
+		return this.save(e.detail.newPreferences);
 
 	}
 
@@ -49,11 +90,7 @@ export default class CookiePreferenceHandler
 	load(options)
 	{
 
-		return new Promise((resolve, reject) => {
-			let settings= this.cookie.get("settings");
-
-			resolve(settings);
-		});
+		return this._cookie.get("settings");
 
 	}
 
@@ -68,7 +105,7 @@ export default class CookiePreferenceHandler
 	save(settings, options)
 	{
 
-		this.cookie.set("settings", settings, options);
+		this._cookie.set("settings", settings, options);
 
 	}
 
