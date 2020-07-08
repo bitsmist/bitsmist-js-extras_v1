@@ -12,7 +12,7 @@
     "rollup-plugin-uglify": "^6.0.4"
   },
   "scripts": {
-    "watch": "npx rollup -c -w --environment BUILD:mode dev",
+    "watch": "npx rollup -c -w --environment BUILD:dev",
     "dev": "npx rollup -c --environment BUILD:dev",
     "prod": "npx rollup -c --environment BUILD:prod"
   }
