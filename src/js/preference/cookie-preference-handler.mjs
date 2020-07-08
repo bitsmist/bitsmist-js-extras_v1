@@ -35,11 +35,11 @@ export default class CookiePreferenceHandler
 		this._options = options;
 
 		this.events = [
-			"init",
+			"load",
 			"setup",
 		]
 
-		this._cookie = new CookieUtil(this._options.options);
+		this._cookie = new CookieUtil(this._options["features"]["cookie"]);
 
 	}
 
@@ -53,10 +53,10 @@ export default class CookiePreferenceHandler
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	init(sender, e)
+	load(sender, e)
 	{
 
-		let settings = this.load();
+		let settings = this.load2();
 		this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
 
 	}
@@ -87,7 +87,7 @@ export default class CookiePreferenceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	load(options)
+	load2(options)
 	{
 
 		return this._cookie.get("settings");
