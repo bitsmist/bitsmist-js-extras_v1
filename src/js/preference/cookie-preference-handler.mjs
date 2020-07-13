@@ -14,6 +14,7 @@ import CookieUtil from '../util/cookie-util';
 //	Cookie preference handler class
 // =============================================================================
 
+//export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 export default class CookiePreferenceHandler
 {
 
@@ -26,87 +27,113 @@ export default class CookiePreferenceHandler
      *
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(options)
+	constructor(component, options)
 	{
 
-		this._component = options["component"];
+//		super(component, options);
+
+		this._component = component;
 		this._options = options;
 		this._events = {
-			"load": {
-				"handler": this.onLoad
-			},
-			"setup": {
-				"handler": this.onSetup
-			},
+			"load": this.onLoad,
+			"setup": this.onSetup,
 		}
+
 		this._cookie = new CookieUtil(this._options["features"]["cookie"]);
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
+}
 
-	/**
-	 * Load event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	onLoad(sender, e)
-	{
+/*
+export default function CookiePreferenceHandler(options)
+{
 
-		let settings = this.loadCookie();
-		this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
-
+	BITSMIST.v1.Plugin.call(this, options);
+	this._events = {
+		"load": this.onLoad,
+		"setup": this.onSetup,
 	}
 
-	// -------------------------------------------------------------------------
+	this._cookie = new CookieUtil(this._options["features"]["cookie"]);
 
-	/**
-	 * Setup event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	onSetup(sender, e)
-	{
+}
+BITSMIST.v1.LoaderUtil.inherit(CookiePreferenceHandler, BITSMIST.v1.Plugin);
+*/
 
-		return this.saveCookie(e.detail.newPreferences);
-
+/*
+var CookiePreferenceHandler = BITSMIST.v1.LoaderUtil.newPlugin(options, {
+	"events": {
+		"load": this.onLoad,
+		"setup": this.onSetup,
 	}
+});
+*/
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  Event handlers
+// -----------------------------------------------------------------------------
 
-	/**
-	 * Load settings
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	loadCookie(options)
-	{
+/**
+ * Load event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ */
+CookiePreferenceHandler.prototype.onLoad = function(sender, e)
+{
 
-		return this._cookie.get("settings");
+	let settings = this.loadCookie();
+	this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
 
-	}
+}
 
-	// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-	/**
-	 * Save settings
-	 *
-	 * @param	{Object}		settings			Settings.
-	 * @param	{Object}		options				Options.
-	 */
-	saveCookie(settings, options)
-	{
+/**
+ * Setup event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ */
+CookiePreferenceHandler.prototype.onSetup = function(sender, e)
+{
 
-		this._cookie.set("settings", settings, options);
+	let options = Object.assign({},this._component.globalSettings["preferences"], e.detail.newPreferences);
+	//return this.saveCookie(e.detail.newPreferences);
+	return this.saveCookie(options);
 
-	}
+}
+
+// -----------------------------------------------------------------------------
+//  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Load settings
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+CookiePreferenceHandler.prototype.loadCookie = function(options)
+{
+
+	return this._cookie.get("settings");
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Save settings
+ *
+ * @param	{Object}		settings			Settings.
+ * @param	{Object}		options				Options.
+ */
+CookiePreferenceHandler.prototype.saveCookie = function(settings, options)
+{
+
+	this._cookie.set("settings", settings, options);
 
 }
