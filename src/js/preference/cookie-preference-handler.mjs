@@ -24,21 +24,21 @@ export default class CookiePreferenceHandler
 	/**
      * Constructor.
      *
-	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(componentName, options)
+	constructor(options)
 	{
 
-		this._name = componentName;
 		this._component = options["component"];
 		this._options = options;
-
-		this.events = [
-			"load",
-			"setup",
-		]
-
+		this._events = {
+			"load": {
+				"handler": this.onLoad
+			},
+			"setup": {
+				"handler": this.onSetup
+			},
+		}
 		this._cookie = new CookieUtil(this._options["features"]["cookie"]);
 
 	}
@@ -48,15 +48,15 @@ export default class CookiePreferenceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Load preference event handler.
+	 * Load event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	load(sender, e)
+	onLoad(sender, e)
 	{
 
-		let settings = this.load2();
+		let settings = this.loadCookie();
 		this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
 
 	}
@@ -64,15 +64,15 @@ export default class CookiePreferenceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Save preference event handler.
+	 * Setup event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	setup(sender, e)
+	onSetup(sender, e)
 	{
 
-		return this.save(e.detail.newPreferences);
+		return this.saveCookie(e.detail.newPreferences);
 
 	}
 
@@ -87,7 +87,7 @@ export default class CookiePreferenceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	load2(options)
+	loadCookie(options)
 	{
 
 		return this._cookie.get("settings");
@@ -102,7 +102,7 @@ export default class CookiePreferenceHandler
 	 * @param	{Object}		settings			Settings.
 	 * @param	{Object}		options				Options.
 	 */
-	save(settings, options)
+	saveCookie(settings, options)
 	{
 
 		this._cookie.set("settings", settings, options);

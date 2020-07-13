@@ -22,21 +22,19 @@ export default class ObserverPreferenceHandler
 	/**
      * Constructor.
      *
-	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(componentName, options)
+	constructor(options)
 	{
 
-		this._name = componentName;
-		this._component = options["component"];
 		this._options = options;
-
+		this._component = options["component"];
 		this._targets = {};
-
-		this.events = [
-			"beforeSetup",
-		]
+		this._events = {
+			"beforeSetup": {
+				"handler": this.onBeforeSetup
+			}
+		}
 
 	}
 
@@ -45,15 +43,15 @@ export default class ObserverPreferenceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Load preference event handler.
+	 * Before setup event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	beforeSetup(sender, e)
+	onBeforeSetup(sender, e)
 	{
 
-		this.setup2(e.detail);
+		this.setup(e.detail);
 
 	}
 
@@ -85,7 +83,7 @@ export default class ObserverPreferenceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	setup2(settings)
+	setup(settings)
 	{
 
 		return new Promise((resolve, reject) => {

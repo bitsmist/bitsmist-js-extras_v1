@@ -22,19 +22,18 @@ export default class AjaxErrorHandler
 	/**
      * Constructor.
      *
-	 * @param	{String}		componentName		Component name.
 	 * @param	{Object}		options				Options for the component.
      */
-	constructor(componentName, options)
+	constructor(options)
 	{
 
-		this._name = componentName;
 		this._component = options["component"];
 		this._options = ( options ? options : {} );
-
-		this.events = [
-			"error",
-		]
+		this._events = {
+			"error": {
+				"handler": this.onError
+			}
+		}
 
 //		this.target.push("AjaxError");
 
@@ -50,7 +49,7 @@ export default class AjaxErrorHandler
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	error(sender, e)
+	onError(sender, e)
 	{
 
 		return this.handle(e.detail.error);
