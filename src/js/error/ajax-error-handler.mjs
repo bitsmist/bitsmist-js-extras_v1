@@ -23,6 +23,8 @@ export default class AjaxErrorHandler
 	/**
      * Constructor.
      *
+	 * @param	{Object}		component			Component which the plugin
+	 * 												is attached to.
 	 * @param	{Object}		options				Options for the component.
      */
 	constructor(component, options)
@@ -91,7 +93,7 @@ export default class AjaxErrorHandler
 							Object.keys(routeInfo["queryParameters"]).forEach((key) => {
 								routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@url@", location.href);
 							});
-							this._options["component"].router.openRoute(routeInfo, {"jump":true});
+							this._component.router.openRoute(routeInfo, {"jump":true});
 							break;
 						// case "transfer":
 						// 	let urlToTransfer = this._options["handlers"]["statusCode"][code][command];

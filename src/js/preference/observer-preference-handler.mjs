@@ -23,6 +23,8 @@ export default class ObserverPreferenceHandler
 	/**
      * Constructor.
      *
+	 * @param	{Object}		component			Component which the plugin
+	 * 												is attached to.
 	 * @param	{Object}		options				Options for the component.
      */
 	constructor(component, options)
