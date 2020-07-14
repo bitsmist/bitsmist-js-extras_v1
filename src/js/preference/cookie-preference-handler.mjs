@@ -25,6 +25,8 @@ export default class CookiePreferenceHandler
 	/**
      * Constructor.
      *
+	 * @param	{Object}		component			Component which the plugin
+	 * 												is attached to.
 	 * @param	{Object}		options				Options for the component.
      */
 	constructor(component, options)
@@ -39,17 +41,20 @@ export default class CookiePreferenceHandler
 			"setup": this.onSetup,
 		}
 
-		this._cookie = new CookieUtil(this._options["features"]["cookie"]);
+		this._cookie = new CookieUtil(this._options["cookieOptions"]);
 
 	}
 
 }
 
 /*
-export default function CookiePreferenceHandler(options)
+export default function CookiePreferenceHandler(component, options)
 {
 
-	BITSMIST.v1.Plugin.call(this, options);
+//	BITSMIST.v1.Plugin.call(this, options);
+
+	this._component = component;
+	this._options = options;
 	this._events = {
 		"load": this.onLoad,
 		"setup": this.onSetup,
@@ -100,7 +105,6 @@ CookiePreferenceHandler.prototype.onSetup = function(sender, e)
 {
 
 	let options = Object.assign({},this._component.globalSettings["preferences"], e.detail.newPreferences);
-	//return this.saveCookie(e.detail.newPreferences);
 	return this.saveCookie(options);
 
 }
