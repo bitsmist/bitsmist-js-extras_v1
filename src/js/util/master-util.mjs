@@ -22,11 +22,11 @@ export default class MasterUtil extends ResourceUtil
 	// -------------------------------------------------------------------------
 
 	/**
-     * Constructor.
-     *
-     * @param	{String}		resourceName		Resource name.
-     * @param	{Object}		options				Options.
-     */
+	 * Constructor.
+	 *
+	 * @param	{String}		resourceName		Resource name.
+	 * @param	{Object}		options				Options.
+	 */
 	constructor(resourceName, options)
 	{
 
@@ -36,8 +36,24 @@ export default class MasterUtil extends ResourceUtil
 
 		if ("items" in options)
 		{
-			this._items = this.__reshapeItems(options["items"]);
-
+			let items;
+			if (typeof options["items"] === "object")
+			{
+				items = options["items"];
+			}
+			else
+			{
+				let c = window;
+				options["items"].split(".").forEach((value) => {
+					c = c[value];
+					if (!c)
+					{
+						throw new ReferenceError(`Master not found. Master=${options["items"]}`);
+					}
+				});
+				items = c;
+			}
+			this._items = this.__reshapeItems(items);
 		}
 
 	}
