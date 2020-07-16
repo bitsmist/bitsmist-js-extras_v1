@@ -26,13 +26,17 @@ export default function Pad()
 
 	let _this = Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
-	_this._masters = {};
 	_this._resource;
 
 	if (_this.getOption("resource"))
 	{
-		let defaults = _this.globalSettings["defaults"];
-		_this._resource = new ResourceUtil(_this.getOption("resource"), {"router":_this.router, "baseUrl":defaults["apiBaseUrl"], "version":defaults["apiVersion"] + "-" + defaults["appVersion"], "settings":_this.globalSettings["ajaxUtil"]});
+		let defaults = _this.app.settings["system"];
+		_this._resource = new ResourceUtil(_this.getOption("resource"), {
+			"router":_this.app.router,
+			"baseUrl":defaults["apiBaseUrl"],
+			"version":defaults["apiVersion"] + "-" + defaults["appVersion"],
+			"settings":_this.app.settings["ajaxUtil"]
+		});
 	}
 
 	return _this;

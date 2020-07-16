@@ -245,4 +245,5 @@ export default class ResourceUtil
 		return url
 
 	}
+
 }

@@ -89,7 +89,7 @@ CookiePreferenceHandler.prototype.onLoad = function(sender, e)
 {
 
 	let settings = this.loadCookie();
-	this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings);
+	this._component.app.settings["preferences"] = Object.assign(this._component.app.settings["preferences"], settings);
 
 }
 
@@ -104,7 +104,7 @@ CookiePreferenceHandler.prototype.onLoad = function(sender, e)
 CookiePreferenceHandler.prototype.onSetup = function(sender, e)
 {
 
-	let options = Object.assign({},this._component.globalSettings["preferences"], e.detail.newPreferences);
+	let options = Object.assign({},this._component.app.settings["preferences"], e.detail.newPreferences);
 	return this.saveCookie(options);
 
 }
