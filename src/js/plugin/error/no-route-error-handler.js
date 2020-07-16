@@ -9,10 +9,10 @@
 // =============================================================================
 
 // =============================================================================
-//	Base error handler class
+//	No route error handler class
 // =============================================================================
 
-export default class BaseErrorHandler
+export default class NoRouteErrorHandler
 {
 
 	// -------------------------------------------------------------------------
@@ -27,10 +27,7 @@ export default class BaseErrorHandler
 	constructor(options)
 	{
 
-		this.options = ( options ? options : {} );
-		this._app = options["app"];
-		this.events = options["events"];
-		this.target = [];
+		this.target.push("NoRouteError");
 
 	}
 
@@ -45,6 +42,23 @@ export default class BaseErrorHandler
      */
 	handle(e)
 	{
+
+		// Check to prevent loop
+		let parameters = this.container["loader"].loadParameters();
+		if (parameters["_redirected_by_norouteerrorhandler"])
+		{
+			throw new Error("Page not found");
+		}
+
+		// Load default page
+		let routeInfo = {
+			"resourceName":	this.options["route"]["resourceName"],
+			"commandName":	this.options["route"]["commandName"],
+			"parameters":	this.options["route"]["parameters"],
+		};
+		routeInfo["parameters"]["_redirected_by_norouteerrorhandler"] = true;
+		this.container["router"].openRoute(routeInfo, {});
+
 	}
 
 }

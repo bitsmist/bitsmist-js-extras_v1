@@ -1,23 +1,23 @@
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
-// Error Handler
+// Error handler
 
-import AjaxErrorHandler from './error/ajax-error-handler';
+import AjaxErrorHandler from './plugin/error/ajax-error-handler';
 window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
 
-import NoRouteErrorHandler from './error/no-route-error-handler';
+import NoRouteErrorHandler from './plugin/error/no-route-error-handler';
 window.BITSMIST.v1.NoRouteErrorHandler = NoRouteErrorHandler;
 
-// Preference
+// Preference handler
 
-import CookiePreferenceHandler from './preference/cookie-preference-handler';
+import CookiePreferenceHandler from './plugin/preference/cookie-preference-handler';
 window.BITSMIST.v1.CookiePreferenceHandler = CookiePreferenceHandler;
 
-import ObserverPreferenceHandler from './preference/observer-preference-handler';
+import ObserverPreferenceHandler from './plugin/preference/observer-preference-handler';
 window.BITSMIST.v1.ObserverPreferenceHandler = ObserverPreferenceHandler;
 
-// Resource
+// Resource handler
 
 import MasterHandler from './plugin/resource/master-handler';
 window.BITSMIST.v1.MasterHandler = MasterHandler;
