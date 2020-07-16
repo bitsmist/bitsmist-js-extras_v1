@@ -17,6 +17,17 @@ window.BITSMIST.v1.CookiePreferenceHandler = CookiePreferenceHandler;
 import ObserverPreferenceHandler from './preference/observer-preference-handler';
 window.BITSMIST.v1.ObserverPreferenceHandler = ObserverPreferenceHandler;
 
+// Resource
+
+import MasterHandler from './plugin/resource/master-handler';
+window.BITSMIST.v1.MasterHandler = MasterHandler;
+
+import ResourceHandler from './plugin/resource/resource-handler';
+window.BITSMIST.v1.ResourceHandler = ResourceHandler;
+
+import SettingHandler from './plugin/resource/setting-handler';
+window.BITSMIST.v1.SettingHandler = SettingHandler;
+
 // Ui
 
 import Pad from './ui/pad';
