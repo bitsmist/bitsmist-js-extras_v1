@@ -34,8 +34,8 @@ export default function List()
 	_this._rows;
 
 	// Init system event handlers
-	_this.addEventHandler(_this, "_append", _this.__initListOnAppend);
-	_this.addEventHandler(_this, "_fill", _this.__initListOnFill);
+	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
+	_this.addEventHandler(_this, "fill", _this.__initListOnFill);
 
 	return _this;
 
@@ -171,8 +171,6 @@ List.prototype.fill = function(options)
 			}
 			return chain;
 		}).then(() => {
-			return this.trigger("_fill", this);
-		}).then(() => {
 			return this.trigger("fill", this);
 		}).then(() => {
 			resolve();
@@ -194,7 +192,7 @@ List.prototype.fill = function(options)
 List.prototype.__initListOnAppend = function(sender, e)
 {
 
-	this.row = this._components[this.getOption("row")].object;
+	this.row = this._components[this.getOption("row")];
 	this.row._element = this._element.querySelector(this.row.getOption("listRootNode"));
 
 }
@@ -211,7 +209,7 @@ List.prototype.__initListOnFill = function(sender, e)
 {
 
 	// Set HTML elements' event handlers after filling completed
-	Object.keys(this.row._elements).forEach((elementName) => {
+	Object.keys(this.row._options["elements"]).forEach((elementName) => {
 		this.row._initHtmlEvents(elementName);
 	});
 
@@ -250,8 +248,7 @@ List.prototype.__appendRow = function(rootNode, masters)
 			return this.row.trigger("beforeFillRow", this, {"item":this.items[i], "no":i, "element":element});
 		}).then(() => {
 			// Fill fields
-			FormUtil.setFields(element, this.items[i], this.masters);
-			//FormUtil.setFields(element, this.items[i], masters);
+			FormUtil.setFields(element, this.items[i], this.app.masters);
 			return this.row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
 		}).then(() => {
 			resolve();

@@ -33,7 +33,7 @@ export default function Form()
 	_this.__cancelSubmit = false;
 
 	// Init system event handlers
-	_this.addEventHandler(_this, "_append", _this.__initFormOnAppend);
+	_this.addEventHandler(_this, "append", _this.__initFormOnAppend);
 
 	return _this;
 
@@ -136,7 +136,7 @@ Form.prototype.fill = function(options)
 		}).then(() => {
 			return this.trigger("beforeFill", sender);
 		}).then(() => {
-			FormUtil.setFields(this._element, this.item, this.masters); //@@@fix
+			FormUtil.setFields(this._element, this.item, this.app.masters);
 			return this.trigger("fill", sender);
 		}).then(() => {
 			resolve();
