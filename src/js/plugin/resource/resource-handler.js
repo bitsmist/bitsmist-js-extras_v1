@@ -37,9 +37,17 @@ export default class ResourceHandler
 		this._component = component;
 		this._options = options;
 		this._events = {
-			"specLoad": this.onSpecLoad,
+			"initComponent": this.oninitComponent,
+			"beforeFetch": this.onBeforeFetch,
 		}
 		this._resources = {};
+
+		this._resource = new ResourceUtil(this._component.getOption("resource"), Object.assign({
+			"router":	this._component.app.router,
+			"baseUrl":	this._component.app.settings["system"]["apiBaseUrl"],
+			"version":	this._component.app.settings["system"]["apiVersion"] + "-" + this._component.app.settings["system"]["appVersion"],
+			"settings":	this._component.app.settings["ajaxUtil"]
+		}));
 
 	}
 
@@ -53,7 +61,7 @@ export default class ResourceHandler
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onSpecLoad(sender, e)
+	onInitComponent(sender, e)
 	{
 
 		if (e.detail.spec && e.detail.spec.resources)
@@ -75,15 +83,21 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Fetch event handler.
+	 * Before fetch event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onFetch(sender, e)
+	onBeforeFetch(sender, e)
 	{
 
-		console.log("@@@onFetch");
+		return new Promise((resolve, reject) => {
+			this._resource.getList(e.detail.target).then((data) => {
+				this._component.data = data;
+				this._component.items = data["data"];
+				resolve();
+			});
+		});
 
 	}
 
