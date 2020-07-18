@@ -139,13 +139,7 @@ List.prototype.fill = function(options)
 			{
 				this._target = options["target"];
 			}
-			return this.trigger("beforeFetch", this);
-		}).then(() => {
-			// Auto load data
-			if (options["autoLoad"])
-			{
-				return this.__autoLoadData();
-			}
+			return this.trigger("beforeFetch", this, {"target":this._target});
 		}).then(() => {
 			return this.trigger("fetch", this);
 		}).then(() => {
@@ -251,26 +245,6 @@ List.prototype.__appendRow = function(rootNode, masters)
 			FormUtil.setFields(element, this.items[i], this.app.masters);
 			return this.row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
 		}).then(() => {
-			resolve();
-		});
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Load data via API when item is not specified in the options.
- *
- * @return  {Promise}		Promise.
- */
-List.prototype.__autoLoadData = function()
-{
-
-	return new Promise((resolve, reject) => {
-		this._resource.getList(this.target).then((data) => {
-			this.data = data;
-			this.items = data["data"];
 			resolve();
 		});
 	});

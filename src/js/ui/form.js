@@ -121,14 +121,10 @@ Form.prototype.fill = function(options)
 			this.clear();
 		}
 
-		this.trigger("target", sender).then(() => {
-			return this.trigger("beforeFetch", sender);
+		Promise.resolve().then(() => {
+			this.trigger("target", sender);
 		}).then(() => {
-			// Auto load data
-			if (options["autoLoad"])
-			{
-				return this.__autoLoadData();
-			}
+			return this.trigger("beforeFetch", sender);
 		}).then(() => {
 			return this.trigger("fetch", sender);
 		}).then(() => {
@@ -432,24 +428,5 @@ Form.prototype.__defaultClear = function(sender, e)
 	}
 
 	this.clear(target);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Load data via API.
- *
- * @return  {Promise}		Promise.
- */
-Form.prototype.__autoLoadData = function()
-{
-
-	return new Promise((resolve, reject) => {
-		this._resource.getItem(this._target).then((data) => {
-			this.item = data["data"][0];
-			resolve();
-		});
-	});
 
 }
