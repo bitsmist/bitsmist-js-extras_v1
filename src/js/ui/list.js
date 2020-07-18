@@ -229,9 +229,9 @@ List.prototype.__appendRow = function(rootNode, masters)
 		let i = this.rows.length - 1;
 
 		// Set click event handler
-		if (this.row._events["click"])
+		if (this.row._options["events"]["click"])
 		{
-			this.row.addEventHandler(element, "click", this.row._events["click"]["handler"], {"element":element});
+			this.row.addEventHandler(element, "click", this.row._options["events"]["click"]["handler"], {"element":element});
 		}
 
 		// Call event handlers
