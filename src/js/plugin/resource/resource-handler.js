@@ -38,7 +38,9 @@ export default class ResourceHandler
 		this._options = options;
 		this._events = {
 			"initComponent": this.onInitComponent,
-			"beforeFetch": this.onBeforeFetch,
+			"beforeFetchList": this.onBeforeFetchList,
+			"beforeFetchItem": this.onBeforeFetchItem,
+			"submit": this.onSubmit,
 		}
 		this._resources = {};
 
@@ -82,13 +84,7 @@ export default class ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Before fetch event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	onBeforeFetch(sender, e)
+	onBeforeFetchList(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
@@ -98,6 +94,36 @@ export default class ResourceHandler
 				resolve();
 			});
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	onBeforeFetchItem(sender, e)
+	{
+
+		return new Promise((resolve, reject) => {
+			this._resource.getItem(e.detail.target).then((data) => {
+				this._component.data = data;
+				this._component.item = data["data"][0];
+				resolve();
+			});
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	* Submit event handler.
+	*
+	* @param	{Object}		sender				Sender.
+	* @param	{Object}		e					Event info.
+	*/
+	onSubmit(sender, e)
+	{
+
+		this._resource.upsertItem(e.detail.target, {items:e.detail.items});
 
 	}
 

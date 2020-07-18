@@ -139,9 +139,9 @@ List.prototype.fill = function(options)
 			{
 				this._target = options["target"];
 			}
-			return this.trigger("beforeFetch", this, {"target":this._target});
+			return this.trigger("beforeFetchList", this, {"target":this._target});
 		}).then(() => {
-			return this.trigger("fetch", this);
+			return this.trigger("fetchList", this);
 		}).then(() => {
 			return this.trigger("beforeFill", this);
 		}).then(() => {

@@ -124,9 +124,9 @@ Form.prototype.fill = function(options)
 		Promise.resolve().then(() => {
 			this.trigger("target", sender);
 		}).then(() => {
-			return this.trigger("beforeFetch", sender);
+			return this.trigger("beforeFetchItem", sender, {"target":this._target});
 		}).then(() => {
-			return this.trigger("fetch", sender);
+			return this.trigger("fetchItem", sender);
 		}).then(() => {
 			return this.trigger("format", sender);
 		}).then(() => {
@@ -226,7 +226,7 @@ Form.prototype.submit = function(options)
 		}).then(() => {
 			if (!this.__cancelSubmit)
 			{
-				return this.trigger("submit", sender);
+				return this.trigger("submit", sender, {"target":this._target, "items":[this.item]});
 			}
 		}).then(() => {
 			resolve();
