@@ -37,7 +37,7 @@ export default class ResourceHandler
 		this._component = component;
 		this._options = options;
 		this._events = {
-			"initComponent": this.oninitComponent,
+			"initComponent": this.onInitComponent,
 			"beforeFetch": this.onBeforeFetch,
 		}
 		this._resources = {};
