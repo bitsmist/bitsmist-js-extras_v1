@@ -35,6 +35,8 @@ export default class DefaultkeyHandler
 			"append": this.onAppend,
 		}
 
+		this.__isComposing = false;
+
 	}
 
 	// -------------------------------------------------------------------------

@@ -29,7 +29,6 @@ export default function Form()
 
 	_this._target;
 	_this._item = {};
-	_this.__isComposing = false;
 	_this.__cancelSubmit = false;
 
 	return _this;
