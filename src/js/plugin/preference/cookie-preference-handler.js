@@ -59,7 +59,7 @@ export default class CookiePreferenceHandler
 	{
 
 		let settings = this.loadCookie();
-		this._component.app.settings["preferences"] = Object.assign(this._component.app.settings["preferences"], settings);
+		this._component.app.preferences = Object.assign(this._component.app.preferences, settings);
 
 	}
 
@@ -74,7 +74,7 @@ export default class CookiePreferenceHandler
 	onSetup(sender, e)
 	{
 
-		let options = Object.assign({},this._component.app.settings["preferences"], e.detail.newPreferences);
+		let options = Object.assign({},this._component.app.preferences, e.detail.newPreferences);
 		return this.saveCookie(options);
 
 	}
