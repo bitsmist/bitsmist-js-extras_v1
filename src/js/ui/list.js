@@ -35,7 +35,6 @@ export default function List()
 
 	// Init system event handlers
 	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
-	_this.addEventHandler(_this, "fill", _this.__initListOnFill);
 
 	return _this;
 
@@ -166,6 +165,8 @@ List.prototype.fill = function(options)
 			return chain;
 		}).then(() => {
 			return this.trigger("fill", this);
+		}).then(() => {
+			this.__initListOnFill();
 		}).then(() => {
 			resolve();
 		});
