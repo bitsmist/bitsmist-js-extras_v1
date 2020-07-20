@@ -39,6 +39,9 @@ window.BITSMIST.v1.Form = Form;
 import List from './ui/list';
 window.BITSMIST.v1.List = List;
 
+import DefaultkeyHandler from './plugin/ui/defaultkey-handler';
+window.BITSMIST.v1.DefaultkeyHandler = DefaultkeyHandler;
+
 // Util
 
 import AuthenticationUtil from './util/authentication-util';
