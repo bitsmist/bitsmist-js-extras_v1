@@ -56,7 +56,7 @@ export default class ObserverPreferenceHandler
 	onBeforeSetup(sender, e)
 	{
 
-		this.setup(e.detail);
+		return this.setup(e.detail);
 
 	}
 
@@ -102,7 +102,6 @@ export default class ObserverPreferenceHandler
 			});
 
 			Promise.all(promises).then(() => {
-//				this._component.globalSettings["preferences"] = Object.assign(this._component.globalSettings["preferences"], settings["newSettings"]);
 				resolve();
 			});
 		});
