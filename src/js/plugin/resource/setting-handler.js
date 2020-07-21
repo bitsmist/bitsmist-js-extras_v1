@@ -35,7 +35,7 @@ export default class SettingHandler
 		this._component = component;
 		this._options = options;
 		this._events = {
-			"appInit": this.onAppInit,
+			"initApp": this.onInitApp,
 		}
 		this._settings;
 
@@ -46,12 +46,12 @@ export default class SettingHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * App init event handler.
+	 * Init app event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onAppInit(sender, e)
+	onInitApp(sender, e)
 	{
 
 		this._settings = e.detail.settings;
