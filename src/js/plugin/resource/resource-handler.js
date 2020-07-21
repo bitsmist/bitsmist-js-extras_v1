@@ -46,9 +46,9 @@ export default class ResourceHandler
 
 		this._resource = new ResourceUtil(this._component.getOption("resource"), Object.assign({
 			"router":	this._component.app.router,
-			"baseUrl":	this._component.app.settings["system"]["apiBaseUrl"],
-			"version":	this._component.app.settings["system"]["apiVersion"] + "-" + this._component.app.settings["system"]["appVersion"],
-			"settings":	this._component.app.settings["ajaxUtil"]
+			"baseUrl":	this._component.app.settings.items["system"]["apiBaseUrl"],
+			"version":	this._component.app.settings.items["system"]["apiVersion"] + "-" + this._component.app.settings.items["system"]["appVersion"],
+			"settings":	this._component.app.settings.items["ajaxUtil"]
 		}));
 
 	}

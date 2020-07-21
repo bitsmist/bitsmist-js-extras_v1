@@ -64,9 +64,9 @@ export default class MasterHandler
 				Object.keys(e.detail.spec.masters).forEach((masterName) => {
 					this._masters[masterName] = new MasterUtil(masterName, Object.assign({
 						"router":	this._component.app.router,
-						"version":	this._component.app.settings["system"]["apiVersion"] + "-" + this._component.app.settings["system"]["appVersion"],
-						"baseUrl":	this._component.app.settings["system"]["apiBaseUrl"],
-						"settings":	this._component.app.settings["ajaxUtil"]
+						"version":	this._component.app.settings.items["system"]["apiVersion"] + "-" + this._component.app.settings.items["system"]["appVersion"],
+						"baseUrl":	this._component.app.settings.items["system"]["apiBaseUrl"],
+						"settings":	this._component.app.settings.items["ajaxUtil"]
 					}, e.detail.spec.masters[masterName]));
 
 					if (e.detail.spec.masters[masterName]["autoLoad"])
