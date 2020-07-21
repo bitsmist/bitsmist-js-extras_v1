@@ -37,8 +37,8 @@ export default class CookiePreferenceHandler
 		this._component = component;
 		this._options = options;
 		this._events = {
-			"load": this.onLoad,
-			"setup": this.onSetup,
+			"loadPreferences": this.onLoadPreferences,
+			"savePreferences": this.onSavePreferences,
 		}
 
 		this._cookie = new CookieUtil(this._options["cookieOptions"]);
@@ -50,65 +50,35 @@ export default class CookiePreferenceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	* Load event handler.
+	* Load preferences handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onLoad(sender, e)
+	onLoadPreferences(sender, e)
 	{
 
-		let settings = this.loadCookie();
-		this._component.app.preferences = Object.assign(this._component.app.preferences, settings);
+
+		return new Promise((resolve, reject) => {
+			let preferences = this._cookie.get("preferences");
+
+			resolve(preferences);
+		});
 
 	}
 
 	// -------------------------------------------------------------------------
 
 	/**
-	* Setup event handler.
+	* Save preferences event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onSetup(sender, e)
+	onSavePreferences(sender, e)
 	{
 
-		let options = Object.assign({},this._component.app.preferences, e.detail.newPreferences);
-		return this.saveCookie(options);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	* Load settings
-	*
-	* @param	{Object}		options				Options.
-	*
-	* @return  {Promise}		Promise.
-	*/
-	loadCookie(options)
-	{
-
-		return this._cookie.get("settings");
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	* Save settings
-	*
-	* @param	{Object}		settings			Settings.
-	* @param	{Object}		options				Options.
-	*/
-	saveCookie(settings, options)
-	{
-
-		this._cookie.set("settings", settings, options);
+		this._cookie.set("preferences", e.detail.preferences);
 
 	}
 
