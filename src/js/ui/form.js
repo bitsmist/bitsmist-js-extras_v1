@@ -35,7 +35,7 @@ export default function Form()
 
 }
 
-BITSMIST.v1.LoaderUtil.inherit(Form, Pad);
+BITSMIST.v1.ClassUtil.inherit(Form, Pad);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter

@@ -40,7 +40,7 @@ export default function List()
 
 }
 
-BITSMIST.v1.LoaderUtil.inherit(List, Pad);
+BITSMIST.v1.ClassUtil.inherit(List, Pad);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter

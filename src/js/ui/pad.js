@@ -30,4 +30,4 @@ export default function Pad()
 
 }
 
-BITSMIST.v1.LoaderUtil.inherit(Pad, BITSMIST.v1.Component);
+BITSMIST.v1.ClassUtil.inherit(Pad, BITSMIST.v1.Component);
