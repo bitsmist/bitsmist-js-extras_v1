@@ -14,8 +14,7 @@ import CookieUtil from '../../util/cookie-util';
 //	Cookie preference handler class
 // =============================================================================
 
-//export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
-export default class CookiePreferenceHandler
+export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -32,10 +31,8 @@ export default class CookiePreferenceHandler
 	constructor(component, options)
 	{
 
-//		super(component, options);
+		super(component, options);
 
-		this._component = component;
-		this._options = options;
 		this._events = {
 			"loadPreferences": this.onLoadPreferences,
 			"savePreferences": this.onSavePreferences,
@@ -57,7 +54,6 @@ export default class CookiePreferenceHandler
 	*/
 	onLoadPreferences(sender, e)
 	{
-
 
 		return new Promise((resolve, reject) => {
 			let preferences = this._cookie.get("preferences");

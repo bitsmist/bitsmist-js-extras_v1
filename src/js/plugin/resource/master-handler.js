@@ -14,8 +14,7 @@ import MasterUtil from '../../util/master-util';
 //	Cookie preference handler class
 // =============================================================================
 
-//export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
-export default class MasterHandler
+export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -32,10 +31,8 @@ export default class MasterHandler
 	constructor(component, options)
 	{
 
-//		super(component, options);
+		super(component, options);
 
-		this._component = component;
-		this._options = options;
 		this._events = {
 			"specLoad": this.onSpecLoad,
 		}

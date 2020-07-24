@@ -12,8 +12,7 @@
 //	Ajax error handler class
 // =============================================================================
 
-//export default class AjaxErrorHandler extends BITSMIST.v1.Plugin
-export default class AjaxErrorHandler
+export default class AjaxErrorHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -30,10 +29,8 @@ export default class AjaxErrorHandler
 	constructor(component, options)
 	{
 
-		//super(component, options);
+		super(component, options);
 
-		this._component = component;
-		this._options = options;
 		this._events = {
 			"error": {
 				"handler": this.onError

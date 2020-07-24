@@ -12,7 +12,7 @@
 //	Defaultkey Handler class
 // =============================================================================
 
-export default class DefaultkeyHandler
+export default class DefaultkeyHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -29,8 +29,8 @@ export default class DefaultkeyHandler
 	constructor(component, options)
 	{
 
-		this._component = component;
-		this._options = options;
+		super(component, options);
+
 		this._events = {
 			"append": this.onAppend,
 		}

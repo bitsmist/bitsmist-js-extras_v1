@@ -12,8 +12,7 @@
 //	Observer preference handler class
 // =============================================================================
 
-//export default class ObserverPreferenceHandler extends BITSMIST.v1.Plugin
-export default class ObserverPreferenceHandler
+export default class ObserverPreferenceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -30,10 +29,8 @@ export default class ObserverPreferenceHandler
 	constructor(component, options)
 	{
 
-//		super(component, options);
+		super(component, options);
 
-		this._component = component;
-		this._options = options;
 		this._targets = {};
 		this._events = {
 			"beforeSetup": {

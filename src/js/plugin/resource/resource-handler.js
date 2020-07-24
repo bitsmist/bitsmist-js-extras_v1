@@ -14,8 +14,7 @@ import ResourceUtil from '../../util/resource-util';
 //	Cookie preference handler class
 // =============================================================================
 
-//export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
-export default class ResourceHandler
+export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -32,10 +31,8 @@ export default class ResourceHandler
 	constructor(component, options)
 	{
 
-//		super(component, options);
+		super(component, options);
 
-		this._component = component;
-		this._options = options;
 		this._events = {
 			"initComponent": this.onInitComponent,
 			"beforeFetchList": this.onBeforeFetchList,
