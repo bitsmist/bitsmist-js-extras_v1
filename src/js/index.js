@@ -14,8 +14,8 @@ window.BITSMIST.v1.NoRouteErrorHandler = NoRouteErrorHandler;
 import CookiePreferenceHandler from './plugin/preference/cookie-preference-handler';
 window.BITSMIST.v1.CookiePreferenceHandler = CookiePreferenceHandler;
 
-import ObserverPreferenceHandler from './plugin/preference/observer-preference-handler';
-window.BITSMIST.v1.ObserverPreferenceHandler = ObserverPreferenceHandler;
+import PreferenceHandler from './plugin/preference/preference-handler';
+window.BITSMIST.v1.PreferenceHandler = PreferenceHandler;
 
 // Resource handler
 

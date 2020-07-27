@@ -9,10 +9,10 @@
 // =============================================================================
 
 // =============================================================================
-//	Observer preference handler class
+//	Preference handler class
 // =============================================================================
 
-export default class ObserverPreferenceHandler extends BITSMIST.v1.Plugin
+export default class PreferenceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
