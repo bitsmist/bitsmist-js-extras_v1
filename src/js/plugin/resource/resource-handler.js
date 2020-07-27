@@ -41,11 +41,11 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 		}
 		this._resources = {};
 
-		this._resource = new ResourceUtil(this._component.getOption("resource"), Object.assign({
+		this._resource = new ResourceUtil(this._component.settings.get("resource"), Object.assign({
 			"router":	this._component.app.router,
-			"baseUrl":	this._component.app.settings.items["system"]["apiBaseUrl"],
-			"version":	this._component.app.settings.items["system"]["apiVersion"] + "-" + this._component.app.settings.items["system"]["appVersion"],
-			"settings":	this._component.app.settings.items["ajaxUtil"]
+			"baseUrl":	this._component.app.settings.get("system.apiBaseUrl"),
+			"version":	this._component.app.settings.get("system.apiVersion") + "-" + this._component.app.settings.get("system.appVersion"),
+			"settings":	this._component.app.settings.get("ajaxUtil"),
 		}));
 
 	}

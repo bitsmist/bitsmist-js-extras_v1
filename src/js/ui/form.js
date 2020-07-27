@@ -108,7 +108,7 @@ Form.prototype.fill = function(options)
 {
 
 	return new Promise((resolve, reject) => {
-		options = Object.assign({}, this._options, options);
+		options = Object.assign({}, this.settings.items, options);
 		let sender = ( options["sender"] ? options["sender"] : this );
 
 		// Clear fields
@@ -174,7 +174,7 @@ Form.prototype.validate = function(options)
 			let ret = true;
 			let form = this._element.querySelector("form");
 
-			if (this.getOption("autoValidate"))
+			if (this.settings.get("autoValidate"))
 			{
 				if (form && form.reportValidity)
 				{

@@ -129,7 +129,7 @@ List.prototype.fill = function(options)
 
 	return new Promise((resolve, reject) => {
 		this.rows = [];
-		options = Object.assign({}, this._options, options);
+		options = Object.assign({}, this.settings.items, options);
 
 		Promise.resolve().then(() => {
 			return this.trigger("target", this);
@@ -187,8 +187,8 @@ List.prototype.fill = function(options)
 List.prototype.__initListOnAppend = function(sender, e)
 {
 
-	this.row = this._components[this.getOption("row")];
-	this.row._element = this._element.querySelector(this.row.getOption("listRootNode"));
+	this.row = this._components[this.settings.get("row")];
+	this.row._element = this._element.querySelector(this.row.settings.get("listRootNode"));
 
 }
 
@@ -204,7 +204,7 @@ List.prototype.__initListOnFill = function(sender, e)
 {
 
 	// Set HTML elements' event handlers after filling completed
-	Object.keys(this.row._options["elements"]).forEach((elementName) => {
+	Object.keys(this.row.settings.items["elements"]).forEach((elementName) => {
 		this.row._initHtmlEvents(elementName);
 	});
 
@@ -230,9 +230,9 @@ List.prototype.__appendRow = function(rootNode, masters)
 		let i = this.rows.length - 1;
 
 		// Set click event handler
-		if (this.row._options["events"]["click"])
+		if (this.row.settings.items["events"]["click"])
 		{
-			this.row.addEventHandler(element, "click", this.row._options["events"]["click"]["handler"], {"element":element});
+			this.row.addEventHandler(element, "click", this.row.settings.items["events"]["click"]["handler"], {"element":element});
 		}
 
 		// Call event handlers
