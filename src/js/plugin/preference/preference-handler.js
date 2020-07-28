@@ -65,14 +65,14 @@ export default class PreferenceHandler extends BITSMIST.v1.Plugin
 	 * Register target component.
 	 *
 	 * @param	{Component}		component			Component to notify.
-	 * @param	{Object}		options				Options.
+	 * @param	{Object}		targets				Targets.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	register(component, options)
+	register(component, targets)
 	{
 
-		this._targets[component.uniqueId] = {"object":component, "options":options};
+		this._targets[component.uniqueId] = {"object":component, "targets":targets};
 
 	}
 
@@ -92,7 +92,7 @@ export default class PreferenceHandler extends BITSMIST.v1.Plugin
 			let promises = [];
 
 			Object.keys(this._targets).forEach((componentId) => {
-				if (this.__isTarget(settings, this._targets[componentId].options["register"]))
+				if (this.__isTarget(settings, this._targets[componentId].targets))
 				{
 					promises.push(this._targets[componentId].object.setup(settings));
 				}
