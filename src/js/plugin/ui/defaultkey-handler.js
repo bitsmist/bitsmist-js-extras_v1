@@ -31,7 +31,7 @@ export default class DefaultkeyHandler extends BITSMIST.v1.Plugin
 
 		super(component, options);
 
-		this._events = {
+		this._options["events"] = {
 			"append": this.onAppend,
 		}
 

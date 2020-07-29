@@ -33,7 +33,7 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 
 		super(component, options);
 
-		this._events = {
+		this._options["events"] = {
 			"loadPreferences": this.onLoadPreferences,
 			"savePreferences": this.onSavePreferences,
 		}

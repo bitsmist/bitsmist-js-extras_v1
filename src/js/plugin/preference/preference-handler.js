@@ -32,7 +32,7 @@ export default class PreferenceHandler extends BITSMIST.v1.Plugin
 		super(component, options);
 
 		this._targets = {};
-		this._events = {
+		this._options["events"] = {
 			"beforeSetup": {
 				"handler": this.onBeforeSetup
 			}

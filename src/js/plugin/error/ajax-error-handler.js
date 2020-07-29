@@ -31,7 +31,7 @@ export default class AjaxErrorHandler extends BITSMIST.v1.Plugin
 
 		super(component, options);
 
-		this._events = {
+		this._options["events"] = {
 			"error": {
 				"handler": this.onError
 			}

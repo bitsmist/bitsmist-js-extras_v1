@@ -31,7 +31,7 @@ export default class SettingHandler extends BITSMIST.v1.Plugin
 
 		super(component, options);
 
-		this._events = {
+		this._options["events"] = {
 			"initApp": this.onInitApp,
 		}
 		this._settings;
