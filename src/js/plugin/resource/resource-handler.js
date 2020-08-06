@@ -100,11 +100,18 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			this._resource.getItem(e.detail.target).then((data) => {
-				this._component.data = data;
-				this._component.item = data["data"][0];
+			if (e.detail.target != "new")
+			{
+				this._resource.getItem(e.detail.target).then((data) => {
+					this._component.data = data;
+					this._component.item = data["data"][0];
+					resolve();
+				});
+			}
+			else
+			{
 				resolve();
-			});
+			}
 		});
 
 	}
