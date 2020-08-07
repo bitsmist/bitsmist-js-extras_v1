@@ -11,10 +11,10 @@
 import ResourceUtil from '../../util/resource-util';
 
 // =============================================================================
-//	Cookie preference handler class
+//	Resource handler class
 // =============================================================================
 
-export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
+export default class ResourceHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
