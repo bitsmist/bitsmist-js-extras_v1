@@ -34,19 +34,64 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"initComponent": this.onInitComponent,
 			"beforeFetchList": this.onBeforeFetchList,
 			"beforeFetchItem": this.onBeforeFetchItem,
 			"submit": this.onSubmit,
 		}
 		this._resources = {};
 
-		this._resource = new ResourceUtil(this._component.settings.get("resource"), Object.assign({
-			"router":	this._component.app.router,
-			"baseUrl":	this._component.app.settings.get("system.apiBaseUrl"),
-			"version":	this._component.app.settings.get("system.apiVersion") + "-" + this._component.app.settings.get("system.appVersion"),
-			"settings":	this._component.app.settings.get("ajaxUtil"),
+		let resources = this.getOption("resources", []);
+		Object.keys(resources).forEach((index) => {
+			let resourceName = resources[index];
+			this.addResource(resourceName, {
+				"baseUrl":	this._component.app.settings.get("system.apiBaseUrl") +
+							"/v" +
+							this._component.app.settings.get("system.apiVersion") +
+							"-" +
+							this._component.app.settings.get("system.appVersion"),
+				"settings":	this._component.app.settings.get("ajaxUtil")
+			});
+		});
+
+		this.switchResource(resources[0]);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	/**
+     * Add a resource.
+     *
+     * @param	{string}		resourceName		Resource name.
+     * @param	{array}			options				Options.
+     */
+	addResource(resourceName, options)
+	{
+
+		// Create a resource object
+		this._resources[resourceName] = new ResourceUtil(resourceName, Object.assign({
+			"baseUrl":	options["baseUrl"],
+			"settings":	options["settings"],
 		}));
+
+		// Expose
+		this[resourceName] = this._resources[resourceName];
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+     * Switch to a resource.
+     *
+     * @param	{string}		resourceName		Resource name.
+     */
+	switchResource(resourceName)
+	{
+
+		this._defaultResourceName = resourceName;
 
 	}
 
@@ -55,37 +100,16 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Spec Load event handler.
+	 * Before fetch list event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onInitComponent(sender, e)
-	{
-
-		if (e.detail.spec && e.detail.spec.resources)
-		{
-			Object.keys(e.detail.spec.resources).forEach((resourceName) => {
-				this._resources[resourceName] = new ResourceUtil(resourceName, Object.assign({
-					"router":	this._component.app.router,
-					"baseUrl":	this._component.app.settings["system"]["apiBaseUrl"],
-					"version":	this._component.app.settings["system"]["apiVersion"] + "-" + this._component.app.settings["system"]["appVersion"],
-					"settings":	this._component.app.settings["ajaxUtil"]
-				}, e.detail.spec.resources[resourceName]));
-
-				this[resourceName] = this._resources[resourceName];
-			});
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	onBeforeFetchList(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
-			this._resource.getList(e.detail.target).then((data) => {
+			this._resources[this._defaultResourceName].getList(e.detail.target).then((data) => {
 				this._component.data = data;
 				this._component.items = data["data"];
 				resolve();
@@ -96,13 +120,19 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Before fetch item event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	onBeforeFetchItem(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
 			if (e.detail.target != "new")
 			{
-				this._resource.getItem(e.detail.target).then((data) => {
+				this._resources[this._defaultResourceName].getItem(e.detail.target).then((data) => {
 					this._component.data = data;
 					this._component.item = data["data"][0];
 					resolve();
@@ -127,7 +157,7 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	onSubmit(sender, e)
 	{
 
-		this._resource.upsertItem(e.detail.target, {items:e.detail.items});
+		this._resources[this._defaultResourceName].upsertItem(e.detail.target, {items:e.detail.items});
 
 	}
 
