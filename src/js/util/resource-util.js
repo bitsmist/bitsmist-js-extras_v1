@@ -30,7 +30,6 @@ export default class ResourceUtil
 
 		this._name = resourceName;
 		this._options = options;
-		this._router = options["router"];
 		this._settings = options["settings"];
 		this._data;
 		this._parameters = {};
@@ -240,9 +239,43 @@ export default class ResourceUtil
 	__buildApiUrl(resourceName, id, parameters)
 	{
 
-		let url = this._options["baseUrl"] + "/v" + this._options["version"] + "/" +  resourceName + "/" + id + ".json" + this._router.buildUrlQuery(parameters);
+		let url = this._options["baseUrl"] + "/" +  resourceName + "/" + id + ".json" + this.__buildUrlQuery(parameters);
 
 		return url
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Build query string from parameters object.
+	 *
+	 * @param	{Object}		paratemers			Query parameters.
+	 *
+	 * @return  {String}		Query string.
+	 */
+	__buildUrlQuery(parameters)
+	{
+
+		let query = "";
+
+		if (parameters)
+		{
+			query = Object.keys(parameters).reduce((result, current) => {
+				if (Array.isArray(parameters[current]))
+				{
+					result += encodeURIComponent(current) + "=" + encodeURIComponent(parameters[current].join()) + "&";
+				}
+				else if (parameters[current])
+				{
+					result += encodeURIComponent(current) + "=" + encodeURIComponent(parameters[current]) + "&";
+				}
+
+				return result;
+			}, "");
+		}
+
+		return ( query ? "?" + query.slice(0, -1) : "");
 
 	}
 
