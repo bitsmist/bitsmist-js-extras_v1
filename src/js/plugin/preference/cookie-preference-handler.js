@@ -39,6 +39,7 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 		}
 
 		this._cookie = new CookieUtil(this._options["cookieOptions"]);
+		this._cookieName = this.getOption("cookieOptions.name", "preferences");
 
 	}
 
@@ -56,7 +57,7 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			let preferences = this._cookie.get("preferences");
+			let preferences = this._cookie.get(this._cookieName);
 
 			resolve(preferences);
 		});
@@ -74,7 +75,7 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 	onSavePreferences(sender, e)
 	{
 
-		this._cookie.set("preferences", e.detail.preferences);
+		this._cookie.set(this._cookieName, e.detail.preferences);
 
 	}
 
