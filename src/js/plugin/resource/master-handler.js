@@ -60,9 +60,7 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 			{
 				Object.keys(e.detail.spec.masters).forEach((masterName) => {
 					this._masters[masterName] = new MasterUtil(masterName, Object.assign({
-						"router":	this._component.app.router,
-						"version":	this._component.app.settings.items["system"]["apiVersion"] + "-" + this._component.app.settings.items["system"]["appVersion"],
-						"baseUrl":	this._component.app.settings.items["system"]["apiBaseUrl"],
+						"baseUrl":	this._component.app.settings.items["system"]["apiBaseUrl"] + "/v" + this._component.app.settings.items["system"]["apiVersion"] + "-" + this._component.app.settings.items["system"]["appVersion"],
 						"settings":	this._component.app.settings.items["ajaxUtil"]
 					}, e.detail.spec.masters[masterName]));
 
