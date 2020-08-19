@@ -44,12 +44,8 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 		Object.keys(resources).forEach((index) => {
 			let resourceName = resources[index];
 			this.addResource(resourceName, {
-				"baseUrl":	this._component.app.settings.get("system.apiBaseUrl") +
-							"/v" +
-							this._component.app.settings.get("system.apiVersion") +
-							"-" +
-							this._component.app.settings.get("system.appVersion"),
-				"settings":	this._component.app.settings.get("ajaxUtil")
+				"baseUrl":	this.getOption("baseUrl"),
+				"settings":	this.getOption("settings", {})
 			});
 		});
 
