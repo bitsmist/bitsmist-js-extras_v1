@@ -30,7 +30,6 @@ export default class ResourceUtil
 
 		this._name = resourceName;
 		this._options = options;
-		this._settings = options["settings"];
 		this._data;
 		this._parameters = {};
 
@@ -50,11 +49,11 @@ export default class ResourceUtil
 	getList(parameters)
 	{
 
-		let url = this.__buildApiUrl(this._name, "list", parameters);
+		let url = this._buildApiUrl(this._name, "list", parameters);
 
 		return new Promise((resolve, reject) => {
-			let headers = this.__getOptions("extraHeaders", "GET");
-			let options = this.__getOptions("options", "GET");
+			let headers = this._getOption("extraHeaders", "GET");
+			let options = this._getOption("options", "GET");
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"GET", data:null, headers:headers, options:options}).then((xhr) => {
 				this._parameters = (parameters ? parameters : {});
@@ -78,11 +77,11 @@ export default class ResourceUtil
 	getItem(id, parameters)
 	{
 
-		let url = this.__buildApiUrl(this._name, id, parameters);
+		let url = this._buildApiUrl(this._name, id, parameters);
 
 		return new Promise((resolve, reject) => {
-			let headers = this.__getOptions("extraHeaders", "GET");
-			let options = this.__getOptions("options", "GET");
+			let headers = this._getOption("extraHeaders", "GET");
+			let options = this._getOption("options", "GET");
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"GET", headers:headers, options:options}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
@@ -104,11 +103,11 @@ export default class ResourceUtil
 	deleteItem(id, parameters)
 	{
 
-		let url = this.__buildApiUrl(this._name, id, parameters);
+		let url = this._buildApiUrl(this._name, id, parameters);
 
 		return new Promise((resolve, reject) => {
-			let headers = this.__getOptions("extraHeaders", "DELETE");
-			let options = this.__getOptions("options", "DELETE");
+			let headers = this._getOption("extraHeaders", "DELETE");
+			let options = this._getOption("options", "DELETE");
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"DELETE", headers:headers, options:options}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
@@ -131,11 +130,11 @@ export default class ResourceUtil
 	insertItem(id, items, parameters)
 	{
 
-		let url = this.__buildApiUrl(this._name, id, parameters);
+		let url = this._buildApiUrl(this._name, id, parameters);
 
 		return new Promise((resolve, reject) => {
-			let headers = this.__getOptions("extraHeaders", "POST");
-			let options = this.__getOptions("options", "POST");
+			let headers = this._getOption("extraHeaders", "POST");
+			let options = this._getOption("options", "POST");
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"POST", headers:headers, options:options, data:JSON.stringify(items)}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
@@ -158,11 +157,11 @@ export default class ResourceUtil
 	updateItem(id, items, parameters)
 	{
 
-		let url = this.__buildApiUrl(this._name, id, parameters);
+		let url = this._buildApiUrl(this._name, id, parameters);
 
 		return new Promise((resolve, reject) => {
-			let headers = this.__getOptions("extraHeaders", "PUT");
-			let options = this.__getOptions("options", "PUT");
+			let headers = this._getOption("extraHeaders", "PUT");
+			let options = this._getOption("options", "PUT");
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"PUT", headers:headers, options:options, data:JSON.stringify(items)}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
@@ -201,22 +200,23 @@ export default class ResourceUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get options for the method.
+	 * Get option for the method.
 	 *
 	 * @param	{string}		target				"ajaxHeaders" or "ajaxOptions"..
 	 * @param	{string}		method				Method.
 	 *
 	 * @return  {object}		Options.
 	 */
-	__getOptions(target, method)
+	_getOption(target, method)
 	{
 
 		let result;
+		let settings = ("settings" in this._options ? this._options["settings"] : {});
 
-		if (this._settings[target])
+		if (settings[target])
 		{
-			let options1 = ("COMMON" in this._settings[target] ? this._settings[target]["COMMON"] : {} );
-			let options2 = (method in this._settings[target] ? this._settings[target][method] : {} );
+			let options1 = ("COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
+			let options2 = (method in settings[target] ? settings[target][method] : {} );
 
 			result = Object.assign(options1, options2);
 		}
@@ -236,10 +236,10 @@ export default class ResourceUtil
 	 *
 	 * @return  {String}		Url.
 	 */
-	__buildApiUrl(resourceName, id, parameters)
+	_buildApiUrl(resourceName, id, parameters)
 	{
 
-		let url = this._options["baseUrl"] + "/" +  resourceName + "/" + id + ".json" + this.__buildUrlQuery(parameters);
+		let url = this._options["baseUrl"] + "/" +  resourceName + "/" + id + ".json" + this._buildUrlQuery(parameters);
 
 		return url
 
@@ -254,7 +254,7 @@ export default class ResourceUtil
 	 *
 	 * @return  {String}		Query string.
 	 */
-	__buildUrlQuery(parameters)
+	_buildUrlQuery(parameters)
 	{
 
 		let query = "";
