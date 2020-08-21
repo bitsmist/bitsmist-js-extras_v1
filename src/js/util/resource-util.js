@@ -22,8 +22,8 @@ export default class ResourceUtil
 	/**
      * Constructor.
      *
-     * @param	{string}		resourceName		Resource name.
-     * @param	{array}			options				Options.
+     * @param	{String}		resourceName		Resource name.
+     * @param	{Object}		options				Options.
      */
 	constructor(resourceName, options)
 	{
@@ -40,50 +40,23 @@ export default class ResourceUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get list data.
+	 * Get data.
 	 *
+	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	getList(parameters)
+	get(id, parameters)
 	{
 
-		let url = this._buildApiUrl(this._name, "list", parameters);
-
 		return new Promise((resolve, reject) => {
-			let headers = this._getOption("extraHeaders", "GET");
-			let options = this._getOption("options", "GET");
+			let method = "GET";
+			let url = this._buildApiUrl(this._name, id, parameters, method);
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"GET", data:null, headers:headers, options:options}).then((xhr) => {
-				this._parameters = (parameters ? parameters : {});
-				this._data = JSON.parse(xhr.responseText);
-				resolve(this._data);
-			});
-		});
-
-	}
-
-    // -------------------------------------------------------------------------
-
-	/**
-	 * Get single data.
-	 *
-	 * @param	{string}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	getItem(id, parameters)
-	{
-
-		let url = this._buildApiUrl(this._name, id, parameters);
-
-		return new Promise((resolve, reject) => {
-			let headers = this._getOption("extraHeaders", "GET");
-			let options = this._getOption("options", "GET");
-
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"GET", headers:headers, options:options}).then((xhr) => {
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
 			});
 		});
@@ -93,23 +66,23 @@ export default class ResourceUtil
     // -------------------------------------------------------------------------
 
 	/**
-	 * Delete single data.
+	 * Delete data.
 	 *
-	 * @param	{string}		id					Target id.
+	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	deleteItem(id, parameters)
+	delete(id, parameters)
 	{
 
-		let url = this._buildApiUrl(this._name, id, parameters);
-
 		return new Promise((resolve, reject) => {
-			let headers = this._getOption("extraHeaders", "DELETE");
-			let options = this._getOption("options", "DELETE");
+			let method = "DELETE";
+			let url = this._buildApiUrl(this._name, id, parameters, method);
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"DELETE", headers:headers, options:options}).then((xhr) => {
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
 			});
 		});
@@ -119,24 +92,24 @@ export default class ResourceUtil
     // -------------------------------------------------------------------------
 
 	/**
-	 * Insert a single data.
+	 * Insert data.
 	 *
-	 * @param	{string}		id					Target id.
-	 * @param	{array}			items				Data to insert.
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		items				Data to insert.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	insertItem(id, items, parameters)
+	insert(id, items, parameters)
 	{
 
-		let url = this._buildApiUrl(this._name, id, parameters);
-
 		return new Promise((resolve, reject) => {
-			let headers = this._getOption("extraHeaders", "POST");
-			let options = this._getOption("options", "POST");
+			let method = "POST";
+			let url = this._buildApiUrl(this._name, id, parameters, method);
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"POST", headers:headers, options:options, data:JSON.stringify(items)}).then((xhr) => {
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertData(items, method)}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
 			});
 		});
@@ -146,52 +119,27 @@ export default class ResourceUtil
     // -------------------------------------------------------------------------
 
 	/**
-	 * Update a single data.
+	 * Update data.
 	 *
-	 * @param	{string}		id					Target id.
-	 * @param	{array}			items				Data to update.
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		items				Data to update.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	updateItem(id, items, parameters)
+	update(id, items, parameters)
 	{
 
-		let url = this._buildApiUrl(this._name, id, parameters);
-
 		return new Promise((resolve, reject) => {
-			let headers = this._getOption("extraHeaders", "PUT");
-			let options = this._getOption("options", "PUT");
+			let method = "PUT";
+			let url = this._buildApiUrl(this._name, id, parameters, method);
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:"PUT", headers:headers, options:options, data:JSON.stringify(items)}).then((xhr) => {
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertData(items, method)}).then((xhr) => {
 				resolve(JSON.parse(xhr.responseText));
 			});
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Upsert a single data.
-	 *
-	 * @param	{string}		id					Target id.
-	 * @param	{array}			items				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	upsertItem(id, items, parameters)
-	{
-
-		if (id == "new")
-		{
-			return this.insertItem(id, items, parameters);
-		}
-		else
-		{
-			return this.updateItem(id, items, parameters);
-		}
 
 	}
 
@@ -199,29 +147,39 @@ export default class ResourceUtil
 	//  Privates
 	// -------------------------------------------------------------------------
 
+	_convertData(items, method)
+	{
+
+		let options = this._getOption("url", method);
+		let dataType = options["dataType"];
+		let data;
+
+		//if (dataType == "")
+		//else
+		{
+			data = JSON.stringify(items);
+		}
+
+		return data;
+
+	}
+
 	/**
 	 * Get option for the method.
 	 *
-	 * @param	{string}		target				"ajaxHeaders" or "ajaxOptions"..
-	 * @param	{string}		method				Method.
+	 * @param	{String}		target				"ajaxHeaders" or "ajaxOptions"..
+	 * @param	{String}		method				Method.
 	 *
-	 * @return  {object}		Options.
+	 * @return  {Object}		Options.
 	 */
 	_getOption(target, method)
 	{
 
-		let result;
 		let settings = ("settings" in this._options ? this._options["settings"] : {});
+		let options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
+		let options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
 
-		if (settings[target])
-		{
-			let options1 = ("COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
-			let options2 = (method in settings[target] ? settings[target][method] : {} );
-
-			result = Object.assign(options1, options2);
-		}
-
-		return result;
+		return Object.assign(options1, options2);
 
 	}
 
@@ -236,10 +194,26 @@ export default class ResourceUtil
 	 *
 	 * @return  {String}		Url.
 	 */
-	_buildApiUrl(resourceName, id, parameters)
+	_buildApiUrl(resourceName, id, parameters, method)
 	{
 
-		let url = this._options["baseUrl"] + "/" +  resourceName + "/" + id + ".json" + this._buildUrlQuery(parameters);
+		let options = this._getOption("url", method);
+
+		let baseUrl = options["baseUrl"];
+		let scheme = options["scheme"];
+		let host = options["host"];
+		let dataType = options["dataType"];
+		let version = options["version"];
+		let format = ( options["format"] ? options["format"] : "@baseUrl@@query@" );;
+		let url = format.
+					replace("@scheme@", scheme).
+					replace("@host@", host).
+					replace("@baseUrl@", baseUrl).
+					replace("@resource@", resourceName).
+					replace("@id@", id).
+					replace("@dataType@", dataType).
+					replace("@query@", this._buildUrlQuery(parameters)).
+					replace("@version@", version);
 
 		return url
 

@@ -105,7 +105,7 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			this._resources[this._defaultResourceName].getList(e.detail.target).then((data) => {
+			this._resources[this._defaultResourceName].get("list", e.detail.target).then((data) => {
 				this._component.data = data;
 				this._component.items = data["data"];
 				resolve();
@@ -128,7 +128,7 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 		return new Promise((resolve, reject) => {
 			if (e.detail.target != "new")
 			{
-				this._resources[this._defaultResourceName].getItem(e.detail.target).then((data) => {
+				this._resources[this._defaultResourceName].get(e.detail.target).then((data) => {
 					this._component.data = data;
 					this._component.item = data["data"][0];
 					resolve();
@@ -153,7 +153,14 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	onSubmit(sender, e)
 	{
 
-		this._resources[this._defaultResourceName].upsertItem(e.detail.target, {items:e.detail.items});
+		if (e.detail.target == "new")
+		{
+			return this._resources[this._defaultResourceName].insert(e.detail.target, {items:e.detail.items});
+		}
+		else
+		{
+			return this._resources[this._defaultResourceName].update(e.detail.target, {items:e.detail.items});
+		}
 
 	}
 

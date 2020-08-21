@@ -49,7 +49,7 @@ export default class AuthenticationUtil extends ResourceUtil
 	{
 
 		return new Promise((resolve, reject) => {
-			this.getList({"user":user, "password":password}).then((json) => {
+			this.get("list", {"user":user, "password":password}).then((json) => {
 				if (json.result.resultCount > 0)
 				{
 					if (options && "redirect" in options)
