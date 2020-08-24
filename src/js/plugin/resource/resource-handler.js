@@ -34,8 +34,7 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"beforeFetchList": this.onBeforeFetchList,
-			"beforeFetchItem": this.onBeforeFetchItem,
+			"beforeFetch": this.onBeforeFetch,
 			"submit": this.onSubmit,
 		}
 		this._resources = {};
@@ -44,7 +43,6 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 		Object.keys(resources).forEach((index) => {
 			let resourceName = resources[index];
 			this.addResource(resourceName, {
-				"baseUrl":	this.getOption("baseUrl"),
 				"settings":	this.getOption("settings", {})
 			});
 		});
@@ -68,7 +66,6 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 
 		// Create a resource object
 		this._resources[resourceName] = new ResourceUtil(resourceName, Object.assign({
-			"baseUrl":	options["baseUrl"],
 			"settings":	options["settings"],
 		}));
 
@@ -96,40 +93,20 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Before fetch list event handler.
+	 * Before fetch event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onBeforeFetchList(sender, e)
+	onBeforeFetch(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
-			this._resources[this._defaultResourceName].get("list", e.detail.target).then((data) => {
-				this._component.data = data;
-				this._component.items = data["data"];
-				resolve();
-			});
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Before fetch item event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	onBeforeFetchItem(sender, e)
-	{
-
-		return new Promise((resolve, reject) => {
-			if (e.detail.target != "new")
+			if (e.detail.id != "new")
 			{
-				this._resources[this._defaultResourceName].get(e.detail.target).then((data) => {
+				this._resources[this._defaultResourceName].get(e.detail.id, e.detail.parameters).then((data) => {
 					this._component.data = data;
+					this._component.items = data["data"];
 					this._component.item = data["data"][0];
 					resolve();
 				});
@@ -153,13 +130,13 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	onSubmit(sender, e)
 	{
 
-		if (e.detail.target == "new")
+		if (e.detail.id == "new")
 		{
-			return this._resources[this._defaultResourceName].insert(e.detail.target, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].insert(e.detail.id, {items:e.detail.items});
 		}
 		else
 		{
-			return this._resources[this._defaultResourceName].update(e.detail.target, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].update(e.detail.id, {items:e.detail.items});
 		}
 
 	}
