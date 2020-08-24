@@ -52,12 +52,15 @@ export default class ResourceUtil
 
 		return new Promise((resolve, reject) => {
 			let method = "GET";
-			let url = this._buildApiUrl(this._name, id, parameters, method);
 			let headers = this._getOption("headers", method);
 			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
+
+			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-				resolve(JSON.parse(xhr.responseText));
+				resolve((this._convertResponseData(xhr.responseText, dataType)));
 			});
 		});
 
@@ -78,12 +81,15 @@ export default class ResourceUtil
 
 		return new Promise((resolve, reject) => {
 			let method = "DELETE";
-			let url = this._buildApiUrl(this._name, id, parameters, method);
 			let headers = this._getOption("headers", method);
 			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
+
+			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-				resolve(JSON.parse(xhr.responseText));
+				resolve((this._convertResponseData(xhr.responseText, dataType)));
 			});
 		});
 
@@ -105,12 +111,15 @@ export default class ResourceUtil
 
 		return new Promise((resolve, reject) => {
 			let method = "POST";
-			let url = this._buildApiUrl(this._name, id, parameters, method);
 			let headers = this._getOption("headers", method);
 			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertData(items, method)}).then((xhr) => {
-				resolve(JSON.parse(xhr.responseText));
+			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
+				resolve((this._convertResponseData(xhr.responseText, dataType)));
 			});
 		});
 
@@ -132,12 +141,15 @@ export default class ResourceUtil
 
 		return new Promise((resolve, reject) => {
 			let method = "PUT";
-			let url = this._buildApiUrl(this._name, id, parameters, method);
 			let headers = this._getOption("headers", method);
 			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertData(items, method)}).then((xhr) => {
-				resolve(JSON.parse(xhr.responseText));
+			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+
+			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
+				resolve((this._convertResponseData(xhr.responseText, dataType)));
 			});
 		});
 
@@ -147,22 +159,64 @@ export default class ResourceUtil
 	//  Privates
 	// -------------------------------------------------------------------------
 
-	_convertData(items, method)
+	/**
+	 * Convert request data to specified format.
+	 *
+	 * @param	{Object}		items				Data to convert.
+	 * @param	{String}		dataType			Target data type.
+	 *
+	 * @return  {String}		Converted data.
+	 */
+	_convertRequestData(items, dataType)
 	{
 
-		let options = this._getOption("url", method);
-		let dataType = options["dataType"];
 		let data;
 
-		//if (dataType == "")
-		//else
+		switch (dataType)
 		{
+		case "json":
+		default:
 			data = JSON.stringify(items);
+			break;
+				/*
+		default:
+			data = items.serialize();
+			break;
+			*/
 		}
 
 		return data;
 
 	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Convert response data to object.
+	 *
+	 * @param	{Object}		items				Data to convert.
+	 * @param	{String}		dataType			Source data type.
+	 *
+	 * @return  {String}		Converted data.
+	 */
+	_convertResponseData(items, dataType)
+	{
+
+		let data;
+
+		switch (dataType)
+		{
+		case "json":
+		default:
+			data = JSON.parse(items);
+			break;
+		}
+
+		return data;
+
+	}
+
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Get option for the method.
@@ -190,14 +244,12 @@ export default class ResourceUtil
 	 *
 	 * @param	{String}		resource			API resource.
 	 * @param	{String}		id					Id for the resource.
-	 * @param	{Object}		parameters			Query parameters.
+	 * @param	{Object}		options				Url options.
 	 *
 	 * @return  {String}		Url.
 	 */
-	_buildApiUrl(resourceName, id, parameters, method)
+	_buildApiUrl(resourceName, id, parameters, options)
 	{
-
-		let options = this._getOption("url", method);
 
 		let baseUrl = options["baseUrl"];
 		let scheme = options["scheme"];
