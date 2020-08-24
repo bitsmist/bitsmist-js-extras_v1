@@ -27,7 +27,8 @@ export default function List()
 
 	let _this = Reflect.construct(Pad, [], this.constructor);
 
-	_this._target;
+	_this._id;
+	_this._parameters;
 	_this._items;
 	_this._data;
 	_this._row;
@@ -81,24 +82,6 @@ Object.defineProperty(List.prototype, 'data', {
 })
 
 // -----------------------------------------------------------------------------
-
-/**
- * Target.
- *
- * @type	{Object}
- */
-Object.defineProperty(List.prototype, 'target', {
-	get()
-	{
-		return this._target;
-	},
-	set(value)
-	{
-		this._target = value;
-	}
-})
-
-// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
@@ -134,13 +117,11 @@ List.prototype.fill = function(options)
 		Promise.resolve().then(() => {
 			return this.trigger("target", this);
 		}).then(() => {
-			if (options["target"])
-			{
-				this._target = options["target"];
-			}
-			return this.trigger("beforeFetchList", this, {"target":this._target});
+			this._id = ( options["id"] ? options["id"] : this._id );
+			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
+			return this.trigger("beforeFetch", this, {"id":this._id, "parameters":this._parameters});
 		}).then(() => {
-			return this.trigger("fetchList", this);
+			return this.trigger("fetch", this);
 		}).then(() => {
 			return this.trigger("beforeFill", this);
 		}).then(() => {

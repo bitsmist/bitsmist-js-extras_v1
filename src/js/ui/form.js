@@ -27,7 +27,8 @@ export default function Form()
 
 	let _this = Reflect.construct(Pad, [], this.constructor);
 
-	_this._target;
+	_this._id;
+	_this._parameters;
 	_this._item = {};
 	_this.__cancelSubmit = false;
 
@@ -54,24 +55,6 @@ Object.defineProperty(Form.prototype, 'item', {
 	set(value)
 	{
 		this._item = value;
-	}
-})
-
-// -----------------------------------------------------------------------------
-
-/**
- * Target.
- *
- * @type	{Object}
- */
-Object.defineProperty(Form.prototype, 'target', {
-	get()
-	{
-		return this._target;
-	},
-	set(value)
-	{
-		this._target = value;
 	}
 })
 
@@ -118,11 +101,13 @@ Form.prototype.fill = function(options)
 		}
 
 		Promise.resolve().then(() => {
-			this.trigger("target", sender);
+			return this.trigger("target", sender);
 		}).then(() => {
-			return this.trigger("beforeFetchItem", sender, {"target":this._target});
+			this._id = ( options["id"] ? options["id"] : this._id );
+			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
+			return this.trigger("beforeFetch", sender, {"id":this._id, "parameters":this._parameters});
 		}).then(() => {
-			return this.trigger("fetchItem", sender);
+			return this.trigger("fetch", sender);
 		}).then(() => {
 			return this.trigger("format", sender);
 		}).then(() => {
@@ -244,4 +229,3 @@ Form.prototype.getFields = function()
 	return FormUtil.getFields(this._element);
 
 }
-
