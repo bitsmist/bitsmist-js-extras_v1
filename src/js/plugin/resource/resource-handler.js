@@ -102,7 +102,7 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			if (e.detail.id != "new")
+			if (e.detail.id)
 			{
 				this._resources[this._defaultResourceName].get(e.detail.id, e.detail.parameters).then((data) => {
 					this._component.data = data;
@@ -130,13 +130,13 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	onSubmit(sender, e)
 	{
 
-		if (e.detail.id == "new")
+		if (e.detail.id)
 		{
-			return this._resources[this._defaultResourceName].insert(e.detail.id, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].update(e.detail.id, {items:e.detail.items});
 		}
 		else
 		{
-			return this._resources[this._defaultResourceName].update(e.detail.id, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].insert(e.detail.id, {items:e.detail.items});
 		}
 
 	}
