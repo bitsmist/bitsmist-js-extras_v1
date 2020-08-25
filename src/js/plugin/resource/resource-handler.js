@@ -106,8 +106,8 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 			{
 				this._resources[this._defaultResourceName].get(e.detail.id, e.detail.parameters).then((data) => {
 					this._component.data = data;
-					this._component.items = data["data"];
-					this._component.item = data["data"][0];
+					this._component.items = this.getOption("getItems", function(data){return data["data"]})(data);
+					this._component.item = this.getOption("getItem", function(data){return data["data"][0]})(data);
 					resolve();
 				});
 			}
