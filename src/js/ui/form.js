@@ -207,7 +207,8 @@ Form.prototype.submit = function(options)
 		}).then(() => {
 			if (!this.__cancelSubmit)
 			{
-				return this.trigger("submit", sender, {"id":this._id, "parameters":this._parameters, "items":[this.item]});
+				let items = this.settings.get("itemGetter", function(item){return [item]})(this.item);
+				return this.trigger("submit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
 			}
 		}).then(() => {
 			resolve();
