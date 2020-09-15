@@ -11,10 +11,10 @@
 import MasterUtil from '../../util/master-util';
 
 // =============================================================================
-//	Cookie preference handler class
+//	Master handler class
 // =============================================================================
 
-export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
+export default class MasterHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
