@@ -182,6 +182,7 @@ List.prototype.__initListOnAppend = function(sender, e)
 
 	this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
 	this._row = this._components[this.settings.get("row")];
+	this._row._element = this._listRootNode;
 
 }
 
@@ -189,11 +190,8 @@ List.prototype.__initListOnAppend = function(sender, e)
 
 /**
  * Init after filling completed.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
  */
-List.prototype.__initListOnFill = function(sender, e)
+List.prototype.__initListOnFill = function()
 {
 
 	// Set HTML elements' event handlers after filling completed
