@@ -33,8 +33,9 @@ export default function List()
 	_this._data;
 	_this._row;
 	_this._rows;
+	_this._listRootNode;
 
-	// Init system event handlers
+	// Init when template appended
 	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
 
 	return _this;
@@ -45,6 +46,20 @@ BITSMIST.v1.ClassUtil.inherit(List, Pad);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
+// -----------------------------------------------------------------------------
+
+/**
+ * Row object.
+ *
+ * @type	{Object}
+ */
+Object.defineProperty(List.prototype, 'row', {
+	get()
+	{
+		return this._row;
+	},
+})
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -91,10 +106,7 @@ Object.defineProperty(List.prototype, 'data', {
 List.prototype.clear = function()
 {
 
-	while (this.row._element.firstChild)
-	{
-		this.row._element.removeChild(this.row._element.firstChild);
-	}
+	this._listRootNode.innerHTML = "";
 
 }
 
@@ -111,7 +123,7 @@ List.prototype.fill = function(options)
 	console.debug(`List.fill(): Filling list. name=${this.name}`);
 
 	return new Promise((resolve, reject) => {
-		this.rows = [];
+		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
 
 		Promise.resolve().then(() => {
@@ -140,7 +152,7 @@ List.prototype.fill = function(options)
 					{
 						this.clear();
 					}
-					this.row._element.appendChild(fragment, options["masters"]);
+					this._listRootNode.appendChild(fragment, options["masters"]);
 				});
 			}
 			return chain;
@@ -160,7 +172,7 @@ List.prototype.fill = function(options)
 // -----------------------------------------------------------------------------
 
 /**
- * Init after clone completed.
+ * Init after template appended.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
@@ -168,8 +180,8 @@ List.prototype.fill = function(options)
 List.prototype.__initListOnAppend = function(sender, e)
 {
 
-	this.row = this._components[this.settings.get("row")];
-	this.row._element = this._element.querySelector(this.row.settings.get("listRootNode"));
+	this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
+	this._row = this._components[this.settings.get("row")];
 
 }
 
@@ -185,8 +197,8 @@ List.prototype.__initListOnFill = function(sender, e)
 {
 
 	// Set HTML elements' event handlers after filling completed
-	Object.keys(this.row.settings.items["elements"]).forEach((elementName) => {
-		this.row._initHtmlEvents(elementName);
+	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
+		this._row._initHtmlEvents(elementName);
 	});
 
 }
@@ -204,28 +216,29 @@ List.prototype.__appendRow = function(rootNode, masters)
 {
 
 	return new Promise((resolve, reject) => {
-		// Append row
-		let element = this.row._dupElement();
-		rootNode.appendChild(element);
-		this.rows.push(element);
-		let i = this.rows.length - 1;
+		let element = this._row.clone();
 
-		// Set click event handler
-		if (this.row.settings.items["events"]["click"])
-		{
-			this.row.addEventHandler(element, "click", this.row.settings.items["events"]["click"]["handler"], {"element":element});
-		}
+		this._rows.push(element);
+		let i = this._rows.length - 1;
 
 		// Call event handlers
 		let chain = Promise.resolve();
 		chain = chain.then(() => {
-			return this.row.trigger("formatRow", this, {"item":this.items[i], "no":i, "element":element});
+			return this._row.trigger("formatRow", this, {"item":this.items[i], "no":i, "element":element});
 		}).then(() => {
-			return this.row.trigger("beforeFillRow", this, {"item":this.items[i], "no":i, "element":element});
+			return this._row.trigger("beforeFillRow", this, {"item":this.items[i], "no":i, "element":element});
 		}).then(() => {
 			// Fill fields
 			FormUtil.setFields(element, this.items[i], this.app.masters);
-			return this.row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
+			return this._row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
+		}).then(() => {
+			rootNode.appendChild(element);
+		}).then(() => {
+			// set row click event handler
+			if (this._row.settings.get("events.click"))
+			{
+				this._row.addEventHandler(element, "click", this._row.settings.get("events.click.handler"), {"element":element});
+			}
 		}).then(() => {
 			resolve();
 		});
