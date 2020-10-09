@@ -182,7 +182,6 @@ List.prototype.__initListOnAppend = function(sender, e)
 
 	this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
 	this._row = this._components[this.settings.get("row")];
-	this._row._element = this._listRootNode;
 
 }
 
@@ -194,10 +193,15 @@ List.prototype.__initListOnAppend = function(sender, e)
 List.prototype.__initListOnFill = function()
 {
 
+
+	this._row._element = this._listRootNode; // Workaround rows' event handlers set properly
+
 	// Set HTML elements' event handlers after filling completed
 	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
 		this._row._initHtmlEvents(elementName);
 	});
+
+	this._row._element = this.row; // Workaround list's template not appended.
 
 }
 
