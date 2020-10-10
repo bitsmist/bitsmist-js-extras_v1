@@ -198,7 +198,7 @@ List.prototype.__initListOnFill = function()
 
 	// Set HTML elements' event handlers after filling completed
 	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
-		this._row._initHtmlEvents(elementName);
+		this._row.setHtmlEventHandlers(elementName);
 	});
 
 	this._row._element = this.row; // Workaround: list's template not appended.
