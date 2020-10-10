@@ -194,14 +194,14 @@ List.prototype.__initListOnFill = function()
 {
 
 
-	this._row._element = this._listRootNode; // Workaround rows' event handlers set properly
+	this._row._element = this._listRootNode; // Workaround: rows' event handlers set properly
 
 	// Set HTML elements' event handlers after filling completed
 	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
 		this._row._initHtmlEvents(elementName);
 	});
 
-	this._row._element = this.row; // Workaround list's template not appended.
+	this._row._element = this.row; // Workaround: list's template not appended.
 
 }
 
@@ -237,9 +237,10 @@ List.prototype.__appendRow = function(rootNode, masters)
 			rootNode.appendChild(element);
 		}).then(() => {
 			// set row click event handler
-			if (this._row.settings.get("events.click"))
+			let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+			if (clickHandler)
 			{
-				this._row.addEventHandler(element, "click", this._row.settings.get("events.click.handler"), {"element":element});
+				this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[i], "no":i, "element":element});
 			}
 		}).then(() => {
 			resolve();
