@@ -219,7 +219,9 @@ List.prototype.__appendRow = function(rootNode, masters)
 {
 
 	return new Promise((resolve, reject) => {
-		let element = this._row.clone();
+		rootNode.appendChild(this._row.clone());
+
+		let element = rootNode.lastElementChild;
 
 		this._rows.push(element);
 		let i = this._rows.length - 1;
@@ -234,8 +236,6 @@ List.prototype.__appendRow = function(rootNode, masters)
 			// Fill fields
 			FormUtil.setFields(element, this.items[i], this.app.masters);
 			return this._row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
-		}).then(() => {
-			rootNode.appendChild(element);
 		}).then(() => {
 			// set row click event handler
 			let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
