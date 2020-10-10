@@ -187,7 +187,6 @@ List.prototype.__initListOnAppend = function(sender, e)
 	}
 
 	this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
-	this._row._element = this._listRootNode;
 
 }
 
@@ -201,7 +200,7 @@ List.prototype.__initListOnFill = function()
 
 	// Set HTML elements' event handlers after filling completed
 	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
-		this._row.setHtmlEventHandlers(elementName);
+		this._row.setHtmlEventHandlers(elementName, null, this._listRootNode);
 	});
 
 }
