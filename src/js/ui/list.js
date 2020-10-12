@@ -250,8 +250,8 @@ List.prototype.__appendRowAsync = function(rootNode, no)
 
 	return new Promise((resolve, reject) => {
 		// Append a row
-		rootNode.appendChild(this._row.clone());
-		let element = rootNode.lastElementChild;
+		let element = this._row.clone();
+		rootNode.appendChild(element);
 
 		this._rows.push(element);
 
@@ -297,8 +297,8 @@ List.prototype.__appendRowSync = function(rootNode, no)
 {
 
 	// Append a row
-	rootNode.appendChild(this._row.clone());
-	let element = rootNode.lastElementChild;
+	let element = this._row.clone();
+	rootNode.appendChild(element);
 
 	this._rows.push(element);
 
