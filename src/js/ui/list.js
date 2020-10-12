@@ -35,6 +35,9 @@ export default function List(settings)
 	_this._rows;
 	_this._listRootNode;
 
+	// Set row's autoOpen option to true
+	_this.settings.get("components")[_this.settings.get("row")]["autoOpen"] = true;
+
 	// Init when template appended
 	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
 
