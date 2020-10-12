@@ -128,6 +128,7 @@ List.prototype.fill = function(options)
 	return new Promise((resolve, reject) => {
 		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
+		let fragment = document.createDocumentFragment();
 
 		Promise.resolve().then(() => {
 			return this.trigger("target", this);
@@ -140,33 +141,74 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			return this.trigger("beforeFill", this);
 		}).then(() => {
-			let chain = Promise.resolve();
 			if (this.items)
 			{
-				let fragment = document.createDocumentFragment();
-				for (let i = 0; i < this.items.length; i++)
+				if (this.settings.get("async"))
 				{
-					chain = chain.then(() => {
-						return this.__appendRow(fragment);
-					});
+					return this._buildAsync(fragment);
 				}
-				chain.then(() => {
-					if (options["autoClear"])
-					{
-						this.clear();
-					}
-					this._listRootNode.appendChild(fragment, options["masters"]);
-				});
+				else
+				{
+					this._buildSync(fragment);
+				}
 			}
-			return chain;
+		}).then(() => {
+			if (options["autoClear"])
+			{
+				this.clear();
+			}
+		}).then(() => {
+			this._listRootNode.appendChild(fragment);
 		}).then(() => {
 			return this.trigger("fill", this);
-		}).then(() => {
-			this.__initListOnFill();
 		}).then(() => {
 			resolve();
 		});
 	});
+
+}
+
+// -----------------------------------------------------------------------------
+//  Protected
+// -----------------------------------------------------------------------------
+
+/**
+ * Build rows synchronously.
+ *
+ * @param	{DocumentFragment}	fragment		Document fragment.
+ */
+List.prototype._buildSync = function(fragment)
+{
+
+	for (let i = 0; i < this.items.length; i++)
+	{
+		this.__appendRowSync(fragment, i);
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Build rows asynchronously.
+ *
+ * @param	{DocumentFragment}	fragment		Document fragment.
+ *
+ * @return  {Promise}		Promise.
+ */
+List.prototype._buildAsync = function(fragment)
+{
+
+	let chain = Promise.resolve();
+
+	for (let i = 0; i < this.items.length; i++)
+	{
+		chain = chain.then(() => {
+			return this.__appendRowAsync(fragment, i);
+		});
+	}
+
+	return chain;
 
 }
 
@@ -196,14 +238,49 @@ List.prototype.__initListOnAppend = function(sender, e)
 // -----------------------------------------------------------------------------
 
 /**
- * Init after filling completed.
+ * Append a new row asynchronously.
+ *
+ * @param	{HTMLElement}	rootNode				Root node to append a row.
+ * @param	{integer}		no						Line no.
+ *
+ * @return  {Promise}		Promise.
  */
-List.prototype.__initListOnFill = function()
+List.prototype.__appendRowAsync = function(rootNode, no)
 {
 
-	// Set HTML elements' event handlers after filling completed
-	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
-		this._row.setHtmlEventHandlers(elementName, null, this._listRootNode);
+	return new Promise((resolve, reject) => {
+		// Append a row
+		rootNode.appendChild(this._row.clone());
+		let element = rootNode.lastElementChild;
+
+		this._rows.push(element);
+
+		// set row click event handler
+		let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+		if (clickHandler)
+		{
+			this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[no], "no":no, "element":element});
+		}
+
+		// set row elements click event handler
+		Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
+			this._row.setHtmlEventHandlers(elementName, {"item":this.items[no], "no":no, "element":element}, element);
+		});
+
+		// Call event handlers
+		let chain = Promise.resolve();
+		chain = chain.then(() => {
+			return this._row.trigger("formatRow", this, {"item":this.items[no], "no":no, "element":element});
+		}).then(() => {
+			return this._row.trigger("beforeFillRow", this, {"item":this.items[no], "no":no, "element":element});
+		}).then(() => {
+			// Fill fields
+			FormUtil.setFields(element, this.items[no], this.app.masters);
+		}).then(() => {
+			return this._row.trigger("fillRow", this, {"item":this.items[no], "no":no, "element":element});
+		}).then(() => {
+			resolve();
+		});
 	});
 
 }
@@ -211,43 +288,36 @@ List.prototype.__initListOnFill = function()
 // -----------------------------------------------------------------------------
 
 /**
- * Append a new row.
+ * Append a new row synchronously.
  *
  * @param	{HTMLElement}	rootNode				Root node to append a row.
- *
- * @return  {Promise}		Promise.
+ * @param	{integer}		no						Line no.
  */
-List.prototype.__appendRow = function(rootNode, masters)
+List.prototype.__appendRowSync = function(rootNode, no)
 {
 
-	return new Promise((resolve, reject) => {
-		rootNode.appendChild(this._row.clone());
+	// Append a row
+	rootNode.appendChild(this._row.clone());
+	let element = rootNode.lastElementChild;
 
-		let element = rootNode.lastElementChild;
+	this._rows.push(element);
 
-		this._rows.push(element);
-		let i = this._rows.length - 1;
+	// set row click event handler
+	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+	if (clickHandler)
+	{
+		this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[no], "no":no, "element":element});
+	}
 
-		// Call event handlers
-		let chain = Promise.resolve();
-		chain = chain.then(() => {
-			return this._row.trigger("formatRow", this, {"item":this.items[i], "no":i, "element":element});
-		}).then(() => {
-			return this._row.trigger("beforeFillRow", this, {"item":this.items[i], "no":i, "element":element});
-		}).then(() => {
-			// Fill fields
-			FormUtil.setFields(element, this.items[i], this.app.masters);
-			return this._row.trigger("fillRow", this, {"item":this.items[i], "no":i, "element":element});
-		}).then(() => {
-			// set row click event handler
-			let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-			if (clickHandler)
-			{
-				this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[i], "no":i, "element":element});
-			}
-		}).then(() => {
-			resolve();
-		});
+	// set row elements click event handler
+	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
+		this._row.setHtmlEventHandlers(elementName, {"item":this.items[no], "no":no, "element":element}, element);
 	});
+
+	// Call event handlers
+	this._row.trigger("formatRow", this, {"item":this.items[no], "no":no, "element":element});
+	this._row.trigger("beforeFillRow", this, {"item":this.items[no], "no":no, "element":element});
+	FormUtil.setFields(element, this.items[no], this.app.masters);
+	this.row.trigger("fillRow", this, {"item":this.items[no], "no":no, "element":element});
 
 }
