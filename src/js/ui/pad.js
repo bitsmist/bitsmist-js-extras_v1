@@ -21,10 +21,10 @@ import ResourceUtil from '../util/resource-util';
 /**
  * Constructor.
  */
-export default function Pad()
+export default function Pad(settings)
 {
 
-	let _this = Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
+	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	return _this;
 

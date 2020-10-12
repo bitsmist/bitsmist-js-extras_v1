@@ -22,10 +22,10 @@ import Pad from './pad';
 /**
  * Constructor.
  */
-export default function List()
+export default function List(settings)
 {
 
-	let _this = Reflect.construct(Pad, [], this.constructor);
+	let _this = Reflect.construct(Pad, [settings], this.constructor);
 
 	_this._id;
 	_this._parameters;
