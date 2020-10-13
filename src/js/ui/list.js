@@ -29,11 +29,11 @@ export default function List(settings)
 
 	_this._id;
 	_this._parameters;
-	_this._items;
 	_this._data;
+	_this._items;
+	_this._listRootNode;
 	_this._row;
 	_this._rows;
-	_this._listRootNode;
 
 	// Set row's autoOpen option to true
 	_this.settings.get("components")[_this.settings.get("row")]["autoOpen"] = true;
@@ -129,6 +129,7 @@ List.prototype.fill = function(options)
 		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
 		let fragment = document.createDocumentFragment();
+		let builder = ( this.settings.get("async") ? this._buildAsync : this._buildSync );
 
 		Promise.resolve().then(() => {
 			return this.trigger("target", this);
@@ -143,14 +144,7 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			if (this._items)
 			{
-				if (this.settings.get("async"))
-				{
-					return this._buildAsync(fragment);
-				}
-				else
-				{
-					this._buildSync(fragment);
-				}
+				return builder.call(this, fragment);
 			}
 		}).then(() => {
 			if (options["autoClear"])
