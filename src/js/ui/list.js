@@ -141,7 +141,7 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			return this.trigger("beforeFill", this);
 		}).then(() => {
-			if (this.items)
+			if (this._items)
 			{
 				if (this.settings.get("async"))
 				{
@@ -180,9 +180,9 @@ List.prototype.fill = function(options)
 List.prototype._buildSync = function(fragment)
 {
 
-	for (let i = 0; i < this.items.length; i++)
+	for (let i = 0; i < this._items.length; i++)
 	{
-		this.__appendRowSync(fragment, i);
+		this.__appendRowSync(fragment, i, this._items[i]);
 	}
 
 }
@@ -201,10 +201,10 @@ List.prototype._buildAsync = function(fragment)
 
 	let chain = Promise.resolve();
 
-	for (let i = 0; i < this.items.length; i++)
+	for (let i = 0; i < this._items.length; i++)
 	{
 		chain = chain.then(() => {
-			return this.__appendRowAsync(fragment, i);
+			return this.__appendRowAsync(fragment, i, this._items[i]);
 		});
 	}
 
@@ -242,10 +242,11 @@ List.prototype.__initListOnAppend = function(sender, e)
  *
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
+ * @param	{Object}		item					Row data.
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.__appendRowAsync = function(rootNode, no)
+List.prototype.__appendRowAsync = function(rootNode, no, item)
 {
 
 	return new Promise((resolve, reject) => {
@@ -259,25 +260,25 @@ List.prototype.__appendRowAsync = function(rootNode, no)
 		let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 		if (clickHandler)
 		{
-			this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[no], "no":no, "element":element});
+			this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
 		}
 
 		// set row elements click event handler
 		Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
-			this._row.setHtmlEventHandlers(elementName, {"item":this.items[no], "no":no, "element":element}, element);
+			this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
 		});
 
 		// Call event handlers
 		let chain = Promise.resolve();
 		chain = chain.then(() => {
-			return this._row.trigger("formatRow", this, {"item":this.items[no], "no":no, "element":element});
+			return this._row.trigger("formatRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
-			return this._row.trigger("beforeFillRow", this, {"item":this.items[no], "no":no, "element":element});
+			return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			// Fill fields
-			FormUtil.setFields(element, this.items[no], this.app.masters);
+			FormUtil.setFields(element, item, this.app.masters);
 		}).then(() => {
-			return this._row.trigger("fillRow", this, {"item":this.items[no], "no":no, "element":element});
+			return this._row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			resolve();
 		});
@@ -292,8 +293,9 @@ List.prototype.__appendRowAsync = function(rootNode, no)
  *
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
+ * @param	{Object}		item					Row data.
  */
-List.prototype.__appendRowSync = function(rootNode, no)
+List.prototype.__appendRowSync = function(rootNode, no, item)
 {
 
 	// Append a row
@@ -306,18 +308,18 @@ List.prototype.__appendRowSync = function(rootNode, no)
 	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 	if (clickHandler)
 	{
-		this._row.addEventHandler(element, "click", clickHandler, {"item":this.items[no], "no":no, "element":element});
+		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
 	}
 
 	// set row elements click event handler
 	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
-		this._row.setHtmlEventHandlers(elementName, {"item":this.items[no], "no":no, "element":element}, element);
+		this._row.setHtmlEventHandlers(elementName, {"item":item, "no":no, "element":element}, element);
 	});
 
 	// Call event handlers
-	this._row.trigger("formatRow", this, {"item":this.items[no], "no":no, "element":element});
-	this._row.trigger("beforeFillRow", this, {"item":this.items[no], "no":no, "element":element});
-	FormUtil.setFields(element, this.items[no], this.app.masters);
-	this.row.trigger("fillRow", this, {"item":this.items[no], "no":no, "element":element});
+	this._row.trigger("formatRow", this, {"item":item, "no":no, "element":element});
+	this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
+	FormUtil.setFields(element, item, this.app.masters);
+	this.row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
 
 }
