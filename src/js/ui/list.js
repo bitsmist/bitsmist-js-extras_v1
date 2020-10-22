@@ -35,9 +35,6 @@ export default function List(settings)
 	_this._row;
 	_this._rows;
 
-	// Set row's autoOpen option to true
-	_this.settings.get("components")[_this.settings.get("row")]["autoOpen"] = true;
-
 	// Init when template appended
 	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
 
@@ -219,13 +216,16 @@ List.prototype._buildAsync = function(fragment)
 List.prototype.__initListOnAppend = function(sender, e)
 {
 
-	this._row = this._components[this._settings.get("row")];
-	if (!this._row)
-	{
-		throw new ReferenceError(`Row component does not exist. name=${this.name}, row=${this._settings.get("row")}`);
-	}
-
-	this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
+	return new Promise((resolve, reject) => {
+		this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
+		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
+		this._row = BITSMIST.v1.ClassUtil.createObject(className);
+		this._row._parent = this;
+		this._row.settings.chain(this.app.settings);
+		this._row.open().then(() => {
+			resolve();
+		});
+	});
 
 }
 
