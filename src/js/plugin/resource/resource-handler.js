@@ -102,7 +102,11 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			if (e.detail.id)
+			if (e.detail.autoLoad == false || !e.detail.id)
+			{
+				resolve();
+			}
+			else
 			{
 				this._resources[this._defaultResourceName].get(e.detail.id, e.detail.parameters).then((data) => {
 					this._component.data = data;
@@ -110,10 +114,6 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 					this._component.item = this.getOption("itemGetter", function(data){return data["data"][0]})(data);
 					resolve();
 				});
-			}
-			else
-			{
-				resolve();
 			}
 		});
 
