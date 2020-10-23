@@ -37,6 +37,8 @@ export default class ResourceHandler extends BITSMIST.v1.Plugin
 			"beforeFetch": this.onBeforeFetch,
 			"submit": this.onSubmit,
 		}
+		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
+		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
 		this._resources = {};
 
 		let resources = this.getOption("resources", []);

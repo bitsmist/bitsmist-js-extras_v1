@@ -36,6 +36,8 @@ export default class MasterHandler extends BITSMIST.v1.Plugin
 		this._options["events"] = {
 			"specLoad": this.onSpecLoad,
 		}
+		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
+		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
 		this._masters = {};
 
 	}
