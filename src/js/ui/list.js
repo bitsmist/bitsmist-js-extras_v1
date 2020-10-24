@@ -125,6 +125,7 @@ List.prototype.fill = function(options)
 	return new Promise((resolve, reject) => {
 		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
+		//options = Object.assign({}, options);
 		let fragment = document.createDocumentFragment();
 		let builder = ( this.settings.get("async") ? this._buildAsync : this._buildSync );
 
@@ -221,7 +222,6 @@ List.prototype.__initListOnAppend = function(sender, e)
 		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
 		this._row = BITSMIST.v1.ClassUtil.createObject(className);
 		this._row._parent = this;
-		this._row.settings.chain(this.app.settings);
 		this._row.open().then(() => {
 			resolve();
 		});
@@ -270,7 +270,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
 			return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			// Fill fields
-			FormUtil.setFields(element, item, this.app.masters);
+			FormUtil.setFields(element, item, this.masters);
 		}).then(() => {
 			return this._row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
@@ -313,7 +313,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item)
 	// Call event handlers
 	this._row.trigger("formatRow", this, {"item":item, "no":no, "element":element});
 	this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
-	FormUtil.setFields(element, item, this.app.masters);
+	FormUtil.setFields(element, item, this.masters);
 	this.row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
 
 }

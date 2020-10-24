@@ -113,7 +113,7 @@ Form.prototype.fill = function(options)
 		}).then(() => {
 			return this.trigger("beforeFill", sender);
 		}).then(() => {
-			FormUtil.setFields(this._element, this.item, this.app.masters);
+			FormUtil.setFields(this._element, this.item, this.masters);
 			return this.trigger("fill", sender);
 		}).then(() => {
 			resolve();
