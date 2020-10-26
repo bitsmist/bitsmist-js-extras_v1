@@ -34,8 +34,8 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"loadPreferences": this.onLoadPreferences,
-			"savePreferences": this.onSavePreferences,
+			"loadStore": this.onLoadStore,
+			"saveStore": this.onSaveStore,
 		}
 
 		this._cookie = new CookieUtil(this._options["cookieOptions"]);
@@ -48,12 +48,12 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Load preferences handler.
+	* Load store event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onLoadPreferences(sender, e)
+	onLoadStore(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
@@ -67,12 +67,12 @@ export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Save preferences event handler.
+	* Save store event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onSavePreferences(sender, e)
+	onSaveStore(sender, e)
 	{
 
 		this._cookie.set(this._cookieName, e.detail.preferences);
