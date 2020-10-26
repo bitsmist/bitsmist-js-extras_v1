@@ -9,13 +9,10 @@ window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
 import NoRouteErrorHandler from './plugin/error/no-route-error-handler';
 window.BITSMIST.v1.NoRouteErrorHandler = NoRouteErrorHandler;
 
-// Preference handler
+// Store handler
 
-import CookiePreferenceHandler from './plugin/preference/cookie-preference-handler';
-window.BITSMIST.v1.CookiePreferenceHandler = CookiePreferenceHandler;
-
-import PreferenceHandler from './plugin/preference/preference-handler';
-window.BITSMIST.v1.PreferenceHandler = PreferenceHandler;
+import CookieStoreHandler from './plugin/store/cookie-store-handler';
+window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
 
 // Resource handler
 

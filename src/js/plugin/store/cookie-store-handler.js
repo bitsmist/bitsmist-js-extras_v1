@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -11,10 +11,10 @@
 import CookieUtil from '../../util/cookie-util';
 
 // =============================================================================
-//	Cookie preference handler class
+//	Cookie store handler class
 // =============================================================================
 
-export default class CookiePreferenceHandler extends BITSMIST.v1.Plugin
+export default class CookieStoreHandler extends BITSMIST.v1.Plugin
 {
 
 	// -------------------------------------------------------------------------
