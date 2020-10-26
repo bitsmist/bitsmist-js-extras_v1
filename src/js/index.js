@@ -1,7 +1,31 @@
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
-// Error handler
+// System
+
+import App from './system/app';
+window.BITSMIST.v1.App = App;
+
+import Router from './system/router';
+window.BITSMIST.v1.Router = Router;
+
+import TagLoader from './system/tagloader';
+
+import SettingManager from './system/setting-manager';
+window.BITSMIST.v1.SettingManager = SettingManager;
+
+import PreferenceManager from './system/preference-manager';
+window.BITSMIST.v1.PreferenceManager = PreferenceManager;
+
+import ErrorManager from './system/error-manager';
+window.BITSMIST.v1.ErrorManager = ErrorManager;
+
+// Plugin
+
+import Plugin from './plugin/plugin';
+window.BITSMIST.v1.Plugin = Plugin;
+
+// Plugin - Error handler
 
 import AjaxErrorHandler from './plugin/error/ajax-error-handler';
 window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
@@ -9,21 +33,18 @@ window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
 import NoRouteErrorHandler from './plugin/error/no-route-error-handler';
 window.BITSMIST.v1.NoRouteErrorHandler = NoRouteErrorHandler;
 
-// Store handler
+// Plugin - Store handler
 
 import CookieStoreHandler from './plugin/store/cookie-store-handler';
 window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
 
-// Resource handler
+// Plugin - Resource handler
 
 import MasterHandler from './plugin/resource/master-handler';
 window.BITSMIST.v1.MasterHandler = MasterHandler;
 
 import ResourceHandler from './plugin/resource/resource-handler';
 window.BITSMIST.v1.ResourceHandler = ResourceHandler;
-
-import SettingHandler from './plugin/resource/setting-handler';
-window.BITSMIST.v1.SettingHandler = SettingHandler;
 
 // Ui
 

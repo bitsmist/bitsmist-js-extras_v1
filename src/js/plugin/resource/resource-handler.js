@@ -8,13 +8,14 @@
  */
 // =============================================================================
 
+import Plugin from '../plugin';
 import ResourceUtil from '../../util/resource-util';
 
 // =============================================================================
 //	Resource handler class
 // =============================================================================
 
-export default class ResourceHandler extends BITSMIST.v1.Plugin
+export default class ResourceHandler extends Plugin
 {
 
 	// -------------------------------------------------------------------------

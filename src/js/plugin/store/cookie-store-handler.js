@@ -9,12 +9,13 @@
 // =============================================================================
 
 import CookieUtil from '../../util/cookie-util';
+import Plugin from '../plugin';
 
 // =============================================================================
 //	Cookie store handler class
 // =============================================================================
 
-export default class CookieStoreHandler extends BITSMIST.v1.Plugin
+export default class CookieStoreHandler extends Plugin
 {
 
 	// -------------------------------------------------------------------------

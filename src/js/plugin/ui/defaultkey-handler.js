@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import Plugin from '../plugin';
+
 // =============================================================================
 //	Defaultkey Handler class
 // =============================================================================
 
-export default class DefaultkeyHandler extends BITSMIST.v1.Plugin
+export default class DefaultkeyHandler extends Plugin
 {
 
 	// -------------------------------------------------------------------------
