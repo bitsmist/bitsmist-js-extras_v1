@@ -25,7 +25,7 @@ export default function SettingManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"SettingManager", "templateName":""}, settings);
+	settings = Object.assign({}, {"name":"SettingManager", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Event handlers
@@ -49,6 +49,20 @@ customElements.define("bm-setting", SettingManager);
  * @param	{Object}		e					Event info.
  */
 SettingManager.prototype.onConnected = function(sender, e)
+{
+
+	this.run();
+
+}
+
+// -----------------------------------------------------------------------------
+//  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start manager.
+ */
+SettingManager.prototype.run = function()
 {
 
 	// Init globals

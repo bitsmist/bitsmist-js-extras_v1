@@ -25,14 +25,14 @@ export default function ErrorManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"ErrorManager", "templateName":"", "autoSetup":false}, settings);
+	settings = Object.assign({}, {"name":"ErrorManager", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
 	_this._targets = {};
 
-	// Init error listeners
-	_this.__initErrorListeners();
+	// Event handlers
+	_this.addEventHandler(_this, "connected", _this.onConnected);
 
 	return _this;
 
@@ -42,7 +42,36 @@ BITSMIST.v1.ClassUtil.inherit(ErrorManager, BITSMIST.v1.Component);
 customElements.define("bm-error", ErrorManager);
 
 // -----------------------------------------------------------------------------
+//	Event handlers
+// -----------------------------------------------------------------------------
+
+/**
+ * Connected event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ */
+ErrorManager.prototype.onConnected = function(sender, e)
+{
+
+	this.run();
+
+}
+
+// -----------------------------------------------------------------------------
 //  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start manager.
+ */
+ErrorManager.prototype.run = function()
+{
+
+	this.__initErrorListeners();
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**

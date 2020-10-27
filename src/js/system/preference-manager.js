@@ -25,7 +25,7 @@ export default function PreferenceManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"PreferenceManager", "templateName":"", "autoSetup":false}, settings);
+	settings = Object.assign({}, {"name":"PreferenceManager", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -55,18 +55,7 @@ customElements.define("bm-preference", PreferenceManager);
 PreferenceManager.prototype.onConnected = function(sender, e)
 {
 
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			return this.load();
-		}).then((preferences) => {
-			return this._preferences.merge(preferences);
-		}).then(() => {
-			// Init globals
-			BITSMIST.v1.Globals["preferences"].items = Object.assign({}, this._settings.get("defaults"), this._preferences.items);
-		}).then(() => {
-			resolve();
-		});
-	});
+	this.run();
 
 }
 
@@ -104,6 +93,29 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e)
 
 // -----------------------------------------------------------------------------
 //  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start manager.
+ */
+PreferenceManager.prototype.run = function()
+{
+
+	return new Promise((resolve, reject) => {
+		Promise.resolve().then(() => {
+			return this.load();
+		}).then((preferences) => {
+			return this._preferences.merge(preferences);
+		}).then(() => {
+			// Init globals
+			BITSMIST.v1.Globals["preferences"].items = Object.assign({}, this._settings.get("defaults"), this._preferences.items);
+		}).then(() => {
+			resolve();
+		});
+	});
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**
