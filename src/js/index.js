@@ -48,9 +48,6 @@ window.BITSMIST.v1.ResourceHandler = ResourceHandler;
 
 // Ui
 
-import Pad from './ui/pad';
-window.BITSMIST.v1.Pad = Pad;
-
 import Form from './ui/form';
 window.BITSMIST.v1.Form = Form;
 
