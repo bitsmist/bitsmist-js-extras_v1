@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -25,7 +25,7 @@ import Pad from './pad';
 export default function Form(settings)
 {
 
-	let _this = Reflect.construct(Pad, [settings], this.constructor);
+	let _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
 
 	_this._id;
 	_this._parameters;
@@ -36,7 +36,7 @@ export default function Form(settings)
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(Form, Pad);
+BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Pad);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
@@ -105,7 +105,7 @@ Form.prototype.fill = function(options)
 		}).then(() => {
 			this._id = ( options["id"] ? options["id"] : this._id );
 			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
-			return this.trigger("beforeFetch", sender, {"id":this._id, "parameters":this._parameters});
+			return this.trigger("beforeFetch", sender, {"id":this._id, "parameters":this._parameters, "options":options});
 		}).then(() => {
 			return this.trigger("fetch", sender);
 		}).then(() => {
