@@ -9,7 +9,6 @@
 // =============================================================================
 
 import FormUtil from '../util/form-util';
-import Pad from './pad';
 
 // =============================================================================
 //	List class
@@ -25,7 +24,7 @@ import Pad from './pad';
 export default function List(settings)
 {
 
-	let _this = Reflect.construct(Pad, [settings], this.constructor);
+	let _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
 
 	_this._id;
 	_this._parameters;
@@ -35,14 +34,14 @@ export default function List(settings)
 	_this._row;
 	_this._rows;
 
-	// Init when template appended
-	_this.addEventHandler(_this, "append", _this.__initListOnAppend);
+	// Event handlers
+	_this.addEventHandler(_this, "append", _this.onListAppend);
 
 	return _this;
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(List, Pad);
+BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
@@ -96,6 +95,30 @@ Object.defineProperty(List.prototype, 'data', {
 	}
 })
 
+// -----------------------------------------------------------------------------
+//  Event handlers
+// -----------------------------------------------------------------------------
+
+/**
+ * Append event hadler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ */
+List.prototype.onListAppend = function(sender, e)
+{
+
+	return new Promise((resolve, reject) => {
+		this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
+		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
+		this._row = BITSMIST.v1.ClassUtil.createObject(className);
+		this._row._parent = this;
+		this._row.open().then(() => {
+			resolve();
+		});
+	});
+
+}
 // -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
@@ -206,29 +229,6 @@ List.prototype._buildAsync = function(fragment)
 
 // -----------------------------------------------------------------------------
 //  Privates
-// -----------------------------------------------------------------------------
-
-/**
- * Init after template appended.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- */
-List.prototype.__initListOnAppend = function(sender, e)
-{
-
-	return new Promise((resolve, reject) => {
-		this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
-		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
-		this._row = BITSMIST.v1.ClassUtil.createObject(className);
-		this._row._parent = this;
-		this._row.open().then(() => {
-			resolve();
-		});
-	});
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**
