@@ -1,12 +1,15 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
  * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
  */
 // =============================================================================
+
+import PreferenceManager from "./preference-manager";
+import ErrorManager from "./error-manager";
 
 // =============================================================================
 //	App class
@@ -28,17 +31,13 @@ export default function App(settings)
 	settings = Object.assign({}, {"name":"App", "templateName":"", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
-	// Init globals
-	BITSMIST.v1.Globals["settings"].component = _this;
-	BITSMIST.v1.Globals["settings"].items = _this._settings.items;
-	BITSMIST.v1.Globals["preferences"].component = _this;
-	BITSMIST.v1.Globals["preferences"].items = _this._preferences.items;
+	// Init vars
+	_this._targets = {};
+	_this.errorManager = new ErrorManager();
 
-	// Init error listeners
-	_this.__initErrorListeners();
-
-	// Init when connected
+	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "beforeSetup", _this.onBeforeSetup);
 
 	return _this;
 
@@ -65,6 +64,38 @@ App.prototype.onConnected = function(sender, e)
 }
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Before setup event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ *
+ * @return  {Promise}		Promise.
+ */
+App.prototype.onBeforeSetup = function(sender, e)
+{
+
+	let settings = e.detail;
+
+	return new Promise((resolve, reject) => {
+		let promises = [];
+
+		Object.keys(this._targets).forEach((componentId) => {
+			if (this.__isTarget(settings, this._targets[componentId].targets))
+			{
+				promises.push(this._targets[componentId].object.setup(settings));
+			}
+		});
+
+		Promise.all(promises).then(() => {
+			resolve();
+		});
+	});
+
+}
+
+// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
@@ -77,6 +108,10 @@ App.prototype.run = function()
 	Promise.resolve().then(() => {
 		// Load preference
 		return this.__initPreference();
+	}).then(() => {
+		// Init globals
+		BITSMIST.v1.Globals["settings"].items = this._settings.items;
+		BITSMIST.v1.Globals["preferences"].items = this._preferences.items;
 	}).then(() => {
 		// Open app
 		return this.open();
@@ -102,11 +137,11 @@ App.prototype.setup = function(options)
 		options = Object.assign({}, options);
 		let sender = ( options["sender"] ? options["sender"] : this );
 
-		Component.prototype.setup.call(this, options).then(() => {
+		BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
 			if (options["newPreferences"])
 			{
 				this.preferences.merge(options["newPreferences"]);
-				this.preferences.save();
+				this.save();
 			}
 		}).then(() => {
 			resolve();
@@ -114,6 +149,60 @@ App.prototype.setup = function(options)
 	});
 
 }
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Register target component.
+ *
+ * @param	{Component}		component			Component to notify.
+ * @param	{Object}		targets				Targets.
+ *
+ * @return  {Promise}		Promise.
+ */
+App.prototype.register = function(component, targets)
+{
+
+	this._targets[component.uniqueId] = {"object":component, "targets":targets};
+
+}
+
+// -------------------------------------------------------------------------
+
+/**
+ * Load items.
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+App.prototype.load = function(options)
+{
+
+	let sender = ( options && options["sender"] ? options["sender"] : this );
+
+	return this.trigger("loadStore", sender);
+
+}
+
+// -------------------------------------------------------------------------
+
+/**
+ * Save items.
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+App.prototype.save = function(options)
+{
+
+	let sender = ( options && options["sender"] ? options["sender"] : this );
+
+	return this.trigger("saveStore", sender, {"preferences":this._preferences.items});
+
+}
+
 
 // -----------------------------------------------------------------------------
 //  Privates
@@ -127,9 +216,9 @@ App.prototype.__initPreference = function()
 
 	return new Promise((resolve, reject) => {
 		Promise.resolve().then(() => {
-			return this.preferences.load();
+			return this.load();
 		}).then((preferences) => {
-			return this.preferences.merge(preferences);
+			return this._preferences.merge(preferences);
 		}).then(() => {
 			resolve();
 		});
@@ -140,118 +229,32 @@ App.prototype.__initPreference = function()
 // -----------------------------------------------------------------------------
 
 /**
- * Init error handling listeners.
+ * Check if it is a target.
+ *
+ * @param	{Object}		settings			Settings.
+ * @param	{Object}		target				Target component to check.
  */
-App.prototype.__initErrorListeners = function()
+App.prototype.__isTarget = function(settings, target)
 {
 
-	window.addEventListener("unhandledrejection", (error) => {
-		let e = {};
+	let result = false;
 
-		if (error["reason"])
-		{
-			if (error.reason instanceof XMLHttpRequest)
-			{
-				e.message = error.reason.statusText;
-			}
-			else
-			{
-				e.message = error.reason.message;
-			}
-		}
-		else
-		{
-			e.message = error;
-		}
-		e.type = error.type;
-		e.name = this.__getErrorName(error);
-		e.filename = "";
-		e.funcname = ""
-		e.lineno = "";
-		e.colno = "";
-		e.stack = error.reason.stack;
-		e.object = error.reason;
-
-		this.__handleException(e);
-
-		return false;
-		//return true;
-	});
-
-	window.addEventListener("error", (error, file, line, col) => {
-		let e = {};
-
-		e.type = "error";
-		e.name = this.__getErrorName(error);
-		e.message = error.message;
-		e.file = error.filename;
-		e.line = error.lineno;
-		e.col = error.colno;
-		if (error.error)
-		{
-			e.stack = error.error.stack;
-			e.object = error.error;
-		}
-
-		this.__handleException(e);
-
-		return false;
-		//return true;
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Get an error name for the given error object.
- *
- * @param	{Object}		error				Error object.
- *
- * @return  {String}		Error name.
- */
-App.prototype.__getErrorName = function(error)
-{
-
-	let name;
-	let e;
-
-	if (error.reason)		e = error.reason;
-	else if (error.error)	e = error.error;
-	else					e = error.message;
-
-	if (e.name)									name = e.name;
-	else if (e instanceof TypeError)			name = "TypeError";
-	else if (e instanceof XMLHttpRequest)		name = "AjaxError";
-	else if (e instanceof EvalError)			name = "EvalError";
-//	else if (e instanceof InternalError)		name = "InternalError";
-	else if (e instanceof RangeError)			name = "RangeError";
-	else if (e instanceof ReferenceError)		name = "ReferenceError";
-	else if (e instanceof SyntaxError)			name = "SyntaxError";
-	else if (e instanceof URIError)				name = "URIError";
-	else
+	/*
+	if (target == "*")
 	{
-		let pos = e.indexOf(":");
-		if (pos > -1)
+		return true;
+	}
+	*/
+
+	for (let i = 0; i < target.length; i++)
+	{
+		if (settings["newPreferences"].hasOwnProperty(target[i]))
 		{
-			name = e.substring(0, pos);
+			result = true;
+			break;
 		}
 	}
 
-	return name;
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Handle an exeption.
- *
- * @param	{Object}		e					Error object.
- */
-App.prototype.__handleException = function(e)
-{
-
-	this.trigger("error", this, {"error":e});
+	return result;
 
 }
