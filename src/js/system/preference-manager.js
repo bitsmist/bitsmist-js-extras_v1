@@ -120,7 +120,7 @@ PreferenceManager.prototype.setup = function(options)
 		options = Object.assign({}, options);
 		let sender = ( options["sender"] ? options["sender"] : this );
 
-		Component.prototype.setup.call(this, options).then(() => {
+		BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
 			if (options["newPreferences"])
 			{
 				this._preferences.merge(options["newPreferences"]);
