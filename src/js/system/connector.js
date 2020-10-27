@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist JS - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -35,7 +35,7 @@ export default function Connector(settings)
 
 }
 
-//BITSMIST.v1.ClassUtil.inherit(Connector, BITSMIST.v1.Component);
+BITSMIST.v1.ClassUtil.inherit(Connector, BITSMIST.v1.Component);
 customElements.define("bm-connector", Connector);
 
 // -----------------------------------------------------------------------------
