@@ -8,8 +8,9 @@
  */
 // =============================================================================
 
-import PreferenceManager from "./preference-manager";
 import ErrorManager from "./error-manager";
+import PreferenceManager from "./preference-manager";
+import SettingManager from "./setting-manager";
 
 // =============================================================================
 //	App class
@@ -28,16 +29,17 @@ export default function App(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"App", "templateName":"", "autoSetup":false}, settings);
+	settings = Object.assign({}, {"name":"App", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
 	_this._targets = {};
-	_this.errorManager = new ErrorManager();
+	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
+	_this._errorManager = new ErrorManager();
+	_this._settingsManager = new SettingManager(_this._settings.items);
 
 	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
-	_this.addEventHandler(_this, "beforeSetup", _this.onBeforeSetup);
 
 	return _this;
 
@@ -64,58 +66,23 @@ App.prototype.onConnected = function(sender, e)
 }
 
 // -----------------------------------------------------------------------------
-
-/**
- * Before setup event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.onBeforeSetup = function(sender, e)
-{
-
-	let settings = e.detail;
-
-	return new Promise((resolve, reject) => {
-		let promises = [];
-
-		Object.keys(this._targets).forEach((componentId) => {
-			if (this.__isTarget(settings, this._targets[componentId].targets))
-			{
-				promises.push(this._targets[componentId].object.setup(settings));
-			}
-		});
-
-		Promise.all(promises).then(() => {
-			resolve();
-		});
-	});
-
-}
-
-// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
 /**
  * Start application.
+ *
+ * @return  {Promise}		Promise.
  */
 App.prototype.run = function()
 {
 
-	Promise.resolve().then(() => {
-		// Load preference
-		return this.__initPreference();
-	}).then(() => {
-		// Init globals
-		BITSMIST.v1.Globals["settings"].items = this._settings.items;
-		BITSMIST.v1.Globals["preferences"].items = this._preferences.items;
-	}).then(() => {
-		// Open app
-		return this.open();
-	});
+	// Start managers
+	this._settingsManager.run();
+	this._preferenceManager.run();
+	this._errorManager.run();
+
+	return this.open();
 
 }
 
@@ -131,29 +98,14 @@ App.prototype.run = function()
 App.prototype.setup = function(options)
 {
 
-	console.debug(`App.setup(): Setting up app.`);
-
-	return new Promise((resolve, reject) => {
-		options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
-
-		BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
-			if (options["newPreferences"])
-			{
-				this.preferences.merge(options["newPreferences"]);
-				this.save();
-			}
-		}).then(() => {
-			resolve();
-		});
-	});
+	this._preferenceManager.setup(options);
 
 }
 
 // -----------------------------------------------------------------------------
 
 /**
- * Register target component.
+ * Register setup component.
  *
  * @param	{Component}		component			Component to notify.
  * @param	{Object}		targets				Targets.
@@ -163,14 +115,14 @@ App.prototype.setup = function(options)
 App.prototype.register = function(component, targets)
 {
 
-	this._targets[component.uniqueId] = {"object":component, "targets":targets};
+	this._preferenceManager.register(component, targets);
 
 }
 
 // -------------------------------------------------------------------------
 
 /**
- * Load items.
+ * Load preferences.
  *
  * @param	{Object}		options				Options.
  *
@@ -179,16 +131,14 @@ App.prototype.register = function(component, targets)
 App.prototype.load = function(options)
 {
 
-	let sender = ( options && options["sender"] ? options["sender"] : this );
-
-	return this.trigger("loadStore", sender);
+	return this._preferenceManager.load(options);
 
 }
 
 // -------------------------------------------------------------------------
 
 /**
- * Save items.
+ * Save preferences.
  *
  * @param	{Object}		options				Options.
  *
@@ -197,64 +147,6 @@ App.prototype.load = function(options)
 App.prototype.save = function(options)
 {
 
-	let sender = ( options && options["sender"] ? options["sender"] : this );
-
-	return this.trigger("saveStore", sender, {"preferences":this._preferences.items});
-
-}
-
-
-// -----------------------------------------------------------------------------
-//  Privates
-// -----------------------------------------------------------------------------
-
-/**
- * Init preferences.
- */
-App.prototype.__initPreference = function()
-{
-
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			return this.load();
-		}).then((preferences) => {
-			return this._preferences.merge(preferences);
-		}).then(() => {
-			resolve();
-		});
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Check if it is a target.
- *
- * @param	{Object}		settings			Settings.
- * @param	{Object}		target				Target component to check.
- */
-App.prototype.__isTarget = function(settings, target)
-{
-
-	let result = false;
-
-	/*
-	if (target == "*")
-	{
-		return true;
-	}
-	*/
-
-	for (let i = 0; i < target.length; i++)
-	{
-		if (settings["newPreferences"].hasOwnProperty(target[i]))
-		{
-			result = true;
-			break;
-		}
-	}
-
-	return result;
+	return this._preferenceManager.save(options);
 
 }
