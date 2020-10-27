@@ -52,7 +52,6 @@ SettingManager.prototype.onConnected = function(sender, e)
 {
 
 	// Init globals
-	BITSMIST.v1.Globals["settings"].component = this;
 	BITSMIST.v1.Globals["settings"].items = this._settings.items;
 
 }

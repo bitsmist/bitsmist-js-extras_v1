@@ -62,7 +62,6 @@ PreferenceManager.prototype.onConnected = function(sender, e)
 			return this._preferences.merge(preferences);
 		}).then(() => {
 			// Init globals
-			BITSMIST.v1.Globals["preferences"].component = this;
 			BITSMIST.v1.Globals["preferences"].items = Object.assign({}, this._settings.get("defaults"), this._preferences.items);
 		}).then(() => {
 			resolve();
