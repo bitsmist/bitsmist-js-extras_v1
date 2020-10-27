@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -134,7 +134,7 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			this._id = ( options["id"] ? options["id"] : this._id );
 			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
-			return this.trigger("beforeFetch", this, {"id":this._id, "parameters":this._parameters});
+			return this.trigger("beforeFetch", this, {"id":this._id, "parameters":this._parameters, "options":options});
 		}).then(() => {
 			return this.trigger("fetch", this);
 		}).then(() => {
