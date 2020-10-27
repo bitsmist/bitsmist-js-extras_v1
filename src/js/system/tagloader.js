@@ -25,7 +25,7 @@ export default function TagLoader(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"TagLoader", "templateName":"", "autoSetup":false}, settings);
+	settings = Object.assign({}, {"name":"TagLoader", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	window.addEventListener('DOMContentLoaded', _this.onDOMContentLoaded.bind(_this));

@@ -25,7 +25,7 @@ export default function Connector(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"Connector", "templateName":""}, settings);
+	settings = Object.assign({}, {"name":"Connector"}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars

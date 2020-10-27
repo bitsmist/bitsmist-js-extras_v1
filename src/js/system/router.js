@@ -27,7 +27,7 @@ export default function Router(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"Router", "templateName":"", "autoSetup":false}, settings);
+	settings = Object.assign({}, {"name":"Router", "autoSetup":false}, settings);
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
