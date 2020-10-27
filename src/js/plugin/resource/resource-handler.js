@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -105,7 +105,7 @@ export default class ResourceHandler extends Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			if (e.detail.autoLoad == false || !e.detail.id)
+			if (e.detail.options["autoLoad"] == false || !e.detail.id)
 			{
 				resolve();
 			}
