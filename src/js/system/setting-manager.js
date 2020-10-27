@@ -61,11 +61,15 @@ SettingManager.prototype.onConnected = function(sender, e)
 
 /**
  * Start manager.
+ *
+ * @return  {Promise}		Promise.
  */
 SettingManager.prototype.run = function()
 {
 
 	// Init globals
 	BITSMIST.v1.Globals["settings"].items = this._settings.items;
+
+	return this.open();
 
 }

@@ -97,6 +97,8 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e)
 
 /**
  * Start manager.
+ *
+ * @return  {Promise}		Promise.
  */
 PreferenceManager.prototype.run = function()
 {
@@ -109,6 +111,8 @@ PreferenceManager.prototype.run = function()
 		}).then(() => {
 			// Init globals
 			BITSMIST.v1.Globals["preferences"].items = Object.assign({}, this._settings.get("defaults"), this._preferences.items);
+		}).then(() => {
+			return this.open();
 		}).then(() => {
 			resolve();
 		});

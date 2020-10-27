@@ -64,11 +64,15 @@ ErrorManager.prototype.onConnected = function(sender, e)
 
 /**
  * Start manager.
+ *
+ * @return  {Promise}		Promise.
  */
 ErrorManager.prototype.run = function()
 {
 
 	this.__initErrorListeners();
+
+	return this.open();
 
 }
 
