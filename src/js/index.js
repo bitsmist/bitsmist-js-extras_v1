@@ -25,6 +25,9 @@ window.BITSMIST.v1.ErrorManager = ErrorManager;
 import Plugin from './plugin/plugin';
 window.BITSMIST.v1.Plugin = Plugin;
 
+import PluginInitializer from './plugin/plugin-initializer';
+BITSMIST.v1.Globals.addInitializer(PluginInitializer, "plugins");
+
 // Plugin - Error handler
 
 import AjaxErrorHandler from './plugin/error/ajax-error-handler';
