@@ -25,7 +25,7 @@ export default function ErrorManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoOpen":false, "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars

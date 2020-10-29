@@ -25,7 +25,7 @@ export default function SettingManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"SettingManager", "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"SettingManager", "autoOpen":false, "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Event handlers
