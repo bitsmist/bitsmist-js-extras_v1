@@ -25,7 +25,7 @@ export default function PreferenceManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"PreferenceManager", "autoSetup":false}, settings);
+	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars

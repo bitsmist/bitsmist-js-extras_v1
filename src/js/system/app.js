@@ -29,7 +29,7 @@ export default function App(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"App", "autoSetup":false}, settings);
+	settings = Object.assign({}, settings, {"name":"App", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
