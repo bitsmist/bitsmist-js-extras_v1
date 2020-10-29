@@ -1,6 +1,6 @@
 // =============================================================================
 /**
- * Bitsmist WebView - Javascript Web Client Framework
+ * BitsmistJS - Javascript Web Client Framework
  *
  * @copyright		Masaki Yasutake
  * @link			https://bitsmist.com/
@@ -9,12 +9,13 @@
 // =============================================================================
 
 import MasterUtil from '../../util/master-util';
+import Plugin from '../plugin';
 
 // =============================================================================
 //	Master handler class
 // =============================================================================
 
-export default class MasterHandler extends BITSMIST.v1.Plugin
+export default class MasterHandler extends Plugin
 {
 
 	// -------------------------------------------------------------------------
@@ -36,8 +37,6 @@ export default class MasterHandler extends BITSMIST.v1.Plugin
 		this._options["events"] = {
 			"specLoad": this.onSpecLoad,
 		}
-		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
-		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
 		this._masters = {};
 
 	}
@@ -58,14 +57,17 @@ export default class MasterHandler extends BITSMIST.v1.Plugin
 		return new Promise((resolve, reject) => {
 			let promises = [];
 
-			if (e.detail.spec && e.detail.spec.masters)
+			if (this._component._spec && this._component._spec["masters"])
 			{
-				Object.keys(e.detail.spec.masters).forEach((masterName) => {
+				let masters = this._component._spec["masters"];
+				let settings = this._component.settings.get("ajaxUtil", {});
+				settings["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
+				Object.keys(masters).forEach((masterName) => {
 					this._masters[masterName] = new MasterUtil(masterName, Object.assign({
-						"settings":	this.getOption("settings", {})
-					}, e.detail.spec.masters[masterName]));
+						"settings": settings,
+					}, masters[masterName]));
 
-					if (e.detail.spec.masters[masterName]["autoLoad"])
+					if (masters[masterName]["autoLoad"])
 					{
 						promises.push(new Promise((resolve, reject) => {
 							this._masters[masterName].load().then(() => {
