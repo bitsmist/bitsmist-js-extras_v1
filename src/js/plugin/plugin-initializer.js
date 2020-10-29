@@ -1,0 +1,117 @@
+// =============================================================================
+/**
+ * BitsmistJS - Javascript Web Client Framework
+ *
+ * @copyright		Masaki Yasutake
+ * @link			https://bitsmist.com/
+ * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+ */
+// =============================================================================
+
+// =============================================================================
+//	Plugin initializer class
+// =============================================================================
+
+export default class PluginInitializer
+{
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Init.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static init(component, settings)
+	{
+
+		if (!component._plugins)
+		{
+			component._plugins = {};
+		}
+
+		if (settings)
+		{
+			Object.keys(settings).forEach((pluginName) => {
+				PluginInitializer.addPlugin(component, pluginName, settings[pluginName]);
+			});
+		}
+
+		return Promise.resolve();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Check if event is target.
+	 *
+	 * @param	{String}		eventName			Event name.
+	 *
+	 * @return 	{Boolean}		True if it is target.
+	 */
+	static isTarget(eventName)
+	{
+
+		let ret = false;
+
+		if (eventName == "initComponent" || eventName == "connected")
+		{
+			ret = true;
+		}
+
+		return ret;
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Add a plugin to the component.
+	 *
+	 * @param	{String}		pluginName			Plugin name.
+	 * @param	{Object}		options				Options for the plugin.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static addPlugin(component, pluginName, options)
+	{
+
+		return new Promise((resolve, reject) => {
+			options = Object.assign({}, options);
+			let className = ( "className" in options ? options["className"] : pluginName );
+			let plugin = null;
+
+			// CreatePlugin
+			plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
+			component._plugins[pluginName] = plugin;
+
+			// Add event handlers
+			let events = plugin.getOption("events", {});
+			Object.keys(events).forEach((eventName) => {
+				component.addEventHandler(component, eventName, events[eventName], null, plugin);
+			});
+
+			// Expose plugin
+			if (options["expose"])
+			{
+				Object.defineProperty(component.__proto__, pluginName, {
+					get()
+					{
+						return plugin;
+					}
+				});
+			}
+
+			resolve(plugin);
+		});
+
+	}
+
+
+}
