@@ -27,7 +27,7 @@ export default function Router(settings)
 {
 
 	// super()
-	settings = Object.assign({}, {"name":"Router", "autoSetup":false}, settings);
+	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -542,26 +542,7 @@ Router.prototype.__initSpec = function()
 					}
 				}
 
-				// Add new Plugins
-				if (spec["plugins"])
-				{
-					Object.keys(spec["plugins"]).forEach((pluginName) => {
-						this.addPlugin(pluginName, spec["plugins"][pluginName]);
-					});
-				}
-
-				// Add new Components
-				let chain = Promise.resolve();
-				if (spec["components"])
-				{
-					Object.keys(spec["components"]).forEach((componentName) => {
-						chain = chain.then(() => {
-							return this.addComponent(componentName, spec["components"][componentName]);
-						});
-					});
-				}
-
-				chain.then(() => {
+				this.applyInitializer(spec, "spec").then(() => {
 					resolve();
 				});
 			});
