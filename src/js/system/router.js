@@ -8,8 +8,6 @@
  */
 // =============================================================================
 
-import { pathToRegexp } from 'path-to-regexp';
-
 // =============================================================================
 //	Router class
 // =============================================================================
@@ -31,7 +29,8 @@ export default function Router(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	this._spec;
+	_this._routes = _this._routes || [];
+	_this._spec;
 
 	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
@@ -73,11 +72,8 @@ Router.prototype.onConnected = function(sender, e)
 {
 
 	return new Promise((resolve, reject) => {
-		this._settings.set("routes", this._settings.get("routes", []));
-		this.__initRoutes(this._settings.get("routes"));
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
 		this.__initPopState();
-
 		this.__initSpec().then(() => {
 			return this.trigger("specLoad", this, {"spec":this._spec});
 		}).then(() => {
@@ -89,41 +85,6 @@ Router.prototype.onConnected = function(sender, e)
 
 // -----------------------------------------------------------------------------
 //  Methods
-// -----------------------------------------------------------------------------
-
-/**
- * Add a route.
- *
- * @param	{Object}		routeInfo			Route info.
- * @param	{Boolean}		first				Add to top when true.
- */
-Router.prototype.addRoute = function(routeInfo, first)
-{
-
-	let keys = [];
-	let route = {
-		"origin": routeInfo["origin"],
-		"name": routeInfo["name"],
-		"path": routeInfo["path"],
-		"keys": keys,
-		"specName": routeInfo["specName"],
-		"componentName": routeInfo["componentName"],
-		"re": pathToRegexp(routeInfo["path"], keys)
-	};
-
-	if (first)
-	{
-		this._routes.unshift(route);
-	}
-	else
-	{
-		this._routes.push(route);
-	}
-
-	this._routeInfo = this.__loadRouteInfo(window.location.href);
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -414,25 +375,6 @@ Router.prototype._open = function(routeInfo, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Init routes.
- *
- * @param	{Object}		routes				Routes.
- */
-Router.prototype.__initRoutes = function(routes)
-{
-
-	this._routes = [];
-
-	for (let i = 0; i < routes.length; i++)
-	{
-		this.addRoute(routes[i]);
-	}
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * Get route info from the url.
  *
  * @param	{String}		url					Url.
@@ -532,15 +474,6 @@ Router.prototype.__initSpec = function()
 
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;
-
-				// Add new routes
-				if (spec["routes"])
-				{
-					for(let i = 0; i < spec["routes"].length; i++)
-					{
-						this.addRoute(spec["routes"][i]);
-					}
-				}
 
 				this.applyInitializer(spec, "spec").then(() => {
 					resolve();
