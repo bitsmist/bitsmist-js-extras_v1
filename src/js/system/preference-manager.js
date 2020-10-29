@@ -140,6 +140,7 @@ PreferenceManager.prototype.setup = function(options)
 			if (options["newPreferences"])
 			{
 				this._preferences.merge(options["newPreferences"]);
+				BITSMIST.v1.Globals["preferences"].items = this._preferences.items;
 				this.save();
 			}
 		}).then(() => {
