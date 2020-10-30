@@ -36,7 +36,7 @@ export default function App(settings)
 	_this._targets = {};
 	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
 	_this._errorManager = new ErrorManager();
-	_this._settingsManager = new SettingManager(_this._settings.items);
+	_this._settingManager = new SettingManager(_this._settings.items);
 
 	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
@@ -47,6 +47,37 @@ export default function App(settings)
 
 BITSMIST.v1.ClassUtil.inherit(App, BITSMIST.v1.Component);
 customElements.define("bm-app", App);
+
+// -----------------------------------------------------------------------------
+//  Setter/Getter
+// -----------------------------------------------------------------------------
+
+/**
+ * Global preferences.
+ *
+ * @type	{String}
+ */
+Object.defineProperty(App.prototype, 'preferences', {
+	get()
+	{
+		return this._preferenceManager;
+	}
+})
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Global settings.
+ *
+ * @type	{String}
+ */
+Object.defineProperty(App.prototype, 'settings', {
+	get()
+	{
+		return this._settingManager;
+	}
+})
+
 
 // -----------------------------------------------------------------------------
 //	Event handlers
@@ -78,7 +109,7 @@ App.prototype.run = function()
 {
 
 	// Start managers
-	this._settingsManager.run();
+	this._settingManager.run();
 	this._preferenceManager.run();
 	this._errorManager.run();
 
@@ -116,37 +147,5 @@ App.prototype.register = function(component, targets)
 {
 
 	this._preferenceManager.register(component, targets);
-
-}
-
-// -------------------------------------------------------------------------
-
-/**
- * Load preferences.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.load = function(options)
-{
-
-	return this._preferenceManager.load(options);
-
-}
-
-// -------------------------------------------------------------------------
-
-/**
- * Save preferences.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.save = function(options)
-{
-
-	return this._preferenceManager.save(options);
 
 }
