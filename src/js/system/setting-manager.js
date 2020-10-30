@@ -63,6 +63,38 @@ SettingManager.prototype.onConnected = function(sender, e)
 // -----------------------------------------------------------------------------
 
 /**
+ * Get a value.
+ *
+ * @param	{String}		key					Key.
+ * @param	{Object}		defaultValue		Value returned when key is not found.
+ *
+ * @return  {*}				Value.
+ */
+SettingManager.prototype.get = function(key, defaultValue)
+{
+
+	return this._preferences.get(key, defaultValue);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set a valuee.
+ *
+ * @param	{String}		key					Key.
+ * @param	{Object}		value				Value to store.
+ */
+SettingManager.prototype.set = function(key, value)
+{
+
+	this._preferences.set(key, value);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Start manager.
  *
  * @return  {Promise}		Promise.
