@@ -30,6 +30,11 @@ export default function PreferenceManager(settings)
 
 	// Init vars
 	_this._targets = {};
+	let preferences = Object.assign({}, settings["preferences"]);
+	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
+
+	// Init globals
+	BITSMIST.v1.Globals["preferences"] = _this._preferences;
 
 	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
@@ -109,9 +114,6 @@ PreferenceManager.prototype.run = function()
 		}).then((preferences) => {
 			return this._preferences.merge(preferences);
 		}).then(() => {
-			// Init globals
-			BITSMIST.v1.Globals["preferences"].items = Object.assign({}, this._settings.get("defaults"), this._preferences.items);
-		}).then(() => {
 			return this.open();
 		}).then(() => {
 			resolve();
@@ -140,7 +142,6 @@ PreferenceManager.prototype.setup = function(options)
 			if (options["newPreferences"])
 			{
 				this._preferences.merge(options["newPreferences"]);
-				BITSMIST.v1.Globals["preferences"].items = this._preferences.items;
 				this.save();
 			}
 		}).then(() => {

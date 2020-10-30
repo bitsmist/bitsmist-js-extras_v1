@@ -28,6 +28,9 @@ export default function SettingManager(settings)
 	settings = Object.assign({}, settings, {"name":"SettingManager", "autoOpen":false, "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
+	// Init globals
+	BITSMIST.v1.Globals["settings"] = _this._settings;
+
 	// Event handlers
 	_this.addEventHandler(_this, "connected", _this.onConnected);
 
@@ -66,9 +69,6 @@ SettingManager.prototype.onConnected = function(sender, e)
  */
 SettingManager.prototype.run = function()
 {
-
-	// Init globals
-	BITSMIST.v1.Globals["settings"].items = this._settings.items;
 
 	return this.open();
 
