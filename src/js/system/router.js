@@ -475,7 +475,7 @@ Router.prototype.__initSpec = function()
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;
 
-				this.applyInitializer(spec, "spec").then(() => {
+				this.organize(spec, "spec").then(() => {
 					resolve();
 				});
 			});

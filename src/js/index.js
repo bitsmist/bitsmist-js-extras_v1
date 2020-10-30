@@ -20,13 +20,13 @@ window.BITSMIST.v1.PreferenceManager = PreferenceManager;
 import ErrorManager from './system/error-manager';
 window.BITSMIST.v1.ErrorManager = ErrorManager;
 
-// Initializer
+// Organizer
 
-import PluginInitializer from './initializer/plugin-initializer';
-BITSMIST.v1.Globals.addInitializer(PluginInitializer, "plugins");
+import PluginOrganizer from './organizer/plugin-organizer';
+BITSMIST.v1.Globals.addOrganizer(PluginOrganizer, "plugins");
 
-import RouteInitializer from './initializer/route-initializer';
-BITSMIST.v1.Globals.addInitializer(RouteInitializer, "routes");
+import RouteOrganizer from './organizer/route-organizer';
+BITSMIST.v1.Globals.addOrganizer(RouteOrganizer, "routes");
 
 // Plugin
 
