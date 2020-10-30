@@ -258,7 +258,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
 		}
 
 		// set row elements click event handler
-		Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
+		Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
 			this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
 		});
 
@@ -306,7 +306,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item)
 	}
 
 	// set row elements click event handler
-	Object.keys(this._row.settings.get("elements")).forEach((elementName) => {
+	Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
 		this._row.setHtmlEventHandlers(elementName, {"item":item, "no":no, "element":element}, element);
 	});
 
