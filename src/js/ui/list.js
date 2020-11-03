@@ -148,7 +148,6 @@ List.prototype.fill = function(options)
 	return new Promise((resolve, reject) => {
 		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
-		//options = Object.assign({}, options);
 		let fragment = document.createDocumentFragment();
 		let builder = ( this.settings.get("async") ? this._buildAsync : this._buildSync );
 
