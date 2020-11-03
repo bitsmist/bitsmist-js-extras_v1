@@ -140,12 +140,24 @@ App.prototype.setup = function(options)
  *
  * @param	{Component}		component			Component to notify.
  * @param	{Object}		targets				Targets.
- *
- * @return  {Promise}		Promise.
  */
 App.prototype.register = function(component, targets)
 {
 
 	this._preferenceManager.register(component, targets);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Register setup component.
+ *
+ * @param	{Component}		component			Component to notify.
+ */
+App.prototype.deregister = function(component)
+{
+
+	this._preferenceManager.deregister(component);
 
 }
