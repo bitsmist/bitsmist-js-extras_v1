@@ -30,7 +30,7 @@ export default function PreferenceManager(settings)
 
 	// Init vars
 	_this._targets = {};
-	let preferences = Object.assign({}, settings["preferences"]);
+	let preferences = Object.assign({}, settings["defaults"]);
 	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
 
 	// Init globals
@@ -46,6 +46,22 @@ export default function PreferenceManager(settings)
 
 BITSMIST.v1.ClassUtil.inherit(PreferenceManager, BITSMIST.v1.Component);
 customElements.define("bm-preference", PreferenceManager);
+
+// -----------------------------------------------------------------------------
+//  Setter/Getter
+// -----------------------------------------------------------------------------
+
+/**
+ * Items.
+ *
+ * @type	{String}
+ */
+Object.defineProperty(PreferenceManager.prototype, 'items', {
+	get()
+	{
+		return this._preferences.items;
+	}
+})
 
 // -----------------------------------------------------------------------------
 //	Event handlers
@@ -85,6 +101,7 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e)
 		Object.keys(this._targets).forEach((componentId) => {
 			if (this.__isTarget(settings, this._targets[componentId].targets))
 			{
+				console.log("@@@", componentId, this._targets[componentId].object);
 				promises.push(this._targets[componentId].object.setup(settings));
 			}
 		});
@@ -98,6 +115,38 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e)
 
 // -----------------------------------------------------------------------------
 //  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a value.
+ *
+ * @param	{String}		key					Key.
+ * @param	{Object}		defaultValue		Value returned when key is not found.
+ *
+ * @return  {*}				Value.
+ */
+PreferenceManager.prototype.get = function(key, defaultValue)
+{
+
+	return this._preferences.get(key, defaultValue);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set a valuee.
+ *
+ * @param	{String}		key					Key.
+ * @param	{Object}		value				Value to store.
+ */
+PreferenceManager.prototype.set = function(key, value)
+{
+
+	this._preferences.set(key, value);
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -165,6 +214,22 @@ PreferenceManager.prototype.register = function(component, targets)
 {
 
 	this._targets[component.uniqueId] = {"object":component, "targets":targets};
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Deregister target component.
+ *
+ * @param	{Component}		component			Component to notify.
+ *
+ * @return  {Promise}		Promise.
+ */
+PreferenceManager.prototype.deregister = function(component)
+{
+
+	delete this._targets[component.uniqueId];
 
 }
 
