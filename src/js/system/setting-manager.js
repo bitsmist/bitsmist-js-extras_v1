@@ -73,7 +73,7 @@ SettingManager.prototype.onConnected = function(sender, e)
 SettingManager.prototype.get = function(key, defaultValue)
 {
 
-	return this._preferences.get(key, defaultValue);
+	return this._settings.get(key, defaultValue);
 
 }
 
@@ -88,7 +88,7 @@ SettingManager.prototype.get = function(key, defaultValue)
 SettingManager.prototype.set = function(key, value)
 {
 
-	this._preferences.set(key, value);
+	this._settings.set(key, value);
 
 }
 
