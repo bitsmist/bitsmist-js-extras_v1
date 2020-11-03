@@ -74,7 +74,7 @@ Router.prototype.onConnected = function(sender, e)
 	return new Promise((resolve, reject) => {
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
 		this.__initPopState();
-		this.__initSpec().then(() => {
+		this.__initSpec(this._routeInfo["specName"]).then(() => {
 			return this.trigger("specLoad", this, {"spec":this._spec});
 		}).then(() => {
 			resolve();
@@ -100,45 +100,15 @@ Router.prototype.buildUrl = function(routeInfo)
 
 	let url;
 
-	// Path
 	if (routeInfo["url"])
 	{
 		url = routeInfo["url"];
 	}
 	else
 	{
-		/*
-		else if (routeInfo["name"])
-		{
-			url = this.__routes[]["path"];
-		}
-		*/
-		if (routeInfo["path"])
-		{
-			url = routeInfo["path"];
-		}
-		else
-		{
-			url = this._routeInfo["path"];
-		}
-
-		// Route parameters
-		/*
-		if (routeInfo["routeParamters"])
-		{
-			url =
-		}
-		*/
-
-		// Query parameters
-		if (routeInfo["query"])
-		{
-			url = url + "?" + routeInfo["query"];
-		}
-		else if (routeInfo["queryParameters"])
-		{
-			url = url + this.buildUrlQuery(routeInfo["queryParameters"]);
-		}
+		url  = ( routeInfo["path"] ? routeInfo["path"] : this._routeInfo["path"] );
+		url += ( routeInfo["query"] ? "?" + routeInfo["query"] : "" );
+		url += ( routeInfo["queryParameters"] ? this.buildUrlQuery(routeInfo["queryParameters"]) : "" );
 	}
 
 	return url;
@@ -222,10 +192,23 @@ Router.prototype.openRoute = function(routeInfo, options)
 {
 
 	options = Object.assign({}, options);
-	options["pushState"] = true;
-	options["autoOpen"] = true;
 
 	this._open(routeInfo, options);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Jump to route.
+ *
+ * @param	{Object}		options				Query options.
+ */
+Router.prototype.jumpRoute = function(routeInfo, options)
+{
+
+	let url = this.buildUrl(routeInfo);
+	this._jump(url);
 
 }
 
@@ -239,11 +222,7 @@ Router.prototype.openRoute = function(routeInfo, options)
 Router.prototype.refreshRoute = function(routeInfo, options)
 {
 
-	options = Object.assign({}, options);
-	options["pushState"] = false;
-	options["autoOpen"] = true;
-
-	this._open(routeInfo, options);
+	return this._refresh(routeInfo, options);
 
 }
 
@@ -258,20 +237,7 @@ Router.prototype.refreshRoute = function(routeInfo, options)
 Router.prototype.updateRoute = function(routeInfo, options)
 {
 
-	options = Object.assign({}, options);
-	options["autoRefresh"] = true;
-
-	if (routeInfo["routeParameters"])
-	{
-		routeInfo["routeParameters"] = Object.assign(this._routeInfo["routeParameters"], routeInfo["routeParameters"]);
-	}
-
-	if (routeInfo["queryParameters"])
-	{
-		routeInfo["queryParameters"] = Object.assign(this._routeInfo["queryParameters"], routeInfo["queryParameters"]);
-	}
-
-	this._open(routeInfo, options);
+	return this._update(routeInfo, options);
 
 }
 
@@ -284,7 +250,7 @@ Router.prototype.updateRoute = function(routeInfo, options)
  *
  * @return  {string}		Url.
  */
-Router.prototype.replace = function(routeInfo)
+Router.prototype.replaceRoute = function(routeInfo)
 {
 
 	history.replaceState(null, null, this.buildUrl(routeInfo));
@@ -308,65 +274,98 @@ Router.prototype._open = function(routeInfo, options)
 	options = Object.assign({}, options);
 	options["pushState"] = ( options["pushState"] !== undefined ? options["pushState"] : true );
 	let url = this.buildUrl(routeInfo);
+	let curRouteInfo = Object.assign({}, this._routeInfo);
+	let newRouteInfo = this.__loadRouteInfo(url);
+	this._routeInfo = this.__loadRouteInfo(url);
 
-	if (options["jump"])
+	if (!newRouteInfo["name"] || ( curRouteInfo["name"] != newRouteInfo["name"]) )
 	{
-		// Jump to another page
-		location.href = url;
+		this._jump(url);
 		return;
 	}
-	else
-	{
-		let newRouteInfo = this.__loadRouteInfo(url);
 
-		if (this._routeInfo["name"] != newRouteInfo["name"])
+	Promise.resolve().then(() => {
+		if (options["pushState"])
 		{
-			location.href = url;
-			return;
+			history.pushState(null, null, url);
 		}
-		else if (this._routeInfo["componentName"] != newRouteInfo["componentName"])
+	}).then(() => {
+		if ( curRouteInfo["specName"] != newRouteInfo["specName"] )
 		{
-			location.href = url;
-			return;
-			/*
-			history.pushState(null, null, newRouteInfo["url"]);
-			this.container["loader"].loadApp(newRouteInfo["specName"]);
-			return;
-			*/
+			// Load another component and open
+			return this._update(newRouteInfo, options);
 		}
+		else
+		{
+			// Refresh current component
+			return this._refresh(routeInfo, options);
+		}
+	}).then(() => {
+		if (routeInfo["dispUrl"])
+		{
+			// Replace url
+			history.replaceState(null, null, routeInfo["dispUrl"]);
+		}
+	});
+
+}
+
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Jump to url.
+ *
+ * @param	{String}		url					Url.
+ */
+Router.prototype._jump = function(url)
+{
+
+	location.href = url;
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Refresh route.
+ *
+ * @param	{Object}		routeInfo			Route information.
+ * @param	{Object}		options				Query options.
+ */
+Router.prototype._refresh = function(routeInfo, options)
+{
+
+	let componentName = this._routeInfo["componentName"];
+	if (this._components[componentName])
+	{
+		return this._components[componentName].refresh({"sender":this, "pushState":false});
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Update route.
+ *
+ * @param	{Object}		routeInfo			Route information.
+ * @param	{Object}		options				Query options.
+ */
+Router.prototype._update = function(routeInfo, options)
+{
+
+	return new Promise((resolve, reject) => {
+		this.clearOrganizers();
 
 		Promise.resolve().then(() => {
-			if (options["pushState"])
-			{
-				history.pushState(null, null, url);
-			}
-			this._routeInfo = this.__loadRouteInfo(window.location.href);
+			return this.__initSpec(routeInfo["specName"]);
 		}).then(() => {
-			if (options["autoOpen"])
-			{
-				let componentName = this._routeInfo["componentName"];
-				if (this._components[componentName])
-				{
-					return this._components[componentName].open({"sender":this});
-				}
-			}
+			return this.trigger("specLoad", this, {"spec":this._spec});
 		}).then(() => {
-			if (options["autoRefresh"])
-			{
-				let componentName = this._routeInfo["componentName"];
-				if (this._components[componentName])
-				{
-					return this._components[componentName].refresh({"sender":this});
-				}
-			}
-		}).then(() => {
-			if (routeInfo["dispUrl"])
-			{
-				// Replace url
-				history.replaceState(null, null, routeInfo["dispUrl"]);
-			}
+			resolve();
 		});
-	}
+	});
 
 }
 
@@ -440,18 +439,22 @@ Router.prototype.__initPopState = function()
 
 	if (window.history && window.history.pushState){
 		window.addEventListener("popstate", (event) => {
-			let promises = [];
 
-			Object.keys(this._components).forEach((componentName) => {
-				promises.push(this._components[componentName].trigger("beforePopState", this));
-			});
+			let promise;
+			let componentName = this._routeInfo["componentName"];
+			if (this._components[componentName])
+			{
+				promise = this._components[componentName].trigger("beforePopState", this);
+			}
 
-			Promise.all(promises).then(() => {
-				this.refreshRoute(this.__loadRouteInfo(window.location.href));
+			Promise.all([promise]).then(() => {
+				this.openRoute(this.__loadRouteInfo(window.location.href), {"pushState":false});
 			}).then(() => {
-				Object.keys(this._components).forEach((componentName) => {
+				let componentName = this._routeInfo["componentName"];
+				if (this._components[componentName])
+				{
 					this._components[componentName].trigger("popState", this);
-				});
+				}
 			});
 		});
 	}
@@ -463,11 +466,10 @@ Router.prototype.__initPopState = function()
 /**
  * Load a spec and init.
  */
-Router.prototype.__initSpec = function()
+Router.prototype.__initSpec = function(specName)
 {
 
 	return new Promise((resolve, reject) => {
-		let specName = this._routeInfo["specName"];
 		if (specName)
 		{
 			let path = this._element.getAttribute("data-specpath") || "";
