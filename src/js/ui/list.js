@@ -35,7 +35,7 @@ export default function List(settings)
 	_this._rows;
 
 	// Event handlers
-	_this.addEventHandler(_this, "append", _this.onListAppend);
+	_this.addEventHandler(_this, "afterAppend", _this.onListAfterAppend);
 
 	return _this;
 
@@ -100,12 +100,12 @@ Object.defineProperty(List.prototype, 'data', {
 // -----------------------------------------------------------------------------
 
 /**
- * Append event hadler.
+ * After append event hadler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-List.prototype.onListAppend = function(sender, e)
+List.prototype.onListAfterAppend = function(sender, e)
 {
 
 	return new Promise((resolve, reject) => {
@@ -152,13 +152,15 @@ List.prototype.fill = function(options)
 		let builder = ( this.settings.get("async") ? this._buildAsync : this._buildSync );
 
 		Promise.resolve().then(() => {
-			return this.trigger("target", this);
+			return this.trigger("doTarget", this);
 		}).then(() => {
 			this._id = ( options["id"] ? options["id"] : this._id );
 			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
 			return this.trigger("beforeFetch", this, {"id":this._id, "parameters":this._parameters, "options":options});
 		}).then(() => {
-			return this.trigger("fetch", this);
+			return this.trigger("doFetch", this);
+		}).then(() => {
+			return this.trigger("afterFetch", this);
 		}).then(() => {
 			return this.trigger("beforeFill", this);
 		}).then(() => {
@@ -174,7 +176,7 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			this._listRootNode.appendChild(fragment);
 		}).then(() => {
-			return this.trigger("fill", this);
+			return this.trigger("afterFill", this);
 		}).then(() => {
 			resolve();
 		});
@@ -264,14 +266,12 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
 		// Call event handlers
 		let chain = Promise.resolve();
 		chain = chain.then(() => {
-			return this._row.trigger("formatRow", this, {"item":item, "no":no, "element":element});
-		}).then(() => {
 			return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			// Fill fields
 			FormUtil.setFields(element, item, this.masters);
 		}).then(() => {
-			return this._row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
+			return this._row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			resolve();
 		});
@@ -310,9 +310,8 @@ List.prototype.__appendRowSync = function(rootNode, no, item)
 	});
 
 	// Call event handlers
-	this._row.trigger("formatRow", this, {"item":item, "no":no, "element":element});
 	this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 	FormUtil.setFields(element, item, this.masters);
-	this.row.trigger("fillRow", this, {"item":item, "no":no, "element":element});
+	this.row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 }

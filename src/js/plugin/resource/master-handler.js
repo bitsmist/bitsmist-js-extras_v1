@@ -35,7 +35,7 @@ export default class MasterHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"specLoad": this.onSpecLoad,
+			"afterSpecLoad": this.onAfterSpecLoad,
 		}
 		this._masters = {};
 
@@ -46,12 +46,12 @@ export default class MasterHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Spec Load event handler.
+	 * After spec load event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onSpecLoad(sender, e)
+	onAfterSpecLoad(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {

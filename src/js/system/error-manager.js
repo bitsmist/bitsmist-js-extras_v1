@@ -32,7 +32,7 @@ export default function ErrorManager(settings)
 	_this._targets = {};
 
 	// Event handlers
-	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 
 	return _this;
 
@@ -46,12 +46,12 @@ customElements.define("bm-error", ErrorManager);
 // -----------------------------------------------------------------------------
 
 /**
- * Connected event handler.
+ * After connect event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-ErrorManager.prototype.onConnected = function(sender, e)
+ErrorManager.prototype.onAfterConnect = function(sender, e)
 {
 
 	this.run();
@@ -230,7 +230,7 @@ ErrorManager.prototype.__handleException = function(e)
 	Object.keys(this._targets).forEach((key) => {
 		if (this.__isTarget(this._targets[key].object, this._targets[key].targets))
 		{
-			this._targets[key].object.trigger("error", this, {"error":e});
+			this._targets[key].object.trigger("afterError", this, {"error":e});
 		}
 	});
 

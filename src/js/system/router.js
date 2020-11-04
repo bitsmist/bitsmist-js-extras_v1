@@ -33,7 +33,7 @@ export default function Router(settings)
 	_this._spec;
 
 	// Event handlers
-	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 
 	return _this;
 
@@ -63,19 +63,19 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 // -----------------------------------------------------------------------------
 
 /**
- * Connected event handler.
+ * After connect event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-Router.prototype.onConnected = function(sender, e)
+Router.prototype.onAfterConnect = function(sender, e)
 {
 
 	return new Promise((resolve, reject) => {
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
 		this.__initPopState();
 		this.__initSpec(this._routeInfo["specName"]).then(() => {
-			return this.trigger("specLoad", this, {"spec":this._spec});
+			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 		}).then(() => {
 			resolve();
 		});
@@ -361,7 +361,7 @@ Router.prototype._update = function(routeInfo, options)
 		Promise.resolve().then(() => {
 			return this.__initSpec(routeInfo["specName"]);
 		}).then(() => {
-			return this.trigger("specLoad", this, {"spec":this._spec});
+			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 		}).then(() => {
 			resolve();
 		});
@@ -453,7 +453,7 @@ Router.prototype.__initPopState = function()
 				let componentName = this._routeInfo["componentName"];
 				if (this._components[componentName])
 				{
-					this._components[componentName].trigger("popState", this);
+					this._components[componentName].trigger("afterPopState", this);
 				}
 			});
 		});

@@ -36,7 +36,7 @@ export default class ResourceHandler extends Plugin
 
 		this._options["events"] = {
 			"beforeFetch": this.onBeforeFetch,
-			"submit": this.onSubmit,
+			"afterSubmit": this.onAfterSubmit,
 		}
 		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
 		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
@@ -125,12 +125,12 @@ export default class ResourceHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Submit event handler.
+	* After submit event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onSubmit(sender, e)
+	onAfterSubmit(sender, e)
 	{
 
 		if (e.detail.id)

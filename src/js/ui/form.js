@@ -100,20 +100,20 @@ Form.prototype.fill = function(options)
 		}
 
 		Promise.resolve().then(() => {
-			return this.trigger("target", sender);
+			return this.trigger("doTarget", sender);
 		}).then(() => {
 			this._id = ( options["id"] ? options["id"] : this._id );
 			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
 			return this.trigger("beforeFetch", sender, {"id":this._id, "parameters":this._parameters, "options":options});
 		}).then(() => {
-			return this.trigger("fetch", sender);
+			return this.trigger("doFetch", sender);
 		}).then(() => {
-			return this.trigger("format", sender);
+			return this.trigger("afterFetch", sender);
 		}).then(() => {
 			return this.trigger("beforeFill", sender);
 		}).then(() => {
 			FormUtil.setFields(this, this.item, this.masters);
-			return this.trigger("fill", sender);
+			return this.trigger("afterFill", sender);
 		}).then(() => {
 			resolve();
 		});
@@ -174,7 +174,7 @@ Form.prototype.validate = function(options)
 			{
 				this.__cancelSubmit = true;
 			}
-			return this.trigger("validate", sender);
+			return this.trigger("afterValidate", sender);
 		}).then(() => {
 			resolve();
 		});
@@ -199,7 +199,7 @@ Form.prototype.submit = function(options)
 		this.__cancelSubmit = false;
 		this.item = this.getFields();
 
-		this.trigger("formatSubmit", sender).then(() => {
+		Promise.resolve(() => {
 			return this.validate();
 		}).then(() => {
 			return this.trigger("beforeSubmit", sender);
@@ -207,8 +207,11 @@ Form.prototype.submit = function(options)
 			if (!this.__cancelSubmit)
 			{
 				let items = this.settings.get("itemGetter", function(item){return [item]})(this.item);
-				return this.trigger("submit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
+				return this.trigger("doSubmit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
 			}
+		}).then(() => {
+			let items = this.settings.get("itemGetter", function(item){return [item]})(this.item);
+			return this.trigger("afterSubmit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
 		}).then(() => {
 			resolve();
 		});

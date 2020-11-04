@@ -32,7 +32,7 @@ export default function SettingManager(settings)
 	BITSMIST.v1.Globals["settings"] = _this._settings;
 
 	// Event handlers
-	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 
 	return _this;
 
@@ -46,12 +46,12 @@ customElements.define("bm-setting", SettingManager);
 // -----------------------------------------------------------------------------
 
 /**
- * Connected event handler.
+ * After connected event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-SettingManager.prototype.onConnected = function(sender, e)
+SettingManager.prototype.onAfterConnect = function(sender, e)
 {
 
 	this.run();

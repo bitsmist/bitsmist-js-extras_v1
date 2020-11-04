@@ -34,7 +34,7 @@ export default class DefaultkeyHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"append": this.onAppend,
+			"afterAppend": this.onAfterAppend,
 		}
 
 		this.__isComposing = false;
@@ -46,12 +46,12 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Init after append completed.
+	* After append event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onAppend(sender, e)
+	onAfterAppend(sender, e)
 	{
 
 		// default keys

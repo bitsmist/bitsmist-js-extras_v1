@@ -35,8 +35,8 @@ export default class CookieStoreHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"loadStore": this.onLoadStore,
-			"saveStore": this.onSaveStore,
+			"doLoadStore": this.onDoLoadStore,
+			"doSaveStore": this.onDoSaveStore,
 		}
 
 		this._cookie = new CookieUtil(this._options["cookieOptions"]);
@@ -49,12 +49,12 @@ export default class CookieStoreHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Load store event handler.
+	* Do load store event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onLoadStore(sender, e)
+	onDoLoadStore(sender, e)
 	{
 
 		return new Promise((resolve, reject) => {
@@ -68,12 +68,12 @@ export default class CookieStoreHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Save store event handler.
+	* Do save store event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onSaveStore(sender, e)
+	onDoSaveStore(sender, e)
 	{
 
 		this._cookie.set(this._cookieName, e.detail.preferences);

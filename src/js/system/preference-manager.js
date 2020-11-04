@@ -37,7 +37,7 @@ export default function PreferenceManager(settings)
 	BITSMIST.v1.Globals["preferences"] = _this._preferences;
 
 	// Event handlers
-	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 	_this.addEventHandler(_this, "beforeSetup", _this.onBeforeSetup);
 
 	return _this;
@@ -68,12 +68,12 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
 // -----------------------------------------------------------------------------
 
 /**
- * Connected event handler.
+ * After connect event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-PreferenceManager.prototype.onConnected = function(sender, e)
+PreferenceManager.prototype.onAfterConnect = function(sender, e)
 {
 
 	this.run();
@@ -101,7 +101,6 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e)
 		Object.keys(this._targets).forEach((componentId) => {
 			if (this.__isTarget(settings, this._targets[componentId].targets))
 			{
-				console.log("@@@", componentId, this._targets[componentId].object);
 				promises.push(this._targets[componentId].object.setup(settings));
 			}
 		});
@@ -247,7 +246,7 @@ PreferenceManager.prototype.load = function(options)
 
 	let sender = ( options && options["sender"] ? options["sender"] : this );
 
-	return this.trigger("loadStore", sender);
+	return this.trigger("doLoadStore", sender);
 
 }
 
@@ -265,7 +264,7 @@ PreferenceManager.prototype.save = function(options)
 
 	let sender = ( options && options["sender"] ? options["sender"] : this );
 
-	return this.trigger("saveStore", sender, {"preferences":this._preferences.items});
+	return this.trigger("doSaveStore", sender, {"preferences":this._preferences.items});
 
 }
 

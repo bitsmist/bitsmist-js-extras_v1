@@ -40,7 +40,7 @@ export default function App(settings)
 	_this._settingManager = new SettingManager(_this._settings.get("globals"));
 
 	// Event handlers
-	_this.addEventHandler(_this, "connected", _this.onConnected);
+	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 
 	return _this;
 
@@ -85,12 +85,12 @@ Object.defineProperty(App.prototype, 'settings', {
 // -----------------------------------------------------------------------------
 
 /**
- * Connected event handler.
+ * After connect event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  */
-App.prototype.onConnected = function(sender, e)
+App.prototype.onAfterConnect = function(sender, e)
 {
 
 	this.run();
