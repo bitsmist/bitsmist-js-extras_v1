@@ -72,7 +72,7 @@ Form.prototype.build = function(items)
 {
 
 	Object.keys(items).forEach((key) => {
-		FormUtil.buildFields(this._element, key, items[key]);
+		FormUtil.buildFields(this, key, items[key]);
 	});
 
 }
@@ -112,7 +112,7 @@ Form.prototype.fill = function(options)
 		}).then(() => {
 			return this.trigger("beforeFill", sender);
 		}).then(() => {
-			FormUtil.setFields(this._element, this.item, this.masters);
+			FormUtil.setFields(this, this.item, this.masters);
 			return this.trigger("fill", sender);
 		}).then(() => {
 			resolve();
@@ -133,7 +133,7 @@ Form.prototype.fill = function(options)
 Form.prototype.clear = function(target)
 {
 
-	return FormUtil.clearFields(this._element, target);
+	return FormUtil.clearFields(this, target);
 
 }
 
@@ -156,7 +156,7 @@ Form.prototype.validate = function(options)
 
 		this.trigger("beforeValidate", sender).then(() => {
 			let ret = true;
-			let form = this._element.querySelector("form");
+			let form = this.querySelector("form");
 
 			if (this.settings.get("autoValidate"))
 			{
@@ -166,7 +166,7 @@ Form.prototype.validate = function(options)
 				}
 				else
 				{
-					ret = FormUtil.reportValidity(this._element);
+					ret = FormUtil.reportValidity(this);
 				}
 			}
 
@@ -226,6 +226,6 @@ Form.prototype.submit = function(options)
 Form.prototype.getFields = function()
 {
 
-	return FormUtil.getFields(this._element);
+	return FormUtil.getFields(this);
 
 }

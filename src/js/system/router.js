@@ -472,7 +472,7 @@ Router.prototype.__initSpec = function(specName)
 	return new Promise((resolve, reject) => {
 		if (specName)
 		{
-			let path = this._element.getAttribute("data-specpath") || "";
+			let path = this.getAttribute("data-specpath") || "";
 
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;

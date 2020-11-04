@@ -58,9 +58,9 @@ export default class DefaultkeyHandler extends Plugin
 		let defaultKeys = this._options["features"]["defaultKeys"];
 		if (defaultKeys)
 		{
-			this._component.addEventHandler(this._component.element, "keydown", this.__defaultKey, {"options":defaultKeys}, this);
-			this._component.addEventHandler(this._component.element, "compositionstart", this.__compositionStart, {"options":defaultKeys}, this);
-			this._component.addEventHandler(this._component.element, "compositionend", this.__compositionEnd, {"options":defaultKeys}, this);
+			this._component.addEventHandler(this._component, "keydown", this.__defaultKey, {"options":defaultKeys}, this);
+			this._component.addEventHandler(this._component, "compositionstart", this.__compositionStart, {"options":defaultKeys}, this);
+			this._component.addEventHandler(this._component, "compositionend", this.__compositionEnd, {"options":defaultKeys}, this);
 		}
 
 		// default buttons
@@ -70,7 +70,7 @@ export default class DefaultkeyHandler extends Plugin
 			let initElements = (options, handler) => {
 				if (options)
 				{
-					let elements = this._component._element.querySelectorAll(options["rootNode"]);
+					let elements = this._component.querySelectorAll(options["rootNode"]);
 					elements = Array.prototype.slice.call(elements, 0);
 					elements.forEach((element) => {
 						this._component.addEventHandler(element, "click", handler, {"options":options}, this);

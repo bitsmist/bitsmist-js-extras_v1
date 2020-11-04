@@ -109,7 +109,7 @@ List.prototype.onListAppend = function(sender, e)
 {
 
 	return new Promise((resolve, reject) => {
-		this._listRootNode = this._element.querySelector(this._settings.get("listRootNode"));
+		this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
 		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
 		this._row = BITSMIST.v1.ClassUtil.createObject(className);
 		this._row._parent = this;
