@@ -34,8 +34,8 @@ export default class AjaxErrorHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"error": {
-				"handler": this.onError
+			"afterError": {
+				"handler": this.onAfterError
 			}
 		}
 
@@ -48,12 +48,12 @@ export default class AjaxErrorHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Error event handler.
+	 * AFter error event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onError(sender, e)
+	onAfterError(sender, e)
 	{
 
 		return this.handle(e.detail.error);
@@ -92,7 +92,7 @@ export default class AjaxErrorHandler extends Plugin
 							Object.keys(routeInfo["queryParameters"]).forEach((key) => {
 								routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@url@", location.href);
 							});
-							this._component.router.openRoute(routeInfo, {"jump":true});
+							document.querySelector("bm-router").openRoute(routeInfo, {"jump":true});
 							break;
 						// case "transfer":
 						// 	let urlToTransfer = this._options["handlers"]["statusCode"][code][command];
