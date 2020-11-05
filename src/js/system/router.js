@@ -71,6 +71,8 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.onAfterConnect = function(sender, e)
 {
 
+	history.replaceState(this.__getDefaultState("connect"), null, null);
+
 	return new Promise((resolve, reject) => {
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
 		this.__initPopState();
@@ -253,7 +255,7 @@ Router.prototype.updateRoute = function(routeInfo, options)
 Router.prototype.replaceRoute = function(routeInfo)
 {
 
-	history.replaceState(null, null, this.buildUrl(routeInfo));
+	history.replaceState(this.__getDefaultState("replaceRoute"), null, this.buildUrl(routeInfo));
 	this._routeInfo = this.__loadRouteInfo(window.location.href);
 
 }
@@ -287,7 +289,7 @@ Router.prototype._open = function(routeInfo, options)
 	Promise.resolve().then(() => {
 		if (options["pushState"])
 		{
-			history.pushState(null, null, url);
+			history.pushState(this.__getDefaultState("_open.pushState"), null, url);
 		}
 	}).then(() => {
 		if ( curRouteInfo["specName"] != newRouteInfo["specName"] )
@@ -304,7 +306,7 @@ Router.prototype._open = function(routeInfo, options)
 		if (routeInfo["dispUrl"])
 		{
 			// Replace url
-			history.replaceState(null, null, routeInfo["dispUrl"]);
+			history.replaceState(this.__getDefaultState("_open.dispUrl"), null, routeInfo["dispUrl"]);
 		}
 	});
 
@@ -321,7 +323,7 @@ Router.prototype._open = function(routeInfo, options)
 Router.prototype._jump = function(url)
 {
 
-	location.href = url;
+	window.location.href = url;
 
 }
 
@@ -335,6 +337,7 @@ Router.prototype._jump = function(url)
  */
 Router.prototype._refresh = function(routeInfo, options)
 {
+
 
 	let componentName = this._routeInfo["componentName"];
 	if (this._components[componentName])
@@ -354,6 +357,7 @@ Router.prototype._refresh = function(routeInfo, options)
  */
 Router.prototype._update = function(routeInfo, options)
 {
+
 
 	return new Promise((resolve, reject) => {
 		this.clearOrganizers();
@@ -438,11 +442,16 @@ Router.prototype.__initPopState = function()
 {
 
 	if (window.history && window.history.pushState){
-		window.addEventListener("popstate", (event) => {
+		window.addEventListener("popstate", (e) => {
+
+			if (!e.state)
+			{
+				return;
+			}
 
 			let promise;
 			let componentName = this._routeInfo["componentName"];
-			if (this._components[componentName])
+			if (this._components && this._components[componentName])
 			{
 				promise = this._components[componentName].trigger("beforePopState", this);
 			}
@@ -451,7 +460,7 @@ Router.prototype.__initPopState = function()
 				this.openRoute(this.__loadRouteInfo(window.location.href), {"pushState":false});
 			}).then(() => {
 				let componentName = this._routeInfo["componentName"];
-				if (this._components[componentName])
+				if (this._components && this._components[componentName])
 				{
 					this._components[componentName].trigger("afterPopState", this);
 				}
@@ -487,5 +496,21 @@ Router.prototype.__initSpec = function(specName)
 			resolve();
 		}
 	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Return history state.
+ *
+ * @param	{String}		msg					Message to store in state..
+ *
+ * @return  {String}		State.
+ */
+Router.prototype.__getDefaultState = function(msg)
+{
+
+	return msg +  ":" + window.location.href;
 
 }
