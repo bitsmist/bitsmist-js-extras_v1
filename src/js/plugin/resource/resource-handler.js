@@ -35,8 +35,8 @@ export default class ResourceHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
-			"beforeFetch": this.onBeforeFetch,
-			"afterSubmit": this.onAfterSubmit,
+			"doFetch": this.onDoFetch,
+			"doSubmit": this.onDoSubmit,
 		}
 		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
 		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
@@ -96,12 +96,12 @@ export default class ResourceHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Before fetch event handler.
+	 * Do fetch event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
-	onBeforeFetch(sender, e)
+	onDoFetch(sender, e)
 	{
 
 		let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this.getOption("autoLoad"));
@@ -127,12 +127,12 @@ export default class ResourceHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* After submit event handler.
+	* Do submit event handler.
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
 	*/
-	onAfterSubmit(sender, e)
+	onDoSubmit(sender, e)
 	{
 
 		if (e.detail.id)
