@@ -104,8 +104,10 @@ export default class ResourceHandler extends Plugin
 	onBeforeFetch(sender, e)
 	{
 
+		let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this.getOption("autoLoad"));
+
 		return new Promise((resolve, reject) => {
-			if (e.detail.options["autoLoad"] == false || !e.detail.id)
+			if (!autoLoad || !e.detail.id)
 			{
 				resolve();
 			}
