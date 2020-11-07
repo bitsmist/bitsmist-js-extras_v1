@@ -36,7 +36,6 @@ export default function App(settings)
 	_this._targets = {};
 	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
 	_this._errorManager = new ErrorManager();
-	_this._errorManager.register(_this, "*");
 	_this._settingManager = new SettingManager(_this._settings.get("globals"));
 
 	// Event handlers
@@ -78,7 +77,6 @@ Object.defineProperty(App.prototype, 'settings', {
 		return this._settingManager;
 	}
 })
-
 
 // -----------------------------------------------------------------------------
 //	Event handlers
