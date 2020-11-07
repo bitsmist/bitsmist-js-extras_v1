@@ -28,6 +28,7 @@ export default function List(settings)
 
 	_this._id;
 	_this._parameters;
+	_this._target = {};
 	_this._data;
 	_this._items;
 	_this._listRootNode;
@@ -148,21 +149,20 @@ List.prototype.fill = function(options)
 	return new Promise((resolve, reject) => {
 		this._rows = [];
 		options = Object.assign({}, this.settings.items, options);
+		let sender = ( options["sender"] ? options["sender"] : this );
 		let fragment = document.createDocumentFragment();
 		let builder = ( this.settings.get("async") ? this._buildAsync : this._buildSync );
 
 		Promise.resolve().then(() => {
 			return this.trigger("doTarget", this);
 		}).then(() => {
-			this._id = ( options["id"] ? options["id"] : this._id );
-			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
-			return this.trigger("beforeFetch", this, {"id":this._id, "parameters":this._parameters, "options":options});
+			return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
-			return this.trigger("doFetch", this);
+			return this.trigger("doFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
-			return this.trigger("afterFetch", this);
+			return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
-			return this.trigger("beforeFill", this);
+			return this.trigger("beforeFill", sender);
 		}).then(() => {
 			if (this._items)
 			{
@@ -176,7 +176,7 @@ List.prototype.fill = function(options)
 		}).then(() => {
 			this._listRootNode.appendChild(fragment);
 		}).then(() => {
-			return this.trigger("afterFill", this);
+			return this.trigger("afterFill", sender);
 		}).then(() => {
 			resolve();
 		});

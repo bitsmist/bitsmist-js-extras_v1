@@ -107,13 +107,16 @@ export default class ResourceHandler extends Plugin
 		let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this.getOption("autoLoad"));
 
 		return new Promise((resolve, reject) => {
-			if (!autoLoad || !e.detail.id)
+			let id = e.detail.target["id"];
+			let parameters = e.detail.target["parameters"];
+
+			if (!autoLoad || !id)
 			{
 				resolve();
 			}
 			else
 			{
-				this._resources[this._defaultResourceName].get(e.detail.id, e.detail.parameters).then((data) => {
+				this._resources[this._defaultResourceName].get(id, parameters).then((data) => {
 					this._component.data = data;
 					this._component.items = this.getOption("itemsGetter", function(data){return data["data"]})(data);
 					this._component.item = this.getOption("itemGetter", function(data){return data["data"][0]})(data);
@@ -135,13 +138,16 @@ export default class ResourceHandler extends Plugin
 	onDoSubmit(sender, e)
 	{
 
-		if (e.detail.id)
+		let id = e.detail.target["id"];
+		let parameters = e.detail.target["parameters"];
+
+		if (id)
 		{
-			return this._resources[this._defaultResourceName].update(e.detail.id, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].update(id, {items:e.detail.items});
 		}
 		else
 		{
-			return this._resources[this._defaultResourceName].insert(e.detail.id, {items:e.detail.items});
+			return this._resources[this._defaultResourceName].insert(id, {items:e.detail.items});
 		}
 
 	}

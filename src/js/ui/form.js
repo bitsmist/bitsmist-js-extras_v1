@@ -24,12 +24,14 @@ import FormUtil from '../util/form-util';
 export default function Form(settings)
 {
 
+	// super()
 	let _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
 
 	_this._id;
 	_this._parameters;
 	_this._item = {};
 	_this.__cancelSubmit = false;
+	_this._target = {};
 
 	return _this;
 
@@ -102,17 +104,15 @@ Form.prototype.fill = function(options)
 		Promise.resolve().then(() => {
 			return this.trigger("doTarget", sender);
 		}).then(() => {
-			this._id = ( options["id"] ? options["id"] : this._id );
-			this._parameters = (options["parameters"] ? options["parameters"] : this._parameters );
-			return this.trigger("beforeFetch", sender, {"id":this._id, "parameters":this._parameters, "options":options});
+			return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
-			return this.trigger("doFetch", sender);
+			return this.trigger("doFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
-			return this.trigger("afterFetch", sender);
+			return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
 		}).then(() => {
 			return this.trigger("beforeFill", sender);
 		}).then(() => {
-			FormUtil.setFields(this, this.item, this.masters);
+			FormUtil.setFields(this, this._item, this.masters);
 			return this.trigger("afterFill", sender);
 		}).then(() => {
 			resolve();
@@ -197,7 +197,7 @@ Form.prototype.submit = function(options)
 		let sender = ( options["sender"] ? options["sender"] : this );
 		delete options["sender"];
 		this.__cancelSubmit = false;
-		this.item = this.getFields();
+		this._item = this.getFields();
 
 		Promise.resolve(() => {
 			return this.validate();
@@ -206,12 +206,12 @@ Form.prototype.submit = function(options)
 		}).then(() => {
 			if (!this.__cancelSubmit)
 			{
-				let items = this.settings.get("itemGetter", function(item){return [item]})(this.item);
-				return this.trigger("doSubmit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
+				let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
+				return this.trigger("doSubmit", sender, {"target":this._target, "items":items});
 			}
 		}).then(() => {
-			let items = this.settings.get("itemGetter", function(item){return [item]})(this.item);
-			return this.trigger("afterSubmit", sender, {"id":this._id, "parameters":this._parameters, "items":items});
+			let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
+			return this.trigger("afterSubmit", sender, {"target":this._target, "items":items});
 		}).then(() => {
 			resolve();
 		});
