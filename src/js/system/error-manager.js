@@ -100,13 +100,24 @@ ErrorManager.prototype.register = function(component, targets)
 /**
  * Check if it is a target.
  *
- * @param	{Object}		settings			Settings.
+ * @param	{Component}		component			Component.
  * @param	{Object}		target				Target component to check.
+ * @param	{Object}		e					Error object.
  */
-ErrorManager.prototype.__isTarget = function(settings, target)
+ErrorManager.prototype.__isTarget = function(component, target, e)
 {
 
-	return true;
+	let result = false;
+
+	for (let i = 0; i < target.length; i++)
+	{
+		if (target[i] && e.name == target[i])
+		{
+			result = true;
+		}
+	}
+
+	return result;
 
 }
 
@@ -123,14 +134,9 @@ ErrorManager.prototype.__initErrorListeners = function()
 
 		if (error["reason"])
 		{
-			if (error.reason instanceof XMLHttpRequest)
-			{
-				e.message = error.reason.statusText;
-			}
-			else
-			{
-				e.message = error.reason.message;
-			}
+			e.message = ( error.reason instanceof XMLHttpRequest ? error.reason.statusText : error.reason.message );
+			e.stack = error.reason.stack;
+			e.object = error.reason;
 		}
 		else
 		{
@@ -142,8 +148,8 @@ ErrorManager.prototype.__initErrorListeners = function()
 		e.funcname = ""
 		e.lineno = "";
 		e.colno = "";
-		e.stack = error.reason.stack;
-		e.object = error.reason;
+		// e.stack = error.reason.stack;
+		// e.object = error.reason;
 
 		this.__handleException(e);
 
@@ -225,10 +231,8 @@ ErrorManager.prototype.__getErrorName = function(error)
 ErrorManager.prototype.__handleException = function(e)
 {
 
-	console.error("@@@ErrorManager", e);
-
 	Object.keys(this._targets).forEach((key) => {
-		if (this.__isTarget(this._targets[key].object, this._targets[key].targets))
+		if (this.__isTarget(this._targets[key].object, this._targets[key].targets, e))
 		{
 			this._targets[key].object.trigger("afterError", this, {"error":e});
 		}
