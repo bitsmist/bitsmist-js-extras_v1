@@ -60,6 +60,24 @@ Object.defineProperty(Form.prototype, 'item', {
 })
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Raw data retrieved via api.
+ *
+ * @type	{Object}
+ */
+Object.defineProperty(Form.prototype, 'data', {
+	get()
+	{
+		return this._data;
+	},
+	set(value)
+	{
+		this._data= value;
+	}
+})
+
+// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
@@ -93,7 +111,11 @@ Form.prototype.fill = function(options)
 
 	return new Promise((resolve, reject) => {
 		options = Object.assign({}, this.settings.items, options);
+		//options = Object.assign({}, options);
 		let sender = ( options["sender"] ? options["sender"] : this );
+
+		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
+		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
 		// Clear fields
 		if (options["autoClear"])

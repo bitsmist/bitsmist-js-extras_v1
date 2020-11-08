@@ -41,6 +41,7 @@ export default class ResourceHandler extends Plugin
 		this._options["settings"] = this._component.settings.get("ajaxUtil", "");
 		this._options["settings"]["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
 		this._resources = {};
+		this._defaultResourceName;
 
 		let resources = this.getOption("resources", []);
 		Object.keys(resources).forEach((index) => {
@@ -104,13 +105,12 @@ export default class ResourceHandler extends Plugin
 	onDoFetch(sender, e)
 	{
 
-		let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this.getOption("autoLoad"));
-
 		return new Promise((resolve, reject) => {
-			let id = e.detail.target["id"];
-			let parameters = e.detail.target["parameters"];
+			let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
+			let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
+			let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this.getOption("autoLoad"));
 
-			if (!autoLoad || !id)
+			if (!autoLoad)
 			{
 				resolve();
 			}
@@ -118,8 +118,14 @@ export default class ResourceHandler extends Plugin
 			{
 				this._resources[this._defaultResourceName].get(id, parameters).then((data) => {
 					this._component.data = data;
-					this._component.items = this.getOption("itemsGetter", function(data){return data["data"]})(data);
-					this._component.item = this.getOption("itemGetter", function(data){return data["data"][0]})(data);
+					if ("items" in this._component)
+					{
+						this._component.items = this.getOption("itemsGetter", function(data){return data["data"]})(data);
+					}
+					else if ("item" in this._component)
+					{
+						this._component.item = this.getOption("itemGetter", function(data){return data["data"][0]})(data);
+					}
 					resolve();
 				});
 			}
@@ -138,17 +144,24 @@ export default class ResourceHandler extends Plugin
 	onDoSubmit(sender, e)
 	{
 
-		let id = e.detail.target["id"];
-		let parameters = e.detail.target["parameters"];
+		return new Promise((resolve, reject) => {
+			let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
+			let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
+			let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
 
-		if (id)
-		{
-			return this._resources[this._defaultResourceName].update(id, {items:e.detail.items});
-		}
-		else
-		{
-			return this._resources[this._defaultResourceName].insert(id, {items:e.detail.items});
-		}
+			Promise.resolve().then(() => {
+				if (id)
+				{
+					return this._resources[this._defaultResourceName].update(id, {items:items});
+				}
+				else
+				{
+					return this._resources[this._defaultResourceName].insert(id, {items:items});
+				}
+			}).then(() => {
+				resolve();
+			});
+		});
 
 	}
 
