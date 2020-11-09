@@ -280,7 +280,7 @@ Router.prototype._open = function(routeInfo, options)
 	let newRouteInfo = this.__loadRouteInfo(url);
 	this._routeInfo = this.__loadRouteInfo(url);
 
-	if (!newRouteInfo["name"] || ( curRouteInfo["name"] != newRouteInfo["name"]) )
+	if (options["jump"] || !newRouteInfo["name"] || ( curRouteInfo["name"] != newRouteInfo["name"]) )
 	{
 		this._jump(url);
 		return;
