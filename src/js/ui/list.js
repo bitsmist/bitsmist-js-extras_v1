@@ -268,8 +268,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
 		});
 
 		// Call event handlers
-		let chain = Promise.resolve();
-		chain = chain.then(() => {
+		Promise.resolve().then(() => {
 			return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 		}).then(() => {
 			// Fill fields
@@ -314,8 +313,8 @@ List.prototype.__appendRowSync = function(rootNode, no, item)
 	});
 
 	// Call event handlers
-	this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
+	this._row.triggerSync("beforeFillRow", this, {"item":item, "no":no, "element":element});
 	FormUtil.setFields(element, item, this.masters);
-	this.row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
+	this.row.triggerSync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 }
