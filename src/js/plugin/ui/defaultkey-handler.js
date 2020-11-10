@@ -46,11 +46,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* After append event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+	 * After append event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	onAfterAppend(sender, e)
 	{
 
@@ -58,7 +58,8 @@ export default class DefaultkeyHandler extends Plugin
 		let defaultKeys = this._options["features"]["defaultKeys"];
 		if (defaultKeys)
 		{
-			this._component.addEventHandler(this._component, "keydown", this.__defaultKey, {"options":defaultKeys}, this);
+			//this._component.addEventHandler(this._component, "keydown", this.__defaultKey, {"options":defaultKeys}, this);
+			this._component.addEventHandler(this._component, "keypress", this.__defaultKey, {"options":defaultKeys}, this);
 			this._component.addEventHandler(this._component, "compositionstart", this.__compositionStart, {"options":defaultKeys}, this);
 			this._component.addEventHandler(this._component, "compositionend", this.__compositionEnd, {"options":defaultKeys}, this);
 		}
@@ -90,11 +91,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Default key event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+ 	 * Default key event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__defaultKey(sender, e)
 	{
 
@@ -104,7 +105,8 @@ export default class DefaultkeyHandler extends Plugin
 			return;
 		}
 
-		let key = e.key.toLowerCase()
+		let key  = ( e.key ? e.key : this.__getKeyfromKeyCode(e.keyCode) );
+		key = key.toLowerCase()
 		key = ( key == "esc" ? "escape" : key ); // For IE11
 
 		if (e.extraDetail.options.submit && key == e.extraDetail.options.submit.key)
@@ -126,16 +128,44 @@ export default class DefaultkeyHandler extends Plugin
 			this.__defaultClear(sender, e);
 		}
 
+		return;
+
 	}
 
 	// -------------------------------------------------------------------------
 
 	/**
-	* Composition start event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+ 	 * Convert key name from key code.
+	 *
+	 * @param	{Integer}		code				Key code.
+	 */
+	__getKeyfromKeyCode(code)
+	{
+
+		let ret;
+
+		switch(code)
+		{
+			case 13:
+				ret = "Enter";
+				break;
+			default:
+				ret = String.fromCharCode(code);
+				break;
+		}
+
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Composition start event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__compositionStart(sender, e)
 	{
 
@@ -146,11 +176,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Composition end event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+	 * Composition end event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__compositionEnd(sender, e)
 	{
 
@@ -161,11 +191,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Default submit.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+	 * Default submit.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__defaultSubmit(sender, e)
 	{
 
@@ -191,11 +221,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Default cancel.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+	 * Default cancel.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__defaultCancel(sender, e)
 	{
 
@@ -206,11 +236,11 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	* Default clear.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	*/
+	 * Default clear.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	__defaultClear(sender, e)
 	{
 
