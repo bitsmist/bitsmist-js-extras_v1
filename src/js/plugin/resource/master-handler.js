@@ -35,6 +35,7 @@ export default class MasterHandler extends Plugin
 		super(component, options);
 
 		this._options["events"] = {
+			"afterConnect": this.onAfterConnect,
 			"afterSpecLoad": this.onAfterSpecLoad,
 		}
 		this._masters = {};
@@ -51,15 +52,45 @@ export default class MasterHandler extends Plugin
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 */
+	onAfterConnect(sender, e)
+	{
+
+		return this.__initMasters(this._component.settings.get("masters"));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * After spec load event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 */
 	onAfterSpecLoad(sender, e)
+	{
+
+		return this.__initMasters(BITSMIST.v1.Util.safeGet(this._component, "_spec.masters"));
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Init masters.
+	 *
+	 * @param	{Object}		masters				Masters settings.
+	 */
+	__initMasters(masters)
 	{
 
 		return new Promise((resolve, reject) => {
 			let promises = [];
 
-			if (this._component._spec && this._component._spec["masters"])
+			if (masters)
 			{
-				let masters = this._component._spec["masters"];
 				let settings = this._component.settings.get("ajaxUtil", {});
 				settings["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
 				Object.keys(masters).forEach((masterName) => {
