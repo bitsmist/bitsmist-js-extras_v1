@@ -91,7 +91,7 @@ Object.defineProperty(App.prototype, 'settings', {
 App.prototype.onAfterConnect = function(sender, e)
 {
 
-	this.run();
+	return this.run();
 
 }
 
@@ -113,50 +113,5 @@ App.prototype.run = function()
 	this._errorManager.run();
 
 	return this.open();
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Apply settings.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.setup = function(options)
-{
-
-	this._preferenceManager.setup(options);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Register setup component.
- *
- * @param	{Component}		component			Component to notify.
- * @param	{Object}		targets				Targets.
- */
-App.prototype.register = function(component, targets)
-{
-
-	this._preferenceManager.register(component, targets);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Register setup component.
- *
- * @param	{Component}		component			Component to notify.
- */
-App.prototype.deregister = function(component)
-{
-
-	this._preferenceManager.deregister(component);
 
 }

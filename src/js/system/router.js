@@ -25,7 +25,7 @@ export default function Router(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"Router", "autoOpen":false, "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -71,13 +71,32 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.onAfterConnect = function(sender, e)
 {
 
-	history.replaceState(this.__getDefaultState("connect"), null, null);
+	return this.run();
+
+}
+
+// -----------------------------------------------------------------------------
+//  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start router.
+ *
+ * @return  {Promise}		Promise.
+ */
+Router.prototype.run = function()
+{
 
 	return new Promise((resolve, reject) => {
+		// Set state on the first page
+		history.replaceState(this.__getDefaultState("connect"), null, null);
+
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
 		this.__initPopState();
 		this.__initSpec(this._routeInfo["specName"]).then(() => {
 			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
+		}).then(() => {
+			this.open();
 		}).then(() => {
 			resolve();
 		});
@@ -85,8 +104,6 @@ Router.prototype.onAfterConnect = function(sender, e)
 
 }
 
-// -----------------------------------------------------------------------------
-//  Methods
 // -----------------------------------------------------------------------------
 
 /**
@@ -312,7 +329,6 @@ Router.prototype._open = function(routeInfo, options)
 
 }
 
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -337,7 +353,6 @@ Router.prototype._jump = function(url)
  */
 Router.prototype._refresh = function(routeInfo, options)
 {
-
 
 	let componentName = this._routeInfo["componentName"];
 	if (this._components[componentName])
@@ -482,6 +497,11 @@ Router.prototype.__initSpec = function(specName)
 		if (specName)
 		{
 			let path = this.getAttribute("data-specpath") || "";
+			if (path)
+			{
+				this._settings.set("system.specPath", path);
+			}
+			path = this._settings.get("system.specPath");
 
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;
