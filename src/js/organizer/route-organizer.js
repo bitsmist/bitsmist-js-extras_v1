@@ -11,10 +11,10 @@
 import { pathToRegexp } from 'path-to-regexp';
 
 // =============================================================================
-//	Route initializer class
+//	Route organizer class
 // =============================================================================
 
-export default class RouteInitializer
+export default class RouteOrganizer
 {
 
 	// -------------------------------------------------------------------------
@@ -22,14 +22,14 @@ export default class RouteInitializer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Init.
+	 * Organizer.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static init(component, settings)
+	static organize(component, settings)
 	{
 
 		component._routes = component._routes || [];
@@ -38,7 +38,7 @@ export default class RouteInitializer
 		{
 			for(let i = 0; i < settings.length; i++)
 			{
-				RouteInitializer.addRoute(component, settings[i]);
+				RouteOrganizer.addRoute(component, settings[i]);
 			}
 		}
 
@@ -60,7 +60,7 @@ export default class RouteInitializer
 
 		let ret = false;
 
-		if (eventName == "initComponent" || eventName == "connected" || eventName == "spec")
+		if (eventName == "afterInitComponent" || eventName == "afterConnect" || eventName == "afterSpecLoad")
 		{
 			ret = true;
 		}

@@ -67,8 +67,9 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-Router.prototype.onAfterConnect = function(sender, e)
+Router.prototype.onAfterConnect = function(sender, e, ex)
 {
 
 	return this.run();
@@ -506,7 +507,7 @@ Router.prototype.__initSpec = function(specName)
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;
 
-				this.organize(spec, "spec").then(() => {
+				this.organize("afterSpecLoad", spec).then(() => {
 					resolve();
 				});
 			});

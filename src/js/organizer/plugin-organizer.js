@@ -9,10 +9,10 @@
 // =============================================================================
 
 // =============================================================================
-//	Plugin initializer class
+//	Plugin organize class
 // =============================================================================
 
-export default class PluginInitializer
+export default class PluginOrganizer
 {
 
 	// -------------------------------------------------------------------------
@@ -20,14 +20,14 @@ export default class PluginInitializer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Init.
+	 * Organize.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static init(component, settings)
+	static organize(component, settings)
 	{
 
 		if (!component._plugins)
@@ -38,7 +38,7 @@ export default class PluginInitializer
 		if (settings)
 		{
 			Object.keys(settings).forEach((pluginName) => {
-				PluginInitializer.addPlugin(component, pluginName, settings[pluginName]);
+				PluginOrganizer.addPlugin(component, pluginName, settings[pluginName]);
 			});
 		}
 
@@ -60,7 +60,7 @@ export default class PluginInitializer
 
 		let ret = false;
 
-		if (eventName == "initComponent" || eventName == "connected")
+		if (eventName == "afterInitComponent" || eventName == "afterConnect")
 		{
 			ret = true;
 		}
@@ -90,23 +90,6 @@ export default class PluginInitializer
 			// CreatePlugin
 			plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
 			component._plugins[pluginName] = plugin;
-
-			// Add event handlers
-			let events = plugin.getOption("events", {});
-			Object.keys(events).forEach((eventName) => {
-				component.addEventHandler(component, eventName, events[eventName], null, plugin);
-			});
-
-			// Expose plugin
-			if (options["expose"])
-			{
-				Object.defineProperty(component.__proto__, pluginName, {
-					get()
-					{
-						return plugin;
-					}
-				});
-			}
 
 			resolve(plugin);
 		});
