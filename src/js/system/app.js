@@ -57,7 +57,7 @@ customElements.define("bm-app", App);
  *
  * @type	{String}
  */
-Object.defineProperty(App.prototype, 'preferences', {
+Object.defineProperty(App.prototype, 'globalPreferences', {
 	get()
 	{
 		return this._preferenceManager;
@@ -71,7 +71,7 @@ Object.defineProperty(App.prototype, 'preferences', {
  *
  * @type	{String}
  */
-Object.defineProperty(App.prototype, 'settings', {
+Object.defineProperty(App.prototype, 'globalSettings', {
 	get()
 	{
 		return this._settingManager;
@@ -87,8 +87,9 @@ Object.defineProperty(App.prototype, 'settings', {
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-App.prototype.onAfterConnect = function(sender, e)
+App.prototype.onAfterConnect = function(sender, e, ex)
 {
 
 	return this.run();
@@ -113,5 +114,22 @@ App.prototype.run = function()
 	this._errorManager.run();
 
 	return this.open();
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Add a component.
+ *
+ * @param	{String}		componentName		Component name.
+ * @param	{Object}		options				Options for the component.
+ *
+ * @return  {Promise}		Promise.
+ */
+App.prototype.addComponent = function(componentName, options)
+{
+
+	return BITSMIST.v1.Globals.addComponent(this, componentName, options);
 
 }
