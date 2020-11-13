@@ -50,8 +50,9 @@ customElements.define("bm-setting", SettingManager);
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-SettingManager.prototype.onAfterConnect = function(sender, e)
+SettingManager.prototype.onAfterConnect = function(sender, e, ex)
 {
 
 	this.run();

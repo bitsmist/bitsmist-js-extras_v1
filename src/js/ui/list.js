@@ -105,8 +105,9 @@ Object.defineProperty(List.prototype, 'data', {
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-List.prototype.onListAfterAppend = function(sender, e)
+List.prototype.onListAfterAppend = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
