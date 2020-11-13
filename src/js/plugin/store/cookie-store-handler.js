@@ -34,7 +34,7 @@ export default class CookieStoreHandler extends Plugin
 
 		super(component, options);
 
-		this._cookie = new CookieUtil(this._options["cookieOptions"]);
+		this._cookie = new CookieUtil(this._options.get("cookieOptions"));
 		this._cookieName = this._options.get("cookieOptions.name", "preferences");
 
 	}
