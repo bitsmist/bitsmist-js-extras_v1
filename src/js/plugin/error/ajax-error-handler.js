@@ -18,32 +18,6 @@ export default class AjaxErrorHandler extends Plugin
 {
 
 	// -------------------------------------------------------------------------
-	//  Constructor
-	// -------------------------------------------------------------------------
-
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		component			Component which the plugin
-	 * 												is attached to.
-	 * @param	{Object}		options				Options for the component.
-     */
-	constructor(component, options)
-	{
-
-		super(component, options);
-
-		this._options["events"] = {
-			"afterError": {
-				"handler": this.onAfterError
-			}
-		}
-
-//		this.target.push("AjaxError");
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -52,8 +26,9 @@ export default class AjaxErrorHandler extends Plugin
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	 */
-	onAfterError(sender, e)
+	onAfterError(sender, e, ex)
 	{
 
 		return this.handle(e.detail.error);
@@ -105,6 +80,28 @@ export default class AjaxErrorHandler extends Plugin
 				});
 			}
 		});
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//  Protected
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get plugin options.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	_getOptions()
+	{
+
+		return {
+			"events": {
+				"afterError": {
+					"handler": this.onAfterError
+				}
+			}
+		};
 
 	}
 

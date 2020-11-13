@@ -33,10 +33,6 @@ export default class DefaultkeyHandler extends Plugin
 
 		super(component, options);
 
-		this._options["events"] = {
-			"afterAppend": this.onAfterAppend,
-		}
-
 		this.__isComposing = false;
 
 	}
@@ -50,44 +46,34 @@ export default class DefaultkeyHandler extends Plugin
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	 */
-	onAfterAppend(sender, e)
+	onAfterAppend(sender, e, ex)
 	{
 
 		// default keys
-		let defaultKeys = this._options["features"]["defaultKeys"];
+		let defaultKeys = this._options.get("features.defaultKeys");
 		if (defaultKeys)
 		{
-			//this._component.addEventHandler(this._component, "keydown", this.__defaultKey, {"options":defaultKeys}, this);
-			this._component.addEventHandler(this._component, "keypress", this.__defaultKey, {"options":defaultKeys}, this);
-			this._component.addEventHandler(this._component, "compositionstart", this.__compositionStart, {"options":defaultKeys}, this);
-			this._component.addEventHandler(this._component, "compositionend", this.__compositionEnd, {"options":defaultKeys}, this);
+			//this._component.addEventHandler(this._component, "keydown", this.onKeyPress, defaultKeys, this);
+			this._component.addEventHandler(this._component, "keypress", this.onKeyPress, defaultKeys, this);
+			this._component.addEventHandler(this._component, "compositionstart", this.onCompositionStart, defaultKeys, this);
+			this._component.addEventHandler(this._component, "compositionend", this.onCompositionEnd, defaultKeys, this);
 		}
 
 		// default buttons
-		let defaultButtons = this._options["features"]["defaultButtons"];
+		let defaultButtons = this._options.get("features.defaultButtons");
 		if (defaultButtons)
 		{
-			let initElements = (options, handler) => {
-				if (options)
-				{
-					let elements = this._component.querySelectorAll(options["rootNode"]);
-					elements = Array.prototype.slice.call(elements, 0);
-					elements.forEach((element) => {
-						this._component.addEventHandler(element, "click", handler, {"options":options}, this);
-					});
-				}
-			};
-
-			initElements(defaultButtons["submit"], this.__defaultSubmit);
-			initElements(defaultButtons["cancel"], this.__defaultCancel);
-			initElements(defaultButtons["clear"], this.__defaultClear);
+			this.__initElements(defaultButtons["submit"], this.onDefaultSubmit);
+			this.__initElements(defaultButtons["cancel"], this.onDefaultCancel);
+			this.__initElements(defaultButtons["clear"], this.onDefaultClear);
 		}
 
 	}
 
 	// -------------------------------------------------------------------------
-	//  Privates
+	//  Event handlers (elements)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -95,8 +81,9 @@ export default class DefaultkeyHandler extends Plugin
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	 */
-	__defaultKey(sender, e)
+	onKeyPress(sender, e, ex)
 	{
 
 		// Ignore all key input when composing.
@@ -109,29 +96,130 @@ export default class DefaultkeyHandler extends Plugin
 		key = key.toLowerCase()
 		key = ( key == "esc" ? "escape" : key ); // For IE11
 
-		if (e.extraDetail.options.submit && key == e.extraDetail.options.submit.key)
+		if (ex.options.submit && key == ex.options.submit.key)
 		{
 			// Submit
-			e.extraDetail = {"options":e.extraDetail.options.submit};
-			this.__defaultSubmit(sender, e);
+			this.onDefaultSubmit(sender, e, {"options":ex.options["submit"]});
 		}
-		else if (e.extraDetail.options.cancel && key == e.extraDetail.options.cancel.key)
+		else if (ex.options.cancel && key == ex.options.cancel.key)
 		{
 			// Cancel
-			e.extraDetail = {"options":e.extraDetail.options.cancel};
-			this.__defaultCancel(sender, e);
+			this.onDefaultCancel(sender, e, {"options":ex.options["cancel"]});
 		}
-		else if (e.extraDetail.options.clear && key == e.extraDetail.options.clear.key)
+		else if (ex.options.clear && key == ex.options.clear.key)
 		{
 			// Clear
-			e.extraDetail = {"options":e.extraDetail.options.clear};
-			this.__defaultClear(sender, e);
+			this.onDefaultClear(sender, e, {"options":ex.options["clear"]});
 		}
 
 		return;
 
 	}
 
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Composition start event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onCompositionStart(sender, e, ex)
+	{
+
+		this.__isComposing = true;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Composition end event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onCompositionEnd(sender, e, ex)
+	{
+
+		this.__isComposing = false;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Default submit.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onDefaultSubmit(sender, e, ex)
+	{
+
+		this._component.submit().then(() => {
+			if (!this._component.__cancelSubmit)
+			{
+				// Modal result
+				if (this._component._isModal)
+				{
+					this._component._modalResult["result"] = true;
+				}
+
+				// Auto close
+				if (ex && ex.options["autoClose"])
+				{
+					this._component.close();
+				}
+			}
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Default cancel.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onDefaultCancel(sender, e, ex)
+	{
+
+		this._component.close();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Default clear.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onDefaultClear(sender, e, ex)
+	{
+
+		let target;
+
+		if (ex && ex.options["target"])
+		{
+			target = sender.getAttribute(ex.options["target"]);
+		}
+
+		this._component.clear(target);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
@@ -161,97 +249,42 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Composition start event handler.
+	 * Init buttons.
 	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
+	 * @param	{Object}		options				Options.
+	 * @param	{Function}		handler				Handler.
 	 */
-	__compositionStart(sender, e)
+	__initElements(options, handler)
 	{
 
-		this.__isComposing = true;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Composition end event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	__compositionEnd(sender, e)
-	{
-
-		this.__isComposing = false;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Default submit.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	__defaultSubmit(sender, e)
-	{
-
-		this._component.submit().then(() => {
-			if (!this._component.__cancelSubmit)
-			{
-				// Modal result
-				if (this._component._isModal)
-				{
-					this._component._modalResult["result"] = true;
-				}
-
-				// Auto close
-				if (e.extraDetail["options"] && e.extraDetail["options"] && e.extraDetail["options"]["autoClose"])
-				{
-					this._component.close();
-				}
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Default cancel.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	__defaultCancel(sender, e)
-	{
-
-		this._component.close();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Default clear.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 */
-	__defaultClear(sender, e)
-	{
-
-		let target;
-
-		if (e.extraDetail["options"] && e.extraDetail["options"] && e.extraDetail["options"]["target"])
+		if (options)
 		{
-			target = sender.getAttribute(e.extraDetail["options"]["target"]);
+			let elements = this._component.querySelectorAll(options["rootNode"]);
+			elements = Array.prototype.slice.call(elements, 0);
+			elements.forEach((element) => {
+				this._component.addEventHandler(element, "click", handler, options, this);
+			});
 		}
 
-		this._component.clear(target);
+	}
+
+	// -----------------------------------------------------------------------------
+	//  Protected
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get plugin options.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	_getOptions()
+	{
+
+		return {
+			"events": {
+				"afterAppend": this.onAfterAppend,
+			}
+		};
 
 	}
 

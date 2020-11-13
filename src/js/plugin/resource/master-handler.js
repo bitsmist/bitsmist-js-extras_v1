@@ -34,10 +34,6 @@ export default class MasterHandler extends Plugin
 
 		super(component, options);
 
-		this._options["events"] = {
-			"afterConnect": this.onAfterConnect,
-			"afterSpecLoad": this.onAfterSpecLoad,
-		}
 		this._masters = {};
 
 	}
@@ -51,8 +47,9 @@ export default class MasterHandler extends Plugin
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	 */
-	onAfterConnect(sender, e)
+	onAfterConnect(sender, e, ex)
 	{
 
 		return this.__initMasters(this._component.settings.get("masters"));
@@ -66,8 +63,9 @@ export default class MasterHandler extends Plugin
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	 */
-	onAfterSpecLoad(sender, e)
+	onAfterSpecLoad(sender, e, ex)
 	{
 
 		return this.__initMasters(BITSMIST.v1.Util.safeGet(this._component, "_spec.masters"));
@@ -118,6 +116,27 @@ export default class MasterHandler extends Plugin
 				resolve();
 			});
 		});
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//  Protected
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get plugin options.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	_getOptions()
+	{
+
+		return {
+			"events": {
+				"afterConnect": this.onAfterConnect,
+				"afterSpecLoad": this.onAfterSpecLoad,
+			}
+		};
 
 	}
 

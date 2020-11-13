@@ -28,12 +28,46 @@ export default class Plugin
 	constructor(component, options)
 	{
 
-		this.init(component, options);
+		this._component = component
+		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, this._getOptions(), options)});
+		this._options.set("name", this._options.get("name", this.constructor.name));
+
+		// Add event handlers
+		let events = this._options.get("events", {});
+		Object.keys(events).forEach((eventName) => {
+			component.addEventHandler(component, eventName, events[eventName], null, this);
+		});
+
+		// Expose plugin
+		if (this._options.get("expose"))
+		{
+			let plugin = this;
+			Object.defineProperty(component.__proto__, this._options.get("expose"), {
+				get()
+				{
+					return plugin;
+				}
+			});
+		}
 
 	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	/**
+	* Component name.
+	*
+	* @type	{String}
+	*/
+	get name()
+	{
+
+		return this._options.get("name");
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
@@ -55,39 +89,19 @@ export default class Plugin
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-     * Init class.
-     *
-	 * @param	{Object}		component			Component to attach.
-	 * @param	{Object}		options				Plugin options.
-     */
-	init(component, options)
-	{
-
-		this._options = Object.assign({}, this._options, options);
-		this._component = component
-		this._events = this.getOption("events", {});
-
-	}
-
+	// -----------------------------------------------------------------------------
+	//  Protected
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Get option value. Return default value when specified key is not available.
-	*
-	* @param	{String}		key					Key to get.
-	* @param	{Object}		defaultValue		Value returned when key is not found.
-	*
-	* @return  {*}				Value.
-	*/
-	getOption(key, defaultValue)
+	 * Get plugin options.  Need to override.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	_getOptions()
 	{
 
-		return BITSMIST.v1.Util.safeGet(this._options, key, defaultValue);
+		return {};
 
 	}
 

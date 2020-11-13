@@ -34,13 +34,8 @@ export default class CookieStoreHandler extends Plugin
 
 		super(component, options);
 
-		this._options["events"] = {
-			"doLoadStore": this.onDoLoadStore,
-			"doSaveStore": this.onDoSaveStore,
-		}
-
 		this._cookie = new CookieUtil(this._options["cookieOptions"]);
-		this._cookieName = this.getOption("cookieOptions.name", "preferences");
+		this._cookieName = this._options.get("cookieOptions.name", "preferences");
 
 	}
 
@@ -53,8 +48,9 @@ export default class CookieStoreHandler extends Plugin
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	*/
-	onDoLoadStore(sender, e)
+	onDoLoadStore(sender, e, ex)
 	{
 
 		return new Promise((resolve, reject) => {
@@ -72,11 +68,33 @@ export default class CookieStoreHandler extends Plugin
 	*
 	* @param	{Object}		sender				Sender.
 	* @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
 	*/
-	onDoSaveStore(sender, e)
+	onDoSaveStore(sender, e, ex)
 	{
 
 		this._cookie.set(this._cookieName, e.detail.preferences);
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//  Protected
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get plugin options.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	_getOptions()
+	{
+
+		return {
+			"events": {
+				"doLoadStore": this.onDoLoadStore,
+				"doSaveStore": this.onDoSaveStore,
+			}
+		};
 
 	}
 
