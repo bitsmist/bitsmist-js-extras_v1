@@ -50,8 +50,9 @@ customElements.define("bm-error", ErrorManager);
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-ErrorManager.prototype.onAfterConnect = function(sender, e)
+ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
 {
 
 	this.run();

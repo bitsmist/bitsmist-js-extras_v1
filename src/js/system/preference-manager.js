@@ -72,8 +72,9 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-PreferenceManager.prototype.onAfterConnect = function(sender, e)
+PreferenceManager.prototype.onAfterConnect = function(sender, e, ex)
 {
 
 	this.run();
@@ -87,10 +88,11 @@ PreferenceManager.prototype.onAfterConnect = function(sender, e)
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  *
  * @return  {Promise}		Promise.
  */
-PreferenceManager.prototype.onBeforeSetup = function(sender, e)
+PreferenceManager.prototype.onBeforeSetup = function(sender, e, ex)
 {
 
 	let settings = e.detail;
@@ -270,26 +272,6 @@ PreferenceManager.prototype.save = function(options)
 
 // -----------------------------------------------------------------------------
 //  Privates
-// -----------------------------------------------------------------------------
-
-/**
- * Init preferences.
- */
-PreferenceManager.prototype.__initPreferences = function()
-{
-
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			return this.load();
-		}).then((preferences) => {
-			return this._preferences.merge(preferences);
-		}).then(() => {
-			resolve();
-		});
-	});
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**
