@@ -33,10 +33,10 @@ export default function App(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._targets = {};
 	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
 	_this._errorManager = new ErrorManager();
 	_this._settingManager = new SettingManager(_this._settings.get("globals"));
+	_this._settings.chain(BITSMIST.v1.Globals["settings"]);
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
@@ -79,6 +79,20 @@ Object.defineProperty(App.prototype, 'globalSettings', {
 })
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Components.
+ *
+ * @type	{String}
+ */
+Object.defineProperty(App.prototype, 'components', {
+	get()
+	{
+		return this._components;
+	}
+})
+
+// -----------------------------------------------------------------------------
 //	Event handlers
 // -----------------------------------------------------------------------------
 
@@ -114,22 +128,5 @@ App.prototype.run = function()
 	this._errorManager.run();
 
 	return this.open();
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Add a component.
- *
- * @param	{String}		componentName		Component name.
- * @param	{Object}		options				Options for the component.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.addComponent = function(componentName, options)
-{
-
-	return BITSMIST.v1.Globals.addComponent(this, componentName, options);
 
 }
