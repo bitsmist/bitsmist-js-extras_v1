@@ -54,9 +54,9 @@ export default class CookieStoreHandler extends Plugin
 	{
 
 		return new Promise((resolve, reject) => {
-			let preferences = this._cookie.get(this._cookieName);
+			let data = this._cookie.get(this._cookieName);
 
-			resolve(preferences);
+			resolve(data);
 		});
 
 	}
@@ -73,7 +73,7 @@ export default class CookieStoreHandler extends Plugin
 	onDoSaveStore(sender, e, ex)
 	{
 
-		this._cookie.set(this._cookieName, e.detail.preferences);
+		this._cookie.set(this._cookieName, e.detail.data);
 
 	}
 

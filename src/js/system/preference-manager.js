@@ -266,7 +266,7 @@ PreferenceManager.prototype.save = function(options)
 
 	let sender = ( options && options["sender"] ? options["sender"] : this );
 
-	return this.trigger("doSaveStore", sender, {"preferences":this._preferences.items});
+	return this.trigger("doSaveStore", sender, {"data":this._preferences.items});
 
 }
 
