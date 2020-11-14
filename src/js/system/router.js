@@ -91,9 +91,12 @@ Router.prototype.run = function()
 	return new Promise((resolve, reject) => {
 		// Set state on the first page
 		history.replaceState(this.__getDefaultState("connect"), null, null);
-
 		this._routeInfo = this.__loadRouteInfo(window.location.href);
+
+		// Init popstate handler
 		this.__initPopState();
+
+		// Load spec file
 		this.__initSpec(this._routeInfo["specName"]).then(() => {
 			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 		}).then(() => {
@@ -374,9 +377,8 @@ Router.prototype._refresh = function(routeInfo, options)
 Router.prototype._update = function(routeInfo, options)
 {
 
-
 	return new Promise((resolve, reject) => {
-		this.clearOrganizers();
+		BITSMIST.v1.Globals.clearOrganizers(this);
 
 		Promise.resolve().then(() => {
 			return this.__initSpec(routeInfo["specName"]);
