@@ -55,7 +55,7 @@ export default class DefaultkeyHandler extends Plugin
 		let defaultKeys = this._options.get("features.defaultKeys");
 		if (defaultKeys)
 		{
-			//this._component.addEventHandler(this._component, "keydown", this.onKeyPress, defaultKeys, this);
+			this._component.addEventHandler(this._component, "keydown", this.onKeyDown, defaultKeys, this);
 			this._component.addEventHandler(this._component, "keypress", this.onKeyPress, defaultKeys, this);
 			this._component.addEventHandler(this._component, "compositionstart", this.onCompositionStart, defaultKeys, this);
 			this._component.addEventHandler(this._component, "compositionend", this.onCompositionEnd, defaultKeys, this);
@@ -77,7 +77,32 @@ export default class DefaultkeyHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
- 	 * Default key event handler.
+ 	 * Key down event handler. Handle keys which do not fire keyPress event.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+ 	 * @param	{Object}		ex					Extra event info.
+	 */
+	onKeyDown(sender, e, ex)
+	{
+
+		let key  = ( e.key ? e.key : this.__getKeyfromKeyCode(e.keyCode) );
+		key = key.toLowerCase()
+		key = ( key == "esc" ? "escape" : key ); // For IE11
+
+		switch (key)
+		{
+			case "escape":
+				this.onKeyPress(sender, e, ex);
+				break;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+ 	 * Key press event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
