@@ -29,7 +29,7 @@ export default function PreferenceManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._targets = {};
+	_this._observers = new BITSMIST.v1.ComponentObserver({"targeter":_this.__isTarget.bind(_this)});
 	let preferences = Object.assign({}, settings["defaults"]);
 	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
 
@@ -97,20 +97,7 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e, ex)
 
 	let settings = e.detail;
 
-	return new Promise((resolve, reject) => {
-		let promises = [];
-
-		Object.keys(this._targets).forEach((componentId) => {
-			if (this.__isTarget(settings, this._targets[componentId].targets))
-			{
-				promises.push(this._targets[componentId].object.setup(settings));
-			}
-		});
-
-		Promise.all(promises).then(() => {
-			resolve();
-		});
-	});
+	return this._observers.notifySync(settings, settings);
 
 }
 
@@ -214,7 +201,7 @@ PreferenceManager.prototype.setup = function(options)
 PreferenceManager.prototype.register = function(component, targets)
 {
 
-	this._targets[component.uniqueId] = {"object":component, "targets":targets};
+	this._observers.register(component, targets, component.setup);
 
 }
 
@@ -230,7 +217,7 @@ PreferenceManager.prototype.register = function(component, targets)
 PreferenceManager.prototype.deregister = function(component)
 {
 
-	delete this._targets[component.uniqueId];
+	this._observers.deregister(component);
 
 }
 
@@ -277,10 +264,10 @@ PreferenceManager.prototype.save = function(options)
 /**
  * Check if it is a target.
  *
- * @param	{Object}		settings			Settings.
- * @param	{Object}		target				Target component to check.
+ * @param	{Object}		conditions			Conditions.
+ * @param	{Object}		target				Target to check.
  */
-PreferenceManager.prototype.__isTarget = function(settings, target)
+PreferenceManager.prototype.__isTarget = function(conditions, target)
 {
 
 	let result = false;
@@ -294,7 +281,7 @@ PreferenceManager.prototype.__isTarget = function(settings, target)
 
 	for (let i = 0; i < target.length; i++)
 	{
-		if (settings["newPreferences"].hasOwnProperty(target[i]))
+		if (conditions["newPreferences"].hasOwnProperty(target[i]))
 		{
 			result = true;
 			break;

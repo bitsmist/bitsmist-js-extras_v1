@@ -29,7 +29,7 @@ export default function ErrorManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._targets = {};
+	_this._observers = new BITSMIST.v1.ComponentObserver();
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
@@ -90,7 +90,7 @@ ErrorManager.prototype.run = function()
 ErrorManager.prototype.register = function(component, targets)
 {
 
-	this._targets[component.uniqueId] = {"object":component, "targets":targets};
+	this._observers.register(component, targets, component.handle);
 
 }
 
@@ -232,11 +232,6 @@ ErrorManager.prototype.__getErrorName = function(error)
 ErrorManager.prototype.__handleException = function(e)
 {
 
-	Object.keys(this._targets).forEach((key) => {
-		if (this.__isTarget(this._targets[key].object, this._targets[key].targets, e))
-		{
-			this._targets[key].object.trigger("afterError", this, {"error":e});
-		}
-	});
+	return this._observers.notifySync(e, "afterError", this, {"error":e});
 
 }
