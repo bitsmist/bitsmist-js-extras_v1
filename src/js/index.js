@@ -23,10 +23,10 @@ window.BITSMIST.v1.ErrorManager = ErrorManager;
 // Organizer
 
 import PluginOrganizer from './organizer/plugin-organizer';
-BITSMIST.v1.Globals.addOrganizer(PluginOrganizer, "plugins");
+BITSMIST.v1.Globals.organizers.register(PluginOrganizer, "plugins");
 
 import RouteOrganizer from './organizer/route-organizer';
-BITSMIST.v1.Globals.addOrganizer(RouteOrganizer, "routes");
+BITSMIST.v1.Globals.organizers.register(RouteOrganizer, "routes");
 
 // Plugin
 

@@ -35,10 +35,11 @@ export default class PluginOrganizer
 			component._plugins = {};
 		}
 
-		if (settings)
+		let plugins = settings["plugins"];
+		if (plugins)
 		{
-			Object.keys(settings).forEach((pluginName) => {
-				PluginOrganizer.addPlugin(component, pluginName, settings[pluginName]);
+			Object.keys(plugins).forEach((pluginName) => {
+				PluginOrganizer.addPlugin(component, pluginName, plugins[pluginName]);
 			});
 		}
 
@@ -95,6 +96,5 @@ export default class PluginOrganizer
 		});
 
 	}
-
 
 }

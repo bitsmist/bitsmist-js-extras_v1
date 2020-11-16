@@ -232,6 +232,6 @@ ErrorManager.prototype.__getErrorName = function(error)
 ErrorManager.prototype.__handleException = function(e)
 {
 
-	return this._observers.notifySync(e, "afterError", this, {"error":e});
+	return this._observers.notifySync("handle", e, "afterError", this, {"error":e});
 
 }

@@ -378,7 +378,7 @@ Router.prototype._update = function(routeInfo, options)
 {
 
 	return new Promise((resolve, reject) => {
-		BITSMIST.v1.Globals.clearOrganizers(this);
+		BITSMIST.v1.Globals.organizers.notify("clear", "*", this);
 
 		Promise.resolve().then(() => {
 			return this.__initSpec(routeInfo["specName"]);
@@ -509,7 +509,7 @@ Router.prototype.__initSpec = function(specName)
 			this.loadSpec(specName, path).then((spec) => {
 				this._spec = spec;
 
-				this.organize("afterSpecLoad", spec).then(() => {
+				BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, spec).then(() => {
 					resolve();
 				});
 			});

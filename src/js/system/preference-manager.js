@@ -97,7 +97,7 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e, ex)
 
 	let settings = e.detail;
 
-	return this._observers.notifySync(settings, settings);
+	return this._observers.notifySync("setup", settings, settings);
 
 }
 

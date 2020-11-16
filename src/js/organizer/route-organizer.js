@@ -34,11 +34,12 @@ export default class RouteOrganizer
 
 		component._routes = component._routes || [];
 
-		if (settings)
+		let routes = settings["routes"];
+		if (routes)
 		{
-			for(let i = 0; i < settings.length; i++)
+			for(let i = 0; i < routes.length; i++)
 			{
-				RouteOrganizer.addRoute(component, settings[i]);
+				RouteOrganizer.addRoute(component, routes[i]);
 			}
 		}
 
