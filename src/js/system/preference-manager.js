@@ -29,7 +29,7 @@ export default function PreferenceManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._observers = new BITSMIST.v1.ComponentObserver({"targeter":_this.__isTarget.bind(_this)});
+	_this._observers = new BITSMIST.v1.Observer({"targeter":_this.__isTarget.bind(_this)});
 	let preferences = Object.assign({}, settings["defaults"]);
 	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
 
@@ -201,7 +201,7 @@ PreferenceManager.prototype.setup = function(options)
 PreferenceManager.prototype.register = function(component, targets)
 {
 
-	this._observers.register(component, targets, component.setup);
+	this._observers.register(component.uniqueId, {"object":component, "targets":targets});
 
 }
 
@@ -217,7 +217,7 @@ PreferenceManager.prototype.register = function(component, targets)
 PreferenceManager.prototype.deregister = function(component)
 {
 
-	this._observers.deregister(component);
+	this._observers.deregister(component.uniqueId);
 
 }
 
@@ -267,10 +267,11 @@ PreferenceManager.prototype.save = function(options)
  * @param	{Object}		conditions			Conditions.
  * @param	{Object}		target				Target to check.
  */
-PreferenceManager.prototype.__isTarget = function(conditions, target)
+PreferenceManager.prototype.__isTarget = function(conditions, info)
 {
 
 	let result = false;
+	let target = info["targets"];
 
 	/*
 	if (target == "*")

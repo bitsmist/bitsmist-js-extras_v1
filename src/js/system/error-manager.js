@@ -29,7 +29,7 @@ export default function ErrorManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._observers = new BITSMIST.v1.ComponentObserver();
+	_this._observers = new BITSMIST.v1.Observer();
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
@@ -90,7 +90,7 @@ ErrorManager.prototype.run = function()
 ErrorManager.prototype.register = function(component, targets)
 {
 
-	this._observers.register(component, targets, component.handle);
+	this._observers.register(component.uniqueId, {"object":component, "targets":targets});
 
 }
 
