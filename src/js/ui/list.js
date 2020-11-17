@@ -114,7 +114,7 @@ List.prototype.onListAfterAppend = function(sender, e, ex)
 		this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
 		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
 		this._row = BITSMIST.v1.ClassUtil.createObject(className);
-		this._row.registerComponent(this._row, "connected");
+		this._row.registerStatus("connected");
 		this._row._parent = this;
 		this._row.open().then(() => {
 			resolve();
