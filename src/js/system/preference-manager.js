@@ -34,7 +34,7 @@ export default function PreferenceManager(settings)
 	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
 
 	// Init globals
-	BITSMIST.v1.Globals["preferences"] = _this._preferences;
+	BITSMIST.v1.Globals["preferences"].items = _this._preferences._items;
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);

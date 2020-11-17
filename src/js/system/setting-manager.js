@@ -29,7 +29,7 @@ export default function SettingManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init globals
-	BITSMIST.v1.Globals["settings"] = _this._settings;
+	BITSMIST.v1.Globals["settings"].items = _this._settings.items;
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);

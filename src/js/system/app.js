@@ -36,7 +36,6 @@ export default function App(settings)
 	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
 	_this._errorManager = new ErrorManager();
 	_this._settingManager = new SettingManager(_this._settings.get("globals"));
-	_this._settings.chain(BITSMIST.v1.Globals["settings"]);
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
