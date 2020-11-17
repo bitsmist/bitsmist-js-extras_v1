@@ -29,7 +29,7 @@ export default function PreferenceManager(settings)
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
-	_this._observers = new BITSMIST.v1.Observer({"targeter":_this.__isTarget.bind(_this)});
+	_this._observers = new BITSMIST.v1.Observer({"filter":_this.__isTarget.bind(_this)});
 	let preferences = Object.assign({}, settings["defaults"]);
 	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
 
