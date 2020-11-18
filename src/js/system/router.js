@@ -84,8 +84,6 @@ Router.prototype.onAfterConnect = function(sender, e, ex)
 		this.__initSpec(this._routeInfo["specName"]).then(() => {
 			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 		}).then(() => {
-			return this.open();
-		}).then(() => {
 			resolve();
 		});
 	});
