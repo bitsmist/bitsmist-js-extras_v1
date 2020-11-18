@@ -29,7 +29,7 @@ export default function App(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"App", "autoOpen":false, "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"App", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -105,7 +105,10 @@ Object.defineProperty(App.prototype, 'components', {
 App.prototype.onAfterConnect = function(sender, e, ex)
 {
 
-	return this.run();
+	// Start managers
+	this._settingManager.run();
+	this._preferenceManager.run();
+	this._errorManager.run();
 
 }
 
@@ -121,11 +124,6 @@ App.prototype.onAfterConnect = function(sender, e, ex)
 App.prototype.run = function()
 {
 
-	// Start managers
-	this._settingManager.run();
-	this._preferenceManager.run();
-	this._errorManager.run();
-
-	return this.open();
+	this.connectedCallback();
 
 }
