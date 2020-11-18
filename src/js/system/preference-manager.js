@@ -25,7 +25,7 @@ export default function PreferenceManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoOpen":false, "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -77,7 +77,15 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
 PreferenceManager.prototype.onAfterConnect = function(sender, e, ex)
 {
 
-	this.run();
+	return new Promise((resolve, reject) => {
+		Promise.resolve().then(() => {
+			return this.load();
+		}).then((preferences) => {
+			return this._preferences.merge(preferences);
+		}).then(() => {
+			resolve();
+		});
+	});
 
 }
 
@@ -145,17 +153,7 @@ PreferenceManager.prototype.set = function(key, value)
 PreferenceManager.prototype.run = function()
 {
 
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			return this.load();
-		}).then((preferences) => {
-			return this._preferences.merge(preferences);
-		}).then(() => {
-			return this.open();
-		}).then(() => {
-			resolve();
-		});
-	});
+	this.connectedCallback();
 
 }
 

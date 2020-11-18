@@ -25,7 +25,7 @@ export default function ErrorManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoOpen":false, "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -55,7 +55,7 @@ customElements.define("bm-error", ErrorManager);
 ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
 {
 
-	this.run();
+	this.__initErrorListeners();
 
 }
 
@@ -71,9 +71,7 @@ ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
 ErrorManager.prototype.run = function()
 {
 
-	this.__initErrorListeners();
-
-	return this.open();
+	this.connectedCallback();
 
 }
 

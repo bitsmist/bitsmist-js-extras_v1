@@ -25,14 +25,11 @@ export default function SettingManager(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"SettingManager", "autoOpen":false, "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"SettingManager", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init globals
 	BITSMIST.v1.Globals["settings"].items = _this._settings.items;
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
 
 	return _this;
 
@@ -40,24 +37,6 @@ export default function SettingManager(settings)
 
 BITSMIST.v1.ClassUtil.inherit(SettingManager, BITSMIST.v1.Component);
 customElements.define("bm-setting", SettingManager);
-
-// -----------------------------------------------------------------------------
-//	Event handlers
-// -----------------------------------------------------------------------------
-
-/**
- * After connected event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-SettingManager.prototype.onAfterConnect = function(sender, e, ex)
-{
-
-	this.run();
-
-}
 
 // -----------------------------------------------------------------------------
 //  Methods
@@ -103,6 +82,6 @@ SettingManager.prototype.set = function(key, value)
 SettingManager.prototype.run = function()
 {
 
-	return this.open();
+	this.connectedCallback();
 
 }

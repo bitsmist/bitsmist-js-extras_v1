@@ -25,7 +25,7 @@ export default function Router(settings)
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"Router", "autoOpen":false, "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
 	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	// Init vars
@@ -72,7 +72,23 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.onAfterConnect = function(sender, e, ex)
 {
 
-	return this.run();
+	return new Promise((resolve, reject) => {
+		// Set state on the first page
+		history.replaceState(this.__getDefaultState("connect"), null, null);
+		this._routeInfo = this.__loadRouteInfo(window.location.href);
+
+		// Init popstate handler
+		this.__initPopState();
+
+		// Load spec file
+		this.__initSpec(this._routeInfo["specName"]).then(() => {
+			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
+		}).then(() => {
+			return this.open();
+		}).then(() => {
+			resolve();
+		});
+	});
 
 }
 
@@ -88,23 +104,7 @@ Router.prototype.onAfterConnect = function(sender, e, ex)
 Router.prototype.run = function()
 {
 
-	return new Promise((resolve, reject) => {
-		// Set state on the first page
-		history.replaceState(this.__getDefaultState("connect"), null, null);
-		this._routeInfo = this.__loadRouteInfo(window.location.href);
-
-		// Init popstate handler
-		this.__initPopState();
-
-		// Load spec file
-		this.__initSpec(this._routeInfo["specName"]).then(() => {
-			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
-		}).then(() => {
-			this.open();
-		}).then(() => {
-			resolve();
-		});
-	});
+	this.connectedCallback();
 
 }
 
