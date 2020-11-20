@@ -153,7 +153,7 @@ PreferenceManager.prototype.set = function(key, value)
 PreferenceManager.prototype.run = function()
 {
 
-	this.connectedCallback();
+	this.connect();
 
 }
 

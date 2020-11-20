@@ -71,7 +71,7 @@ ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
 ErrorManager.prototype.run = function()
 {
 
-	this.connectedCallback();
+	this.connect();
 
 }
 

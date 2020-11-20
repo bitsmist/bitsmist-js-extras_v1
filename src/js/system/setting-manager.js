@@ -82,6 +82,6 @@ SettingManager.prototype.set = function(key, value)
 SettingManager.prototype.run = function()
 {
 
-	this.connectedCallback();
+	this.connect();
 
 }

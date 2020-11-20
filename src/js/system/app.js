@@ -124,6 +124,6 @@ App.prototype.onAfterConnect = function(sender, e, ex)
 App.prototype.run = function()
 {
 
-	this.connectedCallback();
+	this.connect();
 
 }

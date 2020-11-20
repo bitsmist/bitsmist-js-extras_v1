@@ -102,7 +102,7 @@ Router.prototype.onAfterConnect = function(sender, e, ex)
 Router.prototype.run = function()
 {
 
-	this.connectedCallback();
+	this.connect();
 
 }
 
