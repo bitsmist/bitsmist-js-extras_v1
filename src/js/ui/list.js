@@ -116,7 +116,7 @@ List.prototype.onListAfterAppend = function(sender, e, ex)
 		this._row = BITSMIST.v1.ClassUtil.createObject(className);
 		this._row._parent = this;
 		Promise.resolve().then(() => {
-			return this._row.connect();
+			return this._row.start();
 		}).then(() => {
 			resolve();
 		});

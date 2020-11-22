@@ -38,7 +38,7 @@ export default function App(settings)
 	_this._settingManager = new SettingManager(_this._settings.get("globals"));
 
 	// Event handlers
-	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
+	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
 
 	return _this;
 
@@ -96,34 +96,18 @@ Object.defineProperty(App.prototype, 'components', {
 // -----------------------------------------------------------------------------
 
 /**
- * After connect event handler.
+ * After start event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-App.prototype.onAfterConnect = function(sender, e, ex)
+App.prototype.onAfterStart = function(sender, e, ex)
 {
 
 	// Start managers
-	this._settingManager.run();
-	this._preferenceManager.run();
-	this._errorManager.run();
-
-}
-
-// -----------------------------------------------------------------------------
-//  Methods
-// -----------------------------------------------------------------------------
-
-/**
- * Start application.
- *
- * @return  {Promise}		Promise.
- */
-App.prototype.run = function()
-{
-
-	this.connect();
+	this._settingManager.start();
+	this._preferenceManager.start();
+	this._errorManager.start();
 
 }

@@ -37,7 +37,7 @@ export default function PreferenceManager(settings)
 	BITSMIST.v1.Globals["preferences"].items = _this._preferences._items;
 
 	// Event handlers
-	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
+	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
 	_this.addEventHandler(_this, "beforeSetup", _this.onBeforeSetup);
 
 	return _this;
@@ -68,13 +68,13 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
 // -----------------------------------------------------------------------------
 
 /**
- * After connect event handler.
+ * After start event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-PreferenceManager.prototype.onAfterConnect = function(sender, e, ex)
+PreferenceManager.prototype.onAfterStart = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -140,20 +140,6 @@ PreferenceManager.prototype.set = function(key, value)
 {
 
 	this._preferences.set(key, value);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Start manager.
- *
- * @return  {Promise}		Promise.
- */
-PreferenceManager.prototype.run = function()
-{
-
-	this.connect();
 
 }
 

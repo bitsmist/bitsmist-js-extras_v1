@@ -43,13 +43,13 @@ export default class MasterHandler extends Plugin
 	// -------------------------------------------------------------------------
 
 	/**
-	 * After spec load event handler.
+	 * After start event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
  	 * @param	{Object}		ex					Extra event info.
 	 */
-	onAfterConnect(sender, e, ex)
+	onAfterStart(sender, e, ex)
 	{
 
 		return this.__initMasters(this._component.settings.get("masters"));
@@ -133,7 +133,7 @@ export default class MasterHandler extends Plugin
 
 		return {
 			"events": {
-				"afterConnect": this.onAfterConnect,
+				"afterStart": this.onAfterStart,
 				"afterSpecLoad": this.onAfterSpecLoad,
 			}
 		};

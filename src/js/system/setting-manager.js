@@ -71,17 +71,3 @@ SettingManager.prototype.set = function(key, value)
 	this._settings.set(key, value);
 
 }
-
-// -----------------------------------------------------------------------------
-
-/**
- * Start manager.
- *
- * @return  {Promise}		Promise.
- */
-SettingManager.prototype.run = function()
-{
-
-	this.connect();
-
-}

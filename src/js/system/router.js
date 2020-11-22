@@ -33,7 +33,7 @@ export default function Router(settings)
 	_this._spec;
 
 	// Event handlers
-	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
+	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
 
 	return _this;
 
@@ -63,13 +63,13 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 // -----------------------------------------------------------------------------
 
 /**
- * After connect event handler.
+ * After start event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-Router.prototype.onAfterConnect = function(sender, e, ex)
+Router.prototype.onAfterStart = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -92,20 +92,6 @@ Router.prototype.onAfterConnect = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 //  Methods
-// -----------------------------------------------------------------------------
-
-/**
- * Start router.
- *
- * @return  {Promise}		Promise.
- */
-Router.prototype.run = function()
-{
-
-	this.connect();
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**

@@ -61,7 +61,7 @@ export default class RouteOrganizer
 
 		let ret = false;
 
-		if (eventName == "afterInitComponent" || eventName == "afterConnect" || eventName == "afterSpecLoad")
+		if (eventName == "afterInitComponent" || eventName == "afterStart" || eventName == "afterSpecLoad")
 		{
 			ret = true;
 		}

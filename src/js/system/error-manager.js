@@ -32,7 +32,7 @@ export default function ErrorManager(settings)
 	_this._observers = new BITSMIST.v1.Store();
 
 	// Event handlers
-	_this.addEventHandler(_this, "afterConnect", _this.onAfterConnect);
+	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
 
 	return _this;
 
@@ -46,13 +46,13 @@ customElements.define("bm-error", ErrorManager);
 // -----------------------------------------------------------------------------
 
 /**
- * After connect event handler.
+ * After start event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
+ErrorManager.prototype.onAfterStart = function(sender, e, ex)
 {
 
 	this.__initErrorListeners();
@@ -61,20 +61,6 @@ ErrorManager.prototype.onAfterConnect = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 //  Methods
-// -----------------------------------------------------------------------------
-
-/**
- * Start manager.
- *
- * @return  {Promise}		Promise.
- */
-ErrorManager.prototype.run = function()
-{
-
-	this.connect();
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**

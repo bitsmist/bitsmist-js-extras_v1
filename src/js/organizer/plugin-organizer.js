@@ -61,7 +61,7 @@ export default class PluginOrganizer
 
 		let ret = false;
 
-		if (eventName == "afterInitComponent" || eventName == "afterConnect")
+		if (eventName == "afterInitComponent" || eventName == "afterStart")
 		{
 			ret = true;
 		}
