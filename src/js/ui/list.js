@@ -110,19 +110,15 @@ Object.defineProperty(List.prototype, 'data', {
 List.prototype.onListAfterAppend = function(sender, e, ex)
 {
 
-	return new Promise((resolve, reject) => {
-		this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
-		let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
-		this._row = BITSMIST.v1.ClassUtil.createObject(className);
-		this._row._parent = this;
-		Promise.resolve().then(() => {
-			return this._row.start();
-		}).then(() => {
-			resolve();
-		});
-	});
+	this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
+	let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
+	this._row = BITSMIST.v1.ClassUtil.createObject(className);
+	this._row._parent = this;
+
+	return this._row.start();
 
 }
+
 // -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
@@ -149,44 +145,41 @@ List.prototype.fill = function(options)
 
 	console.debug(`List.fill(): Filling list. name=${this.name}`);
 
-	return new Promise((resolve, reject) => {
-		this._rows = [];
-		options = Object.assign({}, this.settings.items, options);
-		//options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
-		let builder = ( this._settings.get("async") ? this._buildAsync : this._buildSync );
-		let fragment = document.createDocumentFragment();
+	options = Object.assign({}, this.settings.items, options);
+	//options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
 
-		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
-		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
+	let builder = ( this._settings.get("async") ? this._buildAsync : this._buildSync );
+	let fragment = document.createDocumentFragment();
 
-		Promise.resolve().then(() => {
-			return this.trigger("doTarget", this);
-		}).then(() => {
-			return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("doFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("beforeFill", sender);
-		}).then(() => {
-			if (this._items)
-			{
-				return builder.call(this, fragment);
-			}
-		}).then(() => {
-			if (options["autoClear"])
-			{
-				this.clear();
-			}
-		}).then(() => {
-			this._listRootNode.appendChild(fragment);
-		}).then(() => {
-			return this.trigger("afterFill", sender);
-		}).then(() => {
-			resolve();
-		});
+	this._rows = [];
+	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
+	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
+
+	return Promise.resolve().then(() => {
+		return this.trigger("doTarget", this);
+	}).then(() => {
+		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("doFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("beforeFill", sender);
+	}).then(() => {
+		if (this._items)
+		{
+			return builder.call(this, fragment);
+		}
+	}).then(() => {
+		if (options["autoClear"])
+		{
+			this.clear();
+		}
+	}).then(() => {
+		this._listRootNode.appendChild(fragment);
+	}).then(() => {
+		return this.trigger("afterFill", sender);
 	});
 
 }
@@ -251,36 +244,32 @@ List.prototype._buildAsync = function(fragment)
 List.prototype.__appendRowAsync = function(rootNode, no, item)
 {
 
-	return new Promise((resolve, reject) => {
-		// Append a row
-		let element = this._row.clone();
-		rootNode.appendChild(element);
+	// Append a row
+	let element = this._row.clone();
+	rootNode.appendChild(element);
 
-		this._rows.push(element);
+	this._rows.push(element);
 
-		// set row click event handler
-		let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-		if (clickHandler)
-		{
-			this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
-		}
+	// set row click event handler
+	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+	if (clickHandler)
+	{
+		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
+	}
 
-		// set row elements click event handler
-		Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
-			this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
-		});
+	// set row elements click event handler
+	Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
+		this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
+	});
 
-		// Call event handlers
-		Promise.resolve().then(() => {
-			return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
-		}).then(() => {
-			// Fill fields
-			FormUtil.setFields(element, item, this.masters);
-		}).then(() => {
-			return this._row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
-		}).then(() => {
-			resolve();
-		});
+	// Call event handlers
+	return Promise.resolve().then(() => {
+		return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
+	}).then(() => {
+		// Fill fields
+		FormUtil.setFields(element, item, this.masters);
+	}).then(() => {
+		return this._row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
 	});
 
 }

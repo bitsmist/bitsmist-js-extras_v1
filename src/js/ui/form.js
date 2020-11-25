@@ -109,36 +109,32 @@ Form.prototype.build = function(items)
 Form.prototype.fill = function(options)
 {
 
-	return new Promise((resolve, reject) => {
-		options = Object.assign({}, this.settings.items, options);
-		//options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
+	options = Object.assign({}, this.settings.items, options);
+	//options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
 
-		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
-		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
+	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
+	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
-		// Clear fields
-		if (options["autoClear"])
-		{
-			this.clear();
-		}
+	// Clear fields
+	if (options["autoClear"])
+	{
+		this.clear();
+	}
 
-		Promise.resolve().then(() => {
-			return this.trigger("doTarget", sender);
-		}).then(() => {
-			return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("doFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
-		}).then(() => {
-			return this.trigger("beforeFill", sender);
-		}).then(() => {
-			FormUtil.setFields(this, this._item, this.masters);
-			return this.trigger("afterFill", sender);
-		}).then(() => {
-			resolve();
-		});
+	return Promise.resolve().then(() => {
+		return this.trigger("doTarget", sender);
+	}).then(() => {
+		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("doFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
+	}).then(() => {
+		return this.trigger("beforeFill", sender);
+	}).then(() => {
+		FormUtil.setFields(this, this._item, this.masters);
+		return this.trigger("afterFill", sender);
 	});
 
 }
@@ -171,35 +167,32 @@ Form.prototype.clear = function(target)
 Form.prototype.validate = function(options)
 {
 
-	return new Promise((resolve, reject) => {
-		options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
-		delete options["sender"];
+	options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
 
-		this.trigger("beforeValidate", sender).then(() => {
-			let ret = true;
-			let form = this.querySelector("form");
+	return Promise.resolve().then(() => {
+		return this.trigger("beforeValidate", sender);
+	}).then(() => {
+		let ret = true;
+		let form = this.querySelector("form");
 
-			if (this.settings.get("autoValidate"))
+		if (this.settings.get("autoValidate"))
+		{
+			if (form && form.reportValidity)
 			{
-				if (form && form.reportValidity)
-				{
-					ret = form.reportValidity();
-				}
-				else
-				{
-					ret = FormUtil.reportValidity(this);
-				}
+				ret = form.reportValidity();
 			}
-
-			if (!ret)
+			else
 			{
-				this.__cancelSubmit = true;
+				ret = FormUtil.reportValidity(this);
 			}
-			return this.trigger("afterValidate", sender);
-		}).then(() => {
-			resolve();
-		});
+		}
+
+		if (!ret)
+		{
+			this.__cancelSubmit = true;
+		}
+		return this.trigger("afterValidate", sender);
 	});
 
 }
@@ -214,29 +207,25 @@ Form.prototype.validate = function(options)
 Form.prototype.submit = function(options)
 {
 
-	return new Promise((resolve, reject) => {
-		options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
-		delete options["sender"];
-		this.__cancelSubmit = false;
-		this._item = this.getFields();
+	options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
+	delete options["sender"];
+	this.__cancelSubmit = false;
+	this._item = this.getFields();
 
-		Promise.resolve(() => {
-			return this.validate();
-		}).then(() => {
-			return this.trigger("beforeSubmit", sender);
-		}).then(() => {
-			if (!this.__cancelSubmit)
-			{
-				let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
-				return this.trigger("doSubmit", sender, {"target":this._target, "items":items});
-			}
-		}).then(() => {
+	return Promise.resolve().then(() => {
+		return this.validate();
+	}).then(() => {
+		return this.trigger("beforeSubmit", sender);
+	}).then(() => {
+		if (!this.__cancelSubmit)
+		{
 			let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
-			return this.trigger("afterSubmit", sender, {"target":this._target, "items":items});
-		}).then(() => {
-			resolve();
-		});
+			return this.trigger("doSubmit", sender, {"target":this._target, "items":items});
+		}
+	}).then(() => {
+		let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
+		return this.trigger("afterSubmit", sender, {"target":this._target, "items":items});
 	});
 
 }

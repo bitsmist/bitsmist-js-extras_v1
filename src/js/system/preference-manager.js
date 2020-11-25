@@ -77,14 +77,10 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
 PreferenceManager.prototype.onAfterStart = function(sender, e, ex)
 {
 
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			return this.load();
-		}).then((preferences) => {
-			return this._preferences.merge(preferences);
-		}).then(() => {
-			resolve();
-		});
+	return Promise.resolve().then(() => {
+		return this.load();
+	}).then((preferences) => {
+		return this._preferences.merge(preferences);
 	});
 
 }
@@ -155,19 +151,15 @@ PreferenceManager.prototype.set = function(key, value)
 PreferenceManager.prototype.setup = function(options)
 {
 
-	return new Promise((resolve, reject) => {
-		options = Object.assign({}, options);
-		let sender = ( options["sender"] ? options["sender"] : this );
+	options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
 
-		BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
-			if (options["newPreferences"])
-			{
-				this._preferences.merge(options["newPreferences"]);
-				this.save();
-			}
-		}).then(() => {
-			resolve();
-		});
+	return BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
+		if (options["newPreferences"])
+		{
+			this._preferences.merge(options["newPreferences"]);
+			this.save();
+		}
 	});
 
 }

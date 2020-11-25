@@ -52,20 +52,16 @@ customElements.define("bm-tagloader", TagLoader);
 TagLoader.prototype.onDOMContentLoaded= function(sender, e)
 {
 
-	return new Promise((resolve, reject) => {
-		Promise.resolve().then(() => {
-			if (document.querySelector("bm-setting"))
-			{
-				return this.waitFor([{"name":"SettingManager", "status":"opened"}]);
-				//return this.waitFor([{"rootNode":"bm-setting", "status":"opened"}]); //@@@fix this does not work.
-			}
-		}).then(() => {
-			let path = BITSMIST.v1.Util.concatPath([this._settings.get("system.appBaseUrl", ""), this._settings.get("system.componentPath", "")]);
-			let splitComponent = this._settings.get("system.splitComponent", false);
-			return this.loadTags(document, path, {"splitComponent":splitComponent});
-		}).then(() => {
-			resolve();
-		});
+	return Promise.resolve().then(() => {
+		if (document.querySelector("bm-setting"))
+		{
+			return this.waitFor([{"name":"SettingManager", "status":"opened"}]);
+		}
+	}).then(() => {
+		let path = BITSMIST.v1.Util.concatPath([this._settings.get("system.appBaseUrl", ""), this._settings.get("system.componentPath", "")]);
+		let splitComponent = this._settings.get("system.splitComponent", false);
+
+		return this.loadTags(document, path, {"splitComponent":splitComponent});
 	});
 
 }

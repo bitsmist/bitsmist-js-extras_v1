@@ -102,31 +102,24 @@ export default class ResourceHandler extends Plugin
 	onDoFetch(sender, e, ex)
 	{
 
-		return new Promise((resolve, reject) => {
-			let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
-			let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
-			let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this._options.get("autoLoad"));
+		let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
+		let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
+		let autoLoad = BITSMIST.v1.Util.safeGet(e.detail.options, "autoLoad", this._options.get("autoLoad"));
 
-			if (!autoLoad)
-			{
-				resolve();
-			}
-			else
-			{
-				this._resources[this._defaultResourceName].get(id, parameters).then((data) => {
-					this._component.data = data;
-					if ("items" in this._component)
-					{
-						this._component.items = this._options.get("itemsGetter", function(data){return data["data"]})(data);
-					}
-					else if ("item" in this._component)
-					{
-						this._component.item = this._options.get("itemGetter", function(data){return data["data"][0]})(data);
-					}
-					resolve();
-				});
-			}
-		});
+		if (autoLoad)
+		{
+			return this._resources[this._defaultResourceName].get(id, parameters).then((data) => {
+				this._component.data = data;
+				if ("items" in this._component)
+				{
+					this._component.items = this._options.get("itemsGetter", function(data){return data["data"]})(data);
+				}
+				else if ("item" in this._component)
+				{
+					this._component.item = this._options.get("itemGetter", function(data){return data["data"][0]})(data);
+				}
+			});
+		}
 
 	}
 
@@ -142,23 +135,19 @@ export default class ResourceHandler extends Plugin
 	onDoSubmit(sender, e, ex)
 	{
 
-		return new Promise((resolve, reject) => {
-			let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
-			let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
-			let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
+		let id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
+		let parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
+		let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
 
-			Promise.resolve().then(() => {
-				if (id)
-				{
-					return this._resources[this._defaultResourceName].update(id, {items:items});
-				}
-				else
-				{
-					return this._resources[this._defaultResourceName].insert(id, {items:items});
-				}
-			}).then(() => {
-				resolve();
-			});
+		return Promise.resolve().then(() => {
+			if (id)
+			{
+				return this._resources[this._defaultResourceName].update(id, {items:items});
+			}
+			else
+			{
+				return this._resources[this._defaultResourceName].insert(id, {items:items});
+			}
 		});
 
 	}

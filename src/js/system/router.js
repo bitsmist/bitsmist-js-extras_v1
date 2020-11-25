@@ -72,20 +72,18 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.onAfterStart = function(sender, e, ex)
 {
 
-	return new Promise((resolve, reject) => {
-		// Set state on the first page
-		history.replaceState(this.__getDefaultState("connect"), null, null);
-		this._routeInfo = this.__loadRouteInfo(window.location.href);
+	// Set state on the first page
+	history.replaceState(this.__getDefaultState("connect"), null, null);
+	this._routeInfo = this.__loadRouteInfo(window.location.href);
 
-		// Init popstate handler
-		this.__initPopState();
+	// Init popstate handler
+	this.__initPopState();
 
-		// Load spec file
-		this.__initSpec(this._routeInfo["specName"]).then(() => {
-			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
-		}).then(() => {
-			resolve();
-		});
+	// Load spec file
+	return Promise.resolve().then(() => {
+		return this.__initSpec(this._routeInfo["specName"]);
+	}).then(() => {
+		return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 	});
 
 }
@@ -361,16 +359,12 @@ Router.prototype._refresh = function(routeInfo, options)
 Router.prototype._update = function(routeInfo, options)
 {
 
-	return new Promise((resolve, reject) => {
-		BITSMIST.v1.Globals.organizers.notify("clear", "*", this);
-
-		Promise.resolve().then(() => {
-			return this.__initSpec(routeInfo["specName"]);
-		}).then(() => {
-			return this.trigger("afterSpecLoad", this, {"spec":this._spec});
-		}).then(() => {
-			resolve();
-		});
+	return Promise.resolve().then(() => {
+		return BITSMIST.v1.Globals.organizers.notify("clear", "*", this);
+	}).then(() => {
+		return this.__initSpec(routeInfo["specName"]);
+	}).then(() => {
+		return this.trigger("afterSpecLoad", this, {"spec":this._spec});
 	});
 
 }
@@ -480,29 +474,21 @@ Router.prototype.__initPopState = function()
 Router.prototype.__initSpec = function(specName)
 {
 
-	return new Promise((resolve, reject) => {
-		if (specName)
+	if (specName)
+	{
+		let path = this.getAttribute("data-specpath") || "";
+		if (path)
 		{
-			let path = this.getAttribute("data-specpath") || "";
-			if (path)
-			{
-				this._settings.set("system.specPath", path);
-			}
-			path = this._settings.get("system.specPath");
-
-			this.loadSpec(specName, path).then((spec) => {
-				this._spec = spec;
-
-				BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, spec).then(() => {
-					resolve();
-				});
-			});
+			this._settings.set("system.specPath", path);
 		}
-		else
-		{
-			resolve();
-		}
-	});
+		path = this._settings.get("system.specPath");
+
+		return this.loadSpec(specName, path).then((spec) => {
+			this._spec = spec;
+
+			return BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, spec);
+		});
+	}
 
 }
 

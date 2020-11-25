@@ -84,38 +84,31 @@ export default class MasterHandler extends Plugin
 	__initMasters(masters)
 	{
 
-		return new Promise((resolve, reject) => {
-			let promises = [];
+		let promises = [];
 
-			if (masters)
-			{
-				let settings = this._component.settings.get("ajaxUtil", {});
-				settings["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
-				Object.keys(masters).forEach((masterName) => {
-					this._masters[masterName] = new MasterUtil(masterName, Object.assign({
-						"settings": settings,
-					}, masters[masterName]));
+		if (masters)
+		{
+			let settings = this._component.settings.get("ajaxUtil", {});
+			settings["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
+			Object.keys(masters).forEach((masterName) => {
+				this._masters[masterName] = new MasterUtil(masterName, Object.assign({
+					"settings": settings,
+				}, masters[masterName]));
 
-					if (masters[masterName]["autoLoad"])
-					{
-						promises.push(new Promise((resolve, reject) => {
-							this._masters[masterName].load().then(() => {
-								this[masterName] = this._masters[masterName];
-								resolve();
-							});
-						}));
-					}
-					else
-					{
+				if (masters[masterName]["autoLoad"])
+				{
+					promises.push(this._masters[masterName].load().then(() => {
 						this[masterName] = this._masters[masterName];
-					}
-				});
-			}
-
-			Promise.all(promises).then(() => {
-				resolve();
+					}));
+				}
+				else
+				{
+					this[masterName] = this._masters[masterName];
+				}
 			});
-		});
+		}
+
+		return Promise.all(promises);
 
 	}
 

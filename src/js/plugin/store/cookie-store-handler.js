@@ -53,11 +53,9 @@ export default class CookieStoreHandler extends Plugin
 	onDoLoadStore(sender, e, ex)
 	{
 
-		return new Promise((resolve, reject) => {
-			let data = this._cookie.get(this._cookieName);
+		let data = this._cookie.get(this._cookieName);
 
-			resolve(data);
-		});
+		return data;
 
 	}
 

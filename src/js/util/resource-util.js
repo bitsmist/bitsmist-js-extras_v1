@@ -50,18 +50,16 @@ export default class ResourceUtil
 	get(id, parameters)
 	{
 
-		return new Promise((resolve, reject) => {
-			let method = "GET";
-			let headers = this._getOption("headers", method);
-			let options = this._getOption("options", method);
-			let urlOptions = this._getOption("url", method);
-			let dataType = urlOptions["dataType"];
+		let method = "GET";
+		let headers = this._getOption("headers", method);
+		let options = this._getOption("options", method);
+		let urlOptions = this._getOption("url", method);
+		let dataType = urlOptions["dataType"];
 
-			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-				resolve((this._convertResponseData(xhr.responseText, dataType)));
-			});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}
@@ -79,18 +77,16 @@ export default class ResourceUtil
 	delete(id, parameters)
 	{
 
-		return new Promise((resolve, reject) => {
-			let method = "DELETE";
-			let headers = this._getOption("headers", method);
-			let options = this._getOption("options", method);
-			let urlOptions = this._getOption("url", method);
-			let dataType = urlOptions["dataType"];
+		let method = "DELETE";
+		let headers = this._getOption("headers", method);
+		let options = this._getOption("options", method);
+		let urlOptions = this._getOption("url", method);
+		let dataType = urlOptions["dataType"];
 
-			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-				resolve((this._convertResponseData(xhr.responseText, dataType)));
-			});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}
@@ -109,18 +105,16 @@ export default class ResourceUtil
 	insert(id, items, parameters)
 	{
 
-		return new Promise((resolve, reject) => {
-			let method = "POST";
-			let headers = this._getOption("headers", method);
-			let options = this._getOption("options", method);
-			let urlOptions = this._getOption("url", method);
-			let dataType = urlOptions["dataType"];
+		let method = "POST";
+		let headers = this._getOption("headers", method);
+		let options = this._getOption("options", method);
+		let urlOptions = this._getOption("url", method);
+		let dataType = urlOptions["dataType"];
 
-			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
-				resolve((this._convertResponseData(xhr.responseText, dataType)));
-			});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
+			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}
@@ -139,18 +133,16 @@ export default class ResourceUtil
 	update(id, items, parameters)
 	{
 
-		return new Promise((resolve, reject) => {
-			let method = "PUT";
-			let headers = this._getOption("headers", method);
-			let options = this._getOption("options", method);
-			let urlOptions = this._getOption("url", method);
-			let dataType = urlOptions["dataType"];
+		let method = "PUT";
+		let headers = this._getOption("headers", method);
+		let options = this._getOption("options", method);
+		let urlOptions = this._getOption("url", method);
+		let dataType = urlOptions["dataType"];
 
-			let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-			BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
-				resolve((this._convertResponseData(xhr.responseText, dataType)));
-			});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
+			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}

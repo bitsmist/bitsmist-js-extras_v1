@@ -83,17 +83,15 @@ export default class PluginOrganizer
 	static addPlugin(component, pluginName, options)
 	{
 
-		return new Promise((resolve, reject) => {
-			options = Object.assign({}, options);
-			let className = ( "className" in options ? options["className"] : pluginName );
-			let plugin = null;
+		options = Object.assign({}, options);
+		let className = ( "className" in options ? options["className"] : pluginName );
+		let plugin = null;
 
-			// CreatePlugin
-			plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
-			component._plugins[pluginName] = plugin;
+		// CreatePlugin
+		plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
+		component._plugins[pluginName] = plugin;
 
-			resolve(plugin);
-		});
+		return plugin;
 
 	}
 

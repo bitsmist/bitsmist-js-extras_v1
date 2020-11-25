@@ -84,12 +84,8 @@ export default class MasterUtil extends ResourceUtil
 	load()
 	{
 
-		return new Promise((resolve, reject) => {
-			this.get("list").then((data) => {
-				this._items = this.__reshapeItems(data["data"]);
-
-				resolve();
-			});
+		return this.get("list").then((data) => {
+			this._items = this.__reshapeItems(data["data"]);
 		});
 
 	}
