@@ -9,8 +9,6 @@ window.BITSMIST.v1.App = App;
 import Router from './system/router';
 window.BITSMIST.v1.Router = Router;
 
-import TagLoader from './system/tagloader';
-
 import SettingManager from './system/setting-manager';
 window.BITSMIST.v1.SettingManager = SettingManager;
 
