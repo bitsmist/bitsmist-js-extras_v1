@@ -26,6 +26,9 @@ BITSMIST.v1.Globals.organizers.set("PluginOrganizer", {"object":PluginOrganizer,
 import RouteOrganizer from './organizer/route-organizer';
 BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targets":"routes"});
 
+import RouteHandlerOrganizer from './organizer/routehandler-organizer';
+BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targets":""});
+
 // Plugin
 
 import Plugin from './plugin/plugin';
