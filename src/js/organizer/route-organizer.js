@@ -33,6 +33,7 @@ export default class RouteOrganizer
 	{
 
 		component._routes = component._routes || [];
+		component._specs = component._specs || {};
 
 		let routes = settings["routes"];
 		if (routes)
@@ -41,6 +42,14 @@ export default class RouteOrganizer
 			{
 				RouteOrganizer.addRoute(component, routes[i]);
 			}
+		}
+
+		let specs = settings["specs"];
+		if (specs)
+		{
+			Object.keys(specs).forEach((key) => {
+				component._specs[key] = specs[key];
+			});
 		}
 
 		return Promise.resolve();
