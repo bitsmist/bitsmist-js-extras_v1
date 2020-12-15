@@ -30,7 +30,7 @@ export default function Router(settings)
 
 	// Init vars
 	_this._routes = _this._routes || [];
-	_this._spec;
+	_this._specs = _this._specs || {};
 
 	// Event handlers
 	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
@@ -79,11 +79,18 @@ Router.prototype.onAfterStart = function(sender, e, ex)
 	// Init popstate handler
 	this.__initPopState();
 
+	// Get settings from attributes
+	let path = this.getAttribute("data-specpath") || "";
+	if (path)
+	{
+		this._settings.set("system.specPath", path);
+	}
+
 	// Load spec file
 	return Promise.resolve().then(() => {
 		return this.__initSpec(this._routeInfo["specName"]);
 	}).then(() => {
-		return this.trigger("afterSpecLoad", this, {"spec":this._spec});
+		return this.trigger("afterSpecLoad", this, {"spec":this._specs[this._routeInfo["specName"]]});
 	});
 
 }
@@ -364,7 +371,7 @@ Router.prototype._update = function(routeInfo, options)
 	}).then(() => {
 		return this.__initSpec(routeInfo["specName"]);
 	}).then(() => {
-		return this.trigger("afterSpecLoad", this, {"spec":this._spec});
+		return this.trigger("afterSpecLoad", this, {"spec":this._specs[routeInfo["specName"]]});
 	});
 
 }
@@ -476,17 +483,15 @@ Router.prototype.__initSpec = function(specName)
 
 	if (specName)
 	{
-		let path = this.getAttribute("data-specpath") || "";
-		if (path)
-		{
-			this._settings.set("system.specPath", path);
-		}
-		path = this._settings.get("system.specPath");
-
-		return this.loadSpec(specName, path).then((spec) => {
-			this._spec = spec;
-
-			return BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, spec);
+		return Promise.resolve().then(() => {
+			if (!this._specs[specName])
+			{
+				return this.loadSpec(specName, this._settings.get("system.specPath")).then((spec) => {;
+					this._specs[specName] = spec;
+				});
+			}
+		}).then(() => {
+			return BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, this._specs[specName]);
 		});
 	}
 
