@@ -68,7 +68,7 @@ export default class MasterHandler extends Plugin
 	onAfterSpecLoad(sender, e, ex)
 	{
 
-		return this.__initMasters(BITSMIST.v1.Util.safeGet(this._component, "_spec.masters"));
+		return this.__initMasters(BITSMIST.v1.Util.safeGet(e.detail, "spec.masters"));
 
 	}
 
