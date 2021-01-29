@@ -21,13 +21,13 @@ window.BITSMIST.v1.ErrorManager = ErrorManager;
 // Organizer
 
 import PluginOrganizer from './organizer/plugin-organizer';
-BITSMIST.v1.Globals.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targets":"plugins"});
+BITSMIST.v1.Globals.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targets":"plugins", "order":1000});
 
 import RouteOrganizer from './organizer/route-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targets":"routes"});
+BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targets":"routes", "order":1100});
 
 import RouteHandlerOrganizer from './organizer/routehandler-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targets":""});
+BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targets":"", "order":1200});
 
 // Plugin
 
