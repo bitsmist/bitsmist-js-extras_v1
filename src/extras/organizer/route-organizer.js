@@ -112,4 +112,80 @@ export default class RouteOrganizer
 
 	}
 
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load the spec file for this page.
+	 *
+	 * @param	{String}		specName			Spec name.
+	 * @param	{String}		path				Path to spec.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static loadSpec(specName, path)
+	{
+
+//		let urlCommon = BITSMIST.v1.Util.concatPath([path, "common.js"]);
+		let url = BITSMIST.v1.Util.concatPath([path, specName + ".js"]);
+		let spec;
+//		let specCommon;
+		let specMerged;
+		let promises = [];
+
+		// Load specs
+//		promises.push(RouteOrganizer.__loadSpecFile(urlCommon, "{}"));
+		promises.push(RouteOrganizer.__loadSpecFile(url));
+
+		return Promise.all(promises).then((result) => {
+			// Convert to json
+			try
+			{
+//				specCommon = JSON.parse(result[0]);
+//				spec = JSON.parse(result[1]);
+				spec = JSON.parse(result[0]);
+			}
+			catch(e)
+			{
+				//throw new SyntaxError(`Illegal json string. url=${(specCommon ? url : urlCommon)}`);
+				throw new SyntaxError(`Illegal json string. url=${url}`);
+			}
+//			specMerged = BITSMIST.v1.Util.deepMerge(specCommon, spec);
+
+			//return specMerged;
+
+			return spec;
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load spec file.
+	 *
+	 * @param	{String}		url					Spec file url.
+	 * @param	{String}		defaultResponse		Response when error.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static __loadSpecFile(url, defaultResponse)
+	{
+
+		console.debug(`LoaderMixin.__loadSpec(): Loading spec file. url=${url}`);
+
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({"url":url, "method":"GET"}).then((xhr) => {
+			console.debug(`LoaderMixin.__loadSpec(): Loaded spec file. url=${url}`);
+
+			return xhr.responseText;
+		}).catch((xhr) => {
+			if (defaultResponse)
+			{
+				return defaultResponse;
+			}
+		});
+
+	}
+
 }

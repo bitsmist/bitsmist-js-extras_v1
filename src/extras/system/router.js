@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import RouteOrganizer from '../organizer/route-organizer';
+
 // =============================================================================
 //	Router class
 // =============================================================================
@@ -486,7 +488,7 @@ Router.prototype.__initSpec = function(specName)
 		return Promise.resolve().then(() => {
 			if (!this._specs[specName])
 			{
-				return this.loadSpec(specName, this._settings.get("system.specPath")).then((spec) => {;
+				return RouteOrganizer.loadSpec(specName, this._settings.get("system.specPath")).then((spec) => {;
 					this._specs[specName] = spec;
 				});
 			}
