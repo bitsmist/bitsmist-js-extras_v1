@@ -22,6 +22,21 @@ export default class RouteOrganizer
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Init.
+	 *
+	 * @param	{Component}		component			Component.
+	 */
+	static init(component)
+	{
+
+		component._routes = [];
+		component._specs = {};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
 	 * Organizer.
 	 *
 	 * @param	{Component}		component			Component.
@@ -31,9 +46,6 @@ export default class RouteOrganizer
 	 */
 	static organize(component, settings)
 	{
-
-		component._routes = component._routes || [];
-		component._specs = component._specs || {};
 
 		let routes = settings["routes"];
 		if (routes)
@@ -70,7 +82,7 @@ export default class RouteOrganizer
 
 		let ret = false;
 
-		if (eventName == "afterInitComponent" || eventName == "afterStart" || eventName == "afterSpecLoad")
+		if (eventName == "*" || eventName == "afterStart" || eventName == "afterSpecLoad")
 		{
 			ret = true;
 		}

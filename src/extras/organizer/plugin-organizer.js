@@ -20,6 +20,20 @@ export default class PluginOrganizer
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Init.
+	 *
+	 * @param	{Component}		component			Component.
+	 */
+	static init(component)
+	{
+
+		component._plugins = {};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
 	 * Organize.
 	 *
 	 * @param	{Component}		component			Component.
@@ -29,11 +43,6 @@ export default class PluginOrganizer
 	 */
 	static organize(component, settings)
 	{
-
-		if (!component._plugins)
-		{
-			component._plugins = {};
-		}
 
 		let plugins = settings["plugins"];
 		if (plugins)
@@ -61,7 +70,7 @@ export default class PluginOrganizer
 
 		let ret = false;
 
-		if (eventName == "afterInitComponent" || eventName == "afterStart")
+		if (eventName == "*" || eventName == "afterStart")
 		{
 			ret = true;
 		}

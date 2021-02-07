@@ -50,7 +50,7 @@ export default class RouteHandlerOrganizer
 
 		let ret = false;
 
-		if (eventName == "afterAppend")
+		if (eventName == "*" || eventName == "afterAppend")
 		{
 			ret = true;
 		}
