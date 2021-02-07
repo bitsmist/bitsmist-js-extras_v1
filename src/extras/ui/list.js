@@ -21,28 +21,42 @@ import FormUtil from '../util/form-util';
 /**
  * Constructor.
  */
-export default function List(settings)
+export default function List()
 {
 
-	let _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
-
-	_this._id;
-	_this._parameters;
-	_this._target = {};
-	_this._data;
-	_this._items;
-	_this._listRootNode;
-	_this._row;
-	_this._rows;
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterAppend", _this.onListAfterAppend);
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Pad, [], this.constructor);
 
 }
 
 BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
+
+// -----------------------------------------------------------------------------
+//  Callbacks
+// -----------------------------------------------------------------------------
+
+/**
+ * Connected callback.
+ */
+List.prototype.connectedCallback = function()
+{
+
+	// Init vars
+	this._id;
+	this._parameters;
+	this._target = {};
+	this._data;
+	this._items;
+	this._listRootNode;
+	this._row;
+	this._rows;
+
+	// Event handlers
+	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
+
+	// super()
+	return BITSMIST.v1.Pad.prototype.connectedCallback.call(this);
+
+}
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
