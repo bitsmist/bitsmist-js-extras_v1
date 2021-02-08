@@ -18,20 +18,12 @@
 
 /**
  * Constructor.
- *
- * @param	{Object}		settings			Options for the component.
  */
-export default function SettingManager(settings)
+export default function SettingManager()
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"SettingManager", "autoSetup":false});
-	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
-
-	// Init globals
-	BITSMIST.v1.Globals["settings"].items = _this._settings.items;
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
@@ -40,6 +32,29 @@ customElements.define("bm-setting", SettingManager);
 
 // -----------------------------------------------------------------------------
 //  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start component.
+ *
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
+ */
+SettingManager.prototype.start = function(settings)
+{
+
+	// Init component settings
+	let localSettings = Object.assign({}, {"name":"SettingManager", "autoSetup":false});
+
+	// Init vars
+	BITSMIST.v1.Globals["settings"].items = settings;
+
+	// Start
+	return BITSMIST.v1.Component.prototype.start.call(this, localSettings);
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**

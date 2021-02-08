@@ -18,23 +18,12 @@
 
 /**
  * Constructor.
- *
- * @param	{Object}		settings			Options for the component.
  */
-export default function ErrorManager(settings)
+export default function ErrorManager()
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
-	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
-
-	// Init vars
-	_this._observers = new BITSMIST.v1.Store();
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
@@ -42,25 +31,32 @@ BITSMIST.v1.ClassUtil.inherit(ErrorManager, BITSMIST.v1.Component);
 customElements.define("bm-error", ErrorManager);
 
 // -----------------------------------------------------------------------------
-//	Event handlers
+//  Methods
 // -----------------------------------------------------------------------------
 
 /**
- * After start event handler.
+ * Start component.
  *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
  */
-ErrorManager.prototype.onAfterStart = function(sender, e, ex)
+ErrorManager.prototype.start = function(settings)
 {
 
-	this.__initErrorListeners();
+	// Init component settings
+	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
+
+	// Init vars
+	this._observers = new BITSMIST.v1.Store();
+
+	// Start
+	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		this.__initErrorListeners();
+	});
 
 }
 
-// -----------------------------------------------------------------------------
-//  Methods
 // -----------------------------------------------------------------------------
 
 /**

@@ -18,29 +18,12 @@
 
 /**
  * Constructor.
- *
- * @param	{Object}		settings			Options for the component.
  */
-export default function PreferenceManager(settings)
+export default function PreferenceManager()
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
-	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
-
-	// Init vars
-	_this._observers = new BITSMIST.v1.Store({"filter":_this.__isTarget.bind(_this)});
-	let preferences = Object.assign({}, settings["defaults"]);
-	_this._preferences = new BITSMIST.v1.Store({"items":preferences});
-
-	// Init globals
-	BITSMIST.v1.Globals["preferences"].items = _this._preferences._items;
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
-	_this.addEventHandler(_this, "beforeSetup", _this.onBeforeSetup);
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
@@ -68,26 +51,6 @@ Object.defineProperty(PreferenceManager.prototype, 'items', {
 // -----------------------------------------------------------------------------
 
 /**
- * After start event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-PreferenceManager.prototype.onAfterStart = function(sender, e, ex)
-{
-
-	return Promise.resolve().then(() => {
-		return this.load();
-	}).then((preferences) => {
-		return this._preferences.merge(preferences);
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * Before setup event handler.
  *
  * @param	{Object}		sender				Sender.
@@ -107,6 +70,39 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 //  Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Start component.
+ *
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
+ */
+PreferenceManager.prototype.start = function(settings)
+{
+
+	// Init component settings
+	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
+
+	// Init vars
+	this._observers = new BITSMIST.v1.Store({"filter":this.__isTarget.bind(this)});
+	this._preferences = new BITSMIST.v1.Store({"items":Object.assign({}, settings["defaults"])});
+	BITSMIST.v1.Globals["preferences"].items = this._preferences._items;
+
+	// Start
+	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		this.addEventHandler(this, "beforeSetup", this.onBeforeSetup);
+	}).then(() => {
+		// Load preferences
+		return this.load();
+	}).then((preferences) => {
+		// Merge preferences
+		return this._preferences.merge(preferences);
+	});
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**

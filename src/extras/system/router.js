@@ -20,24 +20,12 @@ import RouteOrganizer from '../organizer/route-organizer';
 
 /**
  * Constructor.
- *
- * @param	{Object}		settings			Options for the component.
  */
-export default function Router(settings)
+export default function Router()
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
-	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
-
-	// Init vars
-	_this._routes = _this._routes || [];
-	_this._specs = _this._specs || {};
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
@@ -61,35 +49,39 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 })
 
 // -----------------------------------------------------------------------------
-//	Event handlers
+//  Methods
 // -----------------------------------------------------------------------------
 
 /**
- * After start event handler.
+ * Start component.
  *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
  */
-Router.prototype.onAfterStart = function(sender, e, ex)
+Router.prototype.start = function(settings)
 {
 
-	// Set state on the first page
-	history.replaceState(this.__getDefaultState("connect"), null, null);
-	this._routeInfo = this.__loadRouteInfo(window.location.href);
+	// Init component settings
+	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
 
-	// Init popstate handler
-	this.__initPopState();
+	// Start
+	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		// Set state on the first page
+		history.replaceState(this.__getDefaultState("connect"), null, null);
+		this._routeInfo = this.__loadRouteInfo(window.location.href);
 
-	// Get settings from attributes
-	let path = this.getAttribute("data-specpath") || "";
-	if (path)
-	{
-		this._settings.set("system.specPath", path);
-	}
+		// Init popstate handler
+		this.__initPopState();
 
-	// Load spec file
-	return Promise.resolve().then(() => {
+		// Get settings from attributes
+		let path = this.getAttribute("data-specpath") || "";
+		if (path)
+		{
+			this._settings.set("system.specPath", path);
+		}
+	}).then(() => {
+		// Load spec file
 		return this.__initSpec(this._routeInfo["specName"]);
 	}).then(() => {
 		return this.trigger("afterSpecLoad", this, {"spec":this._specs[this._routeInfo["specName"]]});
@@ -97,8 +89,6 @@ Router.prototype.onAfterStart = function(sender, e, ex)
 
 }
 
-// -----------------------------------------------------------------------------
-//  Methods
 // -----------------------------------------------------------------------------
 
 /**

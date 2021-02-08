@@ -22,25 +22,12 @@ import SettingManager from "./setting-manager";
 
 /**
  * Constructor.
- *
- * @param	{Object}		settings			Options for the component.
  */
-export default function App(settings)
+export default function App()
 {
 
 	// super()
-	settings = Object.assign({}, settings, {"name":"App", "autoSetup":false});
-	let _this = Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
-
-	// Init vars
-	_this._preferenceManager = new PreferenceManager(_this._settings.get("preferences"));
-	_this._errorManager = new ErrorManager();
-	_this._settingManager = new SettingManager(_this._settings.get("globals"));
-
-	// Event handlers
-	_this.addEventHandler(_this, "afterStart", _this.onAfterStart);
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
@@ -92,22 +79,33 @@ Object.defineProperty(App.prototype, 'components', {
 })
 
 // -----------------------------------------------------------------------------
-//	Event handlers
+//  Methods
 // -----------------------------------------------------------------------------
 
 /**
- * After start event handler.
+ * Start component.
  *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
  */
-App.prototype.onAfterStart = function(sender, e, ex)
+App.prototype.start = function(settings)
 {
 
-	// Start managers
-	this._settingManager.start();
-	this._preferenceManager.start();
-	this._errorManager.start();
+	// Init component settings
+	settings = Object.assign({}, settings, {"name":"App", "autoSetup":false});
+
+	// Init vars
+	this._preferenceManager = new PreferenceManager();
+	this._errorManager = new ErrorManager();
+	this._settingManager = new SettingManager();
+
+	// Start
+	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		// Start managers
+		this._settingManager.start(settings["globals"]);
+		this._preferenceManager.start(settings["preferences"]);
+		this._errorManager.start();
+	});
 
 }
