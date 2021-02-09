@@ -31,6 +31,24 @@ BITSMIST.v1.ClassUtil.inherit(SettingManager, BITSMIST.v1.Component);
 customElements.define("bm-setting", SettingManager);
 
 // -----------------------------------------------------------------------------
+//  Event handlers
+// -----------------------------------------------------------------------------
+
+/**
+ * After append event hadler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+SettingManager.prototype.onAfterStart = function(sender, e, ex)
+{
+
+	BITSMIST.v1.Globals["settings"].items = this._settings.items["globals"];
+
+}
+
+// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
@@ -45,16 +63,12 @@ SettingManager.prototype.start = function(settings)
 {
 
 	// Init component settings
-	let localSettings = Object.assign({}, {"name":"SettingManager", "autoSetup":false});
-
-	// Init vars
-	BITSMIST.v1.Globals["settings"].items = settings;
+	settings = Object.assign({}, settings, {"name":"SettingManager", "autoSetup":false});
 
 	// Start
-	return BITSMIST.v1.Component.prototype.start.call(this, localSettings);
+	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -68,7 +82,7 @@ SettingManager.prototype.start = function(settings)
 SettingManager.prototype.get = function(key, defaultValue)
 {
 
-	return this._settings.get(key, defaultValue);
+	return BITSMIST.v1.Globals["settings"].get(key, defaultValue);
 
 }
 
@@ -83,6 +97,20 @@ SettingManager.prototype.get = function(key, defaultValue)
 SettingManager.prototype.set = function(key, value)
 {
 
-	this._settings.set(key, value);
+	BITSMIST.v1.Globals["settings"].set(key, value);
+
+}
+
+// -----------------------------------------------------------------------------
+//  Protected
+// -----------------------------------------------------------------------------
+
+/**
+ * Inject event handlers.
+ */
+SettingManager.prototype._injectEvents = function()
+{
+
+	this.addEventHandler(this, "afterStart", this.onAfterStart);
 
 }

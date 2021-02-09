@@ -49,11 +49,10 @@ ErrorManager.prototype.start = function(settings)
 
 	// Init vars
 	this._observers = new BITSMIST.v1.Store();
+	this.__initErrorListeners();
 
 	// Start
-	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
-		this.__initErrorListeners();
-	});
+	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
 

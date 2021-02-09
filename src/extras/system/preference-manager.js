@@ -42,7 +42,7 @@ customElements.define("bm-preference", PreferenceManager);
 Object.defineProperty(PreferenceManager.prototype, 'items', {
 	get()
 	{
-		return this._preferences.items;
+		return BITSMIST.v1.Globals["preferences"].items;
 	}
 })
 
@@ -87,18 +87,17 @@ PreferenceManager.prototype.start = function(settings)
 
 	// Init vars
 	this._observers = new BITSMIST.v1.Store({"filter":this.__isTarget.bind(this)});
-	this._preferences = new BITSMIST.v1.Store({"items":Object.assign({}, settings["defaults"])});
-	BITSMIST.v1.Globals["preferences"].items = this._preferences._items;
 
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		BITSMIST.v1.Globals["preferences"].items = this._settings.items["defaults"];
 		this.addEventHandler(this, "beforeSetup", this.onBeforeSetup);
 	}).then(() => {
 		// Load preferences
 		return this.load();
 	}).then((preferences) => {
 		// Merge preferences
-		return this._preferences.merge(preferences);
+		BITSMIST.v1.Globals["preferences"].merge(preferences);
 	});
 
 }
@@ -116,7 +115,7 @@ PreferenceManager.prototype.start = function(settings)
 PreferenceManager.prototype.get = function(key, defaultValue)
 {
 
-	return this._preferences.get(key, defaultValue);
+	return BITSMIST.v1.Globals["preferences"].get(key, defaultValue);
 
 }
 
@@ -131,7 +130,7 @@ PreferenceManager.prototype.get = function(key, defaultValue)
 PreferenceManager.prototype.set = function(key, value)
 {
 
-	this._preferences.set(key, value);
+	BITSMIST.v1.Globals["preferences"].set(key, value);
 
 }
 
@@ -153,7 +152,7 @@ PreferenceManager.prototype.setup = function(options)
 	return BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
 		if (options["newPreferences"])
 		{
-			this._preferences.merge(options["newPreferences"]);
+			BITSMIST.v1.Globals["preferences"].merge(options["newPreferences"]);
 			this.save();
 		}
 	});
@@ -225,7 +224,7 @@ PreferenceManager.prototype.save = function(options)
 
 	let sender = ( options && options["sender"] ? options["sender"] : this );
 
-	return this.trigger("doSaveStore", sender, {"data":this._preferences.items});
+	return this.trigger("doSaveStore", sender, {"data":BITSMIST.v1.Globals["preferences"].items});
 
 }
 
