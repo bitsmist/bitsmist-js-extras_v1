@@ -135,13 +135,11 @@ App.prototype.start = function(settings)
 	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
 		if ( document.readyState !== 'loading' )
 		{
-			console.log("@@@ready");
-			this.install();
+			this.__install();
 		}
 		else
 		{
-			console.log("@@@not ready");
-			window.addEventListener('DOMContentLoaded', this.install.bind(this));
+			window.addEventListener('DOMContentLoaded', this.__install.bind(this));
 		}
 	});
 
