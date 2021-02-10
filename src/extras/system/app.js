@@ -159,7 +159,7 @@ App.prototype.__install = function()
 	rootNode.insertAdjacentHTML("afterbegin", "<bm-preference></bm-preference>");
 	this._preferenceManager = rootNode.children[0];
 
-	this.waitFor([{"name":"SettingManager", "status":"started"}]).then(() => {
+	this.waitFor([{"name":"SettingManager", "state":"started"}]).then(() => {
 		rootNode.insertAdjacentHTML("afterbegin", "<bm-router></bm-router>");
 		this._router = rootNode.children[0];
 
