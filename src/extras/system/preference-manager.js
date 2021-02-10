@@ -149,7 +149,7 @@ PreferenceManager.prototype.setup = function(options)
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
 
-	return BITSMIST.v1.Component.prototype.setup.call(this, options).then(() => {
+	return BITSMIST.v1.Pad.prototype.setup.call(this, options).then(() => {
 		if (options["newPreferences"])
 		{
 			BITSMIST.v1.Globals["preferences"].merge(options["newPreferences"]);
