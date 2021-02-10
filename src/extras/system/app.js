@@ -110,13 +110,6 @@ App.prototype.start = function(settings)
 	// Init component settings
 	settings = Object.assign({}, settings, {"name":"App", "autoSetup":false});
 
-	// Init vars
-	/*
-	this._preferenceManager = new PreferenceManager();
-	this._errorManager = new ErrorManager();
-	this._settingManager = new SettingManager();
-	*/
-
 	// Inject settings
 
 	SettingManager.prototype._injectSettings = (settings) => {
@@ -172,12 +165,5 @@ App.prototype.__install = function()
 
 		rootNode.insertAdjacentHTML("afterbegin", "<bm-tagloader></bm-tagloader>");
 	});
-
-	// Start managers
-	/*
-	this._settingManager.start({"globals":this._settings.items["globals"]});
-	this._preferenceManager.start(this._settings.items["preferences"]);
-	this._errorManager.start();
-	*/
 
 }
