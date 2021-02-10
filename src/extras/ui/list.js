@@ -31,34 +31,6 @@ export default function List()
 BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
 
 // -----------------------------------------------------------------------------
-//  Callbacks
-// -----------------------------------------------------------------------------
-
-/**
- * Connected callback.
- */
-List.prototype.connectedCallback = function()
-{
-
-	// Init vars
-	this._id;
-	this._parameters;
-	this._target = {};
-	this._data;
-	this._items;
-	this._listRootNode;
-	this._row;
-	this._rows;
-
-	// Event handlers
-	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
-
-	// super()
-	return BITSMIST.v1.Pad.prototype.connectedCallback.call(this);
-
-}
-
-// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -195,6 +167,36 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("afterFill", sender);
 	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Start component.
+ *
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
+ */
+List.prototype.start = function(settings)
+{
+
+	// Init vars
+	this._id;
+	this._parameters;
+	this._target = {};
+	this._data;
+	this._items;
+	this._listRootNode;
+	this._row;
+	this._rows;
+
+	// Event handlers
+	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
+
+	// super()
+	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
 
 }
 
