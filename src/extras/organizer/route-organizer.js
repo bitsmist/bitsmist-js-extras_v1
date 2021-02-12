@@ -25,8 +25,9 @@ export default class RouteOrganizer
 	 * Init.
 	 *
 	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
 	 */
-	static init(component)
+	static init(component, settings)
 	{
 
 		component._routes = [];
@@ -40,14 +41,13 @@ export default class RouteOrganizer
 	 * Organizer.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static organize(component, settings)
+	static organize(component)
 	{
 
-		let routes = settings["routes"];
+		let routes = component.settings.get("routes");
 		if (routes)
 		{
 			for(let i = 0; i < routes.length; i++)
@@ -56,7 +56,7 @@ export default class RouteOrganizer
 			}
 		}
 
-		let specs = settings["specs"];
+		let specs = component.settings.get("specs");
 		if (specs)
 		{
 			Object.keys(specs).forEach((key) => {

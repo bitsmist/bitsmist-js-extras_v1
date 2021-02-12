@@ -23,8 +23,9 @@ export default class PluginOrganizer
 	 * Init.
 	 *
 	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
 	 */
-	static init(component)
+	static init(component, settings)
 	{
 
 		component._plugins = {};
@@ -37,14 +38,13 @@ export default class PluginOrganizer
 	 * Organize.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static organize(component, settings)
+	static organize(component)
 	{
 
-		let plugins = settings["plugins"];
+		let plugins = component.settings.get["plugins"];
 		if (plugins)
 		{
 			Object.keys(plugins).forEach((pluginName) => {
