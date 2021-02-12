@@ -192,9 +192,6 @@ List.prototype.start = function(settings)
 	this._row;
 	this._rows;
 
-	// Event handlers
-	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
-
 	// super()
 	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
 
@@ -202,6 +199,18 @@ List.prototype.start = function(settings)
 
 // -----------------------------------------------------------------------------
 //  Protected
+// -----------------------------------------------------------------------------
+
+/**
+ * Inject event handlers.
+ */
+List.prototype._injectEvents = function()
+{
+
+	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**
