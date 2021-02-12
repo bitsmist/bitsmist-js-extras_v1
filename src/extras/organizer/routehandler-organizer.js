@@ -22,11 +22,12 @@ export default class RouteHandlerOrganizer
 	/**
 	 * Organizer.
 	 *
+	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static organize(component)
+	static organize(conditions, component)
 	{
 
 		RouteHandlerOrganizer.addRouteHandler(component);
