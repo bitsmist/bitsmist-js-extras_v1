@@ -31,6 +31,24 @@ export default function List()
 BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
 
 // -----------------------------------------------------------------------------
+//  Event handlers
+// -----------------------------------------------------------------------------
+
+/**
+ * Before start event hadler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+List.prototype.onBeforeStart = function(sender, e, ex)
+{
+
+	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
+
+}
+
+// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -192,6 +210,15 @@ List.prototype.start = function(settings)
 	this._row;
 	this._rows;
 
+	// Init component settings
+	settings = Object.assign({}, settings, {
+		"events": {
+			"beforeStart": {
+				"handler": this.onBeforeStart
+			}
+		}
+	});
+
 	// super()
 	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
 
@@ -199,18 +226,6 @@ List.prototype.start = function(settings)
 
 // -----------------------------------------------------------------------------
 //  Protected
-// -----------------------------------------------------------------------------
-
-/**
- * Inject event handlers.
- */
-List.prototype._injectEvents = function()
-{
-
-	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
-
-}
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -270,7 +285,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
 {
 
 	// Append a row
-	let element = this._row.clone();
+	let element = this._row.cloneTemplate();
 	rootNode.appendChild(element);
 
 	this._rows.push(element);
@@ -312,7 +327,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item)
 {
 
 	// Append a row
-	let element = this._row.clone();
+	let element = this._row.cloneTemplate();
 	rootNode.appendChild(element);
 
 	this._rows.push(element);
