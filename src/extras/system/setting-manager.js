@@ -63,12 +63,21 @@ SettingManager.prototype.start = function(settings)
 {
 
 	// Init component settings
-	settings = Object.assign({}, settings, {"name":"SettingManager", "autoSetup":false});
+	settings = Object.assign({}, settings, {
+		"name": "SettingManager",
+		"autoSetup": false,
+		"events": {
+			"afterStart": {
+				"handler": this.onAfterStart
+			}
+		}
+	});
 
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -98,19 +107,5 @@ SettingManager.prototype.set = function(key, value)
 {
 
 	BITSMIST.v1.Globals["settings"].set(key, value);
-
-}
-
-// -----------------------------------------------------------------------------
-//  Protected
-// -----------------------------------------------------------------------------
-
-/**
- * Inject event handlers.
- */
-SettingManager.prototype._injectEvents = function()
-{
-
-	this.addEventHandler(this, "afterStart", this.onAfterStart);
 
 }
