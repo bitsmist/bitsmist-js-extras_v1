@@ -83,8 +83,6 @@ Router.prototype.start = function(settings)
 	}).then(() => {
 		// Load spec file
 		return this.__initSpec(this._routeInfo["specName"]);
-	}).then(() => {
-		return this.trigger("afterSpecLoad", this, {"spec":this._specs[this._routeInfo["specName"]]});
 	});
 
 }
@@ -362,8 +360,6 @@ Router.prototype._update = function(routeInfo, options)
 		return BITSMIST.v1.Globals.organizers.notify("clear", "*", this);
 	}).then(() => {
 		return this.__initSpec(routeInfo["specName"]);
-	}).then(() => {
-		return this.trigger("afterSpecLoad", this, {"spec":this._specs[routeInfo["specName"]]});
 	});
 
 }
@@ -484,6 +480,8 @@ Router.prototype.__initSpec = function(specName)
 			}
 		}).then(() => {
 			return BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, this._specs[specName]);
+		}).then(() => {
+			return this.trigger("afterSpecLoad", this, {"spec":this._specs[this._routeInfo["specName"]]});
 		});
 	}
 
