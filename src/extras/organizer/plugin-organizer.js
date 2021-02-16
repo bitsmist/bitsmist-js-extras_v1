@@ -72,7 +72,7 @@ export default class PluginOrganizer
 
 		let ret = false;
 
-		if (eventName == "*" || eventName == "afterStart")
+		if (eventName == "*" || eventName == "beforeStart")
 		{
 			ret = true;
 		}
