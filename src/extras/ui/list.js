@@ -31,24 +31,6 @@ export default function List()
 BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
 
 // -----------------------------------------------------------------------------
-//  Event handlers
-// -----------------------------------------------------------------------------
-
-/**
- * Before start event hadler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-List.prototype.onBeforeStart = function(sender, e, ex)
-{
-
-	this.addEventHandler(this, "afterAppend", this.onListAfterAppend);
-
-}
-
-// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -113,6 +95,8 @@ Object.defineProperty(List.prototype, 'data', {
  */
 List.prototype.onListAfterAppend = function(sender, e, ex)
 {
+
+	console.log("@@@onListAfterAppend");
 
 	this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
 	let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
@@ -213,9 +197,9 @@ List.prototype.start = function(settings)
 	// Init component settings
 	settings = Object.assign({}, settings, {
 		"events": {
-			"beforeStart": {
-				"handler": this.onBeforeStart
-			}
+			"afterAppend": [{
+				"handler": this.onListAfterAppend
+			}]
 		}
 	});
 
