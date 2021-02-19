@@ -86,7 +86,7 @@ PreferenceManager.prototype.start = function(settings)
 	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
 
 	// Init vars
-	this._observers = new BITSMIST.v1.Store({"filter":this.__isTarget.bind(this)});
+	this._observers = new BITSMIST.v1.ObserverStore({"filter":this.__isTarget.bind(this)});
 
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {

@@ -48,7 +48,7 @@ ErrorManager.prototype.start = function(settings)
 	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
 
 	// Init vars
-	this._observers = new BITSMIST.v1.Store();
+	this._observers = new BITSMIST.v1.ObserverStore();
 	this.__initErrorListeners();
 
 	// Start
