@@ -29,6 +29,9 @@ BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "
 import RouteHandlerOrganizer from './organizer/routehandler-organizer';
 BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targets":"", "order":1200});
 
+import FileOrganizer from './organizer/file-organizer';
+BITSMIST.v1.Globals.organizers.set("FileOrganizer", {"object":FileOrganizer, "targets":"files", "order":350}); // Need to come before component-organizer
+
 // Plugin
 
 import Plugin from './plugin/plugin';
