@@ -62,8 +62,16 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.start = function(settings)
 {
 
-	// Init component settings
-	settings = Object.assign({}, settings, {"name":"Router", "autoSetup":false});
+	let defaults = {
+		"name": "Router",
+		"autoSetup": false,
+		"organizers": {
+			"RouteOrganizer": "",
+			"PluginOrganizer": "",
+			"ComponentOrganizer":""
+		}
+	};
+	settings = BITSMIST.v1.Util.deepMerge(defaults, settings);
 
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
@@ -357,7 +365,7 @@ Router.prototype._update = function(routeInfo, options)
 {
 
 	return Promise.resolve().then(() => {
-		return BITSMIST.v1.Globals.organizers.notify("clear", "*", this);
+		return this.clearOrganizers();
 	}).then(() => {
 		return this.__initSpec(routeInfo["specName"]);
 	});
@@ -479,7 +487,7 @@ Router.prototype.__initSpec = function(specName)
 				});
 			}
 		}).then(() => {
-			return BITSMIST.v1.Globals.organizers.notify("organize", "afterSpecLoad", this, this._specs[specName]);
+			return this.callOrganizers("afterSpecLoad", this._specs[specName]);
 		}).then(() => {
 			return this.trigger("afterSpecLoad", this, {"spec":this._specs[this._routeInfo["specName"]]});
 		});
