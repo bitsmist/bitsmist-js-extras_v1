@@ -68,7 +68,8 @@ Router.prototype.start = function(settings)
 		"organizers": {
 			"RouteOrganizer": "",
 			"PluginOrganizer": "",
-			"ComponentOrganizer":""
+			"ComponentOrganizer":"",
+			"FileOrganizer":"",
 		}
 	};
 	settings = BITSMIST.v1.Util.deepMerge(defaults, settings);
