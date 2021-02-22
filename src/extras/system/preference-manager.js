@@ -83,7 +83,7 @@ PreferenceManager.prototype.start = function(settings)
 {
 
 	// Init component settings
-	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false});
+	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false, "organizers":{"PluginOrganizer":""}});
 
 	// Init vars
 	this._observers = new BITSMIST.v1.ObserverStore({"filter":this.__isTarget.bind(this)});
