@@ -82,8 +82,20 @@ PreferenceManager.prototype.onBeforeSetup = function(sender, e, ex)
 PreferenceManager.prototype.start = function(settings)
 {
 
-	// Init component settings
-	settings = Object.assign({}, settings, {"name":"PreferenceManager", "autoSetup":false, "organizers":{"PluginOrganizer":""}});
+	// Defaults
+	let defaults = {
+		"name": "PreferenceManager",
+		"autoSetup": false,
+		"events": {
+			"beforeSetup": {
+				"handler": this.onBeforeSetup
+			}
+		},
+		"organizers": {
+			"PluginOrganizer": ""
+		}
+	};
+	settings = BITSMIST.v1.Util.deepMerge(defaults, settings);
 
 	// Init vars
 	this._observers = new BITSMIST.v1.ObserverStore({"filter":this.__isTarget.bind(this)});
@@ -91,7 +103,6 @@ PreferenceManager.prototype.start = function(settings)
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
 		BITSMIST.v1.Globals["preferences"].items = this._settings.items["defaults"];
-		this.addEventHandler(this, "beforeSetup", this.onBeforeSetup);
 	}).then(() => {
 		// Load preferences
 		return this.load();

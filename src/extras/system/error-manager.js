@@ -44,8 +44,12 @@ customElements.define("bm-error", ErrorManager);
 ErrorManager.prototype.start = function(settings)
 {
 
-	// Init component settings
-	settings = Object.assign({}, settings, {"name":"ErrorManager", "autoSetup":false});
+	// Defaults
+	let defaults = {
+		"name": "ErrorManager",
+		"autoSetup":false,
+	}
+	settings = BITSMIST.v1.Util.deepMerge(defaults, settings);
 
 	// Init vars
 	this._observers = new BITSMIST.v1.ObserverStore();

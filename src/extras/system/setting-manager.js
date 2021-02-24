@@ -62,8 +62,8 @@ SettingManager.prototype.onAfterStart = function(sender, e, ex)
 SettingManager.prototype.start = function(settings)
 {
 
-	// Init component settings
-	settings = Object.assign({}, settings, {
+	// Defaults
+	let defaults = {
 		"name": "SettingManager",
 		"autoSetup": false,
 		"events": {
@@ -71,7 +71,8 @@ SettingManager.prototype.start = function(settings)
 				"handler": this.onAfterStart
 			}
 		}
-	});
+	}
+	settings = BITSMIST.v1.Util.deepMerge(defaults, settings);
 
 	// Start
 	return BITSMIST.v1.Component.prototype.start.call(this, settings);

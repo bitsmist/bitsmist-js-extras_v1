@@ -62,6 +62,7 @@ Object.defineProperty(Router.prototype, 'routeInfo', {
 Router.prototype.start = function(settings)
 {
 
+	// Defaults
 	let defaults = {
 		"name": "Router",
 		"autoSetup": false,
@@ -201,8 +202,6 @@ Router.prototype.loadParameters = function()
  */
 Router.prototype.openRoute = function(routeInfo, options)
 {
-
-	options = Object.assign({}, options);
 
 	this._open(routeInfo, options);
 
