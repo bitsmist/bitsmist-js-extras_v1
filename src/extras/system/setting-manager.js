@@ -44,7 +44,7 @@ customElements.define("bm-setting", SettingManager);
 SettingManager.prototype.onAfterStart = function(sender, e, ex)
 {
 
-	BITSMIST.v1.Globals["settings"].items = this._settings.items["globals"];
+	BITSMIST.v1.Globals["settings"].items = this._settings.items["settings"];
 
 }
 
