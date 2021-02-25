@@ -1,7 +1,7 @@
 {
-  "name": "bitsmist-webview-extras_v1",
-  "version": "0.9.0",
-  "description": "Bitsmist Webview Extras V1",
+  "name": "bitsmist-js-extras_v1",
+  "version": "0.9.3",
+  "description": "BitsmistJS Extras V1",
   "private": true,
   "dependencies": {},
   "devDependencies": {
