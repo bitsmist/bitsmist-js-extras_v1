@@ -109,21 +109,21 @@ Form.prototype.build = function(items)
 Form.prototype.fill = function(options)
 {
 
-	options = Object.assign({}, this.settings.items, options);
-	//options = Object.assign({}, options);
+	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
 
 	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
 	// Clear fields
-	if (options["autoClear"])
+	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("autoClear"));
+	if (autoClear)
 	{
 		this.clear();
 	}
 
 	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", sender);
+		return this.trigger("doTarget", sender, {"target": this._target, "options":options});
 	}).then(() => {
 		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
 	}).then(() => {

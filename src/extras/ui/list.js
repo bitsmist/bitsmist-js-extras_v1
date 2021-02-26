@@ -131,8 +131,7 @@ List.prototype.fill = function(options)
 
 	console.debug(`List.fill(): Filling list. name=${this.name}`);
 
-	options = Object.assign({}, this.settings.items, options);
-	//options = Object.assign({}, options);
+	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
 
 	let builder = ( this._settings.get("async") ? this._buildAsync : this._buildSync );
@@ -143,7 +142,7 @@ List.prototype.fill = function(options)
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
 	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", this);
+		return this.trigger("doTarget", this, {"target": this._target, "options":options});
 	}).then(() => {
 		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
 	}).then(() => {
@@ -158,7 +157,8 @@ List.prototype.fill = function(options)
 			return builder.call(this, fragment);
 		}
 	}).then(() => {
-		if (options["autoClear"])
+		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("autoClear"));
+		if (autoClear)
 		{
 			this.clear();
 		}
