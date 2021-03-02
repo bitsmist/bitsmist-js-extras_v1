@@ -24,6 +24,7 @@ export default class FileOrganizer
 	 *
 	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
