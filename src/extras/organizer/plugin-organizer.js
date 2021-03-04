@@ -51,7 +51,7 @@ export default class PluginOrganizer
 		if (plugins)
 		{
 			Object.keys(plugins).forEach((pluginName) => {
-				PluginOrganizer.addPlugin(component, pluginName, plugins[pluginName]);
+				PluginOrganizer._addPlugin(component, pluginName, plugins[pluginName]);
 			});
 		}
 
@@ -82,7 +82,9 @@ export default class PluginOrganizer
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Add a plugin to the component.
@@ -92,7 +94,7 @@ export default class PluginOrganizer
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static addPlugin(component, pluginName, options)
+	static _addPlugin(component, pluginName, options)
 	{
 
 		options = Object.assign({}, options);

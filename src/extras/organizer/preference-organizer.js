@@ -28,11 +28,11 @@ export default class PreferenceOrganizer
 		// Add methods
 
 		BITSMIST.v1.Component.prototype.save = function() {
-			return PreferenceOrganizer.save(this);
+			return PreferenceOrganizer._save(this);
 		}
 
 		BITSMIST.v1.Component.prototype.setup2 = function(options) {
-			return PreferenceOrganizer.setup(this, options);
+			return PreferenceOrganizer._setup(this, options);
 		}
 
 		// Add properties
@@ -68,11 +68,13 @@ export default class PreferenceOrganizer
 	{
 
 		component._preferences = new BITSMIST.v1.Store({"items":settings});
+
 		if (component._settings.items["preferences"]["load"])
 		{
 			BITSMIST.v1.Globals["preferences"].items = component._settings.items["preferences"]["defaults"];
 		}
-		PreferenceOrganizer.register(component);
+
+		PreferenceOrganizer._register(component);
 
 	}
 
@@ -98,26 +100,12 @@ export default class PreferenceOrganizer
 				BITSMIST.v1.Globals["preferences"].items = component._settings.items["preferences"]["defaults"];
 
 				// Load preferences
-				return PreferenceOrganizer.load(component).then((preferences) => {;
+				return PreferenceOrganizer._load(component).then((preferences) => {;
 					console.log("@@@preferences loaded", preferences);
 					// Merge preferences
 					BITSMIST.v1.Globals["preferences"].merge(preferences);
 					resolve();
 				});
-				
-
-				/*
-				return Promise.resolve().then(() => {
-					BITSMIST.v1.Globals["preferences"].items = component._settings.items["preferences"]["defaults"];
-				}).then(() => {
-					// Load preferences
-					return PreferenceOrganizer.load(component);
-				}).then((preferences) => {
-					console.log("@@@preferences", preferences);
-					// Merge preferences
-					BITSMIST.v1.Globals["preferences"].merge(preferences);
-				});
-				*/
 			}
 			else
 			{
@@ -152,6 +140,8 @@ export default class PreferenceOrganizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
 
 	/**
 	* Get a value.
@@ -161,7 +151,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {*}				Value.
 	*/
-	static get(key, defaultValue)
+	static _get(key, defaultValue)
 	{
 
 		return BITSMIST.v1.Globals["preferences"].get(key, defaultValue);
@@ -176,7 +166,7 @@ export default class PreferenceOrganizer
 	* @param	{String}		key					Key.
 	* @param	{Object}		value				Value to store.
 	*/
-	static set(key, value)
+	static _set(key, value)
 	{
 
 		BITSMIST.v1.Globals["preferences"].set(key, value);
@@ -192,7 +182,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {Promise}		Promise.
 	*/
-	static setup(component, options)
+	static _setup(component, options)
 	{
 
 		options = Object.assign({}, options);
@@ -218,7 +208,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {Promise}		Promise.
 	*/
-	static register(component, targets)
+	static _register(component, targets)
 	{
 
 		PreferenceOrganizer._observers.set(component.uniqueId, {"object":component, "targets":targets});
@@ -234,7 +224,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {Promise}		Promise.
 	*/
-	static deregister(component)
+	static _deregister(component)
 	{
 
 		PreferenceOrganizer._observers.remove(component.uniqueId);
@@ -250,7 +240,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {Promise}		Promise.
 	*/
-	static load(component, options)
+	static _load(component, options)
 	{
 
 		let sender = ( options && options["sender"] ? options["sender"] : component );
@@ -268,7 +258,7 @@ export default class PreferenceOrganizer
 	*
 	* @return  {Promise}		Promise.
 	*/
-	static save(component, options)
+	static _save(component, options)
 	{
 
 		let sender = ( options && options["sender"] ? options["sender"] : component );

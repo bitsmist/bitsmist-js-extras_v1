@@ -33,21 +33,6 @@ export default class ErrorOrganizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Init.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 */
-	/*
-	static init(conditions, component, settings)
-	{
-	}
-	*/
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Organize.
 	 *
 	 * @param	{Object}		conditions			Conditions.

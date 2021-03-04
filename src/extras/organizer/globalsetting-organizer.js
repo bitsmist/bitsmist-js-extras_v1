@@ -20,24 +20,6 @@ export default class GlobalsettingOrganizer
 {
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
-
-	/**
-	* After append event hadler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
-	* @param	{Object}		ex					Extra event info.
-	*/
-	static onAfterStart(sender, e, ex)
-	{
-
-		BITSMIST.v1.Globals["settings"].items = ex.options.component._settings.items["settings"];
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -95,6 +77,26 @@ export default class GlobalsettingOrganizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	/**
+	* After append event hadler.
+	*
+	* @param	{Object}		sender				Sender.
+	* @param	{Object}		e					Event info.
+	* @param	{Object}		ex					Extra event info.
+	*/
+	static onAfterStart(sender, e, ex)
+	{
+
+		BITSMIST.v1.Globals["settings"].items = ex.options.component._settings.items["settings"];
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
 
 	/**
 	* Get a value.
@@ -104,7 +106,7 @@ export default class GlobalsettingOrganizer
 	*
 	* @return  {*}				Value.
 	*/
-	static get(key, defaultValue)
+	static _get(key, defaultValue)
 	{
 
 		return BITSMIST.v1.Globals["settings"].get(key, defaultValue);
@@ -119,7 +121,7 @@ export default class GlobalsettingOrganizer
 	* @param	{String}		key					Key.
 	* @param	{Object}		value				Value to store.
 	*/
-	static set(key, value)
+	static _set(key, value)
 	{
 
 		BITSMIST.v1.Globals["settings"].set(key, value);
