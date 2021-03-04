@@ -1,23 +1,6 @@
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
-// System
-
-import App from './system/app';
-window.BITSMIST.v1.App = App;
-
-import Router from './system/router';
-window.BITSMIST.v1.Router = Router;
-
-import SettingManager from './system/setting-manager';
-window.BITSMIST.v1.SettingManager = SettingManager;
-
-import PreferenceManager from './system/preference-manager';
-window.BITSMIST.v1.PreferenceManager = PreferenceManager;
-
-import ErrorManager from './system/error-manager';
-window.BITSMIST.v1.ErrorManager = ErrorManager;
-
 // Organizer
 
 import PluginOrganizer from './organizer/plugin-organizer';
