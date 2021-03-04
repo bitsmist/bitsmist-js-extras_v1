@@ -64,16 +64,17 @@ export default class PluginOrganizer
 	/**
 	 * Check if event is target.
 	 *
-	 * @param	{String}		eventName			Event name.
+	 * @param	{String}		conditions			Event name.
+	 * @param	{Component}		component			Component.
 	 *
 	 * @return 	{Boolean}		True if it is target.
 	 */
-	static isTarget(eventName)
+	static isTarget(conditions, component)
 	{
 
 		let ret = false;
 
-		if (eventName == "*" || eventName == "beforeStart")
+		if (conditions == "*" || conditions == "beforeStart")
 		{
 			ret = true;
 		}

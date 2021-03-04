@@ -38,17 +38,11 @@ export default class PreferenceOrganizer
 		// Add properties
 
 		Object.defineProperty(BITSMIST.v1.Component.prototype, 'globalPreferences', {
-			get()
-			{
-				return BITSMIST.v1.Globals["preferences"];
-			}
+			get() { return BITSMIST.v1.Globals["preferences"]; }
 		})
 
 		Object.defineProperty(BITSMIST.v1.Component.prototype, 'preferences', {
-			get() {
-				return this._preferences;
-			},
-			configurable: true
+			get() { return this._preferences; },
 		});
 
 		PreferenceOrganizer._observers = new BITSMIST.v1.ObserverStore({"filter":PreferenceOrganizer.__filter});
@@ -69,9 +63,9 @@ export default class PreferenceOrganizer
 
 		component._preferences = new BITSMIST.v1.Store({"items":settings});
 
-		if (component._settings.items["preferences"]["load"])
+		if (component.settings.items["preferences"]["load"])
 		{
-			BITSMIST.v1.Globals["preferences"].items = component._settings.items["preferences"]["defaults"];
+			BITSMIST.v1.Globals["preferences"].items = component.settings.items["preferences"]["defaults"];
 		}
 
 		PreferenceOrganizer._register(component);
@@ -93,15 +87,13 @@ export default class PreferenceOrganizer
 	{
 
 		return new Promise((resolve, reject) => {
-			let preferences = component._settings.items["preferences"];
+			let preferences = component.settings.items["preferences"];
 			if (preferences["load"])
 			{
-				console.log("@@@preference loading", component.name, conditions, settings);
-				BITSMIST.v1.Globals["preferences"].items = component._settings.items["preferences"]["defaults"];
+				BITSMIST.v1.Globals["preferences"].items = component.settings.items["preferences"]["defaults"];
 
 				// Load preferences
 				return PreferenceOrganizer._load(component).then((preferences) => {;
-					console.log("@@@preferences loaded", preferences);
 					// Merge preferences
 					BITSMIST.v1.Globals["preferences"].merge(preferences);
 					resolve();
@@ -120,17 +112,17 @@ export default class PreferenceOrganizer
 	/**
 	 * Check if event is target.
 	 *
-	 * @param	{String}		eventName			Event name.
+	 * @param	{String}		conditions			Event name.
+	 * @param	{Component}		component			Component.
 	 *
 	 * @return 	{Boolean}		True if it is target.
 	 */
-	static isTarget(eventName)
+	static isTarget(conditions, component)
 	{
 
 		let ret = false;
 
-		//if (eventName == "*" || eventName == "beforeStart" || eventName == "afterSpecLoad")
-		if (eventName == "*" || eventName == "beforeStart")
+		if (conditions == "*" || conditions == "beforeStart" || conditions == "afterSpecLoad")
 		{
 			ret = true;
 		}
@@ -192,7 +184,7 @@ export default class PreferenceOrganizer
 			if (options["newPreferences"])
 			{
 				BITSMIST.v1.Globals["preferences"].merge(options["newPreferences"]);
-				PreferenceOrganizer.save(component);
+				PreferenceOrganizer._save(component);
 			}
 		});
 

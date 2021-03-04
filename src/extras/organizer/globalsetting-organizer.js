@@ -34,7 +34,7 @@ export default class GlobalsettingOrganizer
 	{
 
 		component.addEventHandler(component, "afterStart", GlobalsettingOrganizer.onAfterStart, {"component": component});
-		BITSMIST.v1.Globals["settings"].items = component._settings.items["settings"];
+		BITSMIST.v1.Globals["settings"].items = component.settings.items["settings"];
 
 	}
 
@@ -58,16 +58,17 @@ export default class GlobalsettingOrganizer
 	/**
 	 * Check if event is target.
 	 *
-	 * @param	{String}		eventName			Event name.
+	 * @param	{String}		conditions			Event name.
+	 * @param	{Component}		component			Component.
 	 *
 	 * @return 	{Boolean}		True if it is target.
 	 */
-	static isTarget(eventName)
+	static isTarget(conditions, component)
 	{
 
 		let ret = false;
 
-		if (eventName == "*" || eventName == "beforeStart")
+		if (conditions == "*" || conditions == "beforeStart")
 		{
 			ret = true;
 		}
@@ -90,7 +91,7 @@ export default class GlobalsettingOrganizer
 	static onAfterStart(sender, e, ex)
 	{
 
-		BITSMIST.v1.Globals["settings"].items = ex.options.component._settings.items["settings"];
+		BITSMIST.v1.Globals["settings"].items = ex.options.component.settings.items["settings"];
 
 	}
 
