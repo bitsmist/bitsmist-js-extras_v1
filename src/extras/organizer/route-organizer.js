@@ -30,22 +30,37 @@ export default class RouteOrganizer
 		// Add methods
 
 		BITSMIST.v1.Component.prototype.loadParameters = function() {
-			return RouteOrganizer.loadParameters();
+			return RouteOrganizer._loadParameters();
 		}
+
 		BITSMIST.v1.Component.prototype.openRoute = function(routeInfo, options) {
-			return RouteOrganizer.openRoute(this, routeInfo, options);
+			return RouteOrganizer._openRoute(this, routeInfo, options);
 		}
+
 		BITSMIST.v1.Component.prototype.replaceRoute = function(routeInfo, options) {
-			return RouteOrganizer.replaceRoute(this, routeInfo, options);
+			return RouteOrganizer._replaceRoute(this, routeInfo, options);
+		}
+
+		BITSMIST.v1.Component.prototype.jumpRoute = function(routeInfo, options) {
+			return RouteOrganizer._jumpRoute(this, routeInfo, options);
+		}
+
+		BITSMIST.v1.Component.prototype.refreshRoute = function(routeInfo, options) {
+			return RouteOrganizer._refreshRoute(this, routeInfo, options);
+		}
+
+		BITSMIST.v1.Component.prototype.updateRoute = function(routeInfo, options) {
+			return RouteOrganizer._updateRoute(this, routeInfo, options);
 		}
 
 		// Add properties
 
 		Object.defineProperty(BITSMIST.v1.Component.prototype, 'routeInfo', {
-			get() {
-				return this._routeInfo;
-			},
-			configurable: true
+			get() { return this._routeInfo; },
+		});
+
+		Object.defineProperty(BITSMIST.v1.Component.prototype, 'specs', {
+			get() { return this._specs; },
 		});
 
 	}
@@ -58,6 +73,8 @@ export default class RouteOrganizer
 	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
+	 *
+	 * @return 	{Promise}		Promise.
 	 */
 	static init(conditions, component, settings)
 	{
@@ -65,6 +82,19 @@ export default class RouteOrganizer
 		// Init vars
 		component._routes = [];
 		component._specs = {};
+
+		// Set state on the first page
+		history.replaceState(RouteOrganizer.__getDefaultState("connect"), null, null);
+
+		// Init popstate handler
+		RouteOrganizer.__initPopState(component);
+
+		// Get settings from attributes
+		let path = component.getAttribute("data-specpath") || "";
+		if (path)
+		{
+			component.settings.set("system.specPath", path);
+		}
 
 	}
 
@@ -82,35 +112,25 @@ export default class RouteOrganizer
 	static organize(conditions, component, settings)
 	{
 
+		// Load route info
 		let routes = component.settings.get("routes");
 		if (routes)
 		{
 			for(let i = 0; i < routes.length; i++)
 			{
-				RouteOrganizer.addRoute(component, routes[i]);
+				RouteOrganizer._addRoute(component, routes[i]);
 			}
+
+			component._routeInfo = RouteOrganizer.__loadRouteInfo(component, window.location.href);
 		}
 
+		// Load spec info
 		let specs = component.settings.get("specs");
 		if (specs)
 		{
 			Object.keys(specs).forEach((key) => {
 				component._specs[key] = specs[key];
 			});
-		}
-
-		// Set state on the first page
-		history.replaceState(RouteOrganizer.__getDefaultState("connect"), null, null);
-		component._routeInfo = RouteOrganizer.__loadRouteInfo(component, window.location.href);
-
-		// Init popstate handler
-		RouteOrganizer.__initPopState(component);
-
-		// Get settings from attributes
-		let path = component.getAttribute("data-specpath") || "";
-		if (path)
-		{
-			component._settings.set("system.specPath", path);
 		}
 
 		// Load spec file
@@ -123,18 +143,17 @@ export default class RouteOrganizer
 	/**
 	 * Check if event is target.
 	 *
-	 * @param	{String}		eventName			Event name.
+	 * @param	{String}		conditions			Event name.
+	 * @param	{Component}		component			Component.
 	 *
 	 * @return 	{Boolean}		True if it is target.
 	 */
-	static isTarget(eventName)
+	static isTarget(conditions, component)
 	{
 
 		let ret = false;
 
-		//if (eventName == "*" || eventName == "afterStart" || eventName == "afterSpecLoad")
-		//if (eventName == "*" || eventName == "afterStart")
-		if (eventName == "*" || eventName == "beforeStart")
+		if (conditions == "*" || conditions == "beforeStart" || conditions == "afterSpecLoad")
 		{
 			ret = true;
 		}
@@ -144,6 +163,8 @@ export default class RouteOrganizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
 
 	/**
 	* Add a route.
@@ -151,7 +172,7 @@ export default class RouteOrganizer
 	* @param	{Object}		routeInfo			Route info.
 	* @param	{Boolean}		first				Add to top when true.
 	*/
-	static addRoute(component, routeInfo, first)
+	static _addRoute(component, routeInfo, first)
 	{
 
 		let keys = [];
@@ -186,7 +207,7 @@ export default class RouteOrganizer
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static loadSpec(specName, path)
+	static _loadSpec(specName, path)
 	{
 
 //		let urlCommon = BITSMIST.v1.Util.concatPath([path, "common.js"]);
@@ -223,38 +244,6 @@ export default class RouteOrganizer
 	}
 
 	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Load spec file.
-	 *
-	 * @param	{String}		url					Spec file url.
-	 * @param	{String}		defaultResponse		Response when error.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static __loadSpecFile(url, defaultResponse)
-	{
-
-		console.debug(`RouteOrganizer.__loadSpec(): Loading spec file. url=${url}`);
-
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({"url":url, "method":"GET"}).then((xhr) => {
-			console.debug(`RouteOrganizer.__loadSpec(): Loaded spec file. url=${url}`);
-
-			return xhr.responseText;
-		}).catch((xhr) => {
-			if (defaultResponse)
-			{
-				return defaultResponse;
-			}
-		});
-
-	}
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 	/**
 	* Build url from route info.
@@ -264,7 +253,7 @@ export default class RouteOrganizer
 	*
 	* @return  {string}		Url.
 	*/
-	static buildUrl(routeInfo, component)
+	static _buildUrl(routeInfo, component)
 	{
 
 		let url;
@@ -277,7 +266,7 @@ export default class RouteOrganizer
 		{
 			url  = ( routeInfo["path"] ? routeInfo["path"] : component._routeInfo["path"] );
 			url += ( routeInfo["query"] ? "?" + routeInfo["query"] : "" );
-			url += ( routeInfo["queryParameters"] ? RouteOrganizer.buildUrlQuery(routeInfo["queryParameters"]) : "" );
+			url += ( routeInfo["queryParameters"] ? RouteOrganizer._buildUrlQuery(routeInfo["queryParameters"]) : "" );
 		}
 
 		return url;
@@ -291,9 +280,9 @@ export default class RouteOrganizer
 	*
 	* @param	{Object}		options				Query options.
 	*
-	* @return  {String}		Query string.
+	* @return	{String}		Query string.
 	*/
-	static buildUrlQuery(options)
+	static _buildUrlQuery(options)
 	{
 
 		let query = "";
@@ -321,9 +310,11 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Create options array from the current url.
-	*/
-	static loadParameters()
+	 * Create options array from the current url.
+	 *
+	 * @return  {Array}			Options array.
+	 */
+	static _loadParameters()
 	{
 
 		let vars = {}
@@ -352,95 +343,101 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Open route.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	* @param	{Object}		options				Query options.
-	*/
-	static openRoute(component, routeInfo, options)
+	 * Open route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static _openRoute(component, routeInfo, options)
 	{
 
-		RouteOrganizer._open(component, routeInfo, options);
+		RouteOrganizer.__open(component, routeInfo, options);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Jump to route.
-	*
-	* @param	{Object}		options				Query options.
-	*/
-	static jumpRoute(component, routeInfo, options)
+	 * Jump to route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static _jumpRoute(component, routeInfo, options)
 	{
 
-		let url = RouteOrganizer.buildUrl(routeInfo, component);
-		RouteOrganizer._jump(component, url);
+		let url = RouteOrganizer._buildUrl(routeInfo, component);
+		RouteOrganizer.__jump(component, url);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Refresh route.
-	*
-	* @param	{Object}		options				Query options.
-	*/
-	static refreshRoute(component, routeInfo, options)
+	 * Refresh route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static _refreshRoute(component, routeInfo, options)
 	{
 
-		return RouteOrganizer._refresh(component, routeInfo, options);
+		return RouteOrganizer.__refresh(component, routeInfo, options);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Update route.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	* @param	{Object}		options				Query options.
-	*/
-	static updateRoute(component, routeInfo, options)
+	 * Update route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static _updateRoute(component, routeInfo, options)
 	{
 
-		return RouteOrganizer._update(component, routeInfo, options);
+		return RouteOrganizer.__update(component, routeInfo, options);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Replace current url.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	*
-	* @return  {string}		Url.
-	*/
-	static replaceRoute(component, routeInfo)
+	 * Replace current url.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 */
+	static _replaceRoute(component, routeInfo)
 	{
 
-		history.replaceState(RouteOrganizer.__getDefaultState("replaceRoute"), null, RouteOrganizer.buildUrl(routeInfo, component));
+		history.replaceState(RouteOrganizer.__getDefaultState("replaceRoute"), null, RouteOrganizer._buildUrl(routeInfo, component));
 		component._routeInfo = RouteOrganizer.__loadRouteInfo(component, window.location.href);
 
 	}
 
-	// -----------------------------------------------------------------------------
-	//	Protected
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
 
 	/**
-	* Open route.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	* @param	{Object}		options				Query options.
-	*/
-	static _open(component, routeInfo, options)
+	 * Open route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static __open(component, routeInfo, options)
 	{
 
 		options = Object.assign({}, options);
 		options["pushState"] = ( options["pushState"] !== undefined ? options["pushState"] : true );
-		let url = RouteOrganizer.buildUrl(routeInfo, component);
+		let url = RouteOrganizer._buildUrl(routeInfo, component);
 		let curRouteInfo = Object.assign({}, component._routeInfo);
 		let newRouteInfo = RouteOrganizer.__loadRouteInfo(component, url);
 		component._routeInfo = RouteOrganizer.__loadRouteInfo(component, url);
@@ -484,7 +481,7 @@ export default class RouteOrganizer
 	*
 	* @param	{String}		url					Url.
 	*/
-	static _jump(url)
+	static __jump(url)
 	{
 
 		window.location.href = url;
@@ -494,12 +491,13 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Refresh route.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	* @param	{Object}		options				Query options.
-	*/
-	static _refresh(component, routeInfo, options)
+	 * Refresh route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static __refresh(component, routeInfo, options)
 	{
 
 		let componentName = component._routeInfo["componentName"];
@@ -513,12 +511,13 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Update route.
-	*
-	* @param	{Object}		routeInfo			Route information.
-	* @param	{Object}		options				Query options.
-	*/
-	static _update(component, routeInfo, options)
+	 * Update route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Query options.
+	 */
+	static __update(component, routeInfo, options)
 	{
 
 		return Promise.resolve().then(() => {
@@ -529,16 +528,44 @@ export default class RouteOrganizer
 
 	}
 
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Load spec file.
+	 *
+	 * @param	{String}		url					Spec file url.
+	 * @param	{String}		defaultResponse		Response when error.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static __loadSpecFile(url, defaultResponse)
+	{
+
+		console.debug(`RouteOrganizer.__loadSpec(): Loading spec file. url=${url}`);
+
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({"url":url, "method":"GET"}).then((xhr) => {
+			console.debug(`RouteOrganizer.__loadSpec(): Loaded spec file. url=${url}`);
+
+			return xhr.responseText;
+		}).catch((xhr) => {
+			if (defaultResponse)
+			{
+				return defaultResponse;
+			}
+		});
+
+	}
 
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Get route info from the url.
-	*
-	* @param	{String}		url					Url.
-	*
-	* @return  {Object}		Route info.
-	*/
+	 * Get route info from the url.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		url					Url.
+	 *
+	 * @return  {Object}		Route info.
+	 */
 	static __loadRouteInfo(component, url)
 	{
 
@@ -582,7 +609,7 @@ export default class RouteOrganizer
 		routeInfo["query"] = parsedUrl.search;
 		routeInfo["parsedUrl"] = parsedUrl;
 		routeInfo["routeParameters"] = params;
-		routeInfo["queryParameters"] = RouteOrganizer.loadParameters();
+		routeInfo["queryParameters"] = RouteOrganizer._loadParameters();
 
 		return routeInfo;
 
@@ -591,8 +618,10 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Init pop state handling.
-	*/
+	 * Init pop state handling.
+	 *
+	 * @param	{Component}		component			Component.
+	 */
 	static __initPopState(component)
 	{
 
@@ -628,17 +657,22 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Load a spec and init.
-	*/
+	 * Load a spec and init.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		specName			Spec name.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
 	static __initSpec(component, specName)
 	{
 
-		if (specName)
+		if (specName && !component._specs[specName])
 		{
 			return Promise.resolve().then(() => {
 				if (!component._specs[specName])
 				{
-					return RouteOrganizer.loadSpec(specName, component._settings.get("system.specPath")).then((spec) => {;
+					return RouteOrganizer._loadSpec(specName, component.settings.get("system.specPath")).then((spec) => {;
 						component._specs[specName] = spec;
 					});
 				}
@@ -654,12 +688,12 @@ export default class RouteOrganizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	* Return history state.
-	*
-	* @param	{String}		msg					Message to store in state..
-	*
-	* @return  {String}		State.
-	*/
+	 * Return history state.
+	 *
+	 * @param	{String}		msg					Message to store in state..
+	 *
+	 * @return	{String}		State.
+	 */
 	static __getDefaultState(msg)
 	{
 
