@@ -12,7 +12,7 @@
 //	Plugin organizer class
 // =============================================================================
 
-export default class PluginOrganizer
+export default class PluginOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -56,30 +56,6 @@ export default class PluginOrganizer
 		}
 
 		return Promise.resolve();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "beforeStart")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 

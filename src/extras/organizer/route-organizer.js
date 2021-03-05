@@ -14,57 +14,11 @@ import { pathToRegexp } from 'path-to-regexp';
 //	Route organizer class
 // =============================================================================
 
-export default class RouteOrganizer
+export default class RouteOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
 	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Global init.
-	 */
-	static globalInit()
-	{
-
-		// Add methods
-
-		BITSMIST.v1.Component.prototype.loadParameters = function() {
-			return RouteOrganizer._loadParameters();
-		}
-
-		BITSMIST.v1.Component.prototype.openRoute = function(routeInfo, options) {
-			return RouteOrganizer._openRoute(this, routeInfo, options);
-		}
-
-		BITSMIST.v1.Component.prototype.replaceRoute = function(routeInfo, options) {
-			return RouteOrganizer._replaceRoute(this, routeInfo, options);
-		}
-
-		BITSMIST.v1.Component.prototype.jumpRoute = function(routeInfo, options) {
-			return RouteOrganizer._jumpRoute(this, routeInfo, options);
-		}
-
-		BITSMIST.v1.Component.prototype.refreshRoute = function(routeInfo, options) {
-			return RouteOrganizer._refreshRoute(this, routeInfo, options);
-		}
-
-		BITSMIST.v1.Component.prototype.updateRoute = function(routeInfo, options) {
-			return RouteOrganizer._updateRoute(this, routeInfo, options);
-		}
-
-		// Add properties
-
-		Object.defineProperty(BITSMIST.v1.Component.prototype, 'routeInfo', {
-			get() { return this._routeInfo; },
-		});
-
-		Object.defineProperty(BITSMIST.v1.Component.prototype, 'specs', {
-			get() { return this._specs; },
-		});
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -78,6 +32,18 @@ export default class RouteOrganizer
 	 */
 	static init(conditions, component, settings)
 	{
+
+		// Add properties
+		Object.defineProperty(BITSMIST.v1.Component.prototype, 'routeInfo', { get() { return this._routeInfo; }, });
+		Object.defineProperty(BITSMIST.v1.Component.prototype, 'specs', { get() { return this._specs; }, });
+
+		// Add methods
+		component.loadParameters = function() { return RouteOrganizer._loadParameters(); }
+		component.openRoute = function(routeInfo, options) { return RouteOrganizer._openRoute(this, routeInfo, options); }
+		component.replaceRoute = function(routeInfo, options) { return RouteOrganizer._replaceRoute(this, routeInfo, options); }
+		component.jumpRoute = function(routeInfo, options) { return RouteOrganizer._jumpRoute(this, routeInfo, options); }
+		component.refreshRoute = function(routeInfo, options) { return RouteOrganizer._refreshRoute(this, routeInfo, options); }
+		component.updateRoute = function(routeInfo, options) { return RouteOrganizer._updateRoute(this, routeInfo, options); }
 
 		// Init vars
 		component._routes = [];
@@ -132,33 +98,6 @@ export default class RouteOrganizer
 				component._specs[key] = specs[key];
 			});
 		}
-
-		// Load spec file
-		return RouteOrganizer.__initSpec(component, component._routeInfo["specName"]);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "beforeStart" || conditions == "afterSpecLoad")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 
@@ -457,12 +396,12 @@ export default class RouteOrganizer
 			if ( curRouteInfo["specName"] != newRouteInfo["specName"] )
 			{
 				// Load another component and open
-				return RouteOrganizer._update(component, newRouteInfo, options);
+				return RouteOrganizer.__update(component, newRouteInfo, options);
 			}
 			else
 			{
 				// Refresh current component
-				return RouteOrganizer._refresh(component, routeInfo, options);
+				return RouteOrganizer.__refresh(component, routeInfo, options);
 			}
 		}).then(() => {
 			if (routeInfo["dispUrl"])

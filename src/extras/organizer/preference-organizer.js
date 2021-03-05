@@ -12,7 +12,7 @@
 //	Preference organizer class
 // =============================================================================
 
-export default class PreferenceOrganizer
+export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -25,25 +25,17 @@ export default class PreferenceOrganizer
 	static globalInit()
 	{
 
-		// Add methods
-
-		BITSMIST.v1.Component.prototype.save = function() {
-			return PreferenceOrganizer._save(this);
-		}
-
-		BITSMIST.v1.Component.prototype.setup2 = function(options) {
-			return PreferenceOrganizer._setup(this, options);
-		}
-
 		// Add properties
-
 		Object.defineProperty(BITSMIST.v1.Component.prototype, 'globalPreferences', {
 			get() { return BITSMIST.v1.Globals["preferences"]; }
 		})
-
 		Object.defineProperty(BITSMIST.v1.Component.prototype, 'preferences', {
 			get() { return this._preferences; },
 		});
+
+		// Add methods
+		BITSMIST.v1.Component.prototype.save = function() { return PreferenceOrganizer._save(this); }
+		BITSMIST.v1.Component.prototype.setup = function(options) { return PreferenceOrganizer._setup(this, options); }
 
 		PreferenceOrganizer._observers = new BITSMIST.v1.ObserverStore({"filter":PreferenceOrganizer.__filter});
 
@@ -104,30 +96,6 @@ export default class PreferenceOrganizer
 				resolve();
 			}
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "beforeStart" || conditions == "afterSpecLoad")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 

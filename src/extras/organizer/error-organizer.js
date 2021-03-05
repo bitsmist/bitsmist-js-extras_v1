@@ -12,7 +12,7 @@
 //	Error organizer class
 // =============================================================================
 
-export default class ErrorOrganizer
+export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -50,30 +50,6 @@ export default class ErrorOrganizer
 			//ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":errors["targets"]});
 			ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":"*"});
 		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "beforeStart")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 

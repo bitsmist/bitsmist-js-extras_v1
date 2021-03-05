@@ -16,7 +16,7 @@
 //  Constructor
 // -----------------------------------------------------------------------------
 
-export default class GlobalsettingOrganizer
+export default class GlobalsettingOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -35,45 +35,6 @@ export default class GlobalsettingOrganizer
 
 		component.addEventHandler(component, "afterStart", GlobalsettingOrganizer.onAfterStart, {"component": component});
 		BITSMIST.v1.Globals["settings"].items = component.settings.items["settings"];
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
-	{
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "beforeStart")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 

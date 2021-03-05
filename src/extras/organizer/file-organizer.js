@@ -12,7 +12,7 @@
 //	File organizer class
 // =============================================================================
 
-export default class FileOrganizer
+export default class FileOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -42,30 +42,6 @@ export default class FileOrganizer
 		}
 
 		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		conditions			Event name.
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(conditions, component)
-	{
-
-		let ret = false;
-
-		if (conditions == "*" || conditions == "afterSpecLoad")
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	}
 
