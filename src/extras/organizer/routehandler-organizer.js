@@ -33,7 +33,7 @@ export default class RouteHandlerOrganizer extends BITSMIST.v1.Organizer
 
 		RouteHandlerOrganizer.addRouteHandler(component);
 
-		return Promise.resolve();
+		return Promise.resolve(settings);
 
 	}
 

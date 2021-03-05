@@ -41,7 +41,9 @@ export default class FileOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
-		return Promise.all(promises);
+		return Promise.all(promises).then(() => {
+			return settings;
+		});
 
 	}
 

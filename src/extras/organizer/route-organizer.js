@@ -99,6 +99,8 @@ export default class RouteOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
+		return settings;
+
 	}
 
 	// -------------------------------------------------------------------------

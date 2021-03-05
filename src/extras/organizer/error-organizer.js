@@ -51,6 +51,8 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 			ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":"*"});
 		}
 
+		return settings;
+
 	}
 
 	// -------------------------------------------------------------------------

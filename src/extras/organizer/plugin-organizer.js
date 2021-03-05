@@ -55,7 +55,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
-		return Promise.resolve();
+		return settings;
 
 	}
 
