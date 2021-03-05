@@ -29,6 +29,10 @@ BITSMIST.v1.Globals.organizers.get("ComponentOrganizer")["targetEvents"].push("a
 BITSMIST.v1.Globals.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.Globals.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
 
+// Router
+import Router from './system/router';
+window.BITSMIST.v1.Router = Router;
+
 // Plugin
 
 import Plugin from './plugin/plugin';
