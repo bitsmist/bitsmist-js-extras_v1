@@ -4,30 +4,27 @@ window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 // Organizer
 
 import PluginOrganizer from './organizer/plugin-organizer';
-BITSMIST.v1.Globals.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1000});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1000});
 
 import RouteOrganizer from './organizer/route-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targetWords":"routes", "targetEvents":["beforeStart", "afterSpecLoad"], "order":255});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targetWords":"routes", "targetEvents":["beforeStart", "afterSpecLoad"], "order":255});
 
 import RouteHandlerOrganizer from './organizer/routehandler-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targetWords":"", "targetEvents":["afterAppend"], "order":1200});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targetWords":"", "targetEvents":["afterAppend"], "order":1200});
 
 import FileOrganizer from './organizer/file-organizer';
-BITSMIST.v1.Globals.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":250}); // Need to come before component-organizer
-
-import GlobalsettingOrganizer from './organizer/globalsetting-organizer';
-BITSMIST.v1.Globals.organizers.set("GlobalsettingOrganizer", {"object":GlobalsettingOrganizer, "targetWords":"settings", "targetEvents":["beforeStart"], "order":1300});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":250}); // Need to come before component-organizer
 
 import ErrorOrganizer from './organizer/error-organizer';
-BITSMIST.v1.Globals.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart"], "order":1400});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart"], "order":1400});
 
 import PreferenceOrganizer from './organizer/preference-organizer';
-BITSMIST.v1.Globals.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1500});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1500});
 
 // Add new target events to organizers
-BITSMIST.v1.Globals.organizers.get("ComponentOrganizer")["targetEvents"].push("afterSpecLoad");
-BITSMIST.v1.Globals.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
-BITSMIST.v1.Globals.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("ComponentOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
 
 // Router
 import Router from './system/router';
