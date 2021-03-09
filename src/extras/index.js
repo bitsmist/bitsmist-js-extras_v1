@@ -6,12 +6,6 @@ window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 import PluginOrganizer from './organizer/plugin-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1000});
 
-import RouteOrganizer from './organizer/route-organizer';
-BITSMIST.v1.OrganizerOrganizer.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targetWords":"routes", "targetEvents":["beforeStart", "afterSpecLoad"], "order":255});
-
-import RouteHandlerOrganizer from './organizer/routehandler-organizer';
-BITSMIST.v1.OrganizerOrganizer.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targetWords":"", "targetEvents":["afterAppend"], "order":1200});
-
 import FileOrganizer from './organizer/file-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":250}); // Need to come before component-organizer
 
@@ -25,10 +19,6 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":P
 BITSMIST.v1.OrganizerOrganizer.organizers.get("ComponentOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
-
-// Router
-import Router from './system/router';
-window.BITSMIST.v1.Router = Router;
 
 // Plugin
 
