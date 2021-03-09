@@ -9,14 +9,31 @@
 // =============================================================================
 
 // =============================================================================
-//	Plugin organizer class
+//	Global setting organzier class
 // =============================================================================
 
-export default class PluginOrganizer extends BITSMIST.v1.Organizer
+// -----------------------------------------------------------------------------
+//  Constructor
+// -----------------------------------------------------------------------------
+
+export default class GlobalsettingOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
 	//  Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Global init.
+	 */
+	static globalInit()
+	{
+
+		// Init vars
+		GlobalsettingOrganizer.__settings = new BITSMIST.v1.Store();
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
@@ -29,7 +46,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	static init(conditions, component, settings)
 	{
 
-		component._plugins = {};
+		component.settings.chain(GlobalsettingOrganizer.__settings);
 
 	}
 
@@ -47,42 +64,13 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	static organize(conditions, component, settings)
 	{
 
-		let plugins = component.settings.get("plugins");
-		if (plugins)
+		let load = component.settings.get("settings.load");
+		if (load)
 		{
-			Object.keys(plugins).forEach((pluginName) => {
-				PluginOrganizer._addPlugin(component, pluginName, plugins[pluginName]);
-			});
+			GlobalsettingOrganizer.__settings.items = component.settings.items["settings"];
 		}
 
 		return settings;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Add a plugin to the component.
-	 *
-	 * @param	{String}		pluginName			Plugin name.
-	 * @param	{Object}		options				Options for the plugin.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _addPlugin(component, pluginName, options)
-	{
-
-		options = Object.assign({}, options);
-		let className = ( "className" in options ? options["className"] : pluginName );
-		let plugin = null;
-
-		// CreatePlugin
-		plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
-		component._plugins[pluginName] = plugin;
-
-		return plugin;
 
 	}
 

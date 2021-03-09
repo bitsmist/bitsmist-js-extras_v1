@@ -1,36 +1,24 @@
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
-// System
-
-import App from './system/app';
-window.BITSMIST.v1.App = App;
-
-import Router from './system/router';
-window.BITSMIST.v1.Router = Router;
-
-import SettingManager from './system/setting-manager';
-window.BITSMIST.v1.SettingManager = SettingManager;
-
-import PreferenceManager from './system/preference-manager';
-window.BITSMIST.v1.PreferenceManager = PreferenceManager;
-
-import ErrorManager from './system/error-manager';
-window.BITSMIST.v1.ErrorManager = ErrorManager;
-
 // Organizer
 
 import PluginOrganizer from './organizer/plugin-organizer';
-BITSMIST.v1.Globals.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targets":"plugins", "order":1000});
-
-import RouteOrganizer from './organizer/route-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteOrganizer", {"object":RouteOrganizer, "targets":"routes", "order":1100});
-
-import RouteHandlerOrganizer from './organizer/routehandler-organizer';
-BITSMIST.v1.Globals.organizers.set("RouteHandlerOrganizer", {"object":RouteHandlerOrganizer, "targets":"", "order":1200});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1000});
 
 import FileOrganizer from './organizer/file-organizer';
-BITSMIST.v1.Globals.organizers.set("FileOrganizer", {"object":FileOrganizer, "targets":"files", "order":139}); // Need to come before component-organizer
+BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":250}); // Need to come before component-organizer
+
+import ErrorOrganizer from './organizer/error-organizer';
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart"], "order":1400});
+
+import PreferenceOrganizer from './organizer/preference-organizer';
+BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1500});
+
+// Add new target events to organizers
+BITSMIST.v1.OrganizerOrganizer.organizers.get("ComponentOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
 
 // Plugin
 

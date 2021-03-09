@@ -12,7 +12,7 @@
 //	Route handler organizer class
 // =============================================================================
 
-export default class RouteHandlerOrganizer
+export default class RouteHandlerOrganizer extends BITSMIST.v1.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -24,38 +24,16 @@ export default class RouteHandlerOrganizer
 	 *
 	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static organize(conditions, component)
+	static organize(conditions, component, settings)
 	{
 
 		RouteHandlerOrganizer.addRouteHandler(component);
 
-		return Promise.resolve();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if event is target.
-	 *
-	 * @param	{String}		eventName			Event name.
-	 *
-	 * @return 	{Boolean}		True if it is target.
-	 */
-	static isTarget(eventName)
-	{
-
-		let ret = false;
-
-		if (eventName == "*" || eventName == "afterAppend")
-		{
-			ret = true;
-		}
-
-		return ret;
+		return Promise.resolve(settings);
 
 	}
 
