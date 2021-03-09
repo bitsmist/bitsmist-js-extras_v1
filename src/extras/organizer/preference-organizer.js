@@ -93,7 +93,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 			PreferenceOrganizer.__preferences.items = component.settings.items["preferences"]["defaults"];
 
 			// Load preferences
-			chain = PreferenceOrganizer._load(component).then((preferences) => {;
+			chain = PreferenceOrganizer._load(component).then((preferences) => {
 				// Merge preferences
 				PreferenceOrganizer.__preferences.merge(preferences);
 				PreferenceOrganizer.__loaded.resolve();
@@ -101,10 +101,8 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		}
 
 		return chain.then(() => {
-			PreferenceOrganizer.__loaded.promise.then(() => {
-				let options = {"newPreferences":PreferenceOrganizer.__preferences.items};
-
-				return component.setup(options);
+			return PreferenceOrganizer.__loaded.promise.then(() => {
+				settings["newPreferences"] = PreferenceOrganizer.__preferences.items;
 			}).then(() => {
 				return settings;
 			});
