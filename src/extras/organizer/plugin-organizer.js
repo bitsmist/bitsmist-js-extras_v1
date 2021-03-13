@@ -29,6 +29,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	static init(conditions, component, settings)
 	{
 
+		// Init vars
 		component._plugins = {};
 
 	}
