@@ -99,16 +99,19 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 
 			//try
 			{
-				if (error.reason && error.reason instanceof XMLHttpRequest)
+				if (error.reason)
 				{
-					e.message = ( error.reason instanceof XMLHttpRequest ? error.reason.statusText : error.reason.message );
-					e.stack = error.reason.stack;
-					e.object = error.reason;
-				}
-				else if (error.reason)
-				{
-					e.message = error.reason;
-					e.object = error;
+					if (error.reason instanceof XMLHttpRequest)
+					{
+						e.message = error.reason.statusText;
+						e.stack = error.reason.stack;
+						e.object = error.reason;
+					}
+					else
+					{
+						e.message = error.reason.message;
+						e.object = error.reason;
+					}
 				}
 				else
 				{
