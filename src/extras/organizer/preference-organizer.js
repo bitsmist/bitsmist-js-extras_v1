@@ -48,25 +48,16 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	static init(conditions, component, settings)
 	{
 
+
 		// Add properties
 		Object.defineProperty(component, 'preferences', {
 			get() { return this._preferences; },
 		});
 
-		// Add methods
-		component.loadPreferences = function() { return PreferenceOrganizer._load(this); }
-		component.savePreferences = function() { return PreferenceOrganizer._save(this); }
-		component.setupAll = function(options) { return PreferenceOrganizer._setup(this, options); }
-
 		// Init vars
-		component._preferences = PreferenceOrganizer.__preferences;
+		component._preferences = new PreferenceExporter(component);
 
-		// Load defaults from settings if any
-		if (component.settings.items["preferences"]["load"])
-		{
-			PreferenceOrganizer.__preferences.items = component.settings.items["preferences"]["defaults"];
-		}
-
+		// Register a component as an observer
 		PreferenceOrganizer._register(component);
 
 	}
@@ -90,7 +81,8 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		let preferences = component.settings.items["preferences"];
 		if (preferences["load"])
 		{
-			PreferenceOrganizer.__preferences.items = component.settings.items["preferences"]["defaults"];
+			// Set default preferences if any
+			PreferenceOrganizer.__preferences.items = component.settings.get("preferences.defaults");
 
 			// Load preferences
 			chain = PreferenceOrganizer._load(component).then((preferences) => {
@@ -244,4 +236,15 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 	}
 
+}
+
+class PreferenceExporter
+{
+	constructor(component) { this._component = component; }
+	get items() { return PreferenceOrganizer.__preferences.items; }
+	set(key, value) { return PreferenceOrganizer.__preferences.set(key, value); }
+	get(key) { return PreferenceOrganizer.__preferences.get(key); }
+	load() { return PreferenceOrganizer._load(this._component); }
+	save() { return PreferenceOrganizer._save(this._component); }
+	setup(options) { return PreferenceOrganizer._setup(this._component, options); }
 }
