@@ -218,9 +218,13 @@ List.prototype.start = function(settings)
 List.prototype._buildSync = function(fragment)
 {
 
+	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+	let eventElements = this._row.settings.get("elements");
+	let template = this._row._templates[this._row.settings.get("templateName")].html;
+
 	for (let i = 0; i < this._items.length; i++)
 	{
-		this.__appendRowSync(fragment, i, this._items[i]);
+		this.__appendRowSync(fragment, i, this._items[i], template, clickHandler, eventElements);
 	}
 
 }
@@ -238,11 +242,14 @@ List.prototype._buildAsync = function(fragment)
 {
 
 	let chain = Promise.resolve();
+	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
+	let eventElements = this._row.settings.get("elements");
+	let template = this._row._templates[this._row.settings.get("templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
 		chain = chain.then(() => {
-			return this.__appendRowAsync(fragment, i, this._items[i]);
+			return this.__appendRowAsync(fragment, i, this._items[i], template, clickHandler, eventElements);
 		});
 	}
 
@@ -260,29 +267,36 @@ List.prototype._buildAsync = function(fragment)
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
  * @param	{Object}		item					Row data.
+ * @param	{String}		template				Template html.
+ * @param	{Object}		clickHandler			Row's click handler info.
+ * @param	{Object}		eventElements			Elements' event info.
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.__appendRowAsync = function(rootNode, no, item)
+List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHandler, eventElements)
 {
 
 	// Append a row
-	let element = this._row.cloneTemplate();
+	let ele = document.createElement("div");
+	ele.innerHTML = template;
+	let element = ele.firstElementChild;
 	rootNode.appendChild(element);
 
 	this._rows.push(element);
 
 	// set row click event handler
-	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 	if (clickHandler)
 	{
 		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
 	}
 
 	// set row elements click event handler
-	Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
-		this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
-	});
+	if (eventElements)
+	{
+		Object.keys(eventElements).forEach((elementName) => {
+			this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
+		});
+	}
 
 	// Call event handlers
 	return Promise.resolve().then(() => {
@@ -304,27 +318,34 @@ List.prototype.__appendRowAsync = function(rootNode, no, item)
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
  * @param	{Object}		item					Row data.
+ * @param	{String}		template				Template html.
+ * @param	{Object}		clickHandler			Row's click handler info.
+ * @param	{Object}		eventElements			Elements' event info.
  */
-List.prototype.__appendRowSync = function(rootNode, no, item)
+List.prototype.__appendRowSync = function(rootNode, no, item, template, clickHandler, eventElements)
 {
 
 	// Append a row
-	let element = this._row.cloneTemplate();
+	let ele = document.createElement("div");
+	ele.innerHTML = template;
+	let element = ele.firstElementChild;
 	rootNode.appendChild(element);
 
 	this._rows.push(element);
 
 	// set row click event handler
-	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 	if (clickHandler)
 	{
 		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
 	}
 
 	// set row elements click event handler
-	Object.keys(this._row.settings.get("elements", {})).forEach((elementName) => {
-		this._row.setHtmlEventHandlers(elementName, {"item":item, "no":no, "element":element}, element);
-	});
+	if (eventElements)
+	{
+		Object.keys(eventElements).forEach((elementName) => {
+			this._row.setHtmlEventHandlers(elementName, {"item":item, "no":no, "element":element}, element);
+		});
+	}
 
 	// Call event handlers
 	this._row.triggerSync("beforeFillRow", this, {"item":item, "no":no, "element":element});
