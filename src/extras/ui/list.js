@@ -294,7 +294,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHa
 	if (eventElements)
 	{
 		Object.keys(eventElements).forEach((elementName) => {
-			this._row.setHtmlEventHandlers(elementName, {"item":ttem, "no":no, "element":element}, element);
+			this._row.setHtmlEventHandlers(elementName, {"item":item, "no":no, "element":element}, element);
 		});
 	}
 
