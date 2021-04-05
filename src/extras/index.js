@@ -28,14 +28,6 @@ BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"
 import Plugin from './plugin/plugin';
 window.BITSMIST.v1.Plugin = Plugin;
 
-// Plugin - Error handler
-
-import AjaxErrorHandler from './plugin/error/ajax-error-handler';
-window.BITSMIST.v1.AjaxErrorHandler = AjaxErrorHandler;
-
-import NoRouteErrorHandler from './plugin/error/no-route-error-handler';
-window.BITSMIST.v1.NoRouteErrorHandler = NoRouteErrorHandler;
-
 // Plugin - Store handler
 
 import CookieStoreHandler from './plugin/store/cookie-store-handler';
