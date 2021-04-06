@@ -116,7 +116,7 @@ Form.prototype.fill = function(options)
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
 	// Clear fields
-	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("autoClear"));
+	let autoClear = BITSMIST.v1.Util.safeGet(options, "settings.autoClear", this._settings.get("settings.autoClear"));
 	if (autoClear)
 	{
 		this.clear();
@@ -176,7 +176,7 @@ Form.prototype.validate = function(options)
 		let ret = true;
 		let form = this.querySelector("form");
 
-		if (this.settings.get("autoValidate"))
+		if (this.settings.get("settings.autoValidate"))
 		{
 			if (form && form.reportValidity)
 			{
@@ -220,11 +220,11 @@ Form.prototype.submit = function(options)
 	}).then(() => {
 		if (!this.__cancelSubmit)
 		{
-			let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
+			let items = this.settings.get("settings.itemGetter", function(item){return [item]})(this._item);
 			return this.trigger("doSubmit", sender, {"target":this._target, "items":items});
 		}
 	}).then(() => {
-		let items = this.settings.get("itemGetter", function(item){return [item]})(this._item);
+		let items = this.settings.get("settings.itemGetter", function(item){return [item]})(this._item);
 		return this.trigger("afterSubmit", sender, {"target":this._target, "items":items});
 	});
 

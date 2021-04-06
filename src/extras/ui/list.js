@@ -96,8 +96,8 @@ Object.defineProperty(List.prototype, 'data', {
 List.prototype.onListAfterAppend = function(sender, e, ex)
 {
 
-	this._listRootNode = this.querySelector(this._settings.get("listRootNode"));
-	let className = ( this._settings.get("components")[this._settings.get("row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("row"))
+	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
+	let className = ( this._settings.get("components")[this._settings.get("settings.row")]["className"] ? this._settings.get("components")[this._settings.get("row")]["className"] : this._settings.get("settings.row"))
 	this._row = BITSMIST.v1.ClassUtil.createObject(className);
 	this._row._parent = this;
 
@@ -134,7 +134,7 @@ List.prototype.fill = function(options)
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
 
-	let builder = ( this._settings.get("async") ? this._buildAsync : this._buildSync );
+	let builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
 	let fragment = document.createDocumentFragment();
 
 	this._rows = [];
@@ -157,7 +157,7 @@ List.prototype.fill = function(options)
 			return builder.call(this, fragment);
 		}
 	}).then(() => {
-		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("autoClear"));
+		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
 		if (autoClear)
 		{
 			this.clear();
@@ -220,7 +220,7 @@ List.prototype._buildSync = function(fragment)
 
 	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 	let eventElements = this._row.settings.get("elements");
-	let template = this._row._templates[this._row.settings.get("templateName")].html;
+	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
@@ -244,7 +244,7 @@ List.prototype._buildAsync = function(fragment)
 	let chain = Promise.resolve();
 	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
 	let eventElements = this._row.settings.get("elements");
-	let template = this._row._templates[this._row.settings.get("templateName")].html;
+	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
