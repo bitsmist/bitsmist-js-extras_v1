@@ -58,7 +58,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		component._preferences = new PreferenceExporter(component);
 
 		// Register a component as an observer
-		PreferenceOrganizer._register(component);
+		PreferenceOrganizer._register(component, BITSMIST.v1.Util.safeGet(settings, "preferences.targets"));
 
 	}
 
@@ -211,35 +211,38 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	static __filter(conditions, info)
 	{
 
-		return true;
-
-		/*
 		let result = false;
 		let target = info["targets"];
 
-		// if (target == "*")
-		// {
-		// 	return true;
-		// }
-
-		for (let i = 0; i < target.length; i++)
+		if (target == "*")
 		{
-			if (conditions["newPreferences"].hasOwnProperty(target[i]))
+			return true;
+		}
+		else if (target)
+		{
+			for (let i = 0; i < target.length; i++)
 			{
-				result = true;
-				break;
+				if (conditions["newPreferences"].hasOwnProperty(target[i]))
+				{
+					result = true;
+					break;
+				}
 			}
 		}
 
 		return result;
-		*/
 
 	}
 
 }
 
+// =============================================================================
+//	Preference exporter class
+// =============================================================================
+
 class PreferenceExporter
 {
+
 	constructor(component) { this._component = component; }
 	get items() { return PreferenceOrganizer.__preferences.items; }
 	set(key, value) { return PreferenceOrganizer.__preferences.set(key, value); }
@@ -247,4 +250,5 @@ class PreferenceExporter
 	load() { return PreferenceOrganizer._load(this._component); }
 	save() { return PreferenceOrganizer._save(this._component); }
 	setup(options) { return PreferenceOrganizer._setup(this._component, options); }
+
 }
