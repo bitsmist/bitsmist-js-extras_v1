@@ -65,3 +65,12 @@ window.BITSMIST.v1.MasterUtil = MasterUtil;
 
 import ResourceUtil from './util/resource-util';
 window.BITSMIST.v1.ResourceUtil = ResourceUtil;
+
+// Preference
+
+BITSMIST.v1.preferences = PreferenceOrganizer.preferences;
+BITSMIST.v1.ClassUtil.newComponent(BITSMIST.v1.Component, {
+	"settings": {
+		"name":	"PreferenceManager",
+	}
+}, "bm-preference", "PreferenceManager");
