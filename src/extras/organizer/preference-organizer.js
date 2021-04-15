@@ -32,6 +32,12 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
 			PreferenceOrganizer.__loaded["resolve"] = resolve;
 			PreferenceOrganizer.__loaded["reject"] = reject;
+			setTimeout(() => {
+				reject(`Time out waiting for loading preferences.`);
+			}, 10000);
+		});
+		Object.defineProperty(PreferenceOrganizer, 'preferences', {
+			get() { return PreferenceOrganizer.__preferences; },
 		});
 
 	}
@@ -47,7 +53,6 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	 */
 	static init(conditions, component, settings)
 	{
-
 
 		// Add properties
 		Object.defineProperty(component, 'preferences', {
@@ -78,8 +83,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 		let chain = Promise.resolve();
 
-		let preferences = component.settings.items["preferences"];
-		if (preferences["load"])
+		if (component.settings.get("preferences.load"))
 		{
 			// Set default preferences if any
 			PreferenceOrganizer.__preferences.items = component.settings.get("preferences.defaults");
@@ -93,11 +97,10 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		}
 
 		return chain.then(() => {
-			return PreferenceOrganizer.__loaded.promise.then(() => {
-				settings["newPreferences"] = PreferenceOrganizer.__preferences.items;
-			}).then(() => {
-				return settings;
-			});
+			return PreferenceOrganizer.__loaded.promise;
+		}).then(() => {
+			settings["newPreferences"] = PreferenceOrganizer.__preferences.items;
+			return settings;
 		});
 
 	}
