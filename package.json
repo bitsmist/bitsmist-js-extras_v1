@@ -1,7 +1,7 @@
 {
   "name": "bitsmist-js-extras_v1",
-  "version": "0.9.4",
-  "description": "BitsmistJS Extras V1",
+  "version": "0.9.6",
+  "description": "BitsmistJS Extras v1",
   "private": true,
   "dependencies": {},
   "devDependencies": {
@@ -9,12 +9,10 @@
     "@rollup/plugin-commonjs": "^13.0.2",
     "@rollup/plugin-node-resolve": "^8.4.0",
     "rollup": "^2.23.0",
-    "rollup-plugin-uglify": "^6.0.4"
+    "rollup-plugin-terser": "^7.0.2"
   },
   "scripts": {
-    "watch": "npx rollup -c -w --environment BUILD:dev",
-    "dev": "npx rollup -c --environment BUILD:dev",
-    "test": "npx rollup -c --environment BUILD:dev",
-    "prod": "npx rollup -c --environment BUILD:prod"
+    "watch": "npx rollup -c -w",
+    "build": "npx rollup -c"
   }
 }
