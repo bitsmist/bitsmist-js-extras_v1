@@ -19,7 +19,6 @@ import PreferenceOrganizer from './organizer/preference-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
 
 // Add new target events to organizers
-BITSMIST.v1.OrganizerOrganizer.organizers.get("ComponentOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
 
