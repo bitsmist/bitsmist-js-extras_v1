@@ -1049,7 +1049,7 @@
 		{
 
 			options = Object.assign({}, options);
-			var sender = ( options["sender"] ? options["sender"] : this );
+			( options["sender"] ? options["sender"] : this );
 
 			return PreferenceOrganizer.__observers.notify("setup", options).then(function () {
 				if (options["newPreferences"])
@@ -1175,15 +1175,15 @@
 
 	var PreferenceExporter = function PreferenceExporter(component) { this._component = component; };
 
-	var prototypeAccessors = { items: { configurable: true } };
-	prototypeAccessors.items.get = function () { return PreferenceOrganizer.__preferences.items; };
+	var prototypeAccessors$1 = { items: { configurable: true } };
+	prototypeAccessors$1.items.get = function () { return PreferenceOrganizer.__preferences.items; };
 	PreferenceExporter.prototype.set = function set (key, value) { return PreferenceOrganizer.__preferences.set(key, value); };
 	PreferenceExporter.prototype.get = function get (key) { return PreferenceOrganizer.__preferences.get(key); };
 	PreferenceExporter.prototype.load = function load () { return PreferenceOrganizer._load(this._component); };
 	PreferenceExporter.prototype.save = function save () { return PreferenceOrganizer._save(this._component); };
 	PreferenceExporter.prototype.setup = function setup (options) { return PreferenceOrganizer._setup(this._component, options); };
 
-	Object.defineProperties( PreferenceExporter.prototype, prototypeAccessors );
+	Object.defineProperties( PreferenceExporter.prototype, prototypeAccessors$1 );
 
 	// =============================================================================
 	/**
@@ -1228,7 +1228,7 @@
 
 	};
 
-	var prototypeAccessors$1 = { name: { configurable: true },component: { configurable: true } };
+	var prototypeAccessors = { name: { configurable: true },component: { configurable: true } };
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -1239,7 +1239,7 @@
 	*
 	* @type{String}
 	*/
-	prototypeAccessors$1.name.get = function ()
+	prototypeAccessors.name.get = function ()
 	{
 
 		return this._options.get("name");
@@ -1253,14 +1253,14 @@
 	*
 	* @type{String}
 	*/
-	prototypeAccessors$1.component.get = function ()
+	prototypeAccessors.component.get = function ()
 	{
 
 		return this._component;
 
 	};
 
-	prototypeAccessors$1.component.set = function (value)
+	prototypeAccessors.component.set = function (value)
 	{
 
 		this._component = value;
@@ -1283,7 +1283,7 @@
 
 	};
 
-	Object.defineProperties( Plugin.prototype, prototypeAccessors$1 );
+	Object.defineProperties( Plugin.prototype, prototypeAccessors );
 
 	// =============================================================================
 	/**
@@ -1698,7 +1698,7 @@
 
 
 			var id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
-			var parameters = BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
+			BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
 			var items = BITSMIST.v1.Util.safeGet(e.detail, "items");
 
 			return Promise.resolve().then(function () {
