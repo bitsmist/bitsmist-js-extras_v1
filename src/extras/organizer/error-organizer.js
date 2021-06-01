@@ -60,15 +60,14 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	* Filter target components to notify.
-	*
-	* @param	{Component}		component			Component.
-	* @param	{Object}		target				Target component to check.
-	* @param	{Object}		e					Event object.
-	*/
+	 * Filter target components to notify.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		target				Target component to check.
+	 * @param	{Object}		e					Event object.
+	 */
 	static __filter(conditions, observerInfo, sender, e)
 	{
-
 
 		let result = false;
 		let targets = observerInfo["object"]._settings.get("errors").targets;
