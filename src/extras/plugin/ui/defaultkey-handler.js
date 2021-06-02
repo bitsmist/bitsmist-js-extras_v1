@@ -55,10 +55,10 @@ export default class DefaultkeyHandler extends Plugin
 		let defaultKeys = this._options.get("features.defaultKeys");
 		if (defaultKeys)
 		{
-			this._component.addEventHandler(this._component, "keydown", this.onKeyDown, defaultKeys, this);
-			this._component.addEventHandler(this._component, "keypress", this.onKeyPress, defaultKeys, this);
-			this._component.addEventHandler(this._component, "compositionstart", this.onCompositionStart, defaultKeys, this);
-			this._component.addEventHandler(this._component, "compositionend", this.onCompositionEnd, defaultKeys, this);
+			this._component.addEventHandler("keydown", {"handler": this.onKeyDown, "options":defaultKeys}, null, this);
+			this._component.addEventHandler("keypress", {"handler":this.onKeyPress, "options":defaultKeys}, null, this);
+			this._component.addEventHandler("compositionstart", {"handler":this.onCompositionStart, "options":defaultKeys}, null, this);
+			this._component.addEventHandler("compositionend", {"handler":this.onCompositionEnd, "options":defaultKeys}, null, this);
 		}
 
 		// default buttons
@@ -185,6 +185,7 @@ export default class DefaultkeyHandler extends Plugin
 	onDefaultSubmit(sender, e, ex)
 	{
 
+		console.log("@@@", ex);
 		this._component.submit().then(() => {
 			if (!this._component.__cancelSubmit)
 			{
@@ -287,7 +288,7 @@ export default class DefaultkeyHandler extends Plugin
 			let elements = this._component.querySelectorAll(options["rootNode"]);
 			elements = Array.prototype.slice.call(elements, 0);
 			elements.forEach((element) => {
-				this._component.addEventHandler(element, "click", handler, options, this);
+				this._component.addEventHandler("click", {"handler":handler, "options":options}, element, this);
 			});
 		}
 

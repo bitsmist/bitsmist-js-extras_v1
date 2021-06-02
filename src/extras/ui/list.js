@@ -195,9 +195,13 @@ List.prototype.start = function(settings)
 	// Init component settings
 	settings = Object.assign({}, settings, {
 		"events": {
-			"afterAppend": [{
-				"handler": this.onListAfterAppend
-			}]
+			"this": {
+				"handlers": {
+					"afterAppend": [{
+						"handler": this.onListAfterAppend
+					}]
+				}
+			}
 		}
 	});
 
@@ -218,13 +222,12 @@ List.prototype.start = function(settings)
 List.prototype._buildSync = function(fragment)
 {
 
-	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-	let eventElements = this._row.settings.get("elements");
+	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
-		this.__appendRowSync(fragment, i, this._items[i], template, clickHandler, eventElements);
+		this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
 	}
 
 }
@@ -242,14 +245,12 @@ List.prototype._buildAsync = function(fragment)
 {
 
 	let chain = Promise.resolve();
-	let clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-	let eventElements = this._row.settings.get("elements");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
 		chain = chain.then(() => {
-			return this.__appendRowAsync(fragment, i, this._items[i], template, clickHandler, eventElements);
+			return this.__appendRowAsync(fragment, i, this._items[i], template);
 		});
 	}
 
@@ -273,7 +274,7 @@ List.prototype._buildAsync = function(fragment)
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHandler, eventElements)
+List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
@@ -284,17 +285,11 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHa
 
 	this._rows.push(element);
 
-	// set row click event handler
-	if (clickHandler)
-	{
-		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
-	}
-
 	// set row elements click event handler
-	if (eventElements)
+	if (rowEvents)
 	{
-		Object.keys(eventElements).forEach((elementName) => {
-			this._row.initElements(elementName, {"item":item, "no":no, "element":element}, element);
+		Object.keys(rowEvents).forEach((elementName) => {
+			this._row.initElement(elementName, rowEvents[elementName], element);
 		});
 	}
 
@@ -322,7 +317,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHa
  * @param	{Object}		clickHandler			Row's click handler info.
  * @param	{Object}		eventElements			Elements' event info.
  */
-List.prototype.__appendRowSync = function(rootNode, no, item, template, clickHandler, eventElements)
+List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
@@ -333,23 +328,17 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, clickHan
 
 	this._rows.push(element);
 
-	// set row click event handler
-	if (clickHandler)
-	{
-		this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
-	}
-
 	// set row elements click event handler
-	if (eventElements)
+	if (rowEvents)
 	{
-		Object.keys(eventElements).forEach((elementName) => {
-			this._row.initElements(elementName, {"item":item, "no":no, "element":element}, element);
+		Object.keys(rowEvents).forEach((elementName) => {
+			this._row.initElement(elementName, rowEvents[elementName], element);
 		});
 	}
 
 	// Call event handlers
-	this._row.triggerSync("beforeFillRow", this, {"item":item, "no":no, "element":element});
+	this._row.triggerAsync("beforeFillRow", this, {"item":item, "no":no, "element":element});
 	FormUtil.setFields(element, item, this.masters);
-	this.row.triggerSync("afterFillRow", this, {"item":item, "no":no, "element":element});
+	this.row.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 }

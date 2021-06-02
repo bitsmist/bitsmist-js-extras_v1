@@ -35,7 +35,7 @@ export default class Plugin
 		// Add event handlers
 		let events = this._options.get("events", {});
 		Object.keys(events).forEach((eventName) => {
-			component.addEventHandler(component, eventName, events[eventName], null, this);
+			component.addEventHandler(eventName, events[eventName], null, this);
 		});
 
 		// Expose plugin
