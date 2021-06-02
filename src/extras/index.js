@@ -20,7 +20,7 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":P
 
 // Add new target events to organizers
 BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
-BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
+BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
 
 // Plugin
 
@@ -33,9 +33,6 @@ import CookieStoreHandler from './plugin/store/cookie-store-handler';
 window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
 
 // Plugin - Resource handler
-
-import MasterHandler from './plugin/resource/master-handler';
-window.BITSMIST.v1.MasterHandler = MasterHandler;
 
 import ResourceHandler from './plugin/resource/resource-handler';
 window.BITSMIST.v1.ResourceHandler = ResourceHandler;
