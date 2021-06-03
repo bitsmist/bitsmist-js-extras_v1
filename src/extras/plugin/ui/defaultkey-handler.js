@@ -185,7 +185,6 @@ export default class DefaultkeyHandler extends Plugin
 	onDefaultSubmit(sender, e, ex)
 	{
 
-		console.log("@@@", ex);
 		this._component.submit().then(() => {
 			if (!this._component.__cancelSubmit)
 			{
