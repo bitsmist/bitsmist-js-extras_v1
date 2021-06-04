@@ -289,7 +289,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
 	if (rowEvents)
 	{
 		Object.keys(rowEvents).forEach((elementName) => {
-			this._row.initElement(elementName, rowEvents[elementName], element);
+			this._row.initEvents(elementName, rowEvents[elementName], element);
 		});
 	}
 
@@ -332,7 +332,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvent
 	if (rowEvents)
 	{
 		Object.keys(rowEvents).forEach((elementName) => {
-			this._row.initElement(elementName, rowEvents[elementName], element);
+			this._row.initEvents(elementName, rowEvents[elementName], element);
 		});
 	}
 
