@@ -18,8 +18,10 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":Maste
 import PreferenceOrganizer from './organizer/preference-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
 
+import AttrOrganizer from './organizer/attr-organizer';
+BITSMIST.v1.OrganizerOrganizer.organizers.set("AttrOrganizer", {"object":AttrOrganizer, "targetWords":"attrs", "targetEvents":["beforeStart", "afterSpecLoad"], "order":600});
+
 // Add new target events to organizers
-BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
 BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
 
 // Plugin
