@@ -62,15 +62,14 @@
 		// -------------------------------------------------------------------------
 
 		/**
-		* Filter target components to notify.
-		*
-		* @param	{Component}		component			Component.
-		* @param	{Object}		target				Target component to check.
-		* @param	{Object}		e					Event object.
-		*/
+		 * Filter target components to notify.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		target				Target component to check.
+		 * @param	{Object}		e					Event object.
+		 */
 		ErrorOrganizer.__filter = function __filter (conditions, observerInfo, sender, e)
 		{
-
 
 			var result = false;
 			var targets = observerInfo["object"]._settings.get("errors").targets;
@@ -1196,6 +1195,133 @@
 	// =============================================================================
 
 	// =============================================================================
+	//	Attribute organizer class
+	// =============================================================================
+
+	var AttrOrganizer = /*@__PURE__*/(function (superclass) {
+		function AttrOrganizer () {
+			superclass.apply(this, arguments);
+		}
+
+		if ( superclass ) AttrOrganizer.__proto__ = superclass;
+		AttrOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		AttrOrganizer.prototype.constructor = AttrOrganizer;
+
+		AttrOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			var events = {
+				"afterStart": AttrOrganizer.onDoOrganize,
+				"afterAppend": AttrOrganizer.onDoOrganize,
+				"afterSpecLoad": AttrOrganizer.onDoOrganize,
+				"beforeOpen": AttrOrganizer.onDoOrganize,
+				"afterOpen": AttrOrganizer.onDoOrganize,
+				"beforeClose": AttrOrganizer.onDoOrganize,
+				"afterClose": AttrOrganizer.onDoOrganize,
+				"doRefresh": AttrOrganizer.onDoOrganize,
+			};
+
+			var attrs = settings["attrs"];
+			if (attrs)
+			{
+				Object.keys(attrs).forEach(function (eventName) {
+					if (events[eventName])
+					{
+						component.addEventHandler(eventName, {"handler":events[eventName], "options":{"attrs":attrs[eventName]}});
+					}
+				});
+			}
+
+			return settings;
+
+		};
+
+		// -----------------------------------------------------------------------------
+		//	Event handlers
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * DoOrganize event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+		 * @param	{Object}		ex					Extra event info.
+		 */
+		AttrOrganizer.onDoOrganize = function onDoOrganize (sender, e, ex)
+		{
+
+			var component = ex.component;
+			var settings = ex.options["attrs"];
+
+			return AttrOrganizer._initAttr(component, settings);
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Init attributes.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		AttrOrganizer._initAttr = function _initAttr (component, settings)
+		{
+
+			if (settings)
+			{
+				Object.keys(settings).forEach(function (key) {
+					switch (key)
+					{
+						case "style":
+							Object.keys(settings[key]).forEach(function (styleName) {
+								component.style[styleName] = settings[key][styleName];
+							});
+							break;
+						default:
+							component.setAttribute(key, settings[key]);
+
+							/*
+							if (key.substr(0, 1) == "-")
+							{
+								let attrs = settings[key].split(" ");
+								for (let i = 0; i < attrs.length; i++)
+								{
+									console.log("@@@removing attr", component.name, key, attrs[i]);
+									component.removeAttribute(key, attrs[i]);
+								}
+							}
+							else
+							{
+								console.log("@@@settings attr", component.name, key, settings[key]);
+								component.setAttribute(key, settings[key]);
+							}
+							*/
+							break;
+					}
+				});
+			}
+
+			return Promise.resolve();
+
+		};
+
+		return AttrOrganizer;
+	}(BITSMIST.v1.Organizer));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
 	//	Plugin base class
 	// =============================================================================
 
@@ -1211,7 +1337,7 @@
 		// Add event handlers
 		var events = this._options.get("events", {});
 		Object.keys(events).forEach(function (eventName) {
-			component.addEventHandler(component, eventName, events[eventName], null, this$1);
+			component.addEventHandler(eventName, events[eventName], null, this$1);
 		});
 
 		// Expose plugin
@@ -1452,126 +1578,6 @@
 		};
 
 		return CookieStoreHandler;
-	}(Plugin));
-
-	// =============================================================================
-
-	// =============================================================================
-	//	Master handler class
-	// =============================================================================
-
-	var MasterHandler = /*@__PURE__*/(function (Plugin) {
-		function MasterHandler(component, options)
-		{
-
-			Plugin.call(this, component, options);
-
-			this._masters = {};
-
-		}
-
-		if ( Plugin ) MasterHandler.__proto__ = Plugin;
-		MasterHandler.prototype = Object.create( Plugin && Plugin.prototype );
-		MasterHandler.prototype.constructor = MasterHandler;
-
-		// -------------------------------------------------------------------------
-		//  Event handlers
-		// -------------------------------------------------------------------------
-
-		/**
-		 * After start event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		MasterHandler.prototype.onAfterStart = function onAfterStart (sender, e, ex)
-		{
-
-			return this.__initMasters(this._component.settings.get("masters"));
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * After spec load event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		MasterHandler.prototype.onAfterSpecLoad = function onAfterSpecLoad (sender, e, ex)
-		{
-
-			return this.__initMasters(BITSMIST.v1.Util.safeGet(e.detail, "spec.masters"));
-
-		};
-
-		// -------------------------------------------------------------------------
-		//  Privates
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Init masters.
-		 *
-		 * @param	{Object}		masters				Masters settings.
-		 */
-		MasterHandler.prototype.__initMasters = function __initMasters (masters)
-		{
-			var this$1 = this;
-
-
-			var promises = [];
-
-			if (masters)
-			{
-				var settings = this._component.settings.get("ajaxUtil", {});
-				settings["url"]["COMMON"]["baseUrl"] = this._component.settings.get("system.apiBaseUrl", "");
-				Object.keys(masters).forEach(function (masterName) {
-					this$1._masters[masterName] = new MasterUtil(masterName, Object.assign({
-						"settings": settings,
-					}, masters[masterName]));
-
-					if (masters[masterName]["autoLoad"])
-					{
-						promises.push(this$1._masters[masterName].load().then(function () {
-							this$1[masterName] = this$1._masters[masterName];
-						}));
-					}
-					else
-					{
-						this$1[masterName] = this$1._masters[masterName];
-					}
-				});
-			}
-
-			return Promise.all(promises);
-
-		};
-
-		// -----------------------------------------------------------------------------
-		//  Protected
-		// -----------------------------------------------------------------------------
-
-		/**
-		 * Get plugin options.
-		 *
-		 * @return  {Object}		Options.
-		 */
-		MasterHandler.prototype._getOptions = function _getOptions ()
-		{
-
-			return {
-				"events": {
-					"afterStart": this.onAfterStart,
-					"afterSpecLoad": this.onAfterSpecLoad,
-				}
-			};
-
-		};
-
-		return MasterHandler;
 	}(Plugin));
 
 	// =============================================================================
@@ -2865,9 +2871,13 @@
 		// Init component settings
 		settings = Object.assign({}, settings, {
 			"events": {
-				"afterAppend": [{
-					"handler": this.onListAfterAppend
-				}]
+				"this": {
+					"handlers": {
+						"afterAppend": [{
+							"handler": this.onListAfterAppend
+						}]
+					}
+				}
 			}
 		});
 
@@ -2888,13 +2898,12 @@
 	List.prototype._buildSync = function(fragment)
 	{
 
-		var clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-		var eventElements = this._row.settings.get("elements");
+		var rowEvents = this._row.settings.get("rowevents");
 		var template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 		for (var i = 0; i < this._items.length; i++)
 		{
-			this.__appendRowSync(fragment, i, this._items[i], template, clickHandler, eventElements);
+			this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
 		}
 
 	};
@@ -2914,13 +2923,11 @@
 
 
 		var chain = Promise.resolve();
-		var clickHandler = this._row.getEventHandler(this._row.settings.get("events.click"));
-		var eventElements = this._row.settings.get("elements");
 		var template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 		var loop = function ( i ) {
 			chain = chain.then(function () {
-				return this$1.__appendRowAsync(fragment, i, this$1._items[i], template, clickHandler, eventElements);
+				return this$1.__appendRowAsync(fragment, i, this$1._items[i], template);
 			});
 		};
 
@@ -2947,7 +2954,7 @@
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	List.prototype.__appendRowAsync = function(rootNode, no, item, template, clickHandler, eventElements)
+	List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
 	{
 		var this$1 = this;
 
@@ -2960,17 +2967,11 @@
 
 		this._rows.push(element);
 
-		// set row click event handler
-		if (clickHandler)
-		{
-			this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
-		}
-
 		// set row elements click event handler
-		if (eventElements)
+		if (rowEvents)
 		{
-			Object.keys(eventElements).forEach(function (elementName) {
-				this$1._row.initElements(elementName, {"item":item, "no":no, "element":element}, element);
+			Object.keys(rowEvents).forEach(function (elementName) {
+				this$1._row.initEvents(elementName, rowEvents[elementName], element);
 			});
 		}
 
@@ -2998,7 +2999,7 @@
 	 * @param	{Object}		clickHandler			Row's click handler info.
 	 * @param	{Object}		eventElements			Elements' event info.
 	 */
-	List.prototype.__appendRowSync = function(rootNode, no, item, template, clickHandler, eventElements)
+	List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
 	{
 		var this$1 = this;
 
@@ -3011,24 +3012,18 @@
 
 		this._rows.push(element);
 
-		// set row click event handler
-		if (clickHandler)
-		{
-			this._row.addEventHandler(element, "click", clickHandler, {"item":item, "no":no, "element":element});
-		}
-
 		// set row elements click event handler
-		if (eventElements)
+		if (rowEvents)
 		{
-			Object.keys(eventElements).forEach(function (elementName) {
-				this$1._row.initElements(elementName, {"item":item, "no":no, "element":element}, element);
+			Object.keys(rowEvents).forEach(function (elementName) {
+				this$1._row.initEvents(elementName, rowEvents[elementName], element);
 			});
 		}
 
 		// Call event handlers
-		this._row.triggerSync("beforeFillRow", this, {"item":item, "no":no, "element":element});
+		this._row.triggerAsync("beforeFillRow", this, {"item":item, "no":no, "element":element});
 		FormUtil.setFields(element, item, this.masters);
-		this.row.triggerSync("afterFillRow", this, {"item":item, "no":no, "element":element});
+		this.row.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 	};
 
@@ -3070,10 +3065,10 @@
 			var defaultKeys = this._options.get("features.defaultKeys");
 			if (defaultKeys)
 			{
-				this._component.addEventHandler(this._component, "keydown", this.onKeyDown, defaultKeys, this);
-				this._component.addEventHandler(this._component, "keypress", this.onKeyPress, defaultKeys, this);
-				this._component.addEventHandler(this._component, "compositionstart", this.onCompositionStart, defaultKeys, this);
-				this._component.addEventHandler(this._component, "compositionend", this.onCompositionEnd, defaultKeys, this);
+				this._component.addEventHandler("keydown", {"handler": this.onKeyDown, "options":defaultKeys}, null, this);
+				this._component.addEventHandler("keypress", {"handler":this.onKeyPress, "options":defaultKeys}, null, this);
+				this._component.addEventHandler("compositionstart", {"handler":this.onCompositionStart, "options":defaultKeys}, null, this);
+				this._component.addEventHandler("compositionend", {"handler":this.onCompositionEnd, "options":defaultKeys}, null, this);
 			}
 
 			// default buttons
@@ -3306,7 +3301,7 @@
 				var elements = this._component.querySelectorAll(options["rootNode"]);
 				elements = Array.prototype.slice.call(elements, 0);
 				elements.forEach(function (element) {
-					this$1._component.addEventHandler(element, "click", handler, options, this$1);
+					this$1._component.addEventHandler("click", {"handler":handler, "options":options}, element, this$1);
 				});
 			}
 
@@ -3397,13 +3392,12 @@
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":400});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":400});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("AttrOrganizer", {"object":AttrOrganizer, "targetWords":"attrs", "targetEvents":["beforeStart", "afterSpecLoad"], "order":600});
 
 	// Add new target events to organizers
-	BITSMIST.v1.OrganizerOrganizer.organizers.get("AttrOrganizer")["targetEvents"].push("afterSpecLoad");
-	BITSMIST.v1.OrganizerOrganizer.organizers.get("ElementOrganizer")["targetEvents"].push("afterSpecLoad");
+	BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
-	window.BITSMIST.v1.MasterHandler = MasterHandler;
 	window.BITSMIST.v1.ResourceHandler = ResourceHandler;
 	window.BITSMIST.v1.Form = Form;
 	window.BITSMIST.v1.List = List;
