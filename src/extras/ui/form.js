@@ -24,16 +24,7 @@ import FormUtil from '../util/form-util';
 export default function Form(settings)
 {
 
-	// super()
-	let _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
-
-	_this._id;
-	_this._parameters;
-	_this._item = {};
-	_this.__cancelSubmit = false;
-	_this._target = {};
-
-	return _this;
+	return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
 
 }
 
@@ -82,6 +73,37 @@ Object.defineProperty(Form.prototype, 'data', {
 // -----------------------------------------------------------------------------
 
 /**
+ * Start component.
+ *
+ * @param	{Object}		settings			Settings.
+ *
+ * @return  {Promise}		Promise.
+ */
+Form.prototype.start = function(settings)
+{
+
+	// Init vars
+	this._id;
+	this._parameters;
+	this._item = {};
+	this.__cancelSubmit = false;
+	this._target = {};
+
+	// Init component settings
+	settings = Object.assign({}, settings, {
+		"settings": {
+			"autoClear": true,
+		}
+	});
+
+	// super()
+	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Build form.
  *
  * @param	{Object}		items				Items to fill elements.
@@ -111,6 +133,7 @@ Form.prototype.fill = function(options)
 
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
+	let rootNode = ( "target" in options ? this.querySelector(options["target"]) : this );
 
 	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
@@ -119,7 +142,7 @@ Form.prototype.fill = function(options)
 	let autoClear = BITSMIST.v1.Util.safeGet(options, "settings.autoClear", this._settings.get("settings.autoClear"));
 	if (autoClear)
 	{
-		this.clear();
+		this.clear(rootNode);
 	}
 
 	return Promise.resolve().then(() => {
@@ -133,7 +156,8 @@ Form.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFill", sender);
 	}).then(() => {
-		FormUtil.setFields(this, this._item, this.masters);
+		let rootNode = ( "target" in options ? this.querySelector(options["target"]) : this );
+		FormUtil.setFields(rootNode, this._item, this.masters);
 		return this.trigger("afterFill", sender);
 	});
 
@@ -148,10 +172,12 @@ Form.prototype.fill = function(options)
  *
  * @param	{string}		target				Target.
  */
-Form.prototype.clear = function(target)
+Form.prototype.clear = function(rootNode, target)
 {
 
-	return FormUtil.clearFields(this, target);
+	rootNode = ( rootNode ? rootNode : this );
+
+	return FormUtil.clearFields(rootNode, target);
 
 }
 
