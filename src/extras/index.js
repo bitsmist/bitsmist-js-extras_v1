@@ -21,6 +21,9 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":P
 import AttrOrganizer from './organizer/attr-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("AttrOrganizer", {"object":AttrOrganizer, "targetWords":"attrs", "targetEvents":["beforeStart", "afterSpecLoad"], "order":600});
 
+import ElementOrganizer from './organizer/element-organizer';
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":600});
+
 // Add new target events to organizers
 BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
 
