@@ -1,6 +1,11 @@
 window.BITSMIST = window.BITSMIST || {};
 window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
+// Store
+
+import ObserverStore from './store/observer-store';
+window.BITSMIST.v1.ObserverStore = ObserverStore;
+
 // Organizer
 
 import ErrorOrganizer from './organizer/error-organizer';
