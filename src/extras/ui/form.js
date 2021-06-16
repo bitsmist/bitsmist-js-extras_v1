@@ -146,13 +146,18 @@ Form.prototype.fill = function(options)
 	}
 
 	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("doFetch", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
+		if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
+		{
+			return Promise.resolve().then(() => {
+				return this.trigger("doTarget", sender, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("doFetch", sender, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
+			});
+		}
 	}).then(() => {
 		return this.trigger("beforeFill", sender);
 	}).then(() => {

@@ -110,69 +110,6 @@ List.prototype.onListAfterAppend = function(sender, e, ex)
 // -----------------------------------------------------------------------------
 
 /**
- * Clear list.
- */
-List.prototype.clear = function()
-{
-
-	this._listRootNode.innerHTML = "";
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Fill list with data.
- *
- * @return  {Promise}		Promise.
- */
-List.prototype.fill = function(options)
-{
-
-	console.debug(`List.fill(): Filling list. name=${this.name}`);
-
-	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
-
-	let builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
-	let fragment = document.createDocumentFragment();
-
-	this._rows = [];
-	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
-	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
-
-	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", this, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("doFetch", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
-	}).then(() => {
-		return this.trigger("beforeFill", sender);
-	}).then(() => {
-		if (this._items)
-		{
-			return builder.call(this, fragment);
-		}
-	}).then(() => {
-		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
-		if (autoClear)
-		{
-			this.clear();
-		}
-	}).then(() => {
-		this._listRootNode.appendChild(fragment);
-	}).then(() => {
-		return this.trigger("afterFill", sender);
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * Start component.
  *
  * @param	{Object}		settings			Settings.
@@ -207,6 +144,74 @@ List.prototype.start = function(settings)
 
 	// super()
 	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Clear list.
+ */
+List.prototype.clear = function()
+{
+
+	this._listRootNode.innerHTML = "";
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Fill list with data.
+ *
+ * @return  {Promise}		Promise.
+ */
+List.prototype.fill = function(options)
+{
+
+	console.debug(`List.fill(): Filling list. name=${this.name}`);
+
+	options = Object.assign({}, options);
+	let sender = ( options["sender"] ? options["sender"] : this );
+
+	let builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
+	let fragment = document.createDocumentFragment();
+
+	this._rows = [];
+	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
+	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
+
+	return Promise.resolve().then(() => {
+		if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
+		{
+			return Promise.resolve().then(() => {
+				return this.trigger("doTarget", this, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("doFetch", sender, {"target": this._target, "options":options});
+			}).then(() => {
+				return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
+			});
+		}
+	}).then(() => {
+		return this.trigger("beforeFill", sender);
+	}).then(() => {
+		if (this._items)
+		{
+			return builder.call(this, fragment);
+		}
+	}).then(() => {
+		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
+		if (autoClear)
+		{
+			this.clear();
+		}
+	}).then(() => {
+		this._listRootNode.appendChild(fragment);
+	}).then(() => {
+		return this.trigger("afterFill", sender);
+	});
 
 }
 
