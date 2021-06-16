@@ -23,9 +23,6 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":Maste
 import PreferenceOrganizer from './organizer/preference-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
 
-import AttrOrganizer from './organizer/attr-organizer';
-BITSMIST.v1.OrganizerOrganizer.organizers.set("AttrOrganizer", {"object":AttrOrganizer, "targetWords":"attrs", "targetEvents":["beforeStart", "afterSpecLoad"], "order":600});
-
 import ElementOrganizer from './organizer/element-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":600});
 
