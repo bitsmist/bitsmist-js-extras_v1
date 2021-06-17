@@ -6,6 +6,12 @@ window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 import ObserverStore from './store/observer-store';
 window.BITSMIST.v1.ObserverStore = ObserverStore;
 
+import ObserverableStore from './store/observable-store';
+window.BITSMIST.v1.ObservableStore = ObservableStore;
+
+import BindableStore from './store/bindable-store';
+window.BITSMIST.v1.BindableStore = BindableStore;
+
 // Organizer
 
 import ErrorOrganizer from './organizer/error-organizer';
@@ -25,6 +31,9 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":P
 
 import ElementOrganizer from './organizer/element-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":600});
+
+import DatabindingOrganizer from './organizer/databinding-organizer';
+BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":900});
 
 // Add new target events to organizers
 BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
