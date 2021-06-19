@@ -56,6 +56,13 @@ export default class ObservableStore extends BITSMIST.v1.Store
 
 	// -----------------------------------------------------------------------------
 
+	/**
+	 * Subscribe to the store.
+	 *
+	 * @param	{String}		id					Subscriber's id.
+	 * @param	{Function}		handler				Handler function on notification.
+	 * @param	{Object}		optons				Options passed to the handler on notification.
+	 */
 	subscribe(id, handler, options)
 	{
 
@@ -70,6 +77,11 @@ export default class ObservableStore extends BITSMIST.v1.Store
 
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Unsubscribe from the store.
+	 *
+	 * @param	{String}		id					Subscriber's id.
+	 */
 	unsubscribe(id)
 	{
 
