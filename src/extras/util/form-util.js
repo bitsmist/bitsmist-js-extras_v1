@@ -30,15 +30,15 @@ export default function FormUtil() {}
 FormUtil.setFields = function(rootNode, item, masters)
 {
 
-	let fields = rootNode.querySelectorAll("[data-bm-field]");
+	let fields = rootNode.querySelectorAll("[bm-bind]");
 	let elements = Array.prototype.concat([rootNode], Array.prototype.slice.call(fields, 0));
 	elements.forEach((element) => {
-		let fieldName = element.getAttribute("data-bm-field");
+		let fieldName = element.getAttribute("bm-bind");
 		if (fieldName in item)
 		{
-			if (element.hasAttribute("data-bm-master"))
+			if (element.hasAttribute("bm-master"))
 			{
-				let type = element.getAttribute("data-bm-master");
+				let type = element.getAttribute("bm-master");
 				let value = this.getMasterValue(masters, type, item[fieldName]);
 				this.setValue(element, value);
 			}
@@ -67,10 +67,10 @@ FormUtil.getFields = function(rootNode, target)
 	let item = {};
 	target = (target ? target : "");
 
-	let elements = rootNode.querySelectorAll(target + " [data-bm-formitem]");
+	let elements = rootNode.querySelectorAll(target + " [bm-submit]");
 	elements = Array.prototype.slice.call(elements, 0);
 	elements.forEach((element) => {
-		let key = element.getAttribute("data-bm-field");
+		let key = element.getAttribute("bm-bind");
 		let value = this.getValue(element);
 
 		//if (value)
@@ -159,7 +159,7 @@ FormUtil.clearFields = function(rootNode, target)
 FormUtil.buildFields = function(rootNode, fieldName, item)
 {
 
-	let elements = rootNode.querySelectorAll("[data-bm-field='" + fieldName + "']");
+	let elements = rootNode.querySelectorAll("[bm-bind='" + fieldName + "']");
 	elements = Array.prototype.slice.call(elements, 0);
 	elements.forEach((element) => {
 		if (element.tagName.toLowerCase() == "select")
@@ -195,8 +195,8 @@ FormUtil.buildFields = function(rootNode, fieldName, item)
 				option.id = key;
 				option.name = key;
 				option.value = id;
-				option.setAttribute("data-bm-field", key);
-				option.setAttribute("data-bm-formitem", "");
+				option.setAttribute("bm-bind", key);
+				option.setAttribute("bm-submit", "");
 				label.appendChild(option);
 				label.appendChild(document.createTextNode(item.items[id]["title"]));
 				element.appendChild(label);
@@ -247,15 +247,15 @@ FormUtil.setValue = function(element, value)
 	}
 
 	// Format
-	if (element.hasAttribute("data-bm-format"))
+	if (element.hasAttribute("bm-format"))
 	{
-		value = FormatterUtil.format("", element.getAttribute("data-bm-format"), value);
+		value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
 	}
 
 	let sanitizedValue = FormatterUtil.sanitize(value);
 
 	// Target
-	let target = element.getAttribute("data-bm-target");
+	let target = element.getAttribute("bm-target");
 	if (target)
 	{
 		let items = target.split(",");
@@ -397,9 +397,9 @@ FormUtil.getValue = function(element)
 	}
 
 	// Deformat
-	if (element.hasAttribute("data-bm-format"))
+	if (element.hasAttribute("bm-format"))
 	{
-		ret = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("data-bm-format"), ret);
+		ret = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
 	}
 
 	return ret;
