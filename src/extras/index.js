@@ -3,9 +3,6 @@ window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 
 // Store
 
-import ObserverStore from './store/observer-store';
-window.BITSMIST.v1.ObserverStore = ObserverStore;
-
 import ObservableStore from './store/observable-store';
 window.BITSMIST.v1.ObservableStore = ObservableStore;
 

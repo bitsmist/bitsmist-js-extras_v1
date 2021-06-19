@@ -27,7 +27,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 		// Init vars
 		PreferenceOrganizer.__preferences = new BITSMIST.v1.Store();
-		PreferenceOrganizer.__observers = new BITSMIST.v1.ObserverStore({"filter":PreferenceOrganizer.__filter});
+		PreferenceOrganizer.__observers = new BITSMIST.v1.ObservableStore({"filter":PreferenceOrganizer.__filter});
 		PreferenceOrganizer.__loaded =  {};
 		PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
 			PreferenceOrganizer.__loaded["resolve"] = resolve;
@@ -63,7 +63,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		component._preferences = new PreferenceExporter(component);
 
 		// Register a component as an observer
-		PreferenceOrganizer._register(component, BITSMIST.v1.Util.safeGet(settings, "preferences.targets"));
+		PreferenceOrganizer.__observers.subscribe(component.uniqueId, component.setup.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
 
 	}
 
@@ -122,46 +122,13 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		options = Object.assign({}, options);
 		let sender = ( options["sender"] ? options["sender"] : this );
 
-		return PreferenceOrganizer.__observers.notify("setup", options).then(() => {
+		return PreferenceOrganizer.__observers.notify(options).then(() => {
 			if (options["newPreferences"])
 			{
 				PreferenceOrganizer.__preferences.merge(options["newPreferences"]);
 				PreferenceOrganizer._save(component);
 			}
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	* Register target component.
-	*
-	* @param	{Component}		component			Component to notify.
-	* @param	{Object}		targets				Targets.
-	*
-	* @return  {Promise}		Promise.
-	*/
-	static _register(component, targets)
-	{
-
-		PreferenceOrganizer.__observers.set(component.uniqueId, {"object":component, "targets":targets});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	* Deregister target component.
-	*
-	* @param	{Component}		component			Component to notify.
-	*
-	* @return  {Promise}		Promise.
-	*/
-	static _deregister(component)
-	{
-
-		PreferenceOrganizer.__observers.remove(component.uniqueId);
 
 	}
 
@@ -209,13 +176,13 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	* Check if it is a target.
 	*
 	* @param	{Object}		conditions			Conditions.
-	* @param	{Object}		target				Target to check.
+	* @param	{Object}		options				Options.
 	*/
-	static __filter(conditions, info)
+	static __filter(conditions, options)
 	{
 
 		let result = false;
-		let target = info["targets"];
+		let target = options["targets"];
 
 		if (target == "*")
 		{

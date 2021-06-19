@@ -26,7 +26,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		ErrorOrganizer.__initErrorListeners();
-		ErrorOrganizer._observers = new BITSMIST.v1.ObserverStore({"filter":ErrorOrganizer.__filter});
+		ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
 
 	}
 
@@ -47,8 +47,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 		let errors = component.settings.get("errors");
 		if (errors)
 		{
-			//ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":errors["targets"]});
-			ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":"*"});
+			ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
 		}
 
 		return settings;
@@ -66,11 +65,11 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	 * @param	{Object}		target				Target component to check.
 	 * @param	{Object}		e					Event object.
 	 */
-	static __filter(conditions, observerInfo, sender, e)
+	static __filter(conditions, options, sender, e)
 	{
 
 		let result = false;
-		let targets = observerInfo["object"]._settings.get("errors").targets;
+		let targets = options["component"].settings.get("errors.targets");
 
 		for (let i = 0; i < targets.length; i++)
 		{
@@ -212,7 +211,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	static __handleException(e)
 	{
 
-		return ErrorOrganizer._observers.notifySync("trigger", "error", ErrorOrganizer, {"error": e});
+		return ErrorOrganizer._observers.notifyAsync("error", ErrorOrganizer, {"error": e});
 
 	}
 
