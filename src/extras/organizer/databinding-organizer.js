@@ -34,8 +34,8 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		// Add properties
-		Object.defineProperty(component, 'data', {
-			get() { return this._data; },
+		Object.defineProperty(component, 'binds', {
+			get() { return this._binds; },
 			set(newValue) {
 				DatabindingOrganizer.update(this, newValue);
 			},
@@ -45,29 +45,9 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 		component.bindData = function(data) { return DatabindingOrganizer._bindData(this, data); }
 
 		// Init vars
-		component._data = new BindableStore();
-		//component._data = new BindableStore({"2way":false, "eventName":"keyup"});
+		component._binds = new BindableStore();
 
 	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Update bindings.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{HTMLElement}	rootNode			Root node.
-	 */
-	static update(component, data)
-	{
-
-		component.data.items = data;
-
-		// Bind data to elements
-		DatabindingOrganizer._bindData(component);
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -82,14 +62,30 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 	static organize(conditions, component, settings)
 	{
 
-		let data = settings["data"];
-		if (data)
-		{
-			// Bind data after the HTML is appended
-			component.addEventHandler("afterAppend", {"handler":DatabindingOrganizer.onAfterAppend, "options":{"data":data}});
-		}
+		 let data = settings["binds"];
+
+		// Bind data after the HTML is appended
+		component.addEventHandler("afterAppend", {"handler":DatabindingOrganizer.onAfterAppend, "options":{"data":data}});
 
 		return settings;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Update bindings.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{HTMLElement}	rootNode			Root node.
+	 */
+	static update(component, data)
+	{
+
+		component.binds.items = data;
+
+		// Bind data to elements
+		DatabindingOrganizer._bindData(component);
 
 	}
 
@@ -129,8 +125,8 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		rootNode = ( rootNode ? rootNode : component );
 
-		rootNode.querySelectorAll("[data-bind]").forEach(elem => {
-			component.data.bindTo(elem);
+		rootNode.querySelectorAll("[bm-bind]").forEach(elem => {
+			component.binds.bindTo(elem);
 		});
 
 	}
