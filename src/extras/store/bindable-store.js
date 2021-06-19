@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import DomUtil from "../util/dom-util";
 import ObservableStore from "./observable-store";
 
 // =============================================================================
@@ -26,24 +27,26 @@ export default class BindableStore extends ObservableStore
 	bindTo(elem)
 	{
 
-		let key = elem.getAttribute("data-bind");
+		let key = elem.getAttribute("bm-bind");
 
 		// Init element's value
-		elem.value = this.get(key);
+		DomUtil.setElementValue(elem, this.get(key));
 
-		// Change element's value when value changed
-		this.subscribe(key, () => {
-			elem.value = this.get(key);
-		});
-
-		// Set value when element's value changed
-		if (BITSMIST.v1.Util.safeGet(this._options, "2way", true))
+		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
+		if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
 		{
-			let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
+			// Change element's value when store value changed
+			this.subscribe(key, () => {
+				DomUtil.setElementValue(elem, this.get(key));
+			});
 
+			// Set store value when element's value changed
+			let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
 			elem.addEventListener(eventName, (() => {
-				this.set(key, elem.value);
+				this.set(key, DomUtil.getElementValue(elem));
 			}).bind(this));
+
+			elem.__bm_bindinfo = { "bound": true };
 		}
 
 	}
