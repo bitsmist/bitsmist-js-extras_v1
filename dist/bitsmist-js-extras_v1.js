@@ -12,6 +12,435 @@
 	// =============================================================================
 
 	// =============================================================================
+	//	Observable store class
+	// =============================================================================
+
+	var ObservableStore = /*@__PURE__*/(function (superclass) {
+		function ObservableStore(options)
+		{
+
+			superclass.call(this, options);
+
+			this._observers = [];
+
+		}
+
+		if ( superclass ) ObservableStore.__proto__ = superclass;
+		ObservableStore.prototype = Object.create( superclass && superclass.prototype );
+		ObservableStore.prototype.constructor = ObservableStore;
+
+		// -------------------------------------------------------------------------
+		//  Method
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Set a value to the store and notify to subscribers if the value has been changed.
+		 *
+		 * @param	{String}		key					Key to store.
+		 * @param	{Object}		value				Value to store.
+		 */
+		ObservableStore.prototype.set = function set (key, value)
+		{
+
+			if (this.get(key) != value)
+			{
+				BITSMIST.v1.Util.safeSet(this._items, key, value);
+				this.notifyAsync(key);
+			}
+
+		};
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Subscribe to the store.
+		 *
+		 * @param	{String}		id					Subscriber's id.
+		 * @param	{Function}		handler				Handler function on notification.
+		 * @param	{Object}		optons				Options passed to the handler on notification.
+		 */
+		ObservableStore.prototype.subscribe = function subscribe (id, handler, options)
+		{
+
+			if (typeof handler !== "function")
+			{
+				throw TypeError(("Notification handler is not a function. id=" + id));
+			}
+
+			this._observers.push({"id":id, "handler":handler, "options":options});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Unsubscribe from the store.
+		 *
+		 * @param	{String}		id					Subscriber's id.
+		 */
+		ObservableStore.prototype.unsubscribe = function unsubscribe (id)
+		{
+
+			for (var i = 0; i < this._observers.length; i++)
+			{
+				if (this._obvservers[i].id == id)
+				{
+					this._observers.splice(i, 1);
+					break;
+				}
+			}
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Notify observers.
+		 *
+		 * @param	{Object}		conditions			Current conditions.
+		 * @param	{Object}		...args				Arguments to callback function.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		ObservableStore.prototype.notify = function notify (conditions)
+		{
+			var this$1 = this;
+			var args = [], len = arguments.length - 1;
+			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+
+			var chain = Promise.resolve();
+
+			var loop = function ( i ) {
+				chain = chain.then(function () {
+					var ref, ref$1;
+
+					if ((ref = this$1)._filter.apply(ref, [ conditions, this$1._observers[i]["options"] ].concat( args )))
+					{
+						return (ref$1 = this$1._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
+					}
+				});
+			};
+
+			for (var i = 0; i < this$1._observers.length; i++)
+			loop( i );
+
+			return chain;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Notify observers synchronously.
+		 *
+		 * @param	{String}		type				Notification type(=methodname).
+		 * @param	{Object}		conditions			Current conditions.
+		 * @param	{Object}		...args				Arguments to callback function.
+		 */
+		ObservableStore.prototype.notifyAsync = function notifyAsync (conditions)
+		{
+			var ref, ref$1;
+
+			var args = [], len = arguments.length - 1;
+			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+			for (var i = 0; i < this._observers.length; i++)
+			{
+				if ((ref = this)._filter.apply(ref, [ conditions, this._observers[i]["options"] ].concat( args )))
+				{
+					(ref$1 = this._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
+				}
+			}
+
+		};
+
+		return ObservableStore;
+	}(BITSMIST.v1.Store));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
+	//	DOM Util class
+	// =============================================================================
+
+	var DomUtil = function DomUtil () {};
+
+	DomUtil.setElementValue = function setElementValue (element, value)
+	{
+
+		if (value === null || value == undefined)
+		{
+			value = "";
+		}
+
+		var sanitizedValue = value;
+
+		// Target
+		var target = element.getAttribute("bm-bindtarget");
+		if (target)
+		{
+			var items = target.split(",");
+			for (var i = 0; i < items.length; i++)
+			{
+				var item = items[i].toLowerCase();
+				switch (item)
+				{
+				case "text":
+					element.innerText = value;
+					break;
+				case "html":
+					element.innerHTML = value;
+					break;
+				case "href":
+				case "src":
+				case "rel":
+					if (value.substring(0, 4) == "http" || value.substring(0, 1) == "/")
+					{
+						element.setAttribute(item, value);
+					}
+					break;
+				default:
+					var attr = element.getAttribute(item);
+					attr = ( attr ? attr + " " + value : sanitizedValue );
+					element.setAttribute(item, attr);
+					break;
+				}
+			}
+		}
+		else
+		{
+			// Set value
+			if (element.hasAttribute("value"))
+			{
+				if (
+					(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "checkbox") ||
+					(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio")
+				)
+				{
+					if (Array.isArray(value))
+					{
+						if (value.indexOf(element.getAttribute("value")) > -1)
+						{
+							element.checked = true;
+						}
+					}
+					else
+					{
+						if (element.getAttribute("value") == value)
+						{
+							element.checked = true;
+						}
+					}
+				}
+			}
+			else if (element.tagName.toLowerCase() == "select")
+			{
+				element.value = value;
+			}
+			else if (element.tagName.toLowerCase() == "fieldset")
+			;
+			else if (element.tagName.toLowerCase() == "input")
+			{
+				switch (element.type.toLowerCase())
+				{
+				case "number":
+				case "search":
+				case "text":
+					element.value = value;
+					break;
+				case "checkbox":
+					element.checked = ( value ? true : false );
+					break;
+				case "radio":
+					if (element.value == value)
+					{
+						element.checked = true;
+					}
+					break;
+				}
+			}
+			else
+			{
+				element.innerText = value;
+			}
+		}
+
+		// Trigger change event
+		var e = document.createEvent("HTMLEvents");
+		e.initEvent("change", true, true);
+		element.dispatchEvent(e);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+		 * Get  a value from a element.
+		 *
+		 * @param{Object}	element			Html element.
+		 *
+		 * @return  {string}	Value.
+		 */
+	DomUtil.getElementValue = function getElementValue (element)
+	{
+
+		var ret = undefined;
+
+		switch (element.tagName.toLowerCase())
+		{
+		case "input":
+			switch (element.type.toLowerCase())
+			{
+			case "radio":
+			case "checkbox":
+				if (element.checked)
+				{
+					ret = ( element.hasAttribute("value") ? element.getAttribute("value") : element.checked );
+				}
+				break;
+			default:
+				ret = element.value;
+				break;
+			}
+			break;
+		case "select":
+			// todo:multiselect
+			ret = element.value;
+			break;
+		default:
+			if (element.hasAttribute("selected"))
+			{
+				ret = element.getAttribute("value");
+			}
+			break;
+		}
+
+		return ret;
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+		 * Build element.
+		 *
+		 * @param{HTMLElement}rootNode		Form node.
+		 * @param{String}	target			Target.
+		 * @param{Object}	item			Values to fill.
+		 */
+	DomUtil.build = function build (element, item)
+	{
+
+		if (element.tagName.toLowerCase() == "select")
+		{
+			// Select
+			element.options.length = 0;
+
+			if ("emptyItem" in item)
+			{
+				var text = ( "text" in item["emptyItem"] ? item["emptyItem"]["text"] : "");
+				var value = ( "value" in item["emptyItem"] ? item["emptyItem"]["value"] : "");
+				var option = document.createElement("option");
+				option.text = text;
+				option.value = value;
+				option.setAttribute("selected", "");
+				element.appendChild(option);
+			}
+
+			Object.keys(item.items).forEach(function (id) {
+				var option = document.createElement("option");
+				option.text = item.items[id]["title"];
+				option.value = id;
+				element.appendChild(option);
+			});
+		}
+		else
+		{
+			// Radio
+			Object.keys(item.items).forEach(function (id) {
+				var label = document.createElement("label");
+				var option = document.createElement("input");
+				option.type = "radio";
+				option.id = key;
+				option.name = key;
+				option.value = id;
+				option.setAttribute("bm-bind", key);
+	//			option.setAttribute("bm-submit", "");
+				label.appendChild(option);
+				label.appendChild(document.createTextNode(item.items[id]["title"]));
+				element.appendChild(label);
+			});
+		}
+
+	};
+
+	// =============================================================================
+
+	// =============================================================================
+	//	Bindable store class
+	// =============================================================================
+
+	var BindableStore = /*@__PURE__*/(function (ObservableStore) {
+		function BindableStore () {
+			ObservableStore.apply(this, arguments);
+		}
+
+		if ( ObservableStore ) BindableStore.__proto__ = ObservableStore;
+		BindableStore.prototype = Object.create( ObservableStore && ObservableStore.prototype );
+		BindableStore.prototype.constructor = BindableStore;
+
+		BindableStore.prototype.bindTo = function bindTo (elem)
+		{
+			var this$1 = this;
+
+
+			var key = elem.getAttribute("bm-bind");
+
+			// Init element's value
+			DomUtil.setElementValue(elem, this.get(key));
+
+			var bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
+			if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
+			{
+				// Change element's value when store value changed
+				this.subscribe(key, function () {
+					DomUtil.setElementValue(elem, this$1.get(key));
+				});
+
+				// Set store value when element's value changed
+				var eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
+				elem.addEventListener(eventName, (function () {
+					this$1.set(key, DomUtil.getElementValue(elem));
+				}).bind(this));
+
+				elem.__bm_bindinfo = { "bound": true };
+			}
+
+		};
+
+		return BindableStore;
+	}(ObservableStore));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
 	//	Error organizer class
 	// =============================================================================
 
@@ -28,7 +457,7 @@
 		{
 
 			ErrorOrganizer.__initErrorListeners();
-			ErrorOrganizer._observers = new BITSMIST.v1.ObserverStore({"filter":ErrorOrganizer.__filter});
+			ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
 
 		};
 
@@ -49,8 +478,7 @@
 			var errors = component.settings.get("errors");
 			if (errors)
 			{
-				//ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":errors["targets"]});
-				ErrorOrganizer._observers.set(component.uniqueId, {"object":component, "targets":"*"});
+				ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
 			}
 
 			return settings;
@@ -68,11 +496,11 @@
 		 * @param	{Object}		target				Target component to check.
 		 * @param	{Object}		e					Event object.
 		 */
-		ErrorOrganizer.__filter = function __filter (conditions, observerInfo, sender, e)
+		ErrorOrganizer.__filter = function __filter (conditions, options, sender, e)
 		{
 
 			var result = false;
-			var targets = observerInfo["object"]._settings.get("errors").targets;
+			var targets = options["component"].settings.get("errors.targets");
 
 			for (var i = 0; i < targets.length; i++)
 			{
@@ -214,7 +642,7 @@
 		ErrorOrganizer.__handleException = function __handleException (e)
 		{
 
-			return ErrorOrganizer._observers.notifySync("trigger", "error", ErrorOrganizer, {"error": e});
+			return ErrorOrganizer._observers.notifyAsync("error", ErrorOrganizer, {"error": e});
 
 		};
 
@@ -292,6 +720,8 @@
 		 */
 		PluginOrganizer._addPlugin = function _addPlugin (component, pluginName, options)
 		{
+
+			console.debug(("PluginOrganizer._addPlugin(): Adding a plugin. componentName=" + (component.name) + ", pluginName=" + pluginName));
 
 			options = Object.assign({}, options);
 			var className = ( "className" in options ? options["className"] : pluginName );
@@ -955,7 +1385,7 @@
 
 			// Init vars
 			PreferenceOrganizer.__preferences = new BITSMIST.v1.Store();
-			PreferenceOrganizer.__observers = new BITSMIST.v1.ObserverStore({"filter":PreferenceOrganizer.__filter});
+			PreferenceOrganizer.__observers = new BITSMIST.v1.ObservableStore({"filter":PreferenceOrganizer.__filter});
 			PreferenceOrganizer.__loaded =  {};
 			PreferenceOrganizer.__loaded["promise"] = new Promise(function (resolve, reject) {
 				PreferenceOrganizer.__loaded["resolve"] = resolve;
@@ -991,7 +1421,7 @@
 			component._preferences = new PreferenceExporter(component);
 
 			// Register a component as an observer
-			PreferenceOrganizer._register(component, BITSMIST.v1.Util.safeGet(settings, "preferences.targets"));
+			PreferenceOrganizer.__observers.subscribe(component.uniqueId, component.setup.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
 
 		};
 
@@ -1050,46 +1480,13 @@
 			options = Object.assign({}, options);
 			( options["sender"] ? options["sender"] : this );
 
-			return PreferenceOrganizer.__observers.notify("setup", options).then(function () {
+			return PreferenceOrganizer.__observers.notify(options).then(function () {
 				if (options["newPreferences"])
 				{
 					PreferenceOrganizer.__preferences.merge(options["newPreferences"]);
 					PreferenceOrganizer._save(component);
 				}
 			});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		* Register target component.
-		*
-		* @param	{Component}		component			Component to notify.
-		* @param	{Object}		targets				Targets.
-		*
-		* @return  {Promise}		Promise.
-		*/
-		PreferenceOrganizer._register = function _register (component, targets)
-		{
-
-			PreferenceOrganizer.__observers.set(component.uniqueId, {"object":component, "targets":targets});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		* Deregister target component.
-		*
-		* @param	{Component}		component			Component to notify.
-		*
-		* @return  {Promise}		Promise.
-		*/
-		PreferenceOrganizer._deregister = function _deregister (component)
-		{
-
-			PreferenceOrganizer.__observers.remove(component.uniqueId);
 
 		};
 
@@ -1137,13 +1534,13 @@
 		* Check if it is a target.
 		*
 		* @param	{Object}		conditions			Conditions.
-		* @param	{Object}		target				Target to check.
+		* @param	{Object}		options				Options.
 		*/
-		PreferenceOrganizer.__filter = function __filter (conditions, info)
+		PreferenceOrganizer.__filter = function __filter (conditions, options)
 		{
 
 			var result = false;
-			var target = info["targets"];
+			var target = options["targets"];
 
 			if (target == "*")
 			{
@@ -1195,40 +1592,26 @@
 	// =============================================================================
 
 	// =============================================================================
-	//	Attribute organizer class
+	//	Element organizer class
 	// =============================================================================
 
-	var AttrOrganizer = /*@__PURE__*/(function (superclass) {
-		function AttrOrganizer () {
+	var ElementOrganizer = /*@__PURE__*/(function (superclass) {
+		function ElementOrganizer () {
 			superclass.apply(this, arguments);
 		}
 
-		if ( superclass ) AttrOrganizer.__proto__ = superclass;
-		AttrOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		AttrOrganizer.prototype.constructor = AttrOrganizer;
+		if ( superclass ) ElementOrganizer.__proto__ = superclass;
+		ElementOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		ElementOrganizer.prototype.constructor = ElementOrganizer;
 
-		AttrOrganizer.organize = function organize (conditions, component, settings)
+		ElementOrganizer.organize = function organize (conditions, component, settings)
 		{
 
-			var events = {
-				"afterStart": AttrOrganizer.onDoOrganize,
-				"afterAppend": AttrOrganizer.onDoOrganize,
-				"afterSpecLoad": AttrOrganizer.onDoOrganize,
-				"beforeOpen": AttrOrganizer.onDoOrganize,
-				"afterOpen": AttrOrganizer.onDoOrganize,
-				"beforeClose": AttrOrganizer.onDoOrganize,
-				"afterClose": AttrOrganizer.onDoOrganize,
-				"doRefresh": AttrOrganizer.onDoOrganize,
-			};
-
-			var attrs = settings["attrs"];
-			if (attrs)
+			var elements = settings["elements"];
+			if (elements)
 			{
-				Object.keys(attrs).forEach(function (eventName) {
-					if (events[eventName])
-					{
-						component.addEventHandler(eventName, {"handler":events[eventName], "options":{"attrs":attrs[eventName]}});
-					}
+				Object.keys(elements).forEach(function (eventName) {
+					component.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
 				});
 			}
 
@@ -1247,13 +1630,191 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Object}		ex					Extra event info.
 		 */
-		AttrOrganizer.onDoOrganize = function onDoOrganize (sender, e, ex)
+		ElementOrganizer.onDoOrganize = function onDoOrganize (sender, e, ex)
 		{
 
 			var component = ex.component;
 			var settings = ex.options["attrs"];
 
-			return AttrOrganizer._initAttr(component, settings);
+			Object.keys(settings).forEach(function (elementName) {
+				ElementOrganizer.__initAttr(component, elementName, settings[elementName]);
+			});
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Private
+		// -------------------------------------------------------------------------
+
+		ElementOrganizer.__getTargetElements = function __getTargetElements (component, elementName, elementInfo)
+		{
+
+			var elements;
+
+			if (elementInfo["rootNode"])
+			{
+				if (elementInfo["rootNode"] == "this" || elementInfo["rootNode"] == component.tagName.toLowerCase())
+				{
+					elements = [component];
+				}
+				else
+				{
+					elements = component.querySelectorAll(elementInfo["rootNode"]);
+				}
+			}
+			else if (elementName == "this" || elementName == component.tagName.toLowerCase())
+			{
+				elements = [component];
+			}
+			else
+			{
+				elements = component.querySelectorAll("#" + elementName);
+			}
+
+			return elements;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+
+		/**
+		 * Init attributes.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		elementName			Element name.
+		 * @param	{Object}		elementInfo			Element info.
+		 */
+		ElementOrganizer.__initAttr = function __initAttr (component, elementName, elementInfo)
+		{
+
+			if (elementInfo)
+			{
+				var elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
+				var loop = function ( i ) {
+					Object.keys(elementInfo).forEach(function (key) {
+						switch (key)
+						{
+							case "attribute":
+								Object.keys(elementInfo[key]).forEach(function (attrName) {
+									elements[i].setAttribute(attrName, elementInfo[key][attrName]);
+								});
+								break;
+							case "style":
+								Object.keys(elementInfo[key]).forEach(function (styleName) {
+									elements[i].style[styleName] = elementInfo[key][styleName];
+								});
+								break;
+							case "property":
+								Object.keys(elementInfo[key]).forEach(function (propertyName) {
+									elements[i][propertyName] = elementInfo[key][propertyName];
+								});
+								break;
+						}
+					});
+				};
+
+				for (var i = 0; i < elements.length; i++)
+				loop( i );
+			}
+
+		};
+
+		return ElementOrganizer;
+	}(BITSMIST.v1.Organizer));
+
+	// =============================================================================
+
+	// =============================================================================
+	//	Databinding organizer class
+	// =============================================================================
+
+	var DatabindingOrganizer = /*@__PURE__*/(function (superclass) {
+		function DatabindingOrganizer () {
+			superclass.apply(this, arguments);
+		}
+
+		if ( superclass ) DatabindingOrganizer.__proto__ = superclass;
+		DatabindingOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		DatabindingOrganizer.prototype.constructor = DatabindingOrganizer;
+
+		DatabindingOrganizer.init = function init (conditions, component, settings)
+		{
+
+			// Add properties
+			Object.defineProperty(component, 'binds', {
+				get: function get() { return this._binds; },
+				set: function set(newValue) {
+					DatabindingOrganizer.update(this, newValue);
+				},
+			});
+
+			// Add methods
+			component.bindData = function(data) { return DatabindingOrganizer._bindData(this, data); };
+
+			// Init vars
+			component._binds = new BindableStore();
+
+		};
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		DatabindingOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			 var data = settings["binds"];
+
+			// Bind data after the HTML is appended
+			component.addEventHandler("afterAppend", {"handler":DatabindingOrganizer.onAfterAppend, "options":{"data":data}});
+
+			return settings;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Update bindings.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{HTMLElement}	rootNode			Root node.
+		 */
+		DatabindingOrganizer.update = function update (component, data)
+		{
+
+			component.binds.items = data;
+
+			// Bind data to elements
+			DatabindingOrganizer._bindData(component);
+
+		};
+
+		// -----------------------------------------------------------------------------
+		//	Event handlers
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * After append event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+		 * @param	{Object}		ex					Extra event info.
+		 */
+		DatabindingOrganizer.onAfterAppend = function onAfterAppend (sender, e, ex)
+		{
+
+			var component = ex.component;
+			var data = ex.options["data"];
+
+			DatabindingOrganizer.update(component, data);
 
 		};
 
@@ -1262,53 +1823,23 @@
 		// -------------------------------------------------------------------------
 
 		/**
-		 * Init attributes.
+		 * Bind data and elemnets.
 		 *
 		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
+		 * @param	{HTMLElement}	rootNode			Root node.
 		 */
-		AttrOrganizer._initAttr = function _initAttr (component, settings)
+		DatabindingOrganizer._bindData = function _bindData (component, rootNode)
 		{
 
-			if (settings)
-			{
-				Object.keys(settings).forEach(function (key) {
-					switch (key)
-					{
-						case "style":
-							Object.keys(settings[key]).forEach(function (styleName) {
-								component.style[styleName] = settings[key][styleName];
-							});
-							break;
-						default:
-							component.setAttribute(key, settings[key]);
+			rootNode = ( rootNode ? rootNode : component );
 
-							/*
-							if (key.substr(0, 1) == "-")
-							{
-								let attrs = settings[key].split(" ");
-								for (let i = 0; i < attrs.length; i++)
-								{
-									console.log("@@@removing attr", component.name, key, attrs[i]);
-									component.removeAttribute(key, attrs[i]);
-								}
-							}
-							else
-							{
-								console.log("@@@settings attr", component.name, key, settings[key]);
-								component.setAttribute(key, settings[key]);
-							}
-							*/
-							break;
-					}
-				});
-			}
-
-			return Promise.resolve();
+			rootNode.querySelectorAll("[bm-bind]").forEach(function (elem) {
+				component.binds.bindTo(elem);
+			});
 
 		};
 
-		return AttrOrganizer;
+		return DatabindingOrganizer;
 	}(BITSMIST.v1.Organizer));
 
 	// =============================================================================
@@ -1412,94 +1943,6 @@
 	Object.defineProperties( Plugin.prototype, prototypeAccessors );
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
-
-	// =============================================================================
-	//	Cookie util class
-	// =============================================================================
-
-	// -----------------------------------------------------------------------------
-	//  Constructor
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Constructor.
-	 *
-	 * @param	{Object}		options				Options for the component.
-	 */
-	function CookieUtil(options)
-	{
-
-		this._options = ( options ? options : {} );
-
-	}
-
-	// -----------------------------------------------------------------------------
-	//  Methods
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Get cookie.
-	 *
-	 * @param	{String}		key					Key.
-	 */
-	CookieUtil.prototype.get = function(key)
-	{
-
-		var decoded = document.cookie.split(';').reduce(function (result, current) {
-			var ref = current.split('=');
-			var key = ref[0];
-			var value = ref[1];
-			if (key)
-			{
-				result[key.trim()] = ( value ? decodeURIComponent(value.trim()) : undefined );
-			}
-
-			return result;
-		}, {});
-
-		return ( decoded[key] ? JSON.parse(decoded[key]) : {});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Set cookie.
-	 *
-	 * @param	{String}		key					Key.
-	 * @param	{Object}		value				Value.
-	 * @param	{Object}		options				Options.
-	 */
-	CookieUtil.prototype.set = function(key, value, options)
-	{
-
-		var cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
-
-		options = ( options ? options : {} );
-		if (this._options)
-		{
-			options = Object.assign(this._options, options);
-		}
-
-		cookie += Object.keys(options).reduce(function (result, current) {
-			result += current + "=" + options[current] + "; ";
-
-			return result;
-		}, "");
-
-		document.cookie = cookie;
-
-	};
-
-	// =============================================================================
 
 	// =============================================================================
 	//	Cookie store handler class
@@ -1511,7 +1954,7 @@
 
 			Plugin.call(this, component, options);
 
-			this._cookie = new CookieUtil(this._options.get("cookieOptions"));
+	//		this._cookie = new CookieUtil(this._options.get("cookieOptions"));
 			this._cookieName = this._options.get("cookieOptions.name", "preferences");
 
 		}
@@ -1534,7 +1977,8 @@
 		CookieStoreHandler.prototype.onDoLoadStore = function onDoLoadStore (sender, e, ex)
 		{
 
-			var data = this._cookie.get(this._cookieName);
+			//let data = this._cookie.get(this._cookieName);
+			var data = this.__getCookie(this._cookieName);
 
 			return data;
 
@@ -1552,7 +1996,8 @@
 		CookieStoreHandler.prototype.onDoSaveStore = function onDoSaveStore (sender, e, ex)
 		{
 
-			this._cookie.set(this._cookieName, e.detail.data);
+			//this._cookie.set(this._cookieName, e.detail.data);
+			this.__setCookie(this._cookieName, e.detail.data);
 
 		};
 
@@ -1574,6 +2019,58 @@
 					"doSaveStore": this.onDoSaveStore,
 				}
 			};
+
+		};
+
+		// -----------------------------------------------------------------------------
+		//  Privates
+		// -----------------------------------------------------------------------------
+
+		/**
+		* Get cookie.
+		*
+		* @param	{String}		key					Key.
+		*/
+		CookieStoreHandler.prototype.__getCookie = function __getCookie (key)
+		{
+
+			var decoded = document.cookie.split(';').reduce(function (result, current) {
+				var ref = current.split('=');
+				var key = ref[0];
+				var value = ref[1];
+				if (key)
+				{
+					result[key.trim()] = ( value ? decodeURIComponent(value.trim()) : undefined );
+				}
+
+				return result;
+			}, {});
+
+			return ( decoded[key] ? JSON.parse(decoded[key]) : {});
+
+		};
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		* Set cookie.
+		*
+		* @param	{String}		key					Key.
+		* @param	{Object}		value				Value.
+		*/
+		CookieStoreHandler.prototype.__setCookie = function __setCookie (key, value)
+		{
+
+			var cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
+			var options =this._options.get("cookieOptions", {});
+
+			cookie += Object.keys(options).reduce(function (result, current) {
+				result += current + "=" + options[current] + "; ";
+
+				return result;
+			}, "");
+
+			document.cookie = cookie;
 
 		};
 
@@ -1706,15 +2203,42 @@
 			var id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
 			BITSMIST.v1.Util.safeGet(e.detail.target, "parameters");
 			var items = BITSMIST.v1.Util.safeGet(e.detail, "items");
+			var submitData = [];
+			var targetKeys = {};
+			var component = ex.component;
 
+			// Get target keys to submit
+			component.querySelectorAll("[bm-bind]").forEach(function (elem) {
+				if (elem.hasAttribute("bm-submit"))
+				{
+					targetKeys[elem.getAttribute("bm-bind")] = true;
+				}
+			});
+
+			// Remove unnecessary items
+			var loop = function ( i ) {
+				var item = {};
+				Object.keys(items[i]).forEach(function (key) {
+					if (targetKeys[key])
+					{
+						item[key] = items[i][key];
+					}
+				});
+				submitData.push(item);
+			};
+
+			for (var i = 0; i < items.length; i++)
+			loop( i );
+
+			// Submit
 			return Promise.resolve().then(function () {
 				if (id)
 				{
-					return this$1._resources[this$1._defaultResourceName].update(id, {items:items});
+					return this$1._resources[this$1._defaultResourceName].update(id, {items:submitData});
 				}
 				else
 				{
-					return this$1._resources[this$1._defaultResourceName].insert(id, {items:items});
+					return this$1._resources[this$1._defaultResourceName].insert(id, {items:submitData});
 				}
 			});
 
@@ -2026,15 +2550,15 @@
 		var this$1 = this;
 
 
-		var fields = rootNode.querySelectorAll("[data-bm-field]");
+		var fields = rootNode.querySelectorAll("[bm-bind]");
 		var elements = Array.prototype.concat([rootNode], Array.prototype.slice.call(fields, 0));
 		elements.forEach(function (element) {
-			var fieldName = element.getAttribute("data-bm-field");
+			var fieldName = element.getAttribute("bm-bind");
 			if (fieldName in item)
 			{
-				if (element.hasAttribute("data-bm-master"))
+				if (element.hasAttribute("bm-master"))
 				{
-					var type = element.getAttribute("data-bm-master");
+					var type = element.getAttribute("bm-master");
 					var value = this$1.getMasterValue(masters, type, item[fieldName]);
 					this$1.setValue(element, value);
 				}
@@ -2065,10 +2589,10 @@
 		var item = {};
 		target = (target ? target : "");
 
-		var elements = rootNode.querySelectorAll(target + " [data-bm-formitem]");
+		var elements = rootNode.querySelectorAll(target + " [bm-submit]");
 		elements = Array.prototype.slice.call(elements, 0);
 		elements.forEach(function (element) {
-			var key = element.getAttribute("data-bm-field");
+			var key = element.getAttribute("bm-bind");
 			var value = this$1.getValue(element);
 
 			//if (value)
@@ -2157,7 +2681,7 @@
 	FormUtil.buildFields = function(rootNode, fieldName, item)
 	{
 
-		var elements = rootNode.querySelectorAll("[data-bm-field='" + fieldName + "']");
+		var elements = rootNode.querySelectorAll("[bm-bind='" + fieldName + "']");
 		elements = Array.prototype.slice.call(elements, 0);
 		elements.forEach(function (element) {
 			if (element.tagName.toLowerCase() == "select")
@@ -2193,8 +2717,8 @@
 					option.id = key;
 					option.name = key;
 					option.value = id;
-					option.setAttribute("data-bm-field", key);
-					option.setAttribute("data-bm-formitem", "");
+					option.setAttribute("bm-bind", key);
+					option.setAttribute("bm-submit", "");
 					label.appendChild(option);
 					label.appendChild(document.createTextNode(item.items[id]["title"]));
 					element.appendChild(label);
@@ -2245,15 +2769,15 @@
 		}
 
 		// Format
-		if (element.hasAttribute("data-bm-format"))
+		if (element.hasAttribute("bm-format"))
 		{
-			value = FormatterUtil.format("", element.getAttribute("data-bm-format"), value);
+			value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
 		}
 
 		var sanitizedValue = FormatterUtil.sanitize(value);
 
 		// Target
-		var target = element.getAttribute("data-bm-target");
+		var target = element.getAttribute("bm-target");
 		if (target)
 		{
 			var items = target.split(",");
@@ -2394,9 +2918,9 @@
 		}
 
 		// Deformat
-		if (element.hasAttribute("data-bm-format"))
+		if (element.hasAttribute("bm-format"))
 		{
-			ret = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("data-bm-format"), ret);
+			ret = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
 		}
 
 		return ret;
@@ -2454,16 +2978,7 @@
 	function Form(settings)
 	{
 
-		// super()
-		var _this = Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
-
-		_this._id;
-		_this._parameters;
-		_this._item = {};
-		_this.__cancelSubmit = false;
-		_this._target = {};
-
-		return _this;
+		return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
 
 	}
 
@@ -2512,6 +3027,37 @@
 	// -----------------------------------------------------------------------------
 
 	/**
+	 * Start component.
+	 *
+	 * @param	{Object}		settings			Settings.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	Form.prototype.start = function(settings)
+	{
+
+		// Init vars
+		this._id;
+		this._parameters;
+		this._item = {};
+		this.__cancelSubmit = false;
+		this._target = {};
+
+		// Init component settings
+		settings = Object.assign({}, settings, {
+			"settings": {
+				"autoClear": true,
+			}
+		});
+
+		// super()
+		return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
 	 * Build form.
 	 *
 	 * @param	{Object}		items				Items to fill elements.
@@ -2545,6 +3091,7 @@
 
 		options = Object.assign({}, options);
 		var sender = ( options["sender"] ? options["sender"] : this );
+		var rootNode = ( "target" in options ? this.querySelector(options["target"]) : this );
 
 		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
 		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
@@ -2553,21 +3100,27 @@
 		var autoClear = BITSMIST.v1.Util.safeGet(options, "settings.autoClear", this._settings.get("settings.autoClear"));
 		if (autoClear)
 		{
-			this.clear();
+			this.clear(rootNode);
 		}
 
 		return Promise.resolve().then(function () {
-			return this$1.trigger("doTarget", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
+			if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
+			{
+				return Promise.resolve().then(function () {
+					return this$1.trigger("doTarget", sender, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
+				});
+			}
 		}).then(function () {
 			return this$1.trigger("beforeFill", sender);
 		}).then(function () {
-			FormUtil.setFields(this$1, this$1._item, this$1.masters);
+			var rootNode = ( "target" in options ? this$1.querySelector(options["target"]) : this$1 );
+			FormUtil.setFields(rootNode, this$1._item, this$1.masters);
 			return this$1.trigger("afterFill", sender);
 		});
 
@@ -2582,10 +3135,12 @@
 	 *
 	 * @param	{string}		target				Target.
 	 */
-	Form.prototype.clear = function(target)
+	Form.prototype.clear = function(rootNode, target)
 	{
 
-		return FormUtil.clearFields(this, target);
+		rootNode = ( rootNode ? rootNode : this );
+
+		return FormUtil.clearFields(rootNode, target);
 
 	};
 
@@ -2784,71 +3339,6 @@
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Clear list.
-	 */
-	List.prototype.clear = function()
-	{
-
-		this._listRootNode.innerHTML = "";
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fill list with data.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.fill = function(options)
-	{
-		var this$1 = this;
-
-
-		console.debug(("List.fill(): Filling list. name=" + (this.name)));
-
-		options = Object.assign({}, options);
-		var sender = ( options["sender"] ? options["sender"] : this );
-
-		var builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
-		var fragment = document.createDocumentFragment();
-
-		this._rows = [];
-		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
-		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
-
-		return Promise.resolve().then(function () {
-			return this$1.trigger("doTarget", this$1, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
-		}).then(function () {
-			return this$1.trigger("beforeFill", sender);
-		}).then(function () {
-			if (this$1._items)
-			{
-				return builder.call(this$1, fragment);
-			}
-		}).then(function () {
-			var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this$1._settings.get("settings.autoClear"));
-			if (autoClear)
-			{
-				this$1.clear();
-			}
-		}).then(function () {
-			this$1._listRootNode.appendChild(fragment);
-		}).then(function () {
-			return this$1.trigger("afterFill", sender);
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
 	 * Start component.
 	 *
 	 * @param	{Object}		settings			Settings.
@@ -2883,6 +3373,77 @@
 
 		// super()
 		return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Clear list.
+	 */
+	List.prototype.clear = function()
+	{
+
+		//this._items = [];
+		this._listRootNode.innerHTML = "";
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Fill list with data.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	List.prototype.fill = function(options)
+	{
+		var this$1 = this;
+
+
+		console.debug(("List.fill(): Filling list. name=" + (this.name)));
+
+		options = Object.assign({}, options);
+		var sender = ( options["sender"] ? options["sender"] : this );
+
+		var builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
+		var fragment = document.createDocumentFragment();
+
+		this._rows = [];
+		this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
+		this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
+
+		return Promise.resolve().then(function () {
+			if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
+			{
+				return Promise.resolve().then(function () {
+					return this$1.trigger("doTarget", this$1, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
+				}).then(function () {
+					return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
+				});
+			}
+		}).then(function () {
+			return this$1.trigger("beforeFill", sender);
+		}).then(function () {
+			if (this$1._items)
+			{
+				return builder.call(this$1, fragment);
+			}
+		}).then(function () {
+			var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this$1._settings.get("settings.autoClear"));
+			if (autoClear)
+			{
+				this$1.clear();
+			}
+		}).then(function () {
+			this$1._listRootNode.appendChild(fragment);
+		}).then(function () {
+			return this$1.trigger("afterFill", sender);
+		});
 
 	};
 
@@ -3387,12 +3948,15 @@
 
 	window.BITSMIST = window.BITSMIST || {};
 	window.BITSMIST.v1 = window.BITSMIST.v1 || {};
+	window.BITSMIST.v1.ObservableStore = ObservableStore;
+	window.BITSMIST.v1.BindableStore = BindableStore;
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart"], "order":100});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":400});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":400});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":400});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("AttrOrganizer", {"object":AttrOrganizer, "targetWords":"attrs", "targetEvents":["beforeStart", "afterSpecLoad"], "order":600});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":600});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":900});
 
 	// Add new target events to organizers
 	BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
