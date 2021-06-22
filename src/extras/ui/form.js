@@ -207,7 +207,8 @@ Form.prototype.validate = function(options)
 		let ret = true;
 		let form = this.querySelector("form");
 
-		if (this.settings.get("settings.autoValidate"))
+		let autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoValidate"));
+		if (autoValidate)
 		{
 			if (form && form.reportValidity)
 			{
@@ -243,6 +244,7 @@ Form.prototype.submit = function(options)
 	delete options["sender"];
 	this.__cancelSubmit = false;
 	this._item = this.getFields();
+	let itemGetter = BITSMIST.v1.Util.safeGet(options, "itemGetter", "this.settings.get("settings.itemGetter", function(item){return [item]}));
 
 	return Promise.resolve().then(() => {
 		return this.validate();
@@ -251,11 +253,11 @@ Form.prototype.submit = function(options)
 	}).then(() => {
 		if (!this.__cancelSubmit)
 		{
-			let items = this.settings.get("settings.itemGetter", function(item){return [item]})(this._item);
+			let items = itemGetter(this._item);
 			return this.trigger("doSubmit", sender, {"target":this._target, "items":items});
 		}
 	}).then(() => {
-		let items = this.settings.get("settings.itemGetter", function(item){return [item]})(this._item);
+		let items = itemGetter(this._item);
 		return this.trigger("afterSubmit", sender, {"target":this._target, "items":items});
 	});
 
