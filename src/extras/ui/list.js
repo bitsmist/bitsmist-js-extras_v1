@@ -174,7 +174,8 @@ List.prototype.fill = function(options)
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
 
-	let builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
+	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this._settings.get("settings.async", true));
+	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
 	let fragment = document.createDocumentFragment();
 
 	this._rows = [];
@@ -223,17 +224,24 @@ List.prototype.fill = function(options)
  * Build rows synchronously.
  *
  * @param	{DocumentFragment}	fragment		Document fragment.
+ *
+ * @return  {Promise}		Promise.
  */
 List.prototype._buildSync = function(fragment)
 {
 
+	let chain = Promise.resolve();
 	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
-		this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
+		chain = chain.then(() => {
+			return this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
+		});
 	}
+
+	return chain;
 
 }
 
@@ -243,23 +251,17 @@ List.prototype._buildSync = function(fragment)
  * Build rows asynchronously.
  *
  * @param	{DocumentFragment}	fragment		Document fragment.
- *
- * @return  {Promise}		Promise.
  */
 List.prototype._buildAsync = function(fragment)
 {
 
-	let chain = Promise.resolve();
+	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 	for (let i = 0; i < this._items.length; i++)
 	{
-		chain = chain.then(() => {
-			return this.__appendRowAsync(fragment, i, this._items[i], template);
-		});
+		this.__appendRowAsync(fragment, i, this._items[i], template, rowEvents);
 	}
-
-	return chain;
 
 }
 
@@ -268,7 +270,7 @@ List.prototype._buildAsync = function(fragment)
 // -----------------------------------------------------------------------------
 
 /**
- * Append a new row asynchronously.
+ * Append a new row synchronously.
  *
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
@@ -279,7 +281,7 @@ List.prototype._buildAsync = function(fragment)
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
+List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
@@ -313,7 +315,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
 // -----------------------------------------------------------------------------
 
 /**
- * Append a new row synchronously.
+ * Append a new row asynchronously.
  *
  * @param	{HTMLElement}	rootNode				Root node to append a row.
  * @param	{integer}		no						Line no.
@@ -322,7 +324,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
  * @param	{Object}		clickHandler			Row's click handler info.
  * @param	{Object}		eventElements			Elements' event info.
  */
-List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
+List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
