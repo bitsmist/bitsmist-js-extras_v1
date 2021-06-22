@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import CookieUtil from '../../util/cookie-util';
 import Plugin from '../plugin';
 
 // =============================================================================
@@ -34,7 +33,6 @@ export default class CookieStoreHandler extends Plugin
 
 		super(component, options);
 
-		this._cookie = new CookieUtil(this._options.get("cookieOptions"));
 		this._cookieName = this._options.get("cookieOptions.name", "preferences");
 
 	}
@@ -53,7 +51,7 @@ export default class CookieStoreHandler extends Plugin
 	onDoLoadStore(sender, e, ex)
 	{
 
-		let data = this._cookie.get(this._cookieName);
+		let data = this.__getCookie(this._cookieName);
 
 		return data;
 
@@ -71,7 +69,7 @@ export default class CookieStoreHandler extends Plugin
 	onDoSaveStore(sender, e, ex)
 	{
 
-		this._cookie.set(this._cookieName, e.detail.data);
+		this.__setCookie(this._cookieName, e.detail.data);
 
 	}
 
@@ -93,6 +91,56 @@ export default class CookieStoreHandler extends Plugin
 				"doSaveStore": this.onDoSaveStore,
 			}
 		};
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//  Privates
+	// -----------------------------------------------------------------------------
+
+	/**
+	* Get cookie.
+	*
+	* @param	{String}		key					Key.
+	*/
+	__getCookie(key)
+	{
+
+		let decoded = document.cookie.split(';').reduce((result, current) => {
+			const [key, value] = current.split('=');
+			if (key)
+			{
+				result[key.trim()] = ( value ? decodeURIComponent(value.trim()) : undefined );
+			}
+
+			return result;
+		}, {});
+
+		return ( decoded[key] ? JSON.parse(decoded[key]) : {});
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	* Set cookie.
+	*
+	* @param	{String}		key					Key.
+	* @param	{Object}		value				Value.
+	*/
+	__setCookie(key, value)
+	{
+
+		let cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
+		let options =this._options.get("cookieOptions", {})
+
+		cookie += Object.keys(options).reduce((result, current) => {
+			result += current + "=" + options[current] + "; ";
+
+			return result;
+		}, "");
+
+		document.cookie = cookie;
 
 	}
 
