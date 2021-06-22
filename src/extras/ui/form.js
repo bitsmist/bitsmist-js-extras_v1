@@ -244,7 +244,7 @@ Form.prototype.submit = function(options)
 	delete options["sender"];
 	this.__cancelSubmit = false;
 	this._item = this.getFields();
-	let itemGetter = BITSMIST.v1.Util.safeGet(options, "itemGetter", "this.settings.get("settings.itemGetter", function(item){return [item]}));
+	let itemGetter = BITSMIST.v1.Util.safeGet(options, "itemGetter", this.settings.get("settings.itemGetter", function(item){return [item]}));
 
 	return Promise.resolve().then(() => {
 		return this.validate();
