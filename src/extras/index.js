@@ -32,20 +32,13 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":Elem
 import DatabindingOrganizer from './organizer/databinding-organizer';
 BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":900});
 
-// Add new target events to organizers
-BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
-
 // Plugin
 
 import Plugin from './plugin/plugin';
 window.BITSMIST.v1.Plugin = Plugin;
 
-// Plugin - Store handler
-
 import CookieStoreHandler from './plugin/store/cookie-store-handler';
 window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
-
-// Plugin - Resource handler
 
 import ResourceHandler from './plugin/resource/resource-handler';
 window.BITSMIST.v1.ResourceHandler = ResourceHandler;
@@ -75,11 +68,6 @@ window.BITSMIST.v1.MasterUtil = MasterUtil;
 import ResourceUtil from './util/resource-util';
 window.BITSMIST.v1.ResourceUtil = ResourceUtil;
 
-// Preference
+// Widget
 
-BITSMIST.v1.preferences = PreferenceOrganizer.preferences;
-BITSMIST.v1.ClassUtil.newComponent(BITSMIST.v1.Component, {
-	"settings": {
-		"name":	"PreferenceManager",
-	}
-}, "bm-preference", "PreferenceManager");
+import PreferenceManager from "./widget/bm-preference.js";
