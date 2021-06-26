@@ -51,7 +51,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			console.debug(`ObservableStore.set(): value changed. key=${key}, value=${this.get(key)}->${value}`);
 			BITSMIST.v1.Util.safeSet(this._items, key, value);
 
-			this.notify(key);
+			this.notify([key]);
 		}
 
 	}
