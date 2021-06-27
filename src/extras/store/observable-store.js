@@ -27,7 +27,8 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	constructor(options)
 	{
 
-		super(options);
+		let defaults = {"notifyOnChange":true, "async":false};
+		super(Object.assign(defaults, options));
 
 		this._observers = [];
 
@@ -51,7 +52,10 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			console.debug(`ObservableStore.set(): value changed. key=${key}, value=${this.get(key)}->${value}`);
 			BITSMIST.v1.Util.safeSet(this._items, key, value);
 
-			this.notify([key]);
+			if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"))
+			{
+				this.notify([key]);
+			}
 		}
 
 	}
@@ -79,7 +83,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			this.set(key, value);
 		}
 
-		if (changedKeys.length > 0)
+		if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange") && changedKeys.length > 0)
 		{
 			this.notify(changedKeys);
 		}
@@ -206,6 +210,30 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		}
 
 		return Promise.resolve();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Mute notification.
+	 */
+	mute()
+	{
+
+		this._options["notifyOnChange"] = false;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Unmute notification.
+	 */
+	unmute()
+	{
+
+		this._options["notifyOnChange"] = true;
 
 	}
 
