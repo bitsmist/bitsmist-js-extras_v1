@@ -87,11 +87,13 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		// Wait for preference to be loaded
 		let timer;
 		return chain.then(() => {
+			let timeout = component.settings.get("system.preferenceTimeout", 10000);
 			timer = setTimeout(() => {
 				throw new ReferenceError(`Time out waiting for loading preferences. name=${component.name}`);
-			}, 10000);
+			}, timeout);
 			return PreferenceOrganizer.__loaded.promise;
 		}).then(() => {
+
 			clearTimeout(timer);
 			return settings;
 		});
@@ -150,7 +152,9 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	static _triggerEvent(keys)
 	{
 
-		return this.trigger("afterPreferenceChange", PreferenceOrganizer, {"keys":keys});
+		let eventName = this.settings.get("preferences.eventName", "doSetup");
+
+		return this.trigger(eventName, PreferenceOrganizer, {"keys":keys});
 
 	}
 
