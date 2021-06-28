@@ -227,43 +227,44 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	 *
 	 * @return  {Object}		Merged array.
 	 */
-	__deepMerge(arr1, arr2, changedKeys)
+	__deepMerge(obj1, obj2, changedKeys)
 	{
 
 		changedKeys = changedKeys || [];
 		let key = "";
 
-		if (arr2)
+		if (!obj1 || typeof obj1 !== "object" || !obj2 || typeof obj2 !== "object")
 		{
-			Object.keys(arr2).forEach((key) => {
-				if (Array.isArray(arr1[key]))
-				{
-					arr1[key] = arr1[key].concat(arr2[key]);
-					changedKeys.push(key);
-				}
-				else if (
-					arr1.hasOwnProperty(key) &&
-					typeof arr1[key] === 'object' &&
-					typeof arr1[key] !== 'function' &&
-					!(arr1[key] instanceof HTMLElement)
-				)
-				{
-					Util.deepMerge(arr1[key], arr2[key]);
-				}
-				else
-				{
-					if (arr1[key] != arr2[key])
-					{
-						arr1[key] = arr2[key];
-						changedKeys.push(key);
-					}
-				}
-			});
+			throw TypeError("ObservableStore.__deepMerge(): Parameters must be an object.");
 		}
 
-		return arr1;
+		Object.keys(obj2).forEach((key) => {
+			if (Array.isArray(obj1[key]))
+			{
+				obj1[key] = obj1[key].concat(obj2[key]);
+				changedKeys.push(key);
+			}
+			else if (
+				obj1.hasOwnProperty(key) &&
+				obj1[key] && typeof obj1[key] === 'object' &&
+				obj2[key] && typeof obj2[key] === 'object' &&
+				!(obj1[key] instanceof HTMLElement)
+			)
+			{
+				Util.deepMerge(obj1[key], obj2[key]);
+			}
+			else
+			{
+				if (obj1[key] != obj2[key])
+				{
+					obj1[key] = obj2[key];
+					changedKeys.push(key);
+				}
+			}
+		});
+
+		return obj1;
 
 	}
-
 
 }
