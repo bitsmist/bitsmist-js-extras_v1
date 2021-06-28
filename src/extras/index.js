@@ -6,6 +6,9 @@ window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 import ObservableStore from "./store/observable-store.js";
 window.BITSMIST.v1.ObservableStore = ObservableStore;
 
+import ObservableStoreMixin from "./store/observable-store-mixin.js";
+window.BITSMIST.v1.ObservableStoreMixin = ObservableStoreMixin;
+
 import BindableStore from "./store/bindable-store.js";
 window.BITSMIST.v1.BindableStore = BindableStore;
 
