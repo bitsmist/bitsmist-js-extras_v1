@@ -88,28 +88,6 @@ PreferenceManager.prototype.set = function(key, value, options)
 // -------------------------------------------------------------------------
 
 /**
- * Set values to the store.
- *
- * @param	{String}		key					Key to store.
- * @param	{Object}		value				Value to store.
- * @param	{Object}		options				Options.
- */
-PreferenceManager.prototype.mergeSet = function(key, value, options)
-{
-
-	PreferenceOrganizer._store.mergeSet(key, value);
-
-	// Save preferences
-	if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.autoSave")))
-	{
-		PreferenceOrganizer.save(this);
-	}
-
-}
-
-// -------------------------------------------------------------------------
-
-/**
  * Load preferences.
  *
  * @param	{Object}		options				Options.

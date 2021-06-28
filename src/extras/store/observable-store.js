@@ -47,30 +47,6 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	set(key, value)
 	{
 
-		if (this.get(key) != value)
-		{
-			console.debug(`ObservableStore.set(): value changed. key=${key}, value=${this.get(key)}->${value}`);
-			BITSMIST.v1.Util.safeSet(this._items, key, value);
-
-			if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"))
-			{
-				this.notify([key]);
-			}
-		}
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Set values to store to the store and nofity to subscribers if the value has been changed.
-	 *
-	 * @param	{String}		key					Key to store.
-	 * @param	{Object}		value				Value to store.
-	 */
-	mergeSet(key, value)
-	{
-
 		let changedKeys = [];
 		let holder = ( key ? this.get(key) : this._items );
 
@@ -80,7 +56,11 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		}
 		else
 		{
-			this.set(key, value);
+			if (this.get(key) != value)
+			{
+				BITSMIST.v1.Util.safeSet(this._items, key, value);
+				changedKeys.push(key);
+			}
 		}
 
 		if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange") && changedKeys.length > 0)
