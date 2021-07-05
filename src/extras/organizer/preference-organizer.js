@@ -8,6 +8,9 @@
  */
 // =============================================================================
 
+import ObservableStoreMixin from "../store/observable-store-mixin";
+class ObservableChainableStore extends ObservableStoreMixin(BITSMIST.v1.ChainableStore) {};
+
 // =============================================================================
 //	Preference organizer class
 // =============================================================================
@@ -26,7 +29,8 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		// Init vars
-		PreferenceOrganizer._store = new BITSMIST.v1.ObservableStore({"filter":PreferenceOrganizer._filter, "async":true});
+		PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
+		PreferenceOrganizer._store = new ObservableChainableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
 		PreferenceOrganizer.__loaded =  {};
 		PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
 			PreferenceOrganizer.__loaded["resolve"] = resolve;
@@ -71,7 +75,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		// Set default preferences
 		if (component.settings.get("preferences.defaults"))
 		{
-			PreferenceOrganizer._store.items = component.settings.get("preferences.defaults");
+			PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
 		}
 
 		// Load preferences
@@ -93,7 +97,6 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 			}, timeout);
 			return PreferenceOrganizer.__loaded.promise;
 		}).then(() => {
-
 			clearTimeout(timer);
 			return settings;
 		});
