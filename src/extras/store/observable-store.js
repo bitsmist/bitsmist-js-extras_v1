@@ -82,10 +82,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	subscribe(id, handler, options)
 	{
 
-		if (typeof handler !== "function")
-		{
-			throw TypeError(`Notification handler is not a function. id=${id}`);
-		}
+		BITSMIST.v1.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 		this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -233,10 +230,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		changedKeys = changedKeys || [];
 		let key = "";
 
-		if (!obj1 || typeof obj1 !== "object" || !obj2 || typeof obj2 !== "object")
-		{
-			throw TypeError("ObservableStore.__deepMerge(): Parameters must be an object.");
-		}
+		BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
 
 		Object.keys(obj2).forEach((key) => {
 			if (Array.isArray(obj1[key]))
