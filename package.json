@@ -3,6 +3,7 @@
   "version": "0.9.10",
   "description": "BitsmistJS Extras v1",
   "private": true,
+  "type": "module",
   "dependencies": {},
   "devDependencies": {
     "@rollup/plugin-buble": "^0.21.3",
