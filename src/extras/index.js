@@ -35,6 +35,9 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":Elem
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":900});
 
+import KeyOrganizer from "./organizer/key-organizer.js";
+BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["beforeStart"], "order":900});
+
 // Plugin
 
 import Plugin from "./plugin/plugin.js";
