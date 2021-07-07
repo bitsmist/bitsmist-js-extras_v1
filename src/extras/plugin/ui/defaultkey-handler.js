@@ -134,7 +134,7 @@ export default class DefaultkeyHandler extends Plugin
 		else if (ex.options.clear && key == ex.options.clear.key)
 		{
 			// Clear
-			this.onDefaultClear(sender, e, {"options":ex.options["clear"]});
+			this.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
 		}
 
 		return;
@@ -239,7 +239,7 @@ export default class DefaultkeyHandler extends Plugin
 			target = sender.getAttribute(ex.options["target"]);
 		}
 
-		this._component.clear(target);
+		this._component.clear(ex.component, target);
 
 	}
 
