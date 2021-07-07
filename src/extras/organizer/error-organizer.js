@@ -25,8 +25,15 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	static globalInit()
 	{
 
-		ErrorOrganizer.__initErrorListeners();
 		ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
+
+		// Install error listner
+		document.addEventListener("DOMContentLoaded", () => {
+			if (BITSMIST.v1.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
+			{
+				ErrorOrganizer.__initErrorListeners();
+			}
+		});
 
 	}
 
