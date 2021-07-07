@@ -19,7 +19,8 @@
 		function ObservableStore(options)
 		{
 
-			superclass.call(this, options);
+			var defaults = {"notifyOnChange":true, "async":false};
+			superclass.call(this, Object.assign(defaults, options));
 
 			this._observers = [];
 
@@ -42,10 +43,25 @@
 		ObservableStore.prototype.set = function set (key, value)
 		{
 
-			if (this.get(key) != value)
+			var changedKeys = [];
+			var holder = ( key ? this.get(key) : this._items );
+
+			if (typeof holder == "object")
 			{
-				BITSMIST.v1.Util.safeSet(this._items, key, value);
-				this.notifyAsync(key);
+				this.__deepMerge(holder, value, changedKeys);
+			}
+			else
+			{
+				if (this.get(key) != value)
+				{
+					BITSMIST.v1.Util.safeSet(this._items, key, value);
+					changedKeys.push(key);
+				}
+			}
+
+			if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange") && changedKeys.length > 0)
+			{
+				this.notify(changedKeys);
 			}
 
 		};
@@ -62,10 +78,7 @@
 		ObservableStore.prototype.subscribe = function subscribe (id, handler, options)
 		{
 
-			if (typeof handler !== "function")
-			{
-				throw TypeError(("Notification handler is not a function. id=" + id));
-			}
+			BITSMIST.v1.Util.assert(typeof handler === "function", ("ObservableStore.subscribe(): Notification handler is not a function. id=" + id), TypeError);
 
 			this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -95,7 +108,7 @@
 		// -------------------------------------------------------------------------
 
 		/**
-		 * Notify observers.
+		 * Notify dispacher. Call notifySync() or notifyAsync() according to the option.
 		 *
 		 * @param	{Object}		conditions			Current conditions.
 		 * @param	{Object}		...args				Arguments to callback function.
@@ -103,6 +116,34 @@
 		 * @return  {Promise}		Promise.
 		 */
 		ObservableStore.prototype.notify = function notify (conditions)
+		{
+			var ref, ref$1;
+
+			var args = [], len = arguments.length - 1;
+			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+			if (BITSMIST.v1.Util.safeGet(this._options, "async", false))
+			{
+				return (ref = this).notifyAsync.apply(ref, [ conditions ].concat( args ));
+			}
+			else
+			{
+				return (ref$1 = this).notifySync.apply(ref$1, [ conditions ].concat( args ));
+			}
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Notify observers.
+		 *
+		 * @param	{Object}		conditions			Current conditions.
+		 * @param	{Object}		...args				Arguments to callback function.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		ObservableStore.prototype.notifySync = function notifySync (conditions)
 		{
 			var this$1 = this;
 			var args = [], len = arguments.length - 1;
@@ -117,6 +158,7 @@
 
 					if ((ref = this$1)._filter.apply(ref, [ conditions, this$1._observers[i]["options"] ].concat( args )))
 					{
+						console.debug(("ObservableStore.notifySync(): Notifying. conditions=" + conditions + ", observer=" + (this$1._observers[i].id)));
 						return (ref$1 = this$1._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
 					}
 				});
@@ -137,6 +179,8 @@
 		 * @param	{String}		type				Notification type(=methodname).
 		 * @param	{Object}		conditions			Current conditions.
 		 * @param	{Object}		...args				Arguments to callback function.
+		 *
+		 * @return  {Promise}		Promise.
 		 */
 		ObservableStore.prototype.notifyAsync = function notifyAsync (conditions)
 		{
@@ -149,14 +193,109 @@
 			{
 				if ((ref = this)._filter.apply(ref, [ conditions, this._observers[i]["options"] ].concat( args )))
 				{
+					console.debug(("ObservableStore.notifyAsync(): Notifying asynchronously. conditions=" + conditions + ", observer=" + (this._observers[i].id)));
 					(ref$1 = this._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
 				}
 			}
+
+			return Promise.resolve();
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Mute notification.
+		 */
+		ObservableStore.prototype.mute = function mute ()
+		{
+
+			this._options["notifyOnChange"] = false;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Unmute notification.
+		 */
+		ObservableStore.prototype.unmute = function unmute ()
+		{
+
+			this._options["notifyOnChange"] = true;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Deep merge two objects.
+		 *
+		 * @param	{Object}		obj1					Object1.
+		 * @param	{Object}		obj2					Object2.
+		 *
+		 * @return  {Object}		Merged array.
+		 */
+		ObservableStore.prototype.__deepMerge = function __deepMerge (obj1, obj2, changedKeys)
+		{
+
+			changedKeys = changedKeys || [];
+
+			BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+
+			Object.keys(obj2).forEach(function (key) {
+				if (Array.isArray(obj1[key]))
+				{
+					obj1[key] = obj1[key].concat(obj2[key]);
+					changedKeys.push(key);
+				}
+				else if (
+					obj1.hasOwnProperty(key) &&
+					obj1[key] && typeof obj1[key] === 'object' &&
+					obj2[key] && typeof obj2[key] === 'object' &&
+					!(obj1[key] instanceof HTMLElement)
+				)
+				{
+					Util.deepMerge(obj1[key], obj2[key]);
+				}
+				else
+				{
+					if (obj1[key] != obj2[key])
+					{
+						obj1[key] = obj2[key];
+						changedKeys.push(key);
+					}
+				}
+			});
+
+			return obj1;
 
 		};
 
 		return ObservableStore;
 	}(BITSMIST.v1.Store));
+
+	// =============================================================================
+
+	var ObservableStoreMixin = function (superClass) { return /*@__PURE__*/(function (superClass) {
+			function anonymous(options)
+		{
+
+			var defaults = {"notifyOnChange":true, "async":false};
+			superClass.call(this, Object.assign(defaults, options));
+
+			Object.assign(this, ObservableStore.prototype);
+
+			this._observers = [];
+
+		}
+
+			if ( superClass ) anonymous.__proto__ = superClass;
+			anonymous.prototype = Object.create( superClass && superClass.prototype );
+			anonymous.prototype.constructor = anonymous;
+
+			return anonymous;
+		}(superClass)); };
 
 	// =============================================================================
 	/**
@@ -456,8 +595,15 @@
 		ErrorOrganizer.globalInit = function globalInit ()
 		{
 
-			ErrorOrganizer.__initErrorListeners();
 			ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
+
+			// Install error listner
+			document.addEventListener("DOMContentLoaded", function () {
+				if (BITSMIST.v1.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
+				{
+					ErrorOrganizer.__initErrorListeners();
+				}
+			});
 
 		};
 
@@ -660,6 +806,51 @@
 	// =============================================================================
 
 	// =============================================================================
+	//	File organizer class
+	// =============================================================================
+
+	var FileOrganizer = /*@__PURE__*/(function (superclass) {
+		function FileOrganizer () {
+			superclass.apply(this, arguments);
+		}
+
+		if ( superclass ) FileOrganizer.__proto__ = superclass;
+		FileOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		FileOrganizer.prototype.constructor = FileOrganizer;
+
+		FileOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			var promises = [];
+
+			var files = settings["files"];
+			if (files)
+			{
+				Object.keys(files).forEach(function (fileName) {
+					promises.push(BITSMIST.v1.AjaxUtil.loadScript(files[fileName]["href"]));
+				});
+			}
+
+			return Promise.all(promises).then(function () {
+				return settings;
+			});
+
+		};
+
+		return FileOrganizer;
+	}(BITSMIST.v1.Organizer));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
 	//	Plugin organizer class
 	// =============================================================================
 
@@ -739,48 +930,204 @@
 	}(BITSMIST.v1.Organizer));
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
+	var ObservableChainableStore = /*@__PURE__*/(function (superclass) {
+		function ObservableChainableStore () {
+			superclass.apply(this, arguments);
+		}if ( superclass ) ObservableChainableStore.__proto__ = superclass;
+		ObservableChainableStore.prototype = Object.create( superclass && superclass.prototype );
+		ObservableChainableStore.prototype.constructor = ObservableChainableStore;
+
+		
+
+		return ObservableChainableStore;
+	}(ObservableStoreMixin(BITSMIST.v1.ChainableStore)));
+	// =============================================================================
+	//	Preference organizer class
 	// =============================================================================
 
-	// =============================================================================
-	//	File organizer class
-	// =============================================================================
-
-	var FileOrganizer = /*@__PURE__*/(function (superclass) {
-		function FileOrganizer () {
+	var PreferenceOrganizer = /*@__PURE__*/(function (superclass) {
+		function PreferenceOrganizer () {
 			superclass.apply(this, arguments);
 		}
 
-		if ( superclass ) FileOrganizer.__proto__ = superclass;
-		FileOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		FileOrganizer.prototype.constructor = FileOrganizer;
+		if ( superclass ) PreferenceOrganizer.__proto__ = superclass;
+		PreferenceOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		PreferenceOrganizer.prototype.constructor = PreferenceOrganizer;
 
-		FileOrganizer.organize = function organize (conditions, component, settings)
+		PreferenceOrganizer.globalInit = function globalInit ()
 		{
 
-			var promises = [];
+			// Init vars
+			PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
+			PreferenceOrganizer._store = new ObservableChainableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
+			PreferenceOrganizer.__loaded =  {};
+			PreferenceOrganizer.__loaded["promise"] = new Promise(function (resolve, reject) {
+				PreferenceOrganizer.__loaded["resolve"] = resolve;
+				PreferenceOrganizer.__loaded["reject"] = reject;
+			});
 
-			var files = settings["files"];
-			if (files)
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Init.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		PreferenceOrganizer.init = function init (conditions, component, settings)
+		{
+
+			// Register a component as an observer
+			PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		PreferenceOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			var chain = Promise.resolve();
+
+			// Set default preferences
+			if (component.settings.get("preferences.defaults"))
 			{
-				Object.keys(files).forEach(function (fileName) {
-					promises.push(BITSMIST.v1.AjaxUtil.loadScript(files[fileName]["href"]));
+				PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
+			}
+
+			// Load preferences
+			if (component.settings.get("preferences.load"))
+			{
+				chain = PreferenceOrganizer.load(component).then(function (preferences) {
+					// Merge preferences
+					PreferenceOrganizer._store.merge(preferences);
+					PreferenceOrganizer.__loaded.resolve();
 				});
 			}
 
-			return Promise.all(promises).then(function () {
+			// Wait for preference to be loaded
+			var timer;
+			return chain.then(function () {
+				var timeout = component.settings.get("system.preferenceTimeout", 10000);
+				timer = setTimeout(function () {
+					throw new ReferenceError(("Time out waiting for loading preferences. name=" + (component.name)));
+				}, timeout);
+				return PreferenceOrganizer.__loaded.promise;
+			}).then(function () {
+				clearTimeout(timer);
 				return settings;
 			});
 
 		};
 
-		return FileOrganizer;
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Load preferences.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		PreferenceOrganizer.load = function load (component, options)
+		{
+
+			var sender = ( options && options["sender"] ? options["sender"] : component );
+
+			return component.trigger("doLoadStore", sender);
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Save preferences.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		PreferenceOrganizer.save = function save (component, options)
+		{
+
+			var sender = ( options && options["sender"] ? options["sender"] : component );
+
+			return component.trigger("doSaveStore", sender, {"data":PreferenceOrganizer._store.items});
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Load preferences.
+		 *
+		 * @param	{Array}			keys				Changed keys.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		PreferenceOrganizer._triggerEvent = function _triggerEvent (keys)
+		{
+
+			var eventName = this.settings.get("preferences.eventName", "doSetup");
+
+			return this.trigger(eventName, PreferenceOrganizer, {"keys":keys});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Check if it is a target.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Object}		options				Options.
+		 */
+		PreferenceOrganizer._filter = function _filter (conditions, options)
+		{
+
+			var result = false;
+			var target = options["targets"];
+
+			if (target == "*")
+			{
+				result = true;
+			}
+			else
+			{
+				target = ( Array.isArray(target) ? target : [target] );
+				conditions = ( Array.isArray(conditions) ? conditions : [conditions] );
+
+				for (var i = 0; i < target.length; i++)
+				{
+					if (conditions.indexOf(target[i]) > -1)
+					{
+						result = true;
+						break;
+					}
+				}
+			}
+
+			return result;
+
+		};
+
+		return PreferenceOrganizer;
 	}(BITSMIST.v1.Organizer));
 
 	// =============================================================================
@@ -1368,230 +1715,6 @@
 	// =============================================================================
 
 	// =============================================================================
-	//	Preference organizer class
-	// =============================================================================
-
-	var PreferenceOrganizer = /*@__PURE__*/(function (superclass) {
-		function PreferenceOrganizer () {
-			superclass.apply(this, arguments);
-		}
-
-		if ( superclass ) PreferenceOrganizer.__proto__ = superclass;
-		PreferenceOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		PreferenceOrganizer.prototype.constructor = PreferenceOrganizer;
-
-		PreferenceOrganizer.globalInit = function globalInit ()
-		{
-
-			// Init vars
-			PreferenceOrganizer.__preferences = new BITSMIST.v1.Store();
-			PreferenceOrganizer.__observers = new BITSMIST.v1.ObservableStore({"filter":PreferenceOrganizer.__filter});
-			PreferenceOrganizer.__loaded =  {};
-			PreferenceOrganizer.__loaded["promise"] = new Promise(function (resolve, reject) {
-				PreferenceOrganizer.__loaded["resolve"] = resolve;
-				PreferenceOrganizer.__loaded["reject"] = reject;
-				setTimeout(function () {
-					reject("Time out waiting for loading preferences.");
-				}, 10000);
-			});
-			Object.defineProperty(PreferenceOrganizer, 'preferences', {
-				get: function get() { return PreferenceOrganizer.__preferences; },
-			});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Init.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		PreferenceOrganizer.init = function init (conditions, component, settings)
-		{
-
-			// Add properties
-			Object.defineProperty(component, 'preferences', {
-				get: function get() { return this._preferences; },
-			});
-
-			// Init vars
-			component._preferences = new PreferenceExporter(component);
-
-			// Register a component as an observer
-			PreferenceOrganizer.__observers.subscribe(component.uniqueId, component.setup.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		PreferenceOrganizer.organize = function organize (conditions, component, settings)
-		{
-
-			var chain = Promise.resolve();
-
-			if (component.settings.get("preferences.load"))
-			{
-				// Set default preferences if any
-				PreferenceOrganizer.__preferences.items = component.settings.get("preferences.defaults");
-
-				// Load preferences
-				chain = PreferenceOrganizer._load(component).then(function (preferences) {
-					// Merge preferences
-					PreferenceOrganizer.__preferences.merge(preferences);
-					PreferenceOrganizer.__loaded.resolve();
-				});
-			}
-
-			return chain.then(function () {
-				return PreferenceOrganizer.__loaded.promise;
-			}).then(function () {
-				settings["newPreferences"] = PreferenceOrganizer.__preferences.items;
-				return settings;
-			});
-
-		};
-
-		// -------------------------------------------------------------------------
-		//  Protected
-		// -------------------------------------------------------------------------
-
-		/**
-		* Apply settings.
-		*
-		* @param	{Object}		options				Options.
-		*
-		* @return  {Promise}		Promise.
-		*/
-		PreferenceOrganizer._setup = function _setup (component, options)
-		{
-
-			options = Object.assign({}, options);
-			( options["sender"] ? options["sender"] : this );
-
-			return PreferenceOrganizer.__observers.notify(options).then(function () {
-				if (options["newPreferences"])
-				{
-					PreferenceOrganizer.__preferences.merge(options["newPreferences"]);
-					PreferenceOrganizer._save(component);
-				}
-			});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		* Load items.
-		*
-		* @param	{Object}		options				Options.
-		*
-		* @return  {Promise}		Promise.
-		*/
-		PreferenceOrganizer._load = function _load (component, options)
-		{
-
-			var sender = ( options && options["sender"] ? options["sender"] : component );
-
-			return component.trigger("doLoadStore", sender);
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		* Save items.
-		*
-		* @param	{Object}		options				Options.
-		*
-		* @return  {Promise}		Promise.
-		*/
-		PreferenceOrganizer._save = function _save (component, options)
-		{
-
-			var sender = ( options && options["sender"] ? options["sender"] : component );
-
-			return component.trigger("doSaveStore", sender, {"data":PreferenceOrganizer.__preferences.items});
-
-		};
-
-		// -------------------------------------------------------------------------
-		//  Privates
-		// -------------------------------------------------------------------------
-
-		/**
-		* Check if it is a target.
-		*
-		* @param	{Object}		conditions			Conditions.
-		* @param	{Object}		options				Options.
-		*/
-		PreferenceOrganizer.__filter = function __filter (conditions, options)
-		{
-
-			var result = false;
-			var target = options["targets"];
-
-			if (target == "*")
-			{
-				return true;
-			}
-			else if (target)
-			{
-				for (var i = 0; i < target.length; i++)
-				{
-					if (conditions["newPreferences"].hasOwnProperty(target[i]))
-					{
-						result = true;
-						break;
-					}
-				}
-			}
-
-			return result;
-
-		};
-
-		return PreferenceOrganizer;
-	}(BITSMIST.v1.Organizer));
-
-	// =============================================================================
-	//	Preference exporter class
-	// =============================================================================
-
-	var PreferenceExporter = function PreferenceExporter(component) { this._component = component; };
-
-	var prototypeAccessors$1 = { items: { configurable: true } };
-	prototypeAccessors$1.items.get = function () { return PreferenceOrganizer.__preferences.items; };
-	PreferenceExporter.prototype.set = function set (key, value) { return PreferenceOrganizer.__preferences.set(key, value); };
-	PreferenceExporter.prototype.get = function get (key) { return PreferenceOrganizer.__preferences.get(key); };
-	PreferenceExporter.prototype.load = function load () { return PreferenceOrganizer._load(this._component); };
-	PreferenceExporter.prototype.save = function save () { return PreferenceOrganizer._save(this._component); };
-	PreferenceExporter.prototype.setup = function setup (options) { return PreferenceOrganizer._setup(this._component, options); };
-
-	Object.defineProperties( PreferenceExporter.prototype, prototypeAccessors$1 );
-
-	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
-
-	// =============================================================================
 	//	Element organizer class
 	// =============================================================================
 
@@ -1853,6 +1976,347 @@
 	// =============================================================================
 
 	// =============================================================================
+	//	Key organizer class
+	// =============================================================================
+
+	var KeyOrganizer = /*@__PURE__*/(function (superclass) {
+		function KeyOrganizer () {
+			superclass.apply(this, arguments);
+		}
+
+		if ( superclass ) KeyOrganizer.__proto__ = superclass;
+		KeyOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		KeyOrganizer.prototype.constructor = KeyOrganizer;
+
+		KeyOrganizer.init = function init (conditions, component, settings)
+		{
+
+			/*
+			// Add properties
+			Object.defineProperty(component, 'masters', {
+				get() { return this._masters; },
+			});
+
+			// Add methods
+			component.addMaster = function(masterName, options, ajaxSettings) { return MasterOrganizer._initMaster(this, masterName, options, ajaxSettings); }
+			*/
+
+			// Init vars
+			component.__isComposing = false;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		KeyOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			var keys = settings["keys"];
+			if (keys)
+			{
+				component.addEventHandler("afterAppend", {"handler":KeyOrganizer.onAfterAppend, "options":{"keys":keys}});
+			}
+
+			return settings;
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		/**
+		 * After append event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onAfterAppend = function onAfterAppend (sender, e, ex)
+		{
+
+			var component = ex.component;
+
+			// default keys
+			var defaultKeys = component.settings.get("keys.defaultKeys");
+			if (defaultKeys)
+			{
+	//			console.log("@@@defaulKeys", defaultKeys);
+				component.addEventHandler("keydown", {"handler": KeyOrganizer.onKeyDown, "options":defaultKeys}, null, this);
+				component.addEventHandler("keypress", {"handler":KeyOrganizer.onKeyPress, "options":defaultKeys}, null, this);
+				component.addEventHandler("compositionstart", {"handler":KeyOrganizer.onCompositionStart, "options":defaultKeys}, null, this);
+				component.addEventHandler("compositionend", {"handler":KeyOrganizer.onCompositionEnd, "options":defaultKeys}, null, this);
+			}
+
+			// default buttons
+			var defaultButtons = component.settings.get("keys.defaultButtons");
+			if (defaultButtons)
+			{
+	//			console.log("@@@defaulButtons", defaultButtons);
+				KeyOrganizer.__initElements(component, defaultButtons["submit"], KeyOrganizer.onDefaultSubmit);
+				KeyOrganizer.__initElements(component, defaultButtons["cancel"], KeyOrganizer.onDefaultCancel);
+				KeyOrganizer.__initElements(component, defaultButtons["clear"], KeyOrganizer.onDefaultClear);
+			}
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Key down event handler. Handle keys which do not fire keyPress event.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onKeyDown = function onKeyDown (sender, e, ex)
+		{
+
+			var key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
+			key = key.toLowerCase();
+			key = ( key == "esc" ? "escape" : key ); // For IE11
+
+			switch (key)
+			{
+				case "escape":
+					KeyOrganizer.onKeyPress(sender, e, ex);
+					break;
+			}
+
+	//		console.log("@@@onKeyDown" ,key);
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Key press event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onKeyPress = function onKeyPress (sender, e, ex)
+		{
+
+			var component = ex.component;
+
+			// Ignore all key input when composing.
+			if (component.__isComposing || e.keyCode == 229)
+			{
+				return;
+			}
+
+			var key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
+			key = key.toLowerCase();
+			key = ( key == "esc" ? "escape" : key ); // For IE11
+
+	//		console.log("@@@onKeyPress" ,key);
+
+			if (ex.options.submit && key == ex.options.submit.key)
+			{
+				// Submit
+				KeyOrganizer.onDefaultSubmit(sender, e, {"options":ex.options["submit"], "component":component});
+			}
+			else if (ex.options.cancel && key == ex.options.cancel.key)
+			{
+				// Cancel
+				KeyOrganizer.onDefaultCancel(sender, e, {"options":ex.options["cancel"], "component":component});
+			}
+			else if (ex.options.clear && key == ex.options.clear.key)
+			{
+				// Clear
+				KeyOrganizer.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
+			}
+
+			return;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Composition start event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onCompositionStart = function onCompositionStart (sender, e, ex)
+		{
+
+	//		console.log("@@@onCompositionStart");
+
+			ex.component.__isComposing = true;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Composition end event handler.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onCompositionEnd = function onCompositionEnd (sender, e, ex)
+		{
+
+	//		console.log("@@@onCompositionEnd");
+
+			ex.component.__isComposing = false;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Default submit.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onDefaultSubmit = function onDefaultSubmit (sender, e, ex)
+		{
+
+			var component = ex.component;
+
+			component.submit().then(function () {
+				if (!component.__cancelSubmit)
+				{
+					// Modal result
+					if (component._isModal)
+					{
+						component._modalResult["result"] = true;
+					}
+
+					// Auto close
+					if (ex && ex.options["autoClose"])
+					{
+						component.close();
+					}
+				}
+			});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Default cancel.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onDefaultCancel = function onDefaultCancel (sender, e, ex)
+		{
+
+			ex.component.close();
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Default clear.
+		 *
+		 * @param	{Object}		sender				Sender.
+		 * @param	{Object}		e					Event info.
+	 	 * @param	{Object}		ex					Extra event info.
+		 */
+		KeyOrganizer.onDefaultClear = function onDefaultClear (sender, e, ex)
+		{
+
+			var target;
+
+			if (ex && ex.options["target"])
+			{
+				target = sender.getAttribute(ex.options["target"]);
+			}
+
+			ex.component.clear(ex.component, target);
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Privates
+		// -------------------------------------------------------------------------
+
+		/**
+	 	 * Convert key name from key code.
+		 *
+		 * @param	{Integer}		code				Key code.
+		 */
+		KeyOrganizer.__getKeyfromKeyCode = function __getKeyfromKeyCode (code)
+		{
+
+			var ret;
+
+			switch(code)
+			{
+				case 13:
+					ret = "Enter";
+					break;
+				default:
+					ret = String.fromCharCode(code);
+					break;
+			}
+
+			return ret;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Init buttons.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 * @param	{Function}		handler				Handler.
+		 */
+		KeyOrganizer.__initElements = function __initElements (component, options, handler)
+		{
+			var this$1 = this;
+
+
+			if (options)
+			{
+				var elements = component.querySelectorAll(options["rootNode"]);
+				elements = Array.prototype.slice.call(elements, 0);
+				elements.forEach(function (element) {
+					component.addEventHandler("click", {"handler":handler, "options":options}, element, this$1);
+				});
+			}
+
+		};
+
+		return KeyOrganizer;
+	}(BITSMIST.v1.Organizer));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
 	//	Plugin base class
 	// =============================================================================
 
@@ -1954,7 +2418,6 @@
 
 			Plugin.call(this, component, options);
 
-	//		this._cookie = new CookieUtil(this._options.get("cookieOptions"));
 			this._cookieName = this._options.get("cookieOptions.name", "preferences");
 
 		}
@@ -1977,7 +2440,6 @@
 		CookieStoreHandler.prototype.onDoLoadStore = function onDoLoadStore (sender, e, ex)
 		{
 
-			//let data = this._cookie.get(this._cookieName);
 			var data = this.__getCookie(this._cookieName);
 
 			return data;
@@ -1996,7 +2458,6 @@
 		CookieStoreHandler.prototype.onDoSaveStore = function onDoSaveStore (sender, e, ex)
 		{
 
-			//this._cookie.set(this._cookieName, e.detail.data);
 			this.__setCookie(this._cookieName, e.detail.data);
 
 		};
@@ -3119,7 +3580,6 @@
 		}).then(function () {
 			return this$1.trigger("beforeFill", sender);
 		}).then(function () {
-			var rootNode = ( "target" in options ? this$1.querySelector(options["target"]) : this$1 );
 			FormUtil.setFields(rootNode, this$1._item, this$1.masters);
 			return this$1.trigger("afterFill", sender);
 		});
@@ -3167,7 +3627,8 @@
 			var ret = true;
 			var form = this$1.querySelector("form");
 
-			if (this$1.settings.get("settings.autoValidate"))
+			var autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this$1._settings.get("settings.autoValidate"));
+			if (autoValidate)
 			{
 				if (form && form.reportValidity)
 				{
@@ -3205,6 +3666,7 @@
 		delete options["sender"];
 		this.__cancelSubmit = false;
 		this._item = this.getFields();
+		var itemGetter = BITSMIST.v1.Util.safeGet(options, "itemGetter", this.settings.get("settings.itemGetter", function(item){return [item]}));
 
 		return Promise.resolve().then(function () {
 			return this$1.validate();
@@ -3213,11 +3675,11 @@
 		}).then(function () {
 			if (!this$1.__cancelSubmit)
 			{
-				var items = this$1.settings.get("settings.itemGetter", function(item){return [item]})(this$1._item);
+				var items = itemGetter(this$1._item);
 				return this$1.trigger("doSubmit", sender, {"target":this$1._target, "items":items});
 			}
 		}).then(function () {
-			var items = this$1.settings.get("settings.itemGetter", function(item){return [item]})(this$1._item);
+			var items = itemGetter(this$1._item);
 			return this$1.trigger("afterSubmit", sender, {"target":this$1._target, "items":items});
 		});
 
@@ -3384,7 +3846,6 @@
 	List.prototype.clear = function()
 	{
 
-		//this._items = [];
 		this._listRootNode.innerHTML = "";
 
 	};
@@ -3406,7 +3867,8 @@
 		options = Object.assign({}, options);
 		var sender = ( options["sender"] ? options["sender"] : this );
 
-		var builder = ( this._settings.get("settings.async") ? this._buildAsync : this._buildSync );
+		var rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this._settings.get("settings.async", true));
+		var builder = ( rowAsync ? this._buildAsync : this._buildSync );
 		var fragment = document.createDocumentFragment();
 
 		this._rows = [];
@@ -3455,40 +3917,21 @@
 	 * Build rows synchronously.
 	 *
 	 * @param	{DocumentFragment}	fragment		Document fragment.
-	 */
-	List.prototype._buildSync = function(fragment)
-	{
-
-		var rowEvents = this._row.settings.get("rowevents");
-		var template = this._row._templates[this._row.settings.get("settings.templateName")].html;
-
-		for (var i = 0; i < this._items.length; i++)
-		{
-			this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
-		}
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Build rows asynchronously.
-	 *
-	 * @param	{DocumentFragment}	fragment		Document fragment.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	List.prototype._buildAsync = function(fragment)
+	List.prototype._buildSync = function(fragment)
 	{
 		var this$1 = this;
 
 
 		var chain = Promise.resolve();
+		var rowEvents = this._row.settings.get("rowevents");
 		var template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
 		var loop = function ( i ) {
 			chain = chain.then(function () {
-				return this$1.__appendRowAsync(fragment, i, this$1._items[i], template);
+				return this$1.__appendRowSync(fragment, i, this$1._items[i], template, rowEvents);
 			});
 		};
 
@@ -3500,11 +3943,31 @@
 	};
 
 	// -----------------------------------------------------------------------------
+
+	/**
+	 * Build rows asynchronously.
+	 *
+	 * @param	{DocumentFragment}	fragment		Document fragment.
+	 */
+	List.prototype._buildAsync = function(fragment)
+	{
+
+		var rowEvents = this._row.settings.get("rowevents");
+		var template = this._row._templates[this._row.settings.get("settings.templateName")].html;
+
+		for (var i = 0; i < this._items.length; i++)
+		{
+			this.__appendRowAsync(fragment, i, this._items[i], template, rowEvents);
+		}
+
+	};
+
+	// -----------------------------------------------------------------------------
 	//  Privates
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Append a new row asynchronously.
+	 * Append a new row synchronously.
 	 *
 	 * @param	{HTMLElement}	rootNode				Root node to append a row.
 	 * @param	{integer}		no						Line no.
@@ -3515,7 +3978,7 @@
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
+	List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
 	{
 		var this$1 = this;
 
@@ -3551,7 +4014,7 @@
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Append a new row synchronously.
+	 * Append a new row asynchronously.
 	 *
 	 * @param	{HTMLElement}	rootNode				Root node to append a row.
 	 * @param	{integer}		no						Line no.
@@ -3560,7 +4023,7 @@
 	 * @param	{Object}		clickHandler			Row's click handler info.
 	 * @param	{Object}		eventElements			Elements' event info.
 	 */
-	List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
+	List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
 	{
 		var this$1 = this;
 
@@ -3705,7 +4168,7 @@
 			else if (ex.options.clear && key == ex.options.clear.key)
 			{
 				// Clear
-				this.onDefaultClear(sender, e, {"options":ex.options["clear"]});
+				this.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
 			}
 
 			return;
@@ -3812,7 +4275,7 @@
 				target = sender.getAttribute(ex.options["target"]);
 			}
 
-			this._component.clear(target);
+			this._component.clear(ex.component, target);
 
 		};
 
@@ -3946,20 +4409,132 @@
 		return AuthenticationUtil;
 	}(ResourceUtil));
 
+	// =============================================================================
+
+	// =============================================================================
+	//	Preference manager class
+	// =============================================================================
+
+	// -----------------------------------------------------------------------------
+	//  Constructor
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Constructor.
+	 */
+	function PreferenceManager(settings)
+	{
+
+		return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
+
+	}
+
+	BITSMIST.v1.ClassUtil.inherit(PreferenceManager, BITSMIST.v1.Component);
+
+	// -----------------------------------------------------------------------------
+	//  Setter/Getter
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Preference items.
+	 *
+	 * @type	{Object}
+	 */
+	Object.defineProperty(PreferenceManager.prototype, "items", {
+		get: function get()
+		{
+			return PreferenceOrganizer._store.items;
+		},
+	});
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get a value from store. Return default value when specified key is not available.
+	 *
+	 * @param	{String}		key					Key to get.
+	 * @param	{Object}		defaultValue		Value returned when key is not found.
+	 *
+	 * @return  {*}				Value.
+	 */
+	PreferenceManager.prototype.get = function(key, defaultValue)
+	{
+
+		return PreferenceOrganizer._store.get(key, defaultValue);
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Set a value to the store.
+	 *
+	 * @param	{String}		key					Key to store.
+	 * @param	{Object}		value				Value to store.
+	 * @param	{Object}		options				Options.
+	 */
+	PreferenceManager.prototype.set = function(key, value, options)
+	{
+
+		PreferenceOrganizer._store.set(key, value);
+
+		// Save preferences
+		if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.autoSave")))
+		{
+			PreferenceOrganizer.save(this);
+		}
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load preferences.
+	 *
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	PreferenceManager.prototype.load = function(options)
+	{
+
+		return PreferenceOrganizer.load(this, options);
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Save preferences.
+	 *
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	PreferenceManager.prototype.save = function()
+	{
+
+		return PreferenceOrganizer.save(this, options);
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	customElements.define("bm-preference", PreferenceManager);
+
 	window.BITSMIST = window.BITSMIST || {};
 	window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 	window.BITSMIST.v1.ObservableStore = ObservableStore;
+	window.BITSMIST.v1.ObservableStoreMixin = ObservableStoreMixin;
 	window.BITSMIST.v1.BindableStore = BindableStore;
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart"], "order":100});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":400});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":400});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":400});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":500});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":600});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":900});
-
-	// Add new target events to organizers
-	BITSMIST.v1.OrganizerOrganizer.organizers.get("EventOrganizer")["targetEvents"].push("afterSpecLoad");
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["afterSpecLoad"], "order":200});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1100});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1200});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":1300});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":2100});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":2100});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["beforeStart"], "order":2100});
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
 	window.BITSMIST.v1.ResourceHandler = ResourceHandler;
@@ -3970,15 +4545,6 @@
 	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 	window.BITSMIST.v1.MasterUtil = MasterUtil;
 	window.BITSMIST.v1.ResourceUtil = ResourceUtil;
-
-	// Preference
-
-	BITSMIST.v1.preferences = PreferenceOrganizer.preferences;
-	BITSMIST.v1.ClassUtil.newComponent(BITSMIST.v1.Component, {
-		"settings": {
-			"name":	"PreferenceManager",
-		}
-	}, "bm-preference", "PreferenceManager");
 
 }());
 //# sourceMappingURL=bitsmist-js-extras_v1.js.map
