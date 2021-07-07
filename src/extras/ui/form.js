@@ -161,7 +161,6 @@ Form.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFill", sender);
 	}).then(() => {
-		let rootNode = ( "target" in options ? this.querySelector(options["target"]) : this );
 		FormUtil.setFields(rootNode, this._item, this.masters);
 		return this.trigger("afterFill", sender);
 	});
