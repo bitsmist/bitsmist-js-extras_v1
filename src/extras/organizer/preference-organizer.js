@@ -79,10 +79,9 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		}
 
 		// Load preferences
-		if (component.settings.get("preferences.load"))
+		if (component.settings.get("preferences.settings.load"))
 		{
 			chain = PreferenceOrganizer.load(component).then((preferences) => {
-				// Merge preferences
 				PreferenceOrganizer._store.merge(preferences);
 				PreferenceOrganizer.__loaded.resolve();
 			});
@@ -155,7 +154,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	static _triggerEvent(keys)
 	{
 
-		let eventName = this.settings.get("preferences.eventName", "doSetup");
+		let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 
 		return this.trigger(eventName, PreferenceOrganizer, {"keys":keys});
 

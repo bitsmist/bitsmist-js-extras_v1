@@ -78,7 +78,7 @@ PreferenceManager.prototype.set = function(key, value, options)
 	PreferenceOrganizer._store.set(key, value);
 
 	// Save preferences
-	if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.autoSave")))
+	if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
 	{
 		PreferenceOrganizer.save(this);
 	}
