@@ -326,6 +326,10 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 					actions[keys[i]]["handler"] = KeyOrganizer.onDefaultCancel;
 					actions[keys[i]]["option"] = defaultKeys["cancel"];
 					break;
+				default:
+					actions[keys[i]]["handler"] = defaultKeys[key]["handler"];
+					actions[keys[i]]["option"] = defaultKeys[key];
+					break;
 				}
 			}
 		});
