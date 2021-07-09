@@ -29,16 +29,6 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	static init(conditions, component, settings)
 	{
 
-		/*
-		// Add properties
-		Object.defineProperty(component, 'masters', {
-			get() { return this._masters; },
-		});
-
-		// Add methods
-		component.addMaster = function(masterName, options, ajaxSettings) { return MasterOrganizer._initMaster(this, masterName, options, ajaxSettings); }
-		*/
-
 		// Init vars
 		component.__isComposing = false;
 
@@ -61,7 +51,25 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 		let keys = settings["keys"];
 		if (keys)
 		{
-			component.addEventHandler("afterAppend", {"handler":KeyOrganizer.onAfterAppend, "options":{"keys":keys}});
+			// default keys
+			let defaultKeys = component.settings.get("keys.defaultKeys");
+			if (defaultKeys)
+			{
+				let actions = KeyOrganizer.__getActions(defaultKeys);
+				component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component, defaultKeys, actions);});
+				component.addEventListener("keypress", function(e){KeyOrganizer.onKeyPress.call(this, e, component, defaultKeys, actions);});
+				component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, defaultKeys);});
+				component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, defaultKeys);});
+			}
+
+			// default buttons
+			let defaultButtons = component.settings.get("keys.defaultButtons");
+			if (defaultButtons)
+			{
+				KeyOrganizer.__initElements(component, defaultButtons["submit"], KeyOrganizer.onDefaultSubmit);
+				KeyOrganizer.__initElements(component, defaultButtons["cancel"], KeyOrganizer.onDefaultCancel);
+				KeyOrganizer.__initElements(component, defaultButtons["clear"], KeyOrganizer.onDefaultClear);
+			}
 		}
 
 		return settings;
@@ -73,50 +81,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * After append event handler.
+ 	 * Key down event handler. Handle keys that do not fire keyPress event.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 * @param	{Object}		actions				Action info.
 	 */
-	static onAfterAppend(sender, e, ex)
-	{
-
-		let component = ex.component;
-
-		// default keys
-		let defaultKeys = component.settings.get("keys.defaultKeys");
-		if (defaultKeys)
-		{
-//			console.log("@@@defaulKeys", defaultKeys);
-			component.addEventHandler("keydown", {"handler": KeyOrganizer.onKeyDown, "options":defaultKeys}, null, this);
-			component.addEventHandler("keypress", {"handler":KeyOrganizer.onKeyPress, "options":defaultKeys}, null, this);
-			component.addEventHandler("compositionstart", {"handler":KeyOrganizer.onCompositionStart, "options":defaultKeys}, null, this);
-			component.addEventHandler("compositionend", {"handler":KeyOrganizer.onCompositionEnd, "options":defaultKeys}, null, this);
-		}
-
-		// default buttons
-		let defaultButtons = component.settings.get("keys.defaultButtons");
-		if (defaultButtons)
-		{
-//			console.log("@@@defaulButtons", defaultButtons);
-			KeyOrganizer.__initElements(component, defaultButtons["submit"], KeyOrganizer.onDefaultSubmit);
-			KeyOrganizer.__initElements(component, defaultButtons["cancel"], KeyOrganizer.onDefaultCancel);
-			KeyOrganizer.__initElements(component, defaultButtons["clear"], KeyOrganizer.onDefaultClear);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
- 	 * Key down event handler. Handle keys which do not fire keyPress event.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
-	 */
-	static onKeyDown(sender, e, ex)
+	static onKeyDown(e, component, options, actions)
 	{
 
 		let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
@@ -126,11 +98,9 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 		switch (key)
 		{
 			case "escape":
-				KeyOrganizer.onKeyPress(sender, e, ex);
+				KeyOrganizer.onKeyPress(e, component, options, actions);
 				break;
 		}
-
-//		console.log("@@@onKeyDown" ,key);
 
 	}
 
@@ -139,41 +109,29 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
  	 * Key press event handler.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 * @param	{Object}		actions				Action info.
 	 */
-	static onKeyPress(sender, e, ex)
+	static onKeyPress(e, component, options, actions)
 	{
 
-		let component = ex.component;
-
 		// Ignore all key input when composing.
-		if (component.__isComposing || e.keyCode == 229)
+		if (component.__isComposing || e.isComposing || e.keyCode == 229)
 		{
 			return;
 		}
 
+		// Get a key
 		let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
 		key = key.toLowerCase()
 		key = ( key == "esc" ? "escape" : key ); // For IE11
 
-//		console.log("@@@onKeyPress" ,key);
-
-		if (ex.options.submit && key == ex.options.submit.key)
+		// Take an action according to the key pressed if specified
+		if (actions[key])
 		{
-			// Submit
-			KeyOrganizer.onDefaultSubmit(sender, e, {"options":ex.options["submit"], "component":component});
-		}
-		else if (ex.options.cancel && key == ex.options.cancel.key)
-		{
-			// Cancel
-			KeyOrganizer.onDefaultCancel(sender, e, {"options":ex.options["cancel"], "component":component});
-		}
-		else if (ex.options.clear && key == ex.options.clear.key)
-		{
-			// Clear
-			KeyOrganizer.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
+			actions[key]["handler"].call(this, e, component, actions[key]["option"]);
 		}
 
 		return;
@@ -185,16 +143,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Composition start event handler.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
 	 */
-	static onCompositionStart(sender, e, ex)
+	static onCompositionStart(e, component, options)
 	{
 
-//		console.log("@@@onCompositionStart");
-
-		ex.component.__isComposing = true;
+		component.__isComposing = true;
 
 	}
 
@@ -203,16 +159,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Composition end event handler.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
 	 */
-	static onCompositionEnd(sender, e, ex)
+	static onCompositionEnd(e, component, options)
 	{
 
-//		console.log("@@@onCompositionEnd");
-
-		ex.component.__isComposing = false;
+		component.__isComposing = false;
 
 	}
 
@@ -221,14 +175,12 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Default submit.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
 	 */
-	static onDefaultSubmit(sender, e, ex)
+	static onDefaultSubmit(e, component, options)
 	{
-
-		let component = ex.component;
 
 		component.submit().then(() => {
 			if (!component.__cancelSubmit)
@@ -240,7 +192,7 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 				}
 
 				// Auto close
-				if (ex && ex.options["autoClose"])
+				if (options && options["autoClose"])
 				{
 					component.close();
 				}
@@ -254,14 +206,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Default cancel.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
 	 */
-	static onDefaultCancel(sender, e, ex)
+	static onDefaultCancel(e, component, options)
 	{
 
-		ex.component.close();
+		component.close();
 
 	}
 
@@ -270,21 +222,21 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Default clear.
 	 *
-	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
 	 */
-	static onDefaultClear(sender, e, ex)
+	static onDefaultClear(e, component, options)
 	{
 
 		let target;
 
-		if (ex && ex.options["target"])
+		if (options && options["target"])
 		{
-			target = sender.getAttribute(ex.options["target"]);
+			target = this.getAttribute(options["target"]);
 		}
 
-		ex.component.clear(ex.component, target);
+		component.clear(component, target);
 
 	}
 
@@ -333,9 +285,52 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 			let elements = component.querySelectorAll(options["rootNode"]);
 			elements = Array.prototype.slice.call(elements, 0);
 			elements.forEach((element) => {
-				component.addEventHandler("click", {"handler":handler, "options":options}, element, this);
+				element.addEventListener("click", function(e){handler.call(this, e, component, options);});
 			});
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Return an object that holds information about what action is taken when which key is pressed.
+	 *
+	 * @param	{Object}		defaultKeys			Key options.
+	 *
+	 * @return 	{Object}		Action info.
+	 */
+	static __getActions(defaultKeys)
+	{
+
+		let actions = {};
+
+		Object.keys(defaultKeys).forEach((key) => {
+			let keys = ( Array.isArray(defaultKeys[key]["key"]) ? defaultKeys[key]["key"] : [defaultKeys[key]["key"]])
+
+			for (let i = 0; i < keys.length; i++)
+			{
+				actions[keys[i]] = {};
+				actions[keys[i]]["type"] = key;
+				switch (key)
+				{
+				case "submit":
+					actions[keys[i]]["handler"] = KeyOrganizer.onDefaultSubmit;
+					actions[keys[i]]["option"] = defaultKeys["submit"];
+					break;
+				case "clear":
+					actions[keys[i]]["handler"] = KeyOrganizer.onDefaultClear;
+					actions[keys[i]]["option"] = defaultKeys["clear"];
+					break;
+				case "cancel":
+					actions[keys[i]]["handler"] = KeyOrganizer.onDefaultCancel;
+					actions[keys[i]]["option"] = defaultKeys["cancel"];
+					break;
+				}
+			}
+		});
+
+		return actions;
 
 	}
 
