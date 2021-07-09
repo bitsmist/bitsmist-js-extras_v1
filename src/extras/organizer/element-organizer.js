@@ -135,6 +135,9 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 								elements[i][propertyName] = elementInfo[key][propertyName];
 							});
 							break;
+						case "autoFocus":
+							elements[i].focus();
+							break;
 					}
 				});
 			}
