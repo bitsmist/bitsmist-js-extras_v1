@@ -33,10 +33,10 @@ import ElementOrganizer from "./organizer/element-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":2100});
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":2100});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":2100});
 
 import KeyOrganizer from "./organizer/key-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["beforeStart"], "order":2100});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":2100});
 
 // Plugin
 
@@ -56,9 +56,6 @@ window.BITSMIST.v1.Form = Form;
 
 import List from "./ui/list.js";
 window.BITSMIST.v1.List = List;
-
-import DefaultkeyHandler from "./plugin/ui/defaultkey-handler.js";
-window.BITSMIST.v1.DefaultkeyHandler = DefaultkeyHandler;
 
 // Util
 
