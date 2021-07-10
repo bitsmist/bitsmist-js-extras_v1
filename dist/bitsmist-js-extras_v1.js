@@ -145,7 +145,7 @@
 		 */
 		ObservableStore.prototype.notifySync = function notifySync (conditions)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 			var args = [], len = arguments.length - 1;
 			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
@@ -156,15 +156,15 @@
 				chain = chain.then(function () {
 					var ref, ref$1;
 
-					if ((ref = this$1)._filter.apply(ref, [ conditions, this$1._observers[i]["options"] ].concat( args )))
+					if ((ref = this$1$1)._filter.apply(ref, [ conditions, this$1$1._observers[i]["options"] ].concat( args )))
 					{
-						console.debug(("ObservableStore.notifySync(): Notifying. conditions=" + conditions + ", observer=" + (this$1._observers[i].id)));
-						return (ref$1 = this$1._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
+						console.debug(("ObservableStore.notifySync(): Notifying. conditions=" + conditions + ", observer=" + (this$1$1._observers[i].id)));
+						return (ref$1 = this$1$1._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
 					}
 				});
 			};
 
-			for (var i = 0; i < this$1._observers.length; i++)
+			for (var i = 0; i < this$1$1._observers.length; i++)
 			loop( i );
 
 			return chain;
@@ -539,7 +539,7 @@
 
 		BindableStore.prototype.bindTo = function bindTo (elem)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			var key = elem.getAttribute("bm-bind");
@@ -552,13 +552,13 @@
 			{
 				// Change element's value when store value changed
 				this.subscribe(key, function () {
-					DomUtil.setElementValue(elem, this$1.get(key));
+					DomUtil.setElementValue(elem, this$1$1.get(key));
 				});
 
 				// Set store value when element's value changed
 				var eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
 				elem.addEventListener(eventName, (function () {
-					this$1.set(key, DomUtil.getElementValue(elem));
+					this$1$1.set(key, DomUtil.getElementValue(elem));
 				}).bind(this));
 
 				elem.__bm_bindinfo = { "bound": true };
@@ -1008,10 +1008,9 @@
 			}
 
 			// Load preferences
-			if (component.settings.get("preferences.load"))
+			if (component.settings.get("preferences.settings.load"))
 			{
 				chain = PreferenceOrganizer.load(component).then(function (preferences) {
-					// Merge preferences
 					PreferenceOrganizer._store.merge(preferences);
 					PreferenceOrganizer.__loaded.resolve();
 				});
@@ -1084,7 +1083,7 @@
 		PreferenceOrganizer._triggerEvent = function _triggerEvent (keys)
 		{
 
-			var eventName = this.settings.get("preferences.eventName", "doSetup");
+			var eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 
 			return this.trigger(eventName, PreferenceOrganizer, {"keys":keys});
 
@@ -1168,7 +1167,7 @@
 		 */
 	ResourceUtil.prototype.get = function get (id, parameters)
 	{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 		var method = "GET";
@@ -1180,7 +1179,7 @@
 		var url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then(function (xhr) {
-			return this$1._convertResponseData(xhr.responseText, dataType);
+			return this$1$1._convertResponseData(xhr.responseText, dataType);
 		});
 
 	};
@@ -1197,7 +1196,7 @@
 		 */
 	ResourceUtil.prototype.delete = function delete$1 (id, parameters)
 	{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 		var method = "DELETE";
@@ -1209,7 +1208,7 @@
 		var url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then(function (xhr) {
-			return this$1._convertResponseData(xhr.responseText, dataType);
+			return this$1$1._convertResponseData(xhr.responseText, dataType);
 		});
 
 	};
@@ -1227,7 +1226,7 @@
 		 */
 	ResourceUtil.prototype.insert = function insert (id, items, parameters)
 	{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 		var method = "POST";
@@ -1239,7 +1238,7 @@
 		var url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then(function (xhr) {
-			return this$1._convertResponseData(xhr.responseText, dataType);
+			return this$1$1._convertResponseData(xhr.responseText, dataType);
 		});
 
 	};
@@ -1257,7 +1256,7 @@
 		 */
 	ResourceUtil.prototype.update = function update (id, items, parameters)
 	{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 		var method = "PUT";
@@ -1269,7 +1268,7 @@
 		var url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then(function (xhr) {
-			return this$1._convertResponseData(xhr.responseText, dataType);
+			return this$1$1._convertResponseData(xhr.responseText, dataType);
 		});
 
 	};
@@ -1492,11 +1491,11 @@
 	     */
 		MasterUtil.prototype.load = function load ()
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			return this.get("list").then(function (data) {
-				this$1._items = this$1.__reshapeItems(data["data"]);
+				this$1$1._items = this$1$1.__reshapeItems(data["data"]);
 			});
 
 		};
@@ -1560,13 +1559,13 @@
 		 */
 		MasterUtil.prototype.filter = function filter (predicate)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			var ret = Object.keys(this._items).reduce(function (result, key) {
-				if (predicate(this$1._items[key]))
+				if (predicate(this$1$1._items[key]))
 				{
-					result[key] = this$1._items[key];
+					result[key] = this$1$1._items[key];
 				}
 
 				return result;
@@ -1653,7 +1652,7 @@
 		 */
 		MasterOrganizer.organize = function organize (conditions, component, settings)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			var promises = [];
@@ -1667,7 +1666,7 @@
 
 				// Process each master
 				Object.keys(masters).forEach(function (masterName) {
-					promises.push(this$1._initMaster(component, masterName, masters[masterName], settings$1));
+					promises.push(this$1$1._initMaster(component, masterName, masters[masterName], settings$1));
 				});
 			}
 
@@ -1833,6 +1832,9 @@
 									elements[i][propertyName] = elementInfo[key][propertyName];
 								});
 								break;
+							case "autoFocus":
+								elements[i].focus();
+								break;
 						}
 					});
 				};
@@ -1879,6 +1881,7 @@
 			component._binds = new BindableStore();
 
 		};
+
 		// -------------------------------------------------------------------------
 
 		/**
@@ -1896,7 +1899,7 @@
 			 var data = settings["binds"];
 
 			// Bind data after the HTML is appended
-			component.addEventHandler("afterAppend", {"handler":DatabindingOrganizer.onAfterAppend, "options":{"data":data}});
+			DatabindingOrganizer.update(component, data);
 
 			return settings;
 
@@ -1917,27 +1920,6 @@
 
 			// Bind data to elements
 			DatabindingOrganizer._bindData(component);
-
-		};
-
-		// -----------------------------------------------------------------------------
-		//	Event handlers
-		// -----------------------------------------------------------------------------
-
-		/**
-		 * After append event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-		 * @param	{Object}		ex					Extra event info.
-		 */
-		DatabindingOrganizer.onAfterAppend = function onAfterAppend (sender, e, ex)
-		{
-
-			var component = ex.component;
-			var data = ex.options["data"];
-
-			DatabindingOrganizer.update(component, data);
 
 		};
 
@@ -1991,16 +1973,6 @@
 		KeyOrganizer.init = function init (conditions, component, settings)
 		{
 
-			/*
-			// Add properties
-			Object.defineProperty(component, 'masters', {
-				get() { return this._masters; },
-			});
-
-			// Add methods
-			component.addMaster = function(masterName, options, ajaxSettings) { return MasterOrganizer._initMaster(this, masterName, options, ajaxSettings); }
-			*/
-
 			// Init vars
 			component.__isComposing = false;
 
@@ -2023,7 +1995,17 @@
 			var keys = settings["keys"];
 			if (keys)
 			{
-				component.addEventHandler("afterAppend", {"handler":KeyOrganizer.onAfterAppend, "options":{"keys":keys}});
+				// Init keys
+				var actions = KeyOrganizer.__getActions(keys);
+				component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component, keys, actions);});
+				component.addEventListener("keypress", function(e){KeyOrganizer.onKeyPress.call(this, e, component, keys, actions);});
+				component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
+				component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
+
+				// Init buttons
+				Object.keys(keys).forEach(function (key) {
+					KeyOrganizer.__initButtons(component, key, keys[key]);
+				});
 			}
 
 			return settings;
@@ -2035,50 +2017,14 @@
 		// -------------------------------------------------------------------------
 
 		/**
-		 * After append event handler.
+	 	 * Key down event handler. Handle keys that do not fire keyPress event.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 * @param	{Object}		actions				Action info.
 		 */
-		KeyOrganizer.onAfterAppend = function onAfterAppend (sender, e, ex)
-		{
-
-			var component = ex.component;
-
-			// default keys
-			var defaultKeys = component.settings.get("keys.defaultKeys");
-			if (defaultKeys)
-			{
-	//			console.log("@@@defaulKeys", defaultKeys);
-				component.addEventHandler("keydown", {"handler": KeyOrganizer.onKeyDown, "options":defaultKeys}, null, this);
-				component.addEventHandler("keypress", {"handler":KeyOrganizer.onKeyPress, "options":defaultKeys}, null, this);
-				component.addEventHandler("compositionstart", {"handler":KeyOrganizer.onCompositionStart, "options":defaultKeys}, null, this);
-				component.addEventHandler("compositionend", {"handler":KeyOrganizer.onCompositionEnd, "options":defaultKeys}, null, this);
-			}
-
-			// default buttons
-			var defaultButtons = component.settings.get("keys.defaultButtons");
-			if (defaultButtons)
-			{
-	//			console.log("@@@defaulButtons", defaultButtons);
-				KeyOrganizer.__initElements(component, defaultButtons["submit"], KeyOrganizer.onDefaultSubmit);
-				KeyOrganizer.__initElements(component, defaultButtons["cancel"], KeyOrganizer.onDefaultCancel);
-				KeyOrganizer.__initElements(component, defaultButtons["clear"], KeyOrganizer.onDefaultClear);
-			}
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-	 	 * Key down event handler. Handle keys which do not fire keyPress event.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		KeyOrganizer.onKeyDown = function onKeyDown (sender, e, ex)
+		KeyOrganizer.onKeyDown = function onKeyDown (e, component, options, actions)
 		{
 
 			var key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
@@ -2088,11 +2034,9 @@
 			switch (key)
 			{
 				case "escape":
-					KeyOrganizer.onKeyPress(sender, e, ex);
+					KeyOrganizer.onKeyPress(e, component, options, actions);
 					break;
 			}
-
-	//		console.log("@@@onKeyDown" ,key);
 
 		};
 
@@ -2101,41 +2045,29 @@
 		/**
 	 	 * Key press event handler.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 * @param	{Object}		actions				Action info.
 		 */
-		KeyOrganizer.onKeyPress = function onKeyPress (sender, e, ex)
+		KeyOrganizer.onKeyPress = function onKeyPress (e, component, options, actions)
 		{
 
-			var component = ex.component;
-
 			// Ignore all key input when composing.
-			if (component.__isComposing || e.keyCode == 229)
+			if (component.__isComposing || e.isComposing || e.keyCode == 229)
 			{
 				return;
 			}
 
+			// Get a key
 			var key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
 			key = key.toLowerCase();
 			key = ( key == "esc" ? "escape" : key ); // For IE11
 
-	//		console.log("@@@onKeyPress" ,key);
-
-			if (ex.options.submit && key == ex.options.submit.key)
+			// Take an action according to the key pressed if specified
+			if (actions[key])
 			{
-				// Submit
-				KeyOrganizer.onDefaultSubmit(sender, e, {"options":ex.options["submit"], "component":component});
-			}
-			else if (ex.options.cancel && key == ex.options.cancel.key)
-			{
-				// Cancel
-				KeyOrganizer.onDefaultCancel(sender, e, {"options":ex.options["cancel"], "component":component});
-			}
-			else if (ex.options.clear && key == ex.options.clear.key)
-			{
-				// Clear
-				KeyOrganizer.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
+				actions[key]["handler"].call(this, e, component, actions[key]["option"]);
 			}
 
 			return;
@@ -2147,16 +2079,14 @@
 		/**
 		 * Composition start event handler.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.onCompositionStart = function onCompositionStart (sender, e, ex)
+		KeyOrganizer.onCompositionStart = function onCompositionStart (e, component, options)
 		{
 
-	//		console.log("@@@onCompositionStart");
-
-			ex.component.__isComposing = true;
+			component.__isComposing = true;
 
 		};
 
@@ -2165,32 +2095,30 @@
 		/**
 		 * Composition end event handler.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.onCompositionEnd = function onCompositionEnd (sender, e, ex)
+		KeyOrganizer.onCompositionEnd = function onCompositionEnd (e, component, options)
 		{
 
-	//		console.log("@@@onCompositionEnd");
-
-			ex.component.__isComposing = false;
+			component.__isComposing = false;
 
 		};
 
+		// -------------------------------------------------------------------------
+		//  Protected
 		// -------------------------------------------------------------------------
 
 		/**
 		 * Default submit.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.onDefaultSubmit = function onDefaultSubmit (sender, e, ex)
+		KeyOrganizer._defaultSubmit = function _defaultSubmit (e, component, options)
 		{
-
-			var component = ex.component;
 
 			component.submit().then(function () {
 				if (!component.__cancelSubmit)
@@ -2202,7 +2130,7 @@
 					}
 
 					// Auto close
-					if (ex && ex.options["autoClose"])
+					if (options && options["autoClose"])
 					{
 						component.close();
 					}
@@ -2216,14 +2144,14 @@
 		/**
 		 * Default cancel.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.onDefaultCancel = function onDefaultCancel (sender, e, ex)
+		KeyOrganizer._defaultCancel = function _defaultCancel (e, component, options)
 		{
 
-			ex.component.close();
+			component.close();
 
 		};
 
@@ -2232,21 +2160,21 @@
 		/**
 		 * Default clear.
 		 *
-		 * @param	{Object}		sender				Sender.
 		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.onDefaultClear = function onDefaultClear (sender, e, ex)
+		KeyOrganizer._defaultClear = function _defaultClear (e, component, options)
 		{
 
 			var target;
 
-			if (ex && ex.options["target"])
+			if (options && options["target"])
 			{
-				target = sender.getAttribute(ex.options["target"]);
+				target = this.getAttribute(options["target"]);
 			}
 
-			ex.component.clear(ex.component, target);
+			component.clear(component, target);
 
 		};
 
@@ -2284,22 +2212,83 @@
 		 * Init buttons.
 		 *
 		 * @param	{Component}		component			Component.
+		 * @param	{String}		action				Action.
 		 * @param	{Object}		options				Options.
-		 * @param	{Function}		handler				Handler.
 		 */
-		KeyOrganizer.__initElements = function __initElements (component, options, handler)
+		KeyOrganizer.__initButtons = function __initButtons (component, action, options)
 		{
-			var this$1 = this;
 
-
-			if (options)
+			if (options && options["rootNode"])
 			{
+				var handler = ( options["handler"] ? options["handler"] : KeyOrganizer.__getDefaultHandler(action) );
 				var elements = component.querySelectorAll(options["rootNode"]);
 				elements = Array.prototype.slice.call(elements, 0);
+
 				elements.forEach(function (element) {
-					component.addEventHandler("click", {"handler":handler, "options":options}, element, this$1);
+					element.addEventListener("click", function(e){handler.call(this, e, component, options);});
 				});
 			}
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Return an object that holds information about what action is taken when which key is pressed.
+		 *
+		 * @param	{Object}		settings			Key settings.
+		 *
+		 * @return 	{Object}		Action info.
+		 */
+		KeyOrganizer.__getActions = function __getActions (settings)
+		{
+
+			var actions = {};
+
+			Object.keys(settings).forEach(function (key) {
+				var keys = ( Array.isArray(settings[key]["key"]) ? settings[key]["key"] : [settings[key]["key"]]);
+
+				for (var i = 0; i < keys.length; i++)
+				{
+					actions[keys[i]] = {};
+					actions[keys[i]]["type"] = key;
+					actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyOrganizer.__getDefaultHandler(key) );
+					actions[keys[i]]["option"] = settings[key];
+				}
+			});
+
+			return actions;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Return a default handler for the action.
+		 *
+		 * @param	{String}		action				Action.
+		 *
+		 * @return 	{Function}		Handler.
+		 */
+		KeyOrganizer.__getDefaultHandler = function __getDefaultHandler (action)
+		{
+
+			var handler;
+
+			switch (action)
+			{
+			case "submit":
+				handler = KeyOrganizer._defaultSubmit;
+				break;
+			case "clear":
+				handler = KeyOrganizer._defaultClear;
+				break;
+			case "cancel":
+				handler = KeyOrganizer._defaultCancel;
+				break;
+			}
+
+			return handler;
 
 		};
 
@@ -2322,7 +2311,7 @@
 
 	var Plugin = function Plugin(component, options)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		this._component = component;
@@ -2332,7 +2321,7 @@
 		// Add event handlers
 		var events = this._options.get("events", {});
 		Object.keys(events).forEach(function (eventName) {
-			component.addEventHandler(eventName, events[eventName], null, this$1);
+			component.addEventHandler(eventName, events[eventName], null, this$1$1);
 		});
 
 		// Expose plugin
@@ -2547,7 +2536,7 @@
 	var ResourceHandler = /*@__PURE__*/(function (Plugin) {
 		function ResourceHandler(component, options)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			Plugin.call(this, component, options);
@@ -2560,8 +2549,8 @@
 			var resources = this._options.get("resources", []);
 			Object.keys(resources).forEach(function (index) {
 				var resourceName = resources[index];
-				this$1.addResource(resourceName, {
-					"settings":	this$1._options.get("settings", {})
+				this$1$1.addResource(resourceName, {
+					"settings":	this$1$1._options.get("settings", {})
 				});
 			});
 
@@ -2623,7 +2612,7 @@
 		 */
 		ResourceHandler.prototype.onDoFetch = function onDoFetch (sender, e, ex)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			var id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
@@ -2633,14 +2622,14 @@
 			if (autoLoad)
 			{
 				return this._resources[this._defaultResourceName].get(id, parameters).then(function (data) {
-					this$1._component.data = data;
-					if ("items" in this$1._component)
+					this$1$1._component.data = data;
+					if ("items" in this$1$1._component)
 					{
-						this$1._component.items = this$1._options.get("itemsGetter", function(data){return data["data"]})(data);
+						this$1$1._component.items = this$1$1._options.get("itemsGetter", function(data){return data["data"]})(data);
 					}
-					else if ("item" in this$1._component)
+					else if ("item" in this$1$1._component)
 					{
-						this$1._component.item = this$1._options.get("itemGetter", function(data){return data["data"][0]})(data);
+						this$1$1._component.item = this$1$1._options.get("itemGetter", function(data){return data["data"][0]})(data);
 					}
 				});
 			}
@@ -2658,7 +2647,7 @@
 		*/
 		ResourceHandler.prototype.onDoSubmit = function onDoSubmit (sender, e, ex)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			var id = BITSMIST.v1.Util.safeGet(e.detail.target, "id");
@@ -2695,11 +2684,11 @@
 			return Promise.resolve().then(function () {
 				if (id)
 				{
-					return this$1._resources[this$1._defaultResourceName].update(id, {items:submitData});
+					return this$1$1._resources[this$1$1._defaultResourceName].update(id, {items:submitData});
 				}
 				else
 				{
-					return this$1._resources[this$1._defaultResourceName].insert(id, {items:submitData});
+					return this$1$1._resources[this$1$1._defaultResourceName].insert(id, {items:submitData});
 				}
 			});
 
@@ -3008,7 +2997,7 @@
 	 */
 	FormUtil.setFields = function(rootNode, item, masters)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		var fields = rootNode.querySelectorAll("[bm-bind]");
@@ -3020,12 +3009,12 @@
 				if (element.hasAttribute("bm-master"))
 				{
 					var type = element.getAttribute("bm-master");
-					var value = this$1.getMasterValue(masters, type, item[fieldName]);
-					this$1.setValue(element, value);
+					var value = this$1$1.getMasterValue(masters, type, item[fieldName]);
+					this$1$1.setValue(element, value);
 				}
 				else
 				{
-					this$1.setValue(element, item[fieldName]);
+					this$1$1.setValue(element, item[fieldName]);
 				}
 			}
 		});
@@ -3044,7 +3033,7 @@
 	 */
 	FormUtil.getFields = function(rootNode, target)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		var item = {};
@@ -3054,7 +3043,7 @@
 		elements = Array.prototype.slice.call(elements, 0);
 		elements.forEach(function (element) {
 			var key = element.getAttribute("bm-bind");
-			var value = this$1.getValue(element);
+			var value = this$1$1.getValue(element);
 
 			//if (value)
 			{
@@ -3527,11 +3516,11 @@
 	 */
 	Form.prototype.build = function(items)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		Object.keys(items).forEach(function (key) {
-			FormUtil.buildFields(this$1, key, items[key]);
+			FormUtil.buildFields(this$1$1, key, items[key]);
 		});
 
 	};
@@ -3547,7 +3536,7 @@
 	 */
 	Form.prototype.fill = function(options)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		options = Object.assign({}, options);
@@ -3568,20 +3557,20 @@
 			if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
 			{
 				return Promise.resolve().then(function () {
-					return this$1.trigger("doTarget", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("doTarget", sender, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("beforeFetch", sender, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("doFetch", sender, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("afterFetch", sender, {"target": this$1$1._target, "options":options});
 				});
 			}
 		}).then(function () {
-			return this$1.trigger("beforeFill", sender);
+			return this$1$1.trigger("beforeFill", sender);
 		}).then(function () {
-			FormUtil.setFields(rootNode, this$1._item, this$1.masters);
-			return this$1.trigger("afterFill", sender);
+			FormUtil.setFields(rootNode, this$1$1._item, this$1$1.masters);
+			return this$1$1.trigger("afterFill", sender);
 		});
 
 	};
@@ -3615,19 +3604,19 @@
 	 */
 	Form.prototype.validate = function(options)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		options = Object.assign({}, options);
 		var sender = ( options["sender"] ? options["sender"] : this );
 
 		return Promise.resolve().then(function () {
-			return this$1.trigger("beforeValidate", sender);
+			return this$1$1.trigger("beforeValidate", sender);
 		}).then(function () {
 			var ret = true;
-			var form = this$1.querySelector("form");
+			var form = this$1$1.querySelector("form");
 
-			var autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this$1._settings.get("settings.autoValidate"));
+			var autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this$1$1._settings.get("settings.autoValidate"));
 			if (autoValidate)
 			{
 				if (form && form.reportValidity)
@@ -3636,15 +3625,15 @@
 				}
 				else
 				{
-					ret = FormUtil.reportValidity(this$1);
+					ret = FormUtil.reportValidity(this$1$1);
 				}
 			}
 
 			if (!ret)
 			{
-				this$1.__cancelSubmit = true;
+				this$1$1.__cancelSubmit = true;
 			}
-			return this$1.trigger("afterValidate", sender);
+			return this$1$1.trigger("afterValidate", sender);
 		});
 
 	};
@@ -3658,7 +3647,7 @@
 	 */
 	Form.prototype.submit = function(options)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		options = Object.assign({}, options);
@@ -3669,18 +3658,18 @@
 		var itemGetter = BITSMIST.v1.Util.safeGet(options, "itemGetter", this.settings.get("settings.itemGetter", function(item){return [item]}));
 
 		return Promise.resolve().then(function () {
-			return this$1.validate();
+			return this$1$1.validate();
 		}).then(function () {
-			return this$1.trigger("beforeSubmit", sender);
+			return this$1$1.trigger("beforeSubmit", sender);
 		}).then(function () {
-			if (!this$1.__cancelSubmit)
+			if (!this$1$1.__cancelSubmit)
 			{
-				var items = itemGetter(this$1._item);
-				return this$1.trigger("doSubmit", sender, {"target":this$1._target, "items":items});
+				var items = itemGetter(this$1$1._item);
+				return this$1$1.trigger("doSubmit", sender, {"target":this$1$1._target, "items":items});
 			}
 		}).then(function () {
-			var items = itemGetter(this$1._item);
-			return this$1.trigger("afterSubmit", sender, {"target":this$1._target, "items":items});
+			var items = itemGetter(this$1$1._item);
+			return this$1$1.trigger("afterSubmit", sender, {"target":this$1$1._target, "items":items});
 		});
 
 	};
@@ -3859,7 +3848,7 @@
 	 */
 	List.prototype.fill = function(options)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		console.debug(("List.fill(): Filling list. name=" + (this.name)));
@@ -3879,32 +3868,32 @@
 			if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
 			{
 				return Promise.resolve().then(function () {
-					return this$1.trigger("doTarget", this$1, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("doTarget", this$1$1, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("beforeFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("beforeFetch", sender, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("doFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("doFetch", sender, {"target": this$1$1._target, "options":options});
 				}).then(function () {
-					return this$1.trigger("afterFetch", sender, {"target": this$1._target, "options":options});
+					return this$1$1.trigger("afterFetch", sender, {"target": this$1$1._target, "options":options});
 				});
 			}
 		}).then(function () {
-			return this$1.trigger("beforeFill", sender);
+			return this$1$1.trigger("beforeFill", sender);
 		}).then(function () {
-			if (this$1._items)
+			if (this$1$1._items)
 			{
-				return builder.call(this$1, fragment);
+				return builder.call(this$1$1, fragment);
 			}
 		}).then(function () {
-			var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this$1._settings.get("settings.autoClear"));
+			var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this$1$1._settings.get("settings.autoClear"));
 			if (autoClear)
 			{
-				this$1.clear();
+				this$1$1.clear();
 			}
 		}).then(function () {
-			this$1._listRootNode.appendChild(fragment);
+			this$1$1._listRootNode.appendChild(fragment);
 		}).then(function () {
-			return this$1.trigger("afterFill", sender);
+			return this$1$1.trigger("afterFill", sender);
 		});
 
 	};
@@ -3922,7 +3911,7 @@
 	 */
 	List.prototype._buildSync = function(fragment)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		var chain = Promise.resolve();
@@ -3931,11 +3920,11 @@
 
 		var loop = function ( i ) {
 			chain = chain.then(function () {
-				return this$1.__appendRowSync(fragment, i, this$1._items[i], template, rowEvents);
+				return this$1$1.__appendRowSync(fragment, i, this$1$1._items[i], template, rowEvents);
 			});
 		};
 
-		for (var i = 0; i < this$1._items.length; i++)
+		for (var i = 0; i < this$1$1._items.length; i++)
 		loop( i );
 
 		return chain;
@@ -3980,7 +3969,7 @@
 	 */
 	List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		// Append a row
@@ -3995,18 +3984,18 @@
 		if (rowEvents)
 		{
 			Object.keys(rowEvents).forEach(function (elementName) {
-				this$1._row.initEvents(elementName, rowEvents[elementName], element);
+				this$1$1._row.initEvents(elementName, rowEvents[elementName], element);
 			});
 		}
 
 		// Call event handlers
 		return Promise.resolve().then(function () {
-			return this$1._row.trigger("beforeFillRow", this$1, {"item":item, "no":no, "element":element});
+			return this$1$1._row.trigger("beforeFillRow", this$1$1, {"item":item, "no":no, "element":element});
 		}).then(function () {
 			// Fill fields
-			FormUtil.setFields(element, item, this$1.masters);
+			FormUtil.setFields(element, item, this$1$1.masters);
 		}).then(function () {
-			return this$1._row.trigger("afterFillRow", this$1, {"item":item, "no":no, "element":element});
+			return this$1$1._row.trigger("afterFillRow", this$1$1, {"item":item, "no":no, "element":element});
 		});
 
 	};
@@ -4025,7 +4014,7 @@
 	 */
 	List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
 	{
-		var this$1 = this;
+		var this$1$1 = this;
 
 
 		// Append a row
@@ -4040,7 +4029,7 @@
 		if (rowEvents)
 		{
 			Object.keys(rowEvents).forEach(function (elementName) {
-				this$1._row.initEvents(elementName, rowEvents[elementName], element);
+				this$1$1._row.initEvents(elementName, rowEvents[elementName], element);
 			});
 		}
 
@@ -4050,309 +4039,6 @@
 		this.row.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 	};
-
-	// =============================================================================
-
-	// =============================================================================
-	//	Defaultkey Handler class
-	// =============================================================================
-
-	var DefaultkeyHandler = /*@__PURE__*/(function (Plugin) {
-		function DefaultkeyHandler(component, options)
-		{
-
-			Plugin.call(this, component, options);
-
-			this.__isComposing = false;
-
-		}
-
-		if ( Plugin ) DefaultkeyHandler.__proto__ = Plugin;
-		DefaultkeyHandler.prototype = Object.create( Plugin && Plugin.prototype );
-		DefaultkeyHandler.prototype.constructor = DefaultkeyHandler;
-
-		// -------------------------------------------------------------------------
-		//  Event handlers
-		// -------------------------------------------------------------------------
-
-		/**
-		 * After append event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onAfterAppend = function onAfterAppend (sender, e, ex)
-		{
-
-			// default keys
-			var defaultKeys = this._options.get("features.defaultKeys");
-			if (defaultKeys)
-			{
-				this._component.addEventHandler("keydown", {"handler": this.onKeyDown, "options":defaultKeys}, null, this);
-				this._component.addEventHandler("keypress", {"handler":this.onKeyPress, "options":defaultKeys}, null, this);
-				this._component.addEventHandler("compositionstart", {"handler":this.onCompositionStart, "options":defaultKeys}, null, this);
-				this._component.addEventHandler("compositionend", {"handler":this.onCompositionEnd, "options":defaultKeys}, null, this);
-			}
-
-			// default buttons
-			var defaultButtons = this._options.get("features.defaultButtons");
-			if (defaultButtons)
-			{
-				this.__initElements(defaultButtons["submit"], this.onDefaultSubmit);
-				this.__initElements(defaultButtons["cancel"], this.onDefaultCancel);
-				this.__initElements(defaultButtons["clear"], this.onDefaultClear);
-			}
-
-		};
-
-		// -------------------------------------------------------------------------
-		//  Event handlers (elements)
-		// -------------------------------------------------------------------------
-
-		/**
-	 	 * Key down event handler. Handle keys which do not fire keyPress event.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onKeyDown = function onKeyDown (sender, e, ex)
-		{
-
-			var key  = ( e.key ? e.key : this.__getKeyfromKeyCode(e.keyCode) );
-			key = key.toLowerCase();
-			key = ( key == "esc" ? "escape" : key ); // For IE11
-
-			switch (key)
-			{
-				case "escape":
-					this.onKeyPress(sender, e, ex);
-					break;
-			}
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-	 	 * Key press event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onKeyPress = function onKeyPress (sender, e, ex)
-		{
-
-			// Ignore all key input when composing.
-			if (this.__isComposing || e.keyCode == 229)
-			{
-				return;
-			}
-
-			var key  = ( e.key ? e.key : this.__getKeyfromKeyCode(e.keyCode) );
-			key = key.toLowerCase();
-			key = ( key == "esc" ? "escape" : key ); // For IE11
-
-			if (ex.options.submit && key == ex.options.submit.key)
-			{
-				// Submit
-				this.onDefaultSubmit(sender, e, {"options":ex.options["submit"]});
-			}
-			else if (ex.options.cancel && key == ex.options.cancel.key)
-			{
-				// Cancel
-				this.onDefaultCancel(sender, e, {"options":ex.options["cancel"]});
-			}
-			else if (ex.options.clear && key == ex.options.clear.key)
-			{
-				// Clear
-				this.onDefaultClear(sender, e, {"options":ex.options["clear"], "component":component});
-			}
-
-			return;
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Composition start event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onCompositionStart = function onCompositionStart (sender, e, ex)
-		{
-
-			this.__isComposing = true;
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Composition end event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onCompositionEnd = function onCompositionEnd (sender, e, ex)
-		{
-
-			this.__isComposing = false;
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Default submit.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onDefaultSubmit = function onDefaultSubmit (sender, e, ex)
-		{
-			var this$1 = this;
-
-
-			this._component.submit().then(function () {
-				if (!this$1._component.__cancelSubmit)
-				{
-					// Modal result
-					if (this$1._component._isModal)
-					{
-						this$1._component._modalResult["result"] = true;
-					}
-
-					// Auto close
-					if (ex && ex.options["autoClose"])
-					{
-						this$1._component.close();
-					}
-				}
-			});
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Default cancel.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onDefaultCancel = function onDefaultCancel (sender, e, ex)
-		{
-
-			this._component.close();
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Default clear.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-	 	 * @param	{Object}		ex					Extra event info.
-		 */
-		DefaultkeyHandler.prototype.onDefaultClear = function onDefaultClear (sender, e, ex)
-		{
-
-			var target;
-
-			if (ex && ex.options["target"])
-			{
-				target = sender.getAttribute(ex.options["target"]);
-			}
-
-			this._component.clear(ex.component, target);
-
-		};
-
-		// -------------------------------------------------------------------------
-		//  Privates
-		// -------------------------------------------------------------------------
-
-		/**
-	 	 * Convert key name from key code.
-		 *
-		 * @param	{Integer}		code				Key code.
-		 */
-		DefaultkeyHandler.prototype.__getKeyfromKeyCode = function __getKeyfromKeyCode (code)
-		{
-
-			var ret;
-
-			switch(code)
-			{
-				case 13:
-					ret = "Enter";
-					break;
-				default:
-					ret = String.fromCharCode(code);
-					break;
-			}
-
-			return ret;
-
-		};
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Init buttons.
-		 *
-		 * @param	{Object}		options				Options.
-		 * @param	{Function}		handler				Handler.
-		 */
-		DefaultkeyHandler.prototype.__initElements = function __initElements (options, handler)
-		{
-			var this$1 = this;
-
-
-			if (options)
-			{
-				var elements = this._component.querySelectorAll(options["rootNode"]);
-				elements = Array.prototype.slice.call(elements, 0);
-				elements.forEach(function (element) {
-					this$1._component.addEventHandler("click", {"handler":handler, "options":options}, element, this$1);
-				});
-			}
-
-		};
-
-		// -----------------------------------------------------------------------------
-		//  Protected
-		// -----------------------------------------------------------------------------
-
-		/**
-		 * Get plugin options.
-		 *
-		 * @return  {Object}		Options.
-		 */
-		DefaultkeyHandler.prototype._getOptions = function _getOptions ()
-		{
-
-			return {
-				"events": {
-					"afterAppend": this.onAfterAppend,
-				}
-			};
-
-		};
-
-		return DefaultkeyHandler;
-	}(Plugin));
 
 	// =============================================================================
 
@@ -4385,11 +4071,11 @@
 		 */
 		AuthenticationUtil.prototype.authenticate = function authenticate (user, password, options)
 		{
-			var this$1 = this;
+			var this$1$1 = this;
 
 
 			return new Promise(function (resolve, reject) {
-				this$1.get("list", {"user":user, "password":password}).then(function (json) {
+				this$1$1.get("list", {"user":user, "password":password}).then(function (json) {
 					if (json.result.resultCount > 0)
 					{
 						if (options && "redirect" in options)
@@ -4479,7 +4165,7 @@
 		PreferenceOrganizer._store.set(key, value);
 
 		// Save preferences
-		if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.autoSave")))
+		if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
 		{
 			PreferenceOrganizer.save(this);
 		}
@@ -4533,14 +4219,13 @@
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1200});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":1300});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":2100});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["beforeStart"], "order":2100});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["beforeStart"], "order":2100});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":2100});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":2100});
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
 	window.BITSMIST.v1.ResourceHandler = ResourceHandler;
 	window.BITSMIST.v1.Form = Form;
 	window.BITSMIST.v1.List = List;
-	window.BITSMIST.v1.DefaultkeyHandler = DefaultkeyHandler;
 	window.BITSMIST.v1.AuthenticationUtil = AuthenticationUtil;
 	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 	window.BITSMIST.v1.MasterUtil = MasterUtil;
