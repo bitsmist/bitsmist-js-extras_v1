@@ -48,6 +48,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 		component._binds = new BindableStore();
 
 	}
+
 	// -------------------------------------------------------------------------
 
 	/**
@@ -65,7 +66,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 		 let data = settings["binds"];
 
 		// Bind data after the HTML is appended
-		component.addEventHandler("afterAppend", {"handler":DatabindingOrganizer.onAfterAppend, "options":{"data":data}});
+		DatabindingOrganizer.update(component, data);
 
 		return settings;
 
@@ -86,27 +87,6 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		// Bind data to elements
 		DatabindingOrganizer._bindData(component);
-
-	}
-
-	// -----------------------------------------------------------------------------
-	//	Event handlers
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * After append event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
-	static onAfterAppend(sender, e, ex)
-	{
-
-		let component = ex.component;
-		let data = ex.options["data"];
-
-		DatabindingOrganizer.update(component, data);
 
 	}
 
