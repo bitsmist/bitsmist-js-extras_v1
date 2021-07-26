@@ -81,7 +81,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		// Load preferences
 		if (component.settings.get("preferences.settings.load"))
 		{
-			chain = PreferenceOrganizer.load(component).then((preferences) => {
+			chain = component.resources["preferences"].get().then((preferences) => {
 				PreferenceOrganizer._store.merge(preferences);
 				PreferenceOrganizer.__loaded.resolve();
 			});
@@ -103,49 +103,11 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	}
 
 	// -------------------------------------------------------------------------
-
-	/**
- 	 * Load preferences.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static load(component, options)
-	{
-
-		let sender = ( options && options["sender"] ? options["sender"] : component );
-
-		return component.trigger("doLoadStore", sender);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
- 	 * Save preferences.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static save(component, options)
-	{
-
-		let sender = ( options && options["sender"] ? options["sender"] : component );
-
-		return component.trigger("doSaveStore", sender, {"data":PreferenceOrganizer._store.items});
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Protected
 	// -------------------------------------------------------------------------
 
 	/**
- 	 * Load preferences.
+ 	 * Trigger preference changed events.
 	 *
 	 * @param	{Array}			keys				Changed keys.
 	 *

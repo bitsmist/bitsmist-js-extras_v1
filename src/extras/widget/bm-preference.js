@@ -80,40 +80,8 @@ PreferenceManager.prototype.set = function(key, value, options)
 	// Save preferences
 	if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
 	{
-		PreferenceOrganizer.save(this);
+		return this.resources["preferences"].update("", PreferenceOrganizer._store.items);
 	}
-
-}
-
-// -------------------------------------------------------------------------
-
-/**
- * Load preferences.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-PreferenceManager.prototype.load = function(options)
-{
-
-	return PreferenceOrganizer.load(this, options);
-
-}
-
-// -------------------------------------------------------------------------
-
-/**
- * Save preferences.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-PreferenceManager.prototype.save = function()
-{
-
-	return PreferenceOrganizer.save(this, options);
 
 }
 
