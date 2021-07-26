@@ -23,11 +23,11 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrg
 import PluginOrganizer from "./organizer/plugin-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1100});
 
-import PreferenceOrganizer from "./organizer/preference-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1200});
+import ResourceOrganizer from "./organizer/resource-organizer.js";
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad"], "order":1300});
 
-import MasterOrganizer from "./organizer/master-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.organizers.set("MasterOrganizer", {"object":MasterOrganizer, "targetWords":"masters", "targetEvents":["beforeStart", "afterSpecLoad"], "order":1300});
+import PreferenceOrganizer from "./organizer/preference-organizer.js";
+BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1400});
 
 import ElementOrganizer from "./organizer/element-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":2100});
@@ -43,11 +43,16 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrgan
 import Plugin from "./plugin/plugin.js";
 window.BITSMIST.v1.Plugin = Plugin;
 
-import CookieStoreHandler from "./plugin/store/cookie-store-handler.js";
-window.BITSMIST.v1.CookieStoreHandler = CookieStoreHandler;
+// Resource handler
 
-import ResourceHandler from "./plugin/resource/resource-handler.js";
-window.BITSMIST.v1.ResourceHandler = ResourceHandler;
+import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
+window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
+
+import ApiResourceHandler from "./resource-handler/api-resource-handler.js";
+window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
+
+import ObjectResourceHandler from "./resource-handler/object-resource-handler.js";
+window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 
 // Ui
 
@@ -59,17 +64,8 @@ window.BITSMIST.v1.List = List;
 
 // Util
 
-import AuthenticationUtil from "./util/authentication-util.js";
-window.BITSMIST.v1.AuthenticationUtil = AuthenticationUtil;
-
 import FormatterUtil from "./util/formatter-util.js";
 window.BITSMIST.v1.FormatterUtil = FormatterUtil;
-
-import MasterUtil from "./util/master-util.js";
-window.BITSMIST.v1.MasterUtil = MasterUtil;
-
-import ResourceUtil from "./util/resource-util.js";
-window.BITSMIST.v1.ResourceUtil = ResourceUtil;
 
 // Widget
 

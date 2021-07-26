@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import ResourceHandler from './resource-handler';
+
 // =============================================================================
-//	Resource util class
+//	API Resource Handler class
 // =============================================================================
 
-export default class ResourceUtil
+export default class ApiResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
@@ -25,13 +27,10 @@ export default class ResourceUtil
      * @param	{String}		resourceName		Resource name.
      * @param	{Object}		options				Options.
      */
-	constructor(resourceName, options)
+	constructor(component, resourceName, options)
 	{
 
-		this._name = resourceName;
-		this._options = options;
-		this._data;
-		this._parameters = {};
+		super(component, resourceName, options);
 
 	}
 
@@ -59,7 +58,9 @@ export default class ResourceUtil
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-			return this._convertResponseData(xhr.responseText, dataType);
+			this._data = this._convertResponseData(xhr.responseText, dataType);
+
+			return ResourceHandler.prototype.get.call(this, id, parameters);
 		});
 
 	}
@@ -86,7 +87,7 @@ export default class ResourceUtil
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-			return this._convertResponseData(xhr.responseText, dataType);
+	//		return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}
@@ -113,9 +114,7 @@ export default class ResourceUtil
 
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
-			return this._convertResponseData(xhr.responseText, dataType);
-		});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)});
 
 	}
 
@@ -141,9 +140,7 @@ export default class ResourceUtil
 
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)}).then((xhr) => {
-			return this._convertResponseData(xhr.responseText, dataType);
-		});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)});
 
 	}
 
@@ -170,11 +167,11 @@ export default class ResourceUtil
 		default:
 			data = JSON.stringify(items);
 			break;
-				/*
+		/*
 		default:
 			data = items.serialize();
 			break;
-			*/
+		*/
 		}
 
 		return data;
@@ -221,7 +218,7 @@ export default class ResourceUtil
 	_getOption(target, method)
 	{
 
-		let settings = ("settings" in this._options ? this._options["settings"] : {});
+		let settings = this._options.get("handlerOptions", {});
 		let options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
 		let options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
 
@@ -243,12 +240,12 @@ export default class ResourceUtil
 	_buildApiUrl(resourceName, id, parameters, options)
 	{
 
-		let baseUrl = options["baseUrl"];
-		let scheme = options["scheme"];
-		let host = options["host"];
-		let dataType = options["dataType"];
-		let version = options["version"];
-		let format = ( options["format"] ? options["format"] : "@baseUrl@@query@" );;
+		let baseUrl = options["baseUrl"] || this._component.settings.get("system.apiBaseUrl", "");
+		let scheme = options["scheme"] || "";
+		let host = options["host"] || "";
+		let dataType = options["dataType"] || "";
+		let version = options["version"] || "";
+		let format = options["format"] || "";
 		let url = format.
 					replace("@scheme@", scheme).
 					replace("@host@", host).

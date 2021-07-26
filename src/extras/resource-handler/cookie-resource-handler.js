@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import Plugin from '../plugin';
+import ResourceHandler from './resource-handler';
 
 // =============================================================================
-//	Cookie store handler class
+//	Cookie resource handler class
 // =============================================================================
 
-export default class CookieStoreHandler extends Plugin
+export default class CookieResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
@@ -24,73 +24,57 @@ export default class CookieStoreHandler extends Plugin
 	/**
      * Constructor.
      *
-	 * @param	{Object}		component			Component which the plugin
-	 * 												is attached to.
-	 * @param	{Object}		options				Options for the component.
+	 * @param	{Object}		component			Component.
+     * @param	{String}		resourceName		Resource name.
+     * @param	{Object}		options				Options.
      */
-	constructor(component, options)
+	constructor(component, resourceName, options)
 	{
 
-		super(component, options);
+		super(component, resourceName, options);
 
-		this._cookieName = this._options.get("cookieOptions.name", "preferences");
+		this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Methods
 	// -------------------------------------------------------------------------
 
 	/**
-	* Do load store event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
-	*/
-	onDoLoadStore(sender, e, ex)
-	{
-
-		let data = this.__getCookie(this._cookieName);
-
-		return data;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	* Do save store event handler.
-	*
-	* @param	{Object}		sender				Sender.
-	* @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
-	*/
-	onDoSaveStore(sender, e, ex)
-	{
-
-		this.__setCookie(this._cookieName, e.detail.data);
-
-	}
-
-	// -----------------------------------------------------------------------------
-	//  Protected
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Get plugin options.
+	 * Get data.
 	 *
-	 * @return  {Object}		Options.
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
 	 */
-	_getOptions()
+	get(id, parameters)
 	{
 
-		return {
-			"events": {
-				"doLoadStore": this.onDoLoadStore,
-				"doSaveStore": this.onDoSaveStore,
-			}
-		};
+		this._data = this.__getCookie(this._cookieName);
+
+		return ResourceHandler.prototype.get.call(this, id, parameters);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Update data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		items				Data to update.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	update(id, items, parameters)
+	{
+
+		this.__setCookie(this._cookieName, items);
+
+		return Promise.resolve();
 
 	}
 
@@ -132,7 +116,7 @@ export default class CookieStoreHandler extends Plugin
 	{
 
 		let cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
-		let options =this._options.get("cookieOptions", {})
+		let options = this._options.get("cookieOptions");
 
 		cookie += Object.keys(options).reduce((result, current) => {
 			result += current + "=" + options[current] + "; ";

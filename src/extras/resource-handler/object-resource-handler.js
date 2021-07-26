@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import ResourceUtil from './resource-util';
+import ResourceHandler from './resource-handler';
 
 // =============================================================================
-//	Authentication util class
+//	Object Resource Handler class
 // =============================================================================
 
-export default class AuthenticationUtil extends ResourceUtil
+export default class ObjectResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
@@ -24,13 +24,19 @@ export default class AuthenticationUtil extends ResourceUtil
 	/**
      * Constructor.
      *
-     * @param	{string}		resourceName		Resource name.
-     * @param	{array}			options				Options.
+	 * @param	{Object}		component			Component.
+     * @param	{String}		resourceName		Resource name.
+     * @param	{Object}		options				Options.
      */
-	constructor(resourceName, options)
+	constructor(component, resourceName, options)
 	{
 
-		super("authentications", options);
+		super(component, resourceName, options);
+
+		if (options["items"])
+		{
+			this.get();
+		}
 
 	}
 
@@ -39,30 +45,19 @@ export default class AuthenticationUtil extends ResourceUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Authenticate.
+	 * Get data.
 	 *
-	 * @param	{string}		user				User.
-	 * @param	{string}		password			Password.
-	 * @param	{array}			options				Options.
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
 	 */
-	authenticate(user, password, options)
+	get(id, parameters)
 	{
 
-		return new Promise((resolve, reject) => {
-			this.get("list", {"user":user, "password":password}).then((json) => {
-				if (json.result.resultCount > 0)
-				{
-					if (options && "redirect" in options)
-					{
-						location.href = decodeURI(options["redirect"]);
-					}
-				}
-				else
-				{
-					reject("login failed");
-				}
-			});
-		});
+		this._data = this._options.get("items");
+
+		return ResourceHandler.prototype.get.call(this, id, parameters);
 
 	}
 
