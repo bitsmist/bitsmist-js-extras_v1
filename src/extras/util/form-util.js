@@ -36,10 +36,12 @@ FormUtil.setFields = function(rootNode, item, masters)
 		let fieldName = element.getAttribute("bm-bind");
 		if (fieldName in item)
 		{
-			if (element.hasAttribute("bm-master"))
+			if (element.hasAttribute("bm-resource"))
 			{
-				let type = element.getAttribute("bm-master");
-				let value = this.getMasterValue(masters, type, item[fieldName]);
+				let arr = element.getAttribute("bm-resource").split(".");
+				let type = arr[0];
+				let field = arr[1] || "";
+				let value = this.getMasterValue(masters, type, item[fieldName], field);
 				this.setValue(element, value);
 			}
 			else
@@ -217,13 +219,13 @@ FormUtil.buildFields = function(rootNode, fieldName, item)
  *
  * @return  {string}		Master value.
  */
-FormUtil.getMasterValue = function(masters, type, code)
+FormUtil.getMasterValue = function(masters, type, code, fieldName)
 {
 
 	let ret = code;
 	if (masters && (type in masters))
 	{
-		ret = masters[type].getValue(code);
+		ret = masters[type].getItem(code)[fieldName];
 	}
 
 	return ret;

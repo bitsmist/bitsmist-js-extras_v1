@@ -179,6 +179,7 @@ List.prototype.fill = function(options)
 	let fragment = document.createDocumentFragment();
 
 	this._rows = [];
+	this._target["resource"] = ( "resource" in options ? options["resource"] : this._target["resource"] );
 	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
@@ -198,7 +199,7 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFill", sender);
 	}).then(() => {
-		if (this._items)
+		if (this.resources[this._target["resource"]]._items)
 		{
 			return builder.call(this, fragment);
 		}
@@ -234,10 +235,11 @@ List.prototype._buildSync = function(fragment)
 	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
-	for (let i = 0; i < this._items.length; i++)
+	let items = this.resources[this._target["resource"]]._items;
+	for (let i = 0; i < items.length; i++)
 	{
 		chain = chain.then(() => {
-			return this.__appendRowSync(fragment, i, this._items[i], template, rowEvents);
+			return this.__appendRowSync(fragment, i, items[i], template, rowEvents);
 		});
 	}
 
@@ -258,9 +260,10 @@ List.prototype._buildAsync = function(fragment)
 	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
-	for (let i = 0; i < this._items.length; i++)
+	let items = this.resources[this._target["resource"]]._items;
+	for (let i = 0; i < items.length; i++)
 	{
-		this.__appendRowAsync(fragment, i, this._items[i], template, rowEvents);
+		this.__appendRowAsync(fragment, i, items[i], template, rowEvents);
 	}
 
 }
@@ -305,7 +308,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvent
 		return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 	}).then(() => {
 		// Fill fields
-		FormUtil.setFields(element, item, this.masters);
+		FormUtil.setFields(element, item, this.resources);
 	}).then(() => {
 		return this._row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
 	});
@@ -345,7 +348,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
 
 	// Call event handlers
 	this._row.triggerAsync("beforeFillRow", this, {"item":item, "no":no, "element":element});
-	FormUtil.setFields(element, item, this.masters);
+	FormUtil.setFields(element, item, this.resources);
 	this.row.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 }

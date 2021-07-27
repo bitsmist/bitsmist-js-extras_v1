@@ -135,6 +135,7 @@ Form.prototype.fill = function(options)
 	let sender = ( options["sender"] ? options["sender"] : this );
 	let rootNode = ( "target" in options ? this.querySelector(options["target"]) : this );
 
+	this._target["resource"] = ( "resource" in options ? options["resource"] : this._target["resource"] );
 	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
 	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
@@ -161,7 +162,7 @@ Form.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFill", sender);
 	}).then(() => {
-		FormUtil.setFields(rootNode, this._item, this.masters);
+		FormUtil.setFields(rootNode, this._item, this.resources);
 		return this.trigger("afterFill", sender);
 	});
 
