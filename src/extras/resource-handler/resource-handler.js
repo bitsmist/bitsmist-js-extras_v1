@@ -219,17 +219,17 @@ export default class ResourceHandler
     // -------------------------------------------------------------------------
 
 	/**
-	 * Get resource value for the code.
+	 * Get resource text for the code.
 	 *
 	 * @param	{String}		code				Code value.
 	 *
-	 * @return  {String}		Resource value.
+	 * @return  {String}		Resource text.
 	 */
-	getValue(code)
+	getText(code)
 	{
 
 		let ret = code;
-		let title = this._options.get("title");
+		let title = this._options.get("fieldOptions.text");
 
 		if (this._items && code in this._items)
 		{
