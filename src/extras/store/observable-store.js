@@ -44,7 +44,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	 * @param	{String}		key					Key to store.
 	 * @param	{Object}		value				Value to store.
 	 */
-	set(key, value)
+	set(key, value, options)
 	{
 
 		let changedKeys = [];
@@ -63,7 +63,8 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			}
 		}
 
-		if (BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange") && changedKeys.length > 0)
+		let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+		if (notify && changedKeys.length > 0)
 		{
 			this.notify(changedKeys);
 		}
