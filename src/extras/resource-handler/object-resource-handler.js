@@ -33,9 +33,10 @@ export default class ObjectResourceHandler extends ResourceHandler
 
 		super(component, resourceName, options);
 
+		this._options.set("autoFetch", false);
 		if (options["items"])
 		{
-			this.get();
+			this.data = options["items"];
 		}
 
 	}
@@ -52,12 +53,28 @@ export default class ObjectResourceHandler extends ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	get(id, parameters)
+	_get(id, parameters)
 	{
 
-		this._data = this._options.get("items");
+		return this._data;
 
-		return ResourceHandler.prototype.get.call(this, id, parameters);
+	}
+
+    // -------------------------------------------------------------------------
+
+	/**
+	 * Update data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		data				Data to update.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_put(id, data, parameters)
+	{
+
+		this.data = data;
 
 	}
 

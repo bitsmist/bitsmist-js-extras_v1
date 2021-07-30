@@ -33,7 +33,8 @@ export default class ResourceHandler
 		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
 		this._data;
 		this._items;
-		this._reshaper = ( options["reshaper"] ? options["reshaper"] : this.__reshapeItems );
+		this._item;
+		this._target = {};
 
 	}
 
@@ -49,7 +50,7 @@ export default class ResourceHandler
 	get name()
 	{
 
-		return this._namme;
+		return this._name;
 
 	}
 
@@ -57,6 +58,20 @@ export default class ResourceHandler
 	{
 
 		this._name = value;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Fetch target.
+	 *
+	 * @type	{Object}
+	 */
+	get target()
+	{
+
+		return this._target;
 
 	}
 
@@ -71,6 +86,15 @@ export default class ResourceHandler
 	{
 
 		return this._data;
+
+	}
+
+	set data(value)
+	{
+
+		this._data = value;
+		this._items = this.__reshapeItems(value);
+		this._item = ( Array.isArray(this._items) ? this._items[0] : this._items );
 
 	}
 
@@ -103,27 +127,6 @@ export default class ResourceHandler
 	}
 
 	// -------------------------------------------------------------------------
-
-	/**
-	 * Reshaper function to reshape retrieved data.
-	 *
-	 * @type	{Function}
-	 */
-	get reshaper()
-	{
-
-		return this._reshaper;
-
-	}
-
-	set reshaper(value)
-	{
-
-		this._reshaper = value;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -138,16 +141,14 @@ export default class ResourceHandler
 	get(id, parameters)
 	{
 
-		let itemsField = this._options.get("fieldOptions.items");
-		this._items = ( itemsField ? BITSMIST.v1.Util.safeGet(this._data, itemsField) : this._data );
+		return Promise.resolve().then(() => {
+			return this._get(id, parameters);
+		}).then((data) => {
+			console.log("@@@get", this.name, data);
+			this.data = data;
 
-		// Reshape
-		if (this._options.get("reshape"))
-		{
-			this._items = this._reshaper(this._items);
-		}
-
-		return Promise.resolve(this._data);
+			return this._data;
+		});
 
 	}
 
@@ -163,7 +164,13 @@ export default class ResourceHandler
 	 */
 	delete(id, parameters)
 	{
+
+		return Promise.resolve().then(() => {
+			return this._delete(id, parameters);
+		});
+
 	}
+
 
     // -------------------------------------------------------------------------
 
@@ -171,13 +178,20 @@ export default class ResourceHandler
 	 * Insert data.
 	 *
 	 * @param	{String}		id					Target id.
-	 * @param	{Object}		items				Data to insert.
+	 * @param	{Object}		data				Data to insert.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	insert(id, items, parameters)
+	post(id, data, parameters)
 	{
+
+		data = this.__reshapeData(data);
+
+		return Promise.resolve().then(() => {
+			return this._post(id, data, parameter);
+		});
+
 	}
 
     // -------------------------------------------------------------------------
@@ -186,13 +200,20 @@ export default class ResourceHandler
 	 * Update data.
 	 *
 	 * @param	{String}		id					Target id.
-	 * @param	{Object}		items				Data to update.
+	 * @param	{Object}		data				Data to update.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	update(id, items, parameters)
+	put(id, data, parameters)
 	{
+
+		data = this.__reshapeData(data);
+
+		return Promise.resolve().then(() => {
+			return this._put(id, data, parameters);
+		});
+
 	}
 
     // -------------------------------------------------------------------------
@@ -243,17 +264,126 @@ export default class ResourceHandler
 	}
 
 	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_get(id, parameters)
+	{
+	}
+
+    // -------------------------------------------------------------------------
+
+	/**
+	 * Delete data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_delete(id, parameters)
+	{
+	}
+
+    // -------------------------------------------------------------------------
+
+	/**
+	 * Insert data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		data				Data to insert.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_post(id, data, parameters)
+	{
+	}
+
+    // -------------------------------------------------------------------------
+
+	/**
+	 * Update data.
+	 *
+	 * @param	{String}		id					Target id.
+	 * @param	{Object}		data				Data to update.
+	 * @param	{Object}		parameters			Query parameters.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_put(id, data, parameters)
+	{
+	}
+
+	// -------------------------------------------------------------------------
 	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
-     * Reshape an array to master util format object.
+	 * Get and reshape items from raw data on get.
+	 *
+	 * @param	{Object}		data				Raw data from which items are retrieved.
+	 *
+	 * @return  {Object}		Reshaped items.
+	 */
+	__reshapeItems(data)
+	{
+
+		// Get items
+		let itemsField = this._options.get("fieldOptions.items");
+		let items = ( itemsField ? BITSMIST.v1.Util.safeGet(data, itemsField) : data );
+
+		// Reshape
+		if (this._options.get("reshapeOptions.get.reshape"))
+		{
+			let reshaper = this._options.get("reshapeOptions.get.reshaper", this.__reshaper_get.bind(this));
+			items = reshaper(items);
+		}
+
+		return items;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Reshape request data on post/put.
+	 *
+	 * @param	{Object}		data				Data to reshape.
+	 *
+	 * @return  {Object}		Reshaped data.
+	 */
+	__reshapeData(data)
+	{
+
+		if (this._options.get("reshapeOptions.put.reshape"))
+		{
+			let reshaper = this._options.get("reshapeOptions.put.reshaper", () => { return data; });
+			data = reshaper(data);
+		}
+
+		return data;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+     * Reshape items on get.
      *
      * @param	{Object}		target				Target to reshape.
 	 *
 	 * @return  {Object}		Master object.
      */
-	__reshapeItems(target)
+	__reshaper_get(target)
 	{
 
 		let idField = this._options.get("fieldOptions.id");

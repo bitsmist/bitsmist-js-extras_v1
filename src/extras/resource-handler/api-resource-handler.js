@@ -46,7 +46,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	get(id, parameters)
+	_get(id, parameters)
 	{
 
 		let method = "GET";
@@ -58,9 +58,7 @@ export default class ApiResourceHandler extends ResourceHandler
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-			this._data = this._convertResponseData(xhr.responseText, dataType);
-
-			return ResourceHandler.prototype.get.call(this, id, parameters);
+			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
 	}
@@ -75,7 +73,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	delete(id, parameters)
+	_delete(id, parameters)
 	{
 
 		let method = "DELETE";
@@ -86,9 +84,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
-	//		return this._convertResponseData(xhr.responseText, dataType);
-		});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
 
 	}
 
@@ -98,12 +94,12 @@ export default class ApiResourceHandler extends ResourceHandler
 	 * Insert data.
 	 *
 	 * @param	{String}		id					Target id.
-	 * @param	{Object}		items				Data to insert.
+	 * @param	{Object}		data				Data to insert.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	insert(id, items, parameters)
+	_post(id, data, parameters)
 	{
 
 		let method = "POST";
@@ -114,7 +110,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
@@ -124,12 +120,12 @@ export default class ApiResourceHandler extends ResourceHandler
 	 * Update data.
 	 *
 	 * @param	{String}		id					Target id.
-	 * @param	{Object}		items				Data to update.
+	 * @param	{Object}		data				Data to insert.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	update(id, items, parameters)
+	_put(id, data, parameters)
 	{
 
 		let method = "PUT";
@@ -140,7 +136,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._name, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(items, dataType)});
+		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
@@ -151,7 +147,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	/**
 	 * Convert request data to specified format.
 	 *
-	 * @param	{Object}		items				Data to convert.
+	 * @param	{Object}		data				Data to convert.
 	 * @param	{String}		dataType			Target data type.
 	 *
 	 * @return  {String}		Converted data.

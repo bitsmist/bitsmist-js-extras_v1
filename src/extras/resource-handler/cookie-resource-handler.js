@@ -49,12 +49,10 @@ export default class CookieResourceHandler extends ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	get(id, parameters)
+	_get(id, parameters)
 	{
 
-		this._data = this.__getCookie(this._cookieName);
-
-		return ResourceHandler.prototype.get.call(this, id, parameters);
+		return this.__getCookie(this._cookieName);
 
 	}
 
@@ -64,17 +62,15 @@ export default class CookieResourceHandler extends ResourceHandler
 	 * Update data.
 	 *
 	 * @param	{String}		id					Target id.
-	 * @param	{Object}		items				Data to update.
+	 * @param	{Object}		data				Data to update.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	update(id, items, parameters)
+	_put(id, data, parameters)
 	{
 
-		this.__setCookie(this._cookieName, items);
-
-		return Promise.resolve();
+		this.__setCookie(this._cookieName, data);
 
 	}
 
