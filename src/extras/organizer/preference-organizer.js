@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import ObservableStoreMixin from "../store/observable-store-mixin";
+import ObservableStoreMixin from "../store/observable-store-mixin.js";
 class ObservableChainableStore extends ObservableStoreMixin(BITSMIST.v1.ChainableStore) {};
 
 // =============================================================================

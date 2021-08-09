@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import ResourceHandler from './resource-handler';
+import ResourceHandler from "./resource-handler.js";
 
 // =============================================================================
 //	Object Resource Handler class
