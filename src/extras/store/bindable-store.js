@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import DomUtil from "../util/dom-util";
-import ObservableStore from "./observable-store";
+import FormUtil from "../util/form-util.js";
+import ObservableStore from "./observable-store.js";
 
 // =============================================================================
 //	Bindable store class
@@ -18,11 +18,40 @@ import ObservableStore from "./observable-store";
 export default class BindableStore extends ObservableStore
 {
 
+	// -------------------------------------------------------------------------
+	//  Constructor
+	// -------------------------------------------------------------------------
+
+	/**
+     * Constructor.
+     *
+	 * @param	{Object}		options				Options.
+     */
+	constructor(options)
+	{
+
+		super(options);
+
+		this.filter = (conditions, observerInfo, ...args) => {
+			let ret = false;
+			if (conditions == "*" || conditions.indexOf(observerInfo.id) > -1)
+			{
+				ret = true;
+			}
+			return ret;
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Method
+	// -------------------------------------------------------------------------
+
 	/**
 	 * Bind the store to a element.
 	 *
-	 * @param	{String}		key					Key to store.
 	 * @param	{Element}		elem				HTML Element.
+	 * @param	{String}		key					Key to store.
 	 */
 	bindTo(elem)
 	{
@@ -30,20 +59,20 @@ export default class BindableStore extends ObservableStore
 		let key = elem.getAttribute("bm-bind");
 
 		// Init element's value
-		DomUtil.setElementValue(elem, this.get(key));
+		FormUtil.setElementValue(elem, this.get(key));
 
 		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
 		if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
 		{
 			// Change element's value when store value changed
 			this.subscribe(key, () => {
-				DomUtil.setElementValue(elem, this.get(key));
+				FormUtil.setValue(elem, this.get(key));
 			});
 
 			// Set store value when element's value changed
 			let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
 			elem.addEventListener(eventName, (() => {
-				this.set(key, DomUtil.getElementValue(elem));
+				this.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
 			}).bind(this));
 
 			elem.__bm_bindinfo = { "bound": true };
