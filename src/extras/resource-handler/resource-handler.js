@@ -35,6 +35,7 @@ export default class ResourceHandler
 		this._items;
 		this._item;
 		this._target = {};
+		this._currentIndex = 0;
 
 	}
 
@@ -94,7 +95,7 @@ export default class ResourceHandler
 
 		this._data = value;
 		this._items = this.__reshapeItems(value);
-		this._item = ( Array.isArray(this._items) ? this._items[0] : this._items );
+		this._item = ( Array.isArray(this._items) ? this._items[this._currentIndex] : this._items );
 
 	}
 
@@ -109,6 +110,20 @@ export default class ResourceHandler
 	{
 
 		return this._items;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Item.
+	 *
+	 * @type	{Object}
+	 */
+	get item()
+	{
+
+		return this._item;
 
 	}
 
@@ -144,7 +159,6 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._get(id, parameters);
 		}).then((data) => {
-			console.log("@@@get", this.name, data);
 			this.data = data;
 
 			return this._data;
@@ -170,7 +184,6 @@ export default class ResourceHandler
 		});
 
 	}
-
 
     // -------------------------------------------------------------------------
 
