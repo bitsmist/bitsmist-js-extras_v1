@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import FormUtil from "../util/form-util.js";
+
 // =============================================================================
 //	Element organizer class
 // =============================================================================
@@ -120,6 +122,10 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 				Object.keys(elementInfo).forEach((key) => {
 					switch (key)
 					{
+						case "build":
+							let resourceName = elementInfo[key]["resourceName"];
+							FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
+							break;
 						case "attribute":
 							Object.keys(elementInfo[key]).forEach((attrName) => {
 								elements[i].setAttribute(attrName, elementInfo[key][attrName]);
