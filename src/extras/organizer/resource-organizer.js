@@ -146,7 +146,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		let promises = [];
 
 		Object.keys(component.resources).forEach((resourceName) => {
-			let autoFetch = BITSMIST.v1.Util.safeGet(e.detail.options, "autoFetch", component.resources[resourceName].options.get("autoFetch", true));
+			let autoFetch = BITSMIST.v1.Util.safeGet(e.detail.options, "autoFetch", component.resources[resourceName].options.get("autoFetch", false));
 			if (autoFetch)
 			{
 				let id = BITSMIST.v1.Util.safeGet(e.detail.options, "id", component.resources[resourceName].target["id"]);
@@ -173,41 +173,17 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		let component = ex.component;
-		let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
-		let submitData = [];
-		let targetKeys = {};
 		let promises = [];
-
-		// Get target keys to submit
-		component.querySelectorAll("[bm-bind]").forEach((elem) => {
-			if (elem.hasAttribute("bm-submit"))
-			{
-				targetKeys[elem.getAttribute("bm-bind")] = true;
-			}
-		});
-
-		// Remove unnecessary items
-		for (let i = 0; i < items.length; i++)
-		{
-			let item = {};
-			Object.keys(items[i]).forEach((key) => {
-				if (targetKeys[key])
-				{
-					item[key] = items[i][key];
-				}
-			});
-			submitData.push(item);
-		}
 
 		// Submit
 		Object.keys(component.resources).forEach((resourceName) => {
-			let autoSubmit = BITSMIST.v1.Util.safeGet(e.detail.options, "autoSubmit", component.resources[resourceName].options.get("autoSubmit", true));
+			let autoSubmit = BITSMIST.v1.Util.safeGet(e.detail.options, "autoSubmit", component.resources[resourceName].options.get("autoSubmit", false));
 			if (autoSubmit)
 			{
 				let id = BITSMIST.v1.Util.safeGet(e.detail.options, "id", component.resources[resourceName].target["id"]);
 				let parameters = BITSMIST.v1.Util.safeGet(e.detail.options, "parameters", component.resources[resourceName].target["parameters"]);
 
-				promises.push(component.resources[resourceName].put(id, submitData));
+				promises.push(component.resources[resourceName].put(id, component.item, parameters));
 			}
 		});
 
