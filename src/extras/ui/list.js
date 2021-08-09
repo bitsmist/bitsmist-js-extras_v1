@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import FormUtil from '../util/form-util';
+import FormUtil from "../util/form-util.js";
 
 // =============================================================================
 //	List class
@@ -65,24 +65,6 @@ Object.defineProperty(List.prototype, 'items', {
 })
 
 // -----------------------------------------------------------------------------
-
-/**
- * Raw data retrieved via api.
- *
- * @type	{Object}
- */
-Object.defineProperty(List.prototype, 'data', {
-	get()
-	{
-		return this._data;
-	},
-	set(value)
-	{
-		this._data= value;
-	}
-})
-
-// -----------------------------------------------------------------------------
 //  Event handlers
 // -----------------------------------------------------------------------------
 
@@ -120,10 +102,6 @@ List.prototype.start = function(settings)
 {
 
 	// Init vars
-	this._id;
-	this._parameters;
-	this._target = {};
-	this._data;
 	this._items;
 	this._listRootNode;
 	this._row;
@@ -179,29 +157,22 @@ List.prototype.fill = function(options)
 	let fragment = document.createDocumentFragment();
 
 	this._rows = [];
-	this._target["resource"] = ( "resource" in options ? options["resource"] : this._target["resource"] );
-	this._target["id"] = ( "id" in options ? options["id"] : this._target["id"] );
-	this._target["parameters"] = ( "parameters" in options ? options["parameters"] : this._target["parameters"] );
 
 	return Promise.resolve().then(() => {
-		if (BITSMIST.v1.Util.safeGet(options, "autoLoad", true))
-		{
-			return Promise.resolve().then(() => {
-				return this.trigger("doTarget", this, {"target": this._target, "options":options});
-			}).then(() => {
-				return this.trigger("beforeFetch", sender, {"target": this._target, "options":options});
-			}).then(() => {
-				return this.trigger("doFetch", sender, {"target": this._target, "options":options});
-			}).then(() => {
-				return this.trigger("afterFetch", sender, {"target": this._target, "options":options});
-			});
-		}
+		return this.trigger("doTarget", this, {"options":options});
 	}).then(() => {
-		return this.trigger("beforeFill", sender);
+		return this.trigger("beforeFetch", sender, {"options":options});
 	}).then(() => {
-		if (this.resources[this._target["resource"]]._items)
+		return this.trigger("doFetch", sender, {"options":options});
+	}).then(() => {
+	//	this._items = this._defaultResource._items;
+		return this.trigger("afterFetch", sender, {"options":options});
+	}).then(() => {
+		return this.trigger("beforeFill", sender, {"options":options});
+	}).then(() => {
+		if (this._items)
 		{
-			return builder.call(this, fragment);
+			return builder.call(this, fragment, this._items);
 		}
 	}).then(() => {
 		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
@@ -212,7 +183,7 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		this._listRootNode.appendChild(fragment);
 	}).then(() => {
-		return this.trigger("afterFill", sender);
+		return this.trigger("afterFill", sender, {"options":options});
 	});
 
 }
@@ -228,14 +199,13 @@ List.prototype.fill = function(options)
  *
  * @return  {Promise}		Promise.
  */
-List.prototype._buildSync = function(fragment)
+List.prototype._buildSync = function(fragment, items)
 {
 
 	let chain = Promise.resolve();
 	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
-	let items = this.resources[this._target["resource"]]._items;
 	for (let i = 0; i < items.length; i++)
 	{
 		chain = chain.then(() => {
@@ -254,13 +224,12 @@ List.prototype._buildSync = function(fragment)
  *
  * @param	{DocumentFragment}	fragment		Document fragment.
  */
-List.prototype._buildAsync = function(fragment)
+List.prototype._buildAsync = function(fragment, items)
 {
 
 	let rowEvents = this._row.settings.get("rowevents");
 	let template = this._row._templates[this._row.settings.get("settings.templateName")].html;
 
-	let items = this.resources[this._target["resource"]]._items;
 	for (let i = 0; i < items.length; i++)
 	{
 		this.__appendRowAsync(fragment, i, items[i], template, rowEvents);
