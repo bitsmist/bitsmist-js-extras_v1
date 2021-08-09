@@ -50,7 +50,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		let changedKeys = [];
 		let holder = ( key ? this.get(key) : this._items );
 
-		if (typeof holder == "object")
+		if (holder && typeof holder === "object")
 		{
 			this.__deepMerge(holder, value, changedKeys);
 		}
@@ -66,7 +66,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
 		if (notify && changedKeys.length > 0)
 		{
-			this.notify(changedKeys);
+			return this.notify(changedKeys);
 		}
 
 	}
@@ -152,7 +152,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		for (let i = 0; i < this._observers.length; i++)
 		{
 			chain = chain.then(() => {
-				if (this._filter(conditions, this._observers[i]["options"], ...args))
+				if (this._filter(conditions, this._observers[i], ...args))
 				{
 					console.debug(`ObservableStore.notifySync(): Notifying. conditions=${conditions}, observer=${this._observers[i].id}`);
 					return this._observers[i]["handler"](conditions, ...args);
