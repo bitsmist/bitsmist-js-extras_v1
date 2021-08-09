@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import FormatterUtil from './formatter-util';
+import FormatterUtil from "./formatter-util.js";
 
 // =============================================================================
 //	Form util class
@@ -30,24 +30,33 @@ export default function FormUtil() {}
 FormUtil.setFields = function(rootNode, item, masters)
 {
 
+	// Get elements with bm-bind attribute
 	let fields = rootNode.querySelectorAll("[bm-bind]");
 	let elements = Array.prototype.concat([rootNode], Array.prototype.slice.call(fields, 0));
+
 	elements.forEach((element) => {
 		let fieldName = element.getAttribute("bm-bind");
 		if (fieldName in item)
 		{
-			if (element.hasAttribute("bm-resource"))
+			let value = item[fieldName] || "";
+
+			// Get master value
+			if (element.hasAttribute("bm-bindtext"))
 			{
-				let arr = element.getAttribute("bm-resource").split(".");
+				let arr = element.getAttribute("bm-bindtext").split(".");
 				let type = arr[0];
 				let field = arr[1] || "";
-				let value = this.getMasterValue(masters, type, item[fieldName], field);
-				this.setValue(element, value);
+				value = FormUtil._getMasterValue(masters, type, item[fieldName], field);
 			}
-			else
+
+			// Format
+			if (element.hasAttribute("bm-format"))
 			{
-				this.setValue(element, item[fieldName]);
+				value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
 			}
+
+			// Set
+			FormUtil.setValue(element, value);
 		}
 	});
 
@@ -59,52 +68,54 @@ FormUtil.setFields = function(rootNode, item, masters)
  * Get form values.
  *
  * @param	{HTMLElement}	rootNode			Form node.
- * @param	{String}		target				Target.
  *
  * @return  {Object}		Values.
  */
-FormUtil.getFields = function(rootNode, target)
+FormUtil.getFields = function(rootNode)
 {
 
 	let item = {};
-	target = (target ? target : "");
 
-	let elements = rootNode.querySelectorAll(target + " [bm-submit]");
+	// Get elements with bm-submit attribute
+	let elements = rootNode.querySelectorAll("[bm-submit]");
 	elements = Array.prototype.slice.call(elements, 0);
-	elements.forEach((element) => {
-		let key = element.getAttribute("bm-bind");
-		let value = this.getValue(element);
 
-		//if (value)
+	elements.forEach((element) => {
+		// Get a value from the element
+		let key = element.getAttribute("bm-bind");
+		let value = FormUtil.getValue(element);
+
+		// Deformat
+		if (element.hasAttribute("bm-format"))
 		{
-			if (Array.isArray(item[key]))
+			value = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
+		}
+
+		if (Array.isArray(item[key]))
+		{
+			// Same key already exists and it is an array
+			// ---> add the value to the array
+			if (value)
 			{
-				if (value)
-				{
-					item[key].push(value);
-				}
-			}
-			else if (item[key])
-			{
-				if (value)
-				{
-					let items = [];
-					items.push(item[key]);
-					items.push(value);
-					item[key]= items;
-				}
-			}
-			else
-			{
-				item[key] = value;
+				item[key].push(value);
 			}
 		}
-		/*
+		else if (item[key])
+		{
+			// Same key already exists and it is not an array
+			// ---> create an array and add existing value and the value to the array
+			if (value)
+			{
+				let items = [];
+				items.push(item[key]);
+				items.push(value);
+				item[key]= items;
+			}
+		}
 		else
 		{
-			item[key] = "";
+			item[key] = value;
 		}
-		*/
 	});
 
 	return item;
@@ -152,206 +163,58 @@ FormUtil.clearFields = function(rootNode, target)
 // -----------------------------------------------------------------------------
 
 /**
- * Build the form.
- *
- * @param	{HTMLElement}	rootNode			Form node.
- * @param	{String}		target				Target.
- * @param	{Object}		item				Values to fill.
- */
-FormUtil.buildFields = function(rootNode, fieldName, item)
-{
-
-	let elements = rootNode.querySelectorAll("[bm-bind='" + fieldName + "']");
-	elements = Array.prototype.slice.call(elements, 0);
-	elements.forEach((element) => {
-		if (element.tagName.toLowerCase() == "select")
-		{
-			// Select
-			element.options.length = 0;
-
-			if ("emptyItem" in item)
-			{
-				let text = ( "text" in item["emptyItem"] ? item["emptyItem"]["text"] : "");
-				let value = ( "value" in item["emptyItem"] ? item["emptyItem"]["value"] : "");
-				let option = document.createElement("option");
-				option.text = text;
-				option.value = value;
-				option.setAttribute("selected", "");
-				element.appendChild(option);
-			}
-
-			Object.keys(item.items).forEach((id) => {
-				let option = document.createElement("option");
-				option.text = item.items[id]["title"];
-				option.value = id;
-				element.appendChild(option);
-			});
-		}
-		else
-		{
-			// Radio
-			Object.keys(item.items).forEach((id) => {
-				let label = document.createElement("label");
-				let option = document.createElement("input");
-				option.type = "radio";
-				option.id = key;
-				option.name = key;
-				option.value = id;
-				option.setAttribute("bm-bind", key);
-				option.setAttribute("bm-submit", "");
-				label.appendChild(option);
-				label.appendChild(document.createTextNode(item.items[id]["title"]));
-				element.appendChild(label);
-			});
-		}
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Get master value.
- *
- * @param	{array}			masters				Master values.
- * @param	{string}		type				Master type.
- * @param	{string}		code				Code value.
- *
- * @return  {string}		Master value.
- */
-FormUtil.getMasterValue = function(masters, type, code, fieldName)
-{
-
-	let ret = code;
-	if (masters && (type in masters))
-	{
-		ret = masters[type].getItem(code)[fieldName];
-	}
-
-	return ret;
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Set value to the element.
+ * Set a value to the element.
  *
  * @param	{Object}		element				Html element.
- * @param	{string}		value				Value.
+ * @param	{String}		value				Value.
  */
 FormUtil.setValue = function(element, value)
 {
 
-	if (value === null || value == undefined)
+	// Sanitize
+	value = FormatterUtil.sanitize(value);
+
+	// Set value
+	let targets = element.getAttribute("bm-target");
+	if (targets)
 	{
-		value = "";
+		FormUtil._setValue_target(element, targets, value);
 	}
-
-	// Format
-	if (element.hasAttribute("bm-format"))
+	else if (element.hasAttribute("value"))
 	{
-		value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
-	}
-
-	let sanitizedValue = FormatterUtil.sanitize(value);
-
-	// Target
-	let target = element.getAttribute("bm-target");
-	if (target)
-	{
-		let items = target.split(",");
-		for (let i = 0; i < items.length; i++)
-		{
-			let item = items[i].toLowerCase();
-			switch (item)
-			{
-			case "html":
-					element.innerHTML = value;
-				break;
-			case "href":
-			case "src":
-			case "rel":
-				if (value.substring(0, 4) == "http" || value.substring(0, 1) == "/")
-				{
-					element.setAttribute(item, value);
-				}
-				break;
-			default:
-				let attr = element.getAttribute(item);
-				attr = ( attr ? attr + " " + value : sanitizedValue );
-				element.setAttribute(item, attr);
-				break;
-			}
-		}
+		FormUtil._setValue_value(element, value);
 	}
 	else
 	{
-		// Set value
-		if (element.hasAttribute("value"))
-		{
-			if (
-				(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "checkbox") ||
-				(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio")
-			)
-			{
-				if (Array.isArray(value))
-				{
-					if (value.indexOf(element.getAttribute("value")) > -1)
-					{
-						element.checked = true;
-					}
-				}
-				else
-				{
-					if (element.getAttribute("value") == value)
-					{
-						element.checked = true;
-					}
-				}
-			}
-			else
-			{
-				element.setAttribute("value", FormatterUtil.sanitize(value))
-			}
-		}
-		else if (element.tagName.toLowerCase() == "select")
-		{
-			element.value = value;
-		}
-		else if (element.tagName.toLowerCase() == "fieldset")
-		{
-		}
-		else if (element.tagName.toLowerCase() == "input")
-		{
-			switch (element.type.toLowerCase())
-			{
-			case "number":
-			case "search":
-			case "text":
-				element.value = value;
-				break;
-			case "checkbox":
-				element.checked = ( value ? true : false );
-				break;
-			case "radio":
-				if (element.value == value)
-				{
-					element.checked = true;
-				}
-				break;
-			}
-		}
-		else
-		{
-			element.innerText = value;
-		}
+		FormUtil._setValue_element(element, value);
 	}
 
 	// Trigger change event
 	let e = document.createEvent("HTMLEvents");
 	e.initEvent("change", true, true);
 	element.dispatchEvent(e);
+
+}
+
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Build a form element.
+ *
+ * @param	{HTMLElement}	element				Element to build.
+ * @param	{Object}		items				Items.
+ * @param	{Object}		options				Options.
+ */
+FormUtil.build = function(element, items, options)
+{
+
+	switch (element.tagName.toLowerCase())
+	{
+	case "select":
+		FormUtil._build_select(element, items, options);
+		break;
+	}
 
 }
 
@@ -362,7 +225,7 @@ FormUtil.setValue = function(element, value)
  *
  * @param	{Object}		element				Html element.
  *
- * @return  {string}		Value.
+ * @return  {String}		Value.
  */
 FormUtil.getValue = function(element)
 {
@@ -398,12 +261,6 @@ FormUtil.getValue = function(element)
 		break;
 	}
 
-	// Deformat
-	if (element.hasAttribute("bm-format"))
-	{
-		ret = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
-	}
-
 	return ret;
 
 }
@@ -415,30 +272,244 @@ FormUtil.getValue = function(element)
  *
  * @param	{HTMLElement}	rootNode			Root node to check.
  *
- * @return  {Boolean}		True:OK, False:NG.
+ * @return  {Array of HTMLElements}				Failed elements.
  */
-FormUtil.reportValidity = function(rootNode)
+FormUtil.checkValidity = function(rootNode)
 {
 
-	let ret = true;
+	let invalids = [];
 
 	let elements = rootNode.querySelectorAll("input")
 	elements = Array.prototype.slice.call(elements, 0);
+
 	elements.forEach((element) => {
-		let type = element.getAttribute("type");
-		switch (type)
+		if (!element.checkValidity())
 		{
-			case "number":
-				console.error(element.validity);
-				if ((element.validity && element.validity.valid == false) || isNaN(element.value))
-				{
-					element.style.border = "solid 3px red";
-					ret = false;
-				}
-				break;
+			invalids.push(element);
 		}
 	});
+
+	return invalids;
+
+}
+
+// -----------------------------------------------------------------------------
+//  Protected
+// -----------------------------------------------------------------------------
+
+/**
+ * Build a select element.
+ *
+ * @param	{HTMLElement}	element				Element to build.
+ * @param	{Object}		items				Items.
+ * @param	{Object}		options				Options.
+ */
+FormUtil._build_select = function(element, items, options)
+{
+
+	element.options.length = 0;
+
+	if ("emptyItem" in options)
+	{
+		let text = ( "text" in options["emptyItem"] ? options["emptyItem"]["text"] : "");
+		let value = ( "value" in options["emptyItem"] ? options["emptyItem"]["value"] : "");
+		let option = document.createElement("option");
+		option.text = text;
+		option.value = value;
+		option.setAttribute("selected", "");
+		element.appendChild(option);
+	}
+
+	Object.keys(items).forEach((id) => {
+		let option = document.createElement("option");
+
+		option.text = ( options["text"] ? items[id][options["text"]] : id );
+		option.value = ( options["value"] ? items[id][options["value"]] : id );
+
+		element.appendChild(option);
+	});
+
+	if ("defaultValue" in options)
+	{
+		element.value = options["defaultValue"];
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Build a radio element.
+ *
+ * @param	{HTMLElement}	element				Element to build.
+ * @param	{Object}		items				Items.
+ * @param	{Object}		options				Options.
+ */
+FormUtil._build_radio = function(rootNode, fieldName, item)
+{
+
+	Object.keys(item.items).forEach((id) => {
+		let label = document.createElement("label");
+		let option = document.createElement("input");
+		option.type = "radio";
+		option.id = key;
+		option.name = key;
+		option.value = id;
+		option.setAttribute("bm-bind", key);
+		option.setAttribute("bm-submit", "");
+		label.appendChild(option);
+		label.appendChild(document.createTextNode(item.items[id]["title"]));
+		element.appendChild(label);
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set a value to the target positions.
+ *
+ * @param	{Object}		element				Html element.
+ * @param	{String}		targets				Target poisitions.
+ * @param	{String}		value				Value.
+ */
+FormUtil._setValue_target = function(element, targets, value)
+{
+
+	let items = targets.split(",");
+	for (let i = 0; i < items.length; i++)
+	{
+		let item = items[i].toLowerCase();
+		switch (item)
+		{
+		case "text":
+			element.innerText = value;
+			break;
+		case "html":
+			element.innerHTML = value;
+			break;
+		case "href":
+		case "src":
+		case "rel":
+			if (value.substring(0, 4) == "http" || value.substring(0, 1) == "/")
+			{
+				element.setAttribute(item, value);
+			}
+			break;
+		default:
+			let attr = element.getAttribute(item);
+			attr = ( attr ? attr + " " + value : value );
+			element.setAttribute(item, attr);
+			break;
+		}
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set a value to the value attribute.
+ *
+ * @param	{Object}		element				Html element.
+ * @param	{String}		value				Value.
+ */
+FormUtil._setValue_value = function(element, value)
+{
+
+	if (
+		(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "checkbox") ||
+		(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio")
+	)
+	{
+		if (Array.isArray(value))
+		{
+			if (value.indexOf(element.getAttribute("value")) > -1)
+			{
+				element.checked = true;
+			}
+		}
+		else
+		{
+			if (element.getAttribute("value") == value)
+			{
+				element.checked = true;
+			}
+		}
+	}
+	else
+	{
+		element.setAttribute("value", value)
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Set a value to the element.
+ *
+ * @param	{Object}		element				Html element.
+ * @param	{String}		value				Value.
+ */
+FormUtil._setValue_element = function(element, value)
+{
+
+	if (element.tagName.toLowerCase() == "select")
+	{
+		element.value = value;
+	}
+	else if (element.tagName.toLowerCase() == "input")
+	{
+		switch (element.type.toLowerCase())
+		{
+		case "number":
+		case "search":
+		case "text":
+			element.value = value;
+			break;
+		case "checkbox":
+			element.checked = ( value ? true : false );
+			break;
+		case "radio":
+			if (element.value == value)
+			{
+				element.checked = true;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		element.innerText = value;
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get master value.
+ *
+ * @param	{array}			masters				Master values.
+ * @param	{String}		type				Master type.
+ * @param	{String}		code				Code value.
+ *
+ * @return  {String}		Master value.
+ */
+FormUtil._getMasterValue = function(masters, type, code, fieldName)
+{
+
+	let ret = code;
+	if (masters && (type in masters))
+	{
+		ret = masters[type].getItem(code)[fieldName];
+	}
 
 	return ret;
 
 }
+
+
