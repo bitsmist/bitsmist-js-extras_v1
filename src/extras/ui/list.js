@@ -165,8 +165,13 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("doFetch", sender, {"options":options});
 	}).then(() => {
-	//	this._items = this._defaultResource._items;
 		return this.trigger("afterFetch", sender, {"options":options});
+	}).then(() => {
+		let resourceName = this.settings.get("settings.resourceName");
+		if (resourceName && this.resources && this.resources[resourceName])
+		{
+			this.items = this.resources[resourceName]._items;
+		}
 	}).then(() => {
 		return this.trigger("beforeFill", sender, {"options":options});
 	}).then(() => {
