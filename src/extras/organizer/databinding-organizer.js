@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import BindableStore from '../store/bindable-store';
+import BindableStore from "../store/bindable-store.js";
 
 // =============================================================================
 //	Databinding organizer class
@@ -43,6 +43,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		// Add methods
 		component.bindData = function(data) { return DatabindingOrganizer._bindData(this, data); }
+		component.update = function(data) { return DatabindingOrganizer._update(this, data); }
 
 		// Init vars
 		component._binds = new BindableStore();
@@ -63,12 +64,42 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 	static organize(conditions, component, settings)
 	{
 
-		 let data = settings["binds"];
+		switch (conditions)
+		{
+			case "afterAppend":
+				DatabindingOrganizer._bindData(component);
+				break;
+			case "afterFetch":
+				let bindings = settings["bindings"];
+				if (bindings)
+				{
 
-		// Bind data after the HTML is appended
-		DatabindingOrganizer.update(component, data);
+					DatabindingOrganizer.setResource(component, bindings);
+				}
+				break;
+		}
 
 		return settings;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Set resource to the component.
+	 *
+	 * @param	{Object}		conditions			Conditions.
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Settings.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static setResource(component, settings)
+	{
+
+		let resourceName = settings["resourceName"];
+
+		component._binds.replace(component.resources[resourceName]._item);
 
 	}
 
