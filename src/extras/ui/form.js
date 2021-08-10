@@ -127,6 +127,12 @@ Form.prototype.fill = function(options)
 		return this.trigger("doFetch", sender, {"options":options});
 	}).then(() => {
 		return this.trigger("afterFetch", sender, {"options":options});
+	 }).then(() => {
+		let resourceName = this.settings.get("settings.resourceName");
+		if (resourceName && this.resources && this.resources[resourceName])
+		{
+			this._item = this.resources[resourceName]._item;
+		}
 	}).then(() => {
 		return this.trigger("beforeFill", sender, {"options":options});
 	}).then(() => {
@@ -134,6 +140,7 @@ Form.prototype.fill = function(options)
 		{
 			FormUtil.setFields(rootNode, this._item, this.resources);
 		}
+
 		return this.trigger("afterFill", sender, {"options":options});
 	});
 
@@ -169,8 +176,8 @@ Form.prototype.validate = function(options)
 
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
-
 	let invalids;
+
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeValidate", sender);
 	}).then(() => {
@@ -222,8 +229,7 @@ Form.prototype.submit = function(options)
 	this.__cancelSubmit = false;
 
 	// Get values from the form
-	let item = FormUtil.getFields(this);
-	this.item = item;
+	this._item = FormUtil.getFields(this);
 
 	return Promise.resolve().then(() => {
 		return this.validate(options);
@@ -231,11 +237,11 @@ Form.prototype.submit = function(options)
 		if (!this.__cancelSubmit)
 		{
 			return Promise.resolve().then(() => {
-				return this.trigger("beforeSubmit", sender, {"item":item});
+				return this.trigger("beforeSubmit", sender, {"item":this._item});
 			}).then(() => {
-				return this.trigger("doSubmit", sender, {"item":item});
+				return this.trigger("doSubmit", sender, {"item":this._item});
 			}).then(() => {
-				return this.trigger("afterSubmit", sender, {"item":item});
+				return this.trigger("afterSubmit", sender, {"item":this._item});
 			});
 		}
 	});
