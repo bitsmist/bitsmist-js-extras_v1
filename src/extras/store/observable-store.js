@@ -73,6 +73,28 @@ export default class ObservableStore extends BITSMIST.v1.Store
 
 	// -----------------------------------------------------------------------------
 
+    /**
+     * Replace all values in the store.
+     *
+     * @param   {String}        key                 Key to store.
+     * @param   {Object}        value               Value to store.
+     */
+    replace(value, options)
+    {
+
+        this._items = {};
+        this.__deepMerge(this._items, value);
+
+        let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+        if (notify)
+        {
+            return this.notify("*");
+        }
+
+    }
+
+	// -----------------------------------------------------------------------------
+
 	/**
 	 * Subscribe to the store.
 	 *
