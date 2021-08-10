@@ -59,7 +59,7 @@ export default class BindableStore extends ObservableStore
 		let key = elem.getAttribute("bm-bind");
 
 		// Init element's value
-		FormUtil.setElementValue(elem, this.get(key));
+//		FormUtil.setValue(elem, this.get(key));
 
 		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
 		if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
