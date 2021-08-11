@@ -26,9 +26,13 @@ export default function FormUtil() {}
  * @param	{HTMLElement}	rootNode			Form node.
  * @param	{Ojbect}		item				Values to fill.
  * @param	{Object}		masters				Master values.
+ * @param	{Object}		options				Options.
  */
-FormUtil.setFields = function(rootNode, item, masters)
+FormUtil.setFields = function(rootNode, item, options)
 {
+
+	let masters = BITSMIST.v1.Util.safeGet(options, "masters");
+	let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
 
 	// Get elements with bm-bind attribute
 	let fields = rootNode.querySelectorAll("[bm-bind]");
@@ -57,6 +61,14 @@ FormUtil.setFields = function(rootNode, item, masters)
 
 			// Set
 			FormUtil.setValue(element, value);
+
+			// Trigger change event
+			if (triggerEvent)
+			{
+				let e = document.createEvent("HTMLEvents");
+				e.initEvent(triggerEvent, true, true);
+				element.dispatchEvent(e);
+			}
 		}
 	});
 
@@ -165,11 +177,16 @@ FormUtil.clearFields = function(rootNode, target)
 /**
  * Set a value to the element.
  *
- * @param	{Object}		element				Html element.
+ * @param	{HTMLElement}	element				Html element.
  * @param	{String}		value				Value.
  */
 FormUtil.setValue = function(element, value)
 {
+
+	if (value === undefined || value == null)
+	{
+		value = "";
+	}
 
 	// Sanitize
 	value = FormatterUtil.sanitize(value);
@@ -188,11 +205,6 @@ FormUtil.setValue = function(element, value)
 	{
 		FormUtil._setValue_element(element, value);
 	}
-
-	// Trigger change event
-	let e = document.createEvent("HTMLEvents");
-	e.initEvent("change", true, true);
-	element.dispatchEvent(e);
 
 }
 
