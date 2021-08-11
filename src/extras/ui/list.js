@@ -163,7 +163,15 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFetch", sender, {"options":options});
 	}).then(() => {
-		return this.trigger("doFetch", sender, {"options":options});
+		let autoFetch = BITSMIST.v1.Util.safeGet(options, "autoFetch", this._settings.get("settings.autoFetch"));
+		if (autoFetch)
+		{
+			return this.callOrganizers("doFetch", options);
+		}
+		else
+		{
+			return this.trigger("doFetch", sender, {"options":options});
+		}
 	}).then(() => {
 		return this.trigger("afterFetch", sender, {"options":options});
 	}).then(() => {
@@ -282,7 +290,7 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvent
 		return this._row.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
 	}).then(() => {
 		// Fill fields
-		FormUtil.setFields(element, item, this.resources);
+		FormUtil.setFields(element, item, {"masters":this.resources});
 	}).then(() => {
 		return this._row.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
 	});
@@ -322,7 +330,7 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
 
 	// Call event handlers
 	this._row.triggerAsync("beforeFillRow", this, {"item":item, "no":no, "element":element});
-	FormUtil.setFields(element, item, this.resources);
+	FormUtil.setFields(element, item, {"masters":this.resources});
 	this.row.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
 
 }

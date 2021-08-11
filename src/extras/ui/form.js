@@ -124,7 +124,15 @@ Form.prototype.fill = function(options)
 	}).then(() => {
 		return this.trigger("beforeFetch", sender, {"options":options});
 	}).then(() => {
-		return this.trigger("doFetch", sender, {"options":options});
+		let autoFetch = BITSMIST.v1.Util.safeGet(options, "autoFetch", this._settings.get("settings.autoFetch"));
+		if (autoFetch)
+		{
+			return this.callOrganizers("doFetch", options);
+		}
+		else
+		{
+			return this.trigger("doFetch", sender, {"options":options});
+		}
 	}).then(() => {
 		return this.trigger("afterFetch", sender, {"options":options});
 	 }).then(() => {
@@ -138,7 +146,7 @@ Form.prototype.fill = function(options)
 	}).then(() => {
 		if (this._item)
 		{
-			FormUtil.setFields(rootNode, this._item, this.resources);
+			FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
 		}
 
 		return this.trigger("afterFill", sender, {"options":options});
@@ -239,7 +247,15 @@ Form.prototype.submit = function(options)
 			return Promise.resolve().then(() => {
 				return this.trigger("beforeSubmit", sender, {"item":this._item});
 			}).then(() => {
-				return this.trigger("doSubmit", sender, {"item":this._item});
+				let autoSubmit = BITSMIST.v1.Util.safeGet(options, "autoSubmit", this._settings.get("settings.autoSubmit"));
+				if (autoSubmit)
+				{
+					return this.callOrganizers("doSubmit", options);
+				}
+				else
+				{
+					return this.trigger("doSubmit", sender, {"item":this._item});
+				}
 			}).then(() => {
 				return this.trigger("afterSubmit", sender, {"item":this._item});
 			});

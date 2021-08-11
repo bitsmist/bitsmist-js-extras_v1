@@ -24,7 +24,7 @@ import PluginOrganizer from "./organizer/plugin-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart"], "order":1100});
 
 import ResourceOrganizer from "./organizer/resource-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.organizers.set("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad"], "order":1300});
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":1300});
 
 import PreferenceOrganizer from "./organizer/preference-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart"], "order":1400});

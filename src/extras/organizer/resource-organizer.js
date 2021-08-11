@@ -60,26 +60,34 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 
 		let promises = [];
 
-		// Install auto fetch/submit handlers
-		component.addEventHandler("doFetch", {"handler":ResourceOrganizer.onDoFetch});
-		component.addEventHandler("doSubmit", {"handler":ResourceOrganizer.onDoSubmit});
-
-		let resources = settings["resources"];
-		if (resources)
+		switch (conditions)
 		{
-			Object.keys(resources).forEach((resourceName) => {
-				// Add resource
-				ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
-
-				// Load data
-				if (resources[resourceName]["autoLoad"])
+			case "beforeStart":
+			case "afterSpecLoad":
+				let resources = settings["resources"];
+				if (resources)
 				{
-					let id = resources[resourceName]["autoLoad"]["id"];
-					let paramters = resources[resourceName]["autoLoad"]["paramters"];
+					Object.keys(resources).forEach((resourceName) => {
+						// Add resource
+						ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
 
-					promises.push(component.resources[resourceName].get(id, paramters));
+						// Load data
+						if (resources[resourceName]["autoLoad"])
+						{
+							let id = resources[resourceName]["autoLoad"]["id"];
+							let paramters = resources[resourceName]["autoLoad"]["paramters"];
+
+							promises.push(component.resources[resourceName].get(id, paramters));
+						}
+					});
 				}
-			});
+				break;
+			case "doFetch":
+				promises.push(ResourceOrganizer.doFetch(component, settings));
+				break;
+			case "doSubmit":
+				promises.push(ResourceOrganizer.doSubmit(component, settings));
+				break;
 		}
 
 		return Promise.all(promises).then(() => {
@@ -129,32 +137,29 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Protected
 	// -------------------------------------------------------------------------
 
 	/**
 	 * Do fetch event handler.
 	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component				Component.
+	 * @param	{Object}		options					Options
 	 */
-	static onDoFetch(sender, e, ex)
+	static doFetch(component, options)
 	{
 
-		let component = ex.component;
 		let promises = [];
+		let resources = ResourceOrganizer.__getTargetResources(component, options, "autoFetch");
 
-		Object.keys(component.resources).forEach((resourceName) => {
-			let autoFetch = BITSMIST.v1.Util.safeGet(e.detail.options, "autoFetch", component.resources[resourceName].options.get("autoFetch", false));
-			if (autoFetch)
-			{
-				let id = BITSMIST.v1.Util.safeGet(e.detail.options, "id", component.resources[resourceName].target["id"]);
-				let parameters = BITSMIST.v1.Util.safeGet(e.detail.options, "parameters", component.resources[resourceName].target["parameters"]);
+		for (let i = 0; i < resources.length; i++)
+		{
+			let resourceName = resources[i];
+			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
+			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
 
-				promises.push(component.resources[resourceName].get(id, parameters));
-			}
-		});
+			promises.push(component.resources[resourceName].get(id, parameters));
+		}
 
 		return Promise.all(promises);
 
@@ -165,29 +170,58 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Do submit event handler.
 	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
- 	 * @param	{Object}		ex					Extra event info.
+	 * @param	{Component}		component				Component.
+	 * @param	{Object}		options					Options
 	 */
-	static onDoSubmit(sender, e, ex)
+	static doSubmit(component, options)
 	{
 
-		let component = ex.component;
 		let promises = [];
+		let resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
 
-		// Submit
-		Object.keys(component.resources).forEach((resourceName) => {
-			let autoSubmit = BITSMIST.v1.Util.safeGet(e.detail.options, "autoSubmit", component.resources[resourceName].options.get("autoSubmit", false));
-			if (autoSubmit)
-			{
-				let id = BITSMIST.v1.Util.safeGet(e.detail.options, "id", component.resources[resourceName].target["id"]);
-				let parameters = BITSMIST.v1.Util.safeGet(e.detail.options, "parameters", component.resources[resourceName].target["parameters"]);
+		for (let i = 0; i < resources.length; i++)
+		{
+			let resourceName = resources[i];
+			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
+			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
 
-				promises.push(component.resources[resourceName].put(id, component.item, parameters));
-			}
-		});
+			promises.push(component.resources[resourceName].put(id, component.item, parameters));
+		}
 
 		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get target resource names.
+	 *
+	 * @param	{Component}		component				Component.
+	 * @param	{Object}		options					Options
+	 * @param	{String}		target					Target event
+ 	 *
+	 * @return  {Array}			Array of target resource names.
+	 */
+	static __getTargetResources(component, options, target)
+	{
+
+		let resources = BITSMIST.v1.Util.safeGet(options, target, component._settings.get("settings." + target));
+
+		if (Array.isArray(resources))
+		{
+		}
+		else if (resources === true)
+		{
+			if (component.settings.get("settings.resourceName"))
+			{
+				resources = [component.settings.get("settings.resourceName")];
+			}
+		}
+
+		return resources;
 
 	}
 
