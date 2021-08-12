@@ -33,7 +33,6 @@ export default class ObjectResourceHandler extends ResourceHandler
 
 		super(component, resourceName, options);
 
-		this._options.set("autoFetch", false);
 		if (options["items"])
 		{
 			this.data = options["items"];
