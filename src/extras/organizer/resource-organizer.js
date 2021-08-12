@@ -40,7 +40,6 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 
 		// Init vars
 		component._resources = {};
-		component._defaultResource;
 
 	}
 
@@ -113,11 +112,6 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		if (options["handlerClassName"])
 		{
 			component._resources[resourceName] = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options);
-
-			if (!component._defaultResource)
-			{
-				component._defaultResource = component._resources[resourceName];
-			}
 		}
 
 	}
