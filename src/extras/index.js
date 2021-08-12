@@ -54,6 +54,9 @@ window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
 import ObjectResourceHandler from "./resource-handler/object-resource-handler.js";
 window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 
+import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
+window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
+
 // Ui
 
 import Form from "./ui/form.js";
