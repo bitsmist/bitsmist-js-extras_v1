@@ -100,7 +100,7 @@ FormUtil.getFields = function(rootNode)
 		// Deformat
 		if (element.hasAttribute("bm-format"))
 		{
-			value = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
+			value = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
 		}
 
 		if (Array.isArray(item[key]))
@@ -515,9 +515,14 @@ FormUtil._getMasterValue = function(masters, type, code, fieldName)
 {
 
 	let ret = code;
+
 	if (masters && (type in masters))
 	{
-		ret = masters[type].getItem(code)[fieldName];
+		let item = masters[type].getItem(code);
+		if (item)
+		{
+			ret = item[fieldName];
+		}
 	}
 
 	return ret;
