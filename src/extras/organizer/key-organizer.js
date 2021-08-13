@@ -225,12 +225,12 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 
 		let target;
 
-		if (options && options["target"])
+		if (this.hasAttribute("bm-cleartarget"))
 		{
-			target = this.getAttribute(options["target"]);
+			target = this.getAttribute("bm-cleartarget");
 		}
 
-		component.clear(component, target);
+		component.clear(target);
 
 	}
 
