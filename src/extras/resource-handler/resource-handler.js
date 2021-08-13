@@ -202,7 +202,7 @@ export default class ResourceHandler
 		data = this.__reshapeData(data);
 
 		return Promise.resolve().then(() => {
-			return this._post(id, data, parameter);
+			return this._post(id, data, parameters);
 		});
 
 	}
