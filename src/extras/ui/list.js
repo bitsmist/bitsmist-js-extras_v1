@@ -102,13 +102,16 @@ List.prototype.start = function(settings)
 {
 
 	// Init vars
-	this._items;
+	this._items = [];
 	this._listRootNode;
 	this._row;
 	this._rows;
 
 	// Init component settings
 	settings = Object.assign({}, settings, {
+		"settings": {
+			"autoClear": true,
+		},
 		"events": {
 			"this": {
 				"handlers": {
@@ -140,6 +143,28 @@ List.prototype.clear = function()
 // -----------------------------------------------------------------------------
 
 /**
+ * Fetch data.
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+List.prototype.fetch = function(options)
+{
+
+	return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(() => {
+		let resourceName = this.settings.get("settings.resourceName");
+		if (resourceName && this.resources && this.resources[resourceName])
+		{
+			this.items = this.resources[resourceName]._items;
+		}
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Fill list with data.
  *
  * @return  {Promise}		Promise.
@@ -159,34 +184,9 @@ List.prototype.fill = function(options)
 	this._rows = [];
 
 	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", this, {"options":options});
-	}).then(() => {
-		return this.trigger("beforeFetch", sender, {"options":options});
-	}).then(() => {
-		let autoFetch = BITSMIST.v1.Util.safeGet(options, "autoFetch", this._settings.get("settings.autoFetch"));
-		if (autoFetch)
-		{
-			return this.callOrganizers("doFetch", options);
-		}
-		else
-		{
-			return this.trigger("doFetch", sender, {"options":options});
-		}
-	}).then(() => {
-		return this.trigger("afterFetch", sender, {"options":options});
-	}).then(() => {
-		let resourceName = this.settings.get("settings.resourceName");
-		if (resourceName && this.resources && this.resources[resourceName])
-		{
-			this.items = this.resources[resourceName]._items;
-		}
-	}).then(() => {
 		return this.trigger("beforeFill", sender, {"options":options});
 	}).then(() => {
-		if (this._items)
-		{
-			return builder.call(this, fragment, this._items);
-		}
+		return builder.call(this, fragment, this._items);
 	}).then(() => {
 		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
 		if (autoClear)
