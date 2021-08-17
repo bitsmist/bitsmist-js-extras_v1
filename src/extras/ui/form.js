@@ -65,7 +65,7 @@ Form.prototype.start = function(settings)
 {
 
 	// Init vars
-	this._item;
+	this._item = {};
 	this.__cancelSubmit = false;
 
 	// Init component settings
@@ -99,6 +99,42 @@ Form.prototype.build = function(element, items, options)
 // -----------------------------------------------------------------------------
 
 /**
+ * Clear the form.
+ *
+ * @param	{String}		target				Target selector.
+ */
+Form.prototype.clear = function(target)
+{
+
+	return FormUtil.clearFields(this, target);
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Fetch data.
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+Form.prototype.fetch = function(options)
+{
+
+	return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(() => {
+		let resourceName = this.settings.get("settings.resourceName");
+		if (resourceName && this.resources && this.resources[resourceName])
+		{
+			this._item = this.resources[resourceName]._item;
+		}
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Fill the form.
  *
  * @param	{Object}		options				Options.
@@ -113,60 +149,19 @@ Form.prototype.fill = function(options)
 	let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
 
 	// Clear fields
-	let autoClear = BITSMIST.v1.Util.safeGet(options, "settings.autoClear", this._settings.get("settings.autoClear"));
+	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
 	if (autoClear)
 	{
-		this.clear(rootNode);
+		this.clear();
 	}
 
 	return Promise.resolve().then(() => {
-		return this.trigger("doTarget", sender, {"options":options});
-	}).then(() => {
-		return this.trigger("beforeFetch", sender, {"options":options});
-	}).then(() => {
-		let autoFetch = BITSMIST.v1.Util.safeGet(options, "autoFetch", this._settings.get("settings.autoFetch"));
-		if (autoFetch)
-		{
-			return this.callOrganizers("doFetch", options);
-		}
-		else
-		{
-			return this.trigger("doFetch", sender, {"options":options});
-		}
-	}).then(() => {
-		return this.trigger("afterFetch", sender, {"options":options});
-	 }).then(() => {
-		let resourceName = this.settings.get("settings.resourceName");
-		if (resourceName && this.resources && this.resources[resourceName])
-		{
-			this._item = this.resources[resourceName]._item;
-		}
-	}).then(() => {
 		return this.trigger("beforeFill", sender, {"options":options});
 	}).then(() => {
-		if (this._item)
-		{
-			FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
-		}
+		FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
 
 		return this.trigger("afterFill", sender, {"options":options});
 	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Clear the form.
- *
- * @param	{Object}		options				Options.
- */
-Form.prototype.clear = function(rootNode)
-{
-
-	rootNode = ( rootNode ? rootNode : this );
-
-	return FormUtil.clearFields(rootNode);
 
 }
 
@@ -189,8 +184,8 @@ Form.prototype.validate = function(options)
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeValidate", sender);
 	}).then(() => {
-		let autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoValidate"));
-		if (autoValidate)
+		let autoCheckValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoCheckValidate"));
+		if (autoCheckValidate)
 		{
 			invalids = FormUtil.checkValidity(this);
 			if (invalids.length > 0)
@@ -198,10 +193,8 @@ Form.prototype.validate = function(options)
 				this.__cancelSubmit = true;
 			}
 		}
-		else
-		{
-			return this.trigger("doValidate", sender);
-		}
+	}).then(() => {
+		return this.trigger("doValidate", sender);
 	}).then(() => {
 		return this.trigger("afterValidate", sender, {"invalids":invalids});
 	}).then(() => {
@@ -214,10 +207,8 @@ Form.prototype.validate = function(options)
 				form.reportValidity();
 			}
 		}
-		else
-		{
-			return this.trigger("doReportValidate", sender, {"invalids":invalids});
-		}
+	}).then(() => {
+		return this.trigger("doReportValidate", sender, {"invalids":invalids});
 	});
 
 }
@@ -240,22 +231,20 @@ Form.prototype.submit = function(options)
 	this._item = FormUtil.getFields(this);
 
 	return Promise.resolve().then(() => {
-		return this.validate(options);
+		let autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoValidate"));
+		if (autoValidate)
+		{
+			return this.validate(options);
+		}
 	}).then(() => {
 		if (!this.__cancelSubmit)
 		{
 			return Promise.resolve().then(() => {
 				return this.trigger("beforeSubmit", sender, {"item":this._item});
 			}).then(() => {
-				let autoSubmit = BITSMIST.v1.Util.safeGet(options, "autoSubmit", this._settings.get("settings.autoSubmit"));
-				if (autoSubmit)
-				{
-					return this.callOrganizers("doSubmit", options);
-				}
-				else
-				{
-					return this.trigger("doSubmit", sender, {"item":this._item});
-				}
+				return this.callOrganizers("doSubmit", options);
+			}).then(() => {
+				return this.trigger("doSubmit", sender, {"item":this._item});
 			}).then(() => {
 				return this.trigger("afterSubmit", sender, {"item":this._item});
 			});
