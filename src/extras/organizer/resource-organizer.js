@@ -176,10 +176,11 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		for (let i = 0; i < resources.length; i++)
 		{
 			let resourceName = resources[i];
+			let method = BITSMIST.v1.Util.safeGet(options, "method", component.resources[resourceName].target["method"] || "put"); // Default is "put"
 			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
 			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
 
-			promises.push(component.resources[resourceName].put(id, component.item, parameters));
+			promises.push(component.resources[resourceName][method](id, component.item, parameters));
 		}
 
 		return Promise.all(promises);
@@ -202,10 +203,14 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	static __getTargetResources(component, options, target)
 	{
 
-		let resources = BITSMIST.v1.Util.safeGet(options, target, component._settings.get("settings." + target));
+		let resources = BITSMIST.v1.Util.safeGet(options, target, component._settings.get("settings." + target, []));
 
 		if (Array.isArray(resources))
 		{
+		}
+		else if (typeof resources === "string")
+		{
+			resources = [component.settings.get("settings." + target)];
 		}
 		else if (resources === true)
 		{
