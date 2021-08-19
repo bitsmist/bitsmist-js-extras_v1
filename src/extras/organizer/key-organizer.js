@@ -63,8 +63,6 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
-		return settings;
-
 	}
 
 	// -------------------------------------------------------------------------

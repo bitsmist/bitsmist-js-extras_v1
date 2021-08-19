@@ -96,7 +96,6 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 			return PreferenceOrganizer.__loaded.promise;
 		}).then(() => {
 			clearTimeout(timer);
-			return settings;
 		});
 
 	}

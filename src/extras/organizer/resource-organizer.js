@@ -88,9 +88,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 				break;
 		}
 
-		return Promise.all(promises).then(() => {
-			return settings;
-		});
+		return Promise.all(promises);
 
 	}
 

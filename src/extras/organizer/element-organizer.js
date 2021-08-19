@@ -41,8 +41,6 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
-		return settings;
-
 	}
 
 	// -----------------------------------------------------------------------------

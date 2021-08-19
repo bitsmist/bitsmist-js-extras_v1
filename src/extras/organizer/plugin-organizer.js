@@ -55,8 +55,6 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 			});
 		}
 
-		return settings;
-
 	}
 
 	// -------------------------------------------------------------------------

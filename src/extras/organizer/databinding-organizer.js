@@ -78,8 +78,6 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 				break;
 		}
 
-		return settings;
-
 	}
 
 	// -------------------------------------------------------------------------
