@@ -22,11 +22,10 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Init.
 	 *
-	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
 	 */
-	static init(conditions, component, settings)
+	static init(component, settings)
 	{
 
 		// Add properties

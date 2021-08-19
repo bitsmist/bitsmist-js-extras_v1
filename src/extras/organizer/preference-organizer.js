@@ -44,11 +44,10 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	/**
 	 * Init.
 	 *
-	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
 	 */
-	static init(conditions, component, settings)
+	static init(component, settings)
 	{
 
 		// Register a component as an observer
