@@ -14,9 +14,7 @@ import ObservableStore from "../store/observable-store.js";
 //	ObservableStoreMixin
 // =============================================================================
 
-export default ObservableStoreMixin;
-
-const ObservableStoreMixin = (superClass) => class extends superClass {
+export default (superClass) => class extends superClass {
 
 	constructor(options)
 	{
