@@ -52,10 +52,10 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 		{
 			// Init keys
 			let actions = KeyOrganizer.__getActions(keys);
-			component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component, keys, actions);});
-			component.addEventListener("keypress", function(e){KeyOrganizer.onKeyPress.call(this, e, component, keys, actions);});
-			component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
-			component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
+			component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component);});
+			component.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, component, keys, actions);});
+			// component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
+			// component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
 
 			// Init buttons
 			Object.keys(keys).forEach((key) => {
@@ -70,60 +70,53 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
- 	 * Key down event handler. Handle keys that do not fire keyPress event.
+ 	 * Key down event handler. Check if it is in composing mode or not.
 	 *
 	 * @param	{Object}		e					Event info.
 	 * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 * @param	{Object}		actions				Action info.
 	 */
-	static onKeyDown(e, component, options, actions)
+	static onKeyDown(e, component)
 	{
 
-		let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
-		key = key.toLowerCase()
-		key = ( key == "esc" ? "escape" : key ); // For IE11
-
-		switch (key)
-		{
-			case "escape":
-				KeyOrganizer.onKeyPress(e, component, options, actions);
-				break;
-		}
+		component.__isComposing = ( e.keyCode == 229 ? true : false );
 
 	}
 
 	// -------------------------------------------------------------------------
 
 	/**
- 	 * Key press event handler.
+ 	 * Key up event handler.
 	 *
 	 * @param	{Object}		e					Event info.
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 * @param	{Object}		actions				Action info.
 	 */
-	static onKeyPress(e, component, options, actions)
+	static onKeyUp(e, component, options, actions)
 	{
 
 		// Ignore all key input when composing.
-		if (component.__isComposing || e.isComposing || e.keyCode == 229)
+		if (component.__isComposing)
 		{
 			return;
 		}
 
-		// Get a key
 		let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
+		switch (key)
+		{
+			case "Esc":		key = "Escape";		break;
+			case "Down": 	key = "ArrowDown";	break;
+			case "Up": 		key = "ArrowUp";	break;
+			case "Left": 	key = "ArrowLeft";	break;
+			case "Right": 	key = "ArrowRight";	break;
+		}
 		key = key.toLowerCase()
-		key = ( key == "esc" ? "escape" : key ); // For IE11
 
-		// Take an action according to the key pressed if specified
+		// Take an action according to the key pressed
 		if (actions[key])
 		{
 			actions[key]["handler"].call(this, e, component, actions[key]["option"]);
 		}
-
-		return;
 
 	}
 
@@ -136,12 +129,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
+	/*
 	static onCompositionStart(e, component, options)
 	{
 
 		component.__isComposing = true;
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
@@ -152,12 +147,14 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
+	/*
 	static onCompositionEnd(e, component, options)
 	{
 
 		component.__isComposing = false;
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 	//  Protected
