@@ -88,8 +88,8 @@ FormUtil.getFields = function(rootNode)
 
 	let item = {};
 
-	// Get elements with bm-submit attribute
-	let elements = rootNode.querySelectorAll("[bm-submit]");
+	// Get elements with bm-bind attribute
+	let elements = rootNode.querySelectorAll("[bm-bind]");
 	elements = Array.prototype.slice.call(elements, 0);
 
 	elements.forEach((element) => {
