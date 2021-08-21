@@ -32,8 +32,8 @@ export default class ResourceHandler
 		this._component = component;
 		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
 		this._data;
-		this._items;
-		this._item;
+		this._items = [];
+		this._item = {};
 		this._target = {};
 		this._currentIndex = 0;
 
