@@ -189,7 +189,7 @@ FormUtil.setValue = function(element, value)
 	}
 
 	// Sanitize
-	value = FormatterUtil.sanitize(value);
+	//value = FormatterUtil.sanitize(value);
 
 	// Set value
 	let targets = element.getAttribute("bm-target");
