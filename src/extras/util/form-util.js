@@ -401,7 +401,10 @@ FormUtil._setValue_target = function(element, targets, value)
 			element.innerHTML = value;
 			break;
 		case "outerhtml":
-			element.outerHTML = value;
+			if (value)
+			{
+				element.outerHTML = value;
+			}
 			break;
 		case "href":
 		case "src":
