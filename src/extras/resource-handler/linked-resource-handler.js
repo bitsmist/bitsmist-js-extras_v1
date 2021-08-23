@@ -31,14 +31,11 @@ export default class LinkedResourceHandler extends ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		super(component, resourceName, options);
+		let defaults = {"autoLoad":true};
+
+		super(component, resourceName, Object.assign(defaults, options));
 
 		this._ref;
-
-		if (options["rootNode"] && options["resourceName"])
-		{
-			this._ref = document.querySelector(options["rootNode"]).resources[resourceName];
-		}
 
 	}
 
@@ -108,20 +105,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	}
 
 	// -------------------------------------------------------------------------
-
-	/**
-	 * Options.
-	 *
-	 * @type	{Object}
-	 */
-	get options()
-	{
-
-		return this._ref.options;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -136,60 +119,20 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get(id, parameters)
 	{
 
-		return this._ref.get(id, paramters);
+		let handlerOptions = this._options.get("handlerOptions");
+		let rootNode = handlerOptions["rootNode"];
+		let resourceName = handlerOptions["resourceName"];
+		let state = handlerOptions["state"];
 
-	}
+		let options = { "rootNode": rootNode };
+		if (state)
+		{
+			options["state"] = state;
+		}
 
-    // -------------------------------------------------------------------------
-
-	/**
-	 * Delete data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	delete(id, parameters)
-	{
-
-		return this._ref.delete(id, paramters);
-
-	}
-
-    // -------------------------------------------------------------------------
-
-	/**
-	 * Insert data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to insert.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	post(id, data, parameters)
-	{
-
-		return this._ref.delete(id, data, paramters);
-
-	}
-
-    // -------------------------------------------------------------------------
-
-	/**
-	 * Update data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	put(id, data, parameters)
-	{
-
-		return this._ref.put(id, data, paramters);
+		return BITSMIST.v1.StateOrganizer.waitFor([options]).then(() => {
+			this._ref = document.querySelector(rootNode).resources[resourceName];
+		});
 
 	}
 
