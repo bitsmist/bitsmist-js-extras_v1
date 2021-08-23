@@ -67,13 +67,13 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 				{
 					Object.keys(resources).forEach((resourceName) => {
 						// Add resource
-						ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
+						let resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
 
 						// Load data
-						if (resources[resourceName]["autoLoad"])
+						if (resource.options.get("autoLoad"))
 						{
-							let id = resources[resourceName]["autoLoad"]["id"];
-							let paramters = resources[resourceName]["autoLoad"]["paramters"];
+							let id = resource.options.get("autoLoad.id");
+							let paramters = resource.options.get("autoLoad.parameters");
 
 							promises.push(component.resources[resourceName].get(id, paramters));
 						}
@@ -106,10 +106,15 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	static _addResource(component, resourceName, options)
 	{
 
+		let resource;
+
 		if (options["handlerClassName"])
 		{
-			component._resources[resourceName] = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options);
+			resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options);
+			component._resources[resourceName] = resource;
 		}
+
+		return resource;
 
 	}
 
