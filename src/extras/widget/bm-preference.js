@@ -24,7 +24,7 @@ import PreferenceOrganizer from "../organizer/preference-organizer.js";
 export default function PreferenceManager(settings)
 {
 
-	return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
+	return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 }
 
