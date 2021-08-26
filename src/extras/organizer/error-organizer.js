@@ -51,7 +51,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	static organize(conditions, component, settings)
 	{
 
-		let errors = component.settings.get("errors");
+		let errors = settings["errors"];
 		if (errors)
 		{
 			ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
@@ -78,7 +78,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 
 		for (let i = 0; i < targets.length; i++)
 		{
-			if (e.error.name == targets[i])
+			if (e.error.name == targets[i] || targets[i] == "*")
 			{
 				result = true;
 				break;
