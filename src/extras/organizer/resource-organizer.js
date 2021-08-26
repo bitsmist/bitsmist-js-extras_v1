@@ -153,6 +153,8 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 			let resourceName = resources[i];
 			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
 			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
+			component.resources[resourceName].target["id"] = id;
+			component.resources[resourceName].target["parameters"] = parameters;
 
 			promises.push(component.resources[resourceName].get(id, parameters));
 		}
