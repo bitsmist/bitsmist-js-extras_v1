@@ -130,7 +130,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 			options["state"] = state;
 		}
 
-		return BITSMIST.v1.StateOrganizer.waitFor([options]).then(() => {
+		return this._component.waitFor([options]).then(() => {
 			this._ref = document.querySelector(rootNode).resources[resourceName];
 		});
 
