@@ -110,8 +110,7 @@ PreferenceManager.prototype.set = function(values, options)
 		// Validation failed?
 		if (!this._validationResult["result"])
 		{
-			console.error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}`);
-			return;
+			throw new Error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}, invalids=${JSON.stringify(this._validationResult["invalids"])}`);
 		}
 
 		// Store
