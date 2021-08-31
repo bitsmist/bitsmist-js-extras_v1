@@ -22,12 +22,12 @@ export default class ObjectValidationHandler extends ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check validity.
+	 * Validate.
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
 	 */
-	checkValidity(values, rules)
+	static validate(values, rules)
 	{
 
 		let result = true;
@@ -36,19 +36,36 @@ export default class ObjectValidationHandler extends ValidationHandler
 		Object.keys(values).forEach((key) => {
 			if (rules[key])
 			{
-				let failed = this._validateValue(key, values[key], rules[key]);
+				let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
 				if (failed.length > 0)
 				{
 					invalids[key] = {"value":values[key], "failed":failed};
-					invalids[key]["message"] = this.__getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = this.__getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids[key]["message"] = ObjectValidationHandler.__getFunctionValue(key, values[key], "message", rules[key]);
+					invalids[key]["fix"] = ObjectValidationHandler.__getFunctionValue(key, values[key], "fix", rules[key]);
 
 					result = false;
 				}
 			}
 		});
 
-		this._component.validationResult["result"] = result;
+		return invalids;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Check validity.
+	 *
+	 * @param	{Object}		values				Values to validate.
+	 * @param	{Object}		rules				Validation rules.
+	 */
+	checkValidity(values, rules)
+	{
+
+		let invalids = ObjectValidationHandler.validate(values, rules);
+
+		this._component.validationResult["result"] = ( invalids.length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;
 
 	}
@@ -76,13 +93,13 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{Object}		value				Value to validate.
 	 * @param	{Object}		rules				Validation rules.
 	 */
-	_validateValue(key, value, rules)
+	static _validateValue(key, value, rules)
 	{
 
 		let failed = [];
 
 		Object.keys(rules["constraints"]).forEach((constraintName) => {
-			let result = this._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
+			let result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
 			if (result)
 			{
 				failed.push(result);
@@ -103,7 +120,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{String}		constraintName		Constraint name.
 	 * @param	{Object}		rule				Validation rules.
 	 */
-	_checkConstraint(key, value, constraintName, rule)
+	static _checkConstraint(key, value, constraintName, rule)
 	{
 
 		let result;
@@ -183,7 +200,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{String}		target				Target name.
 	 * @param	{Object}		rule				Validation rules.
 	 */
-	__getFunctionValue(key, value, target, rule)
+	static __getFunctionValue(key, value, target, rule)
 	{
 
 		let ret;
