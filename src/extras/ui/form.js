@@ -66,13 +66,16 @@ Form.prototype.start = function(settings)
 
 	// Init vars
 	this._item = {};
-	this.__cancelSubmit = false;
+	this._cancelSubmit = false;
 
 	// Init component settings
 	settings = Object.assign({}, settings, {
 		"settings": {
-			"autoClear": true,
+			"autoClear":				true,
 		},
+		"organizers": {
+			"ValidationOrganizer":		{"settings":{"attach":true}},
+		}
 	});
 
 	// super()
@@ -179,36 +182,27 @@ Form.prototype.validate = function(options)
 
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
-	let invalids;
+	this._validationResult["result"] = true;
 
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeValidate", sender);
 	}).then(() => {
-		let autoCheckValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoCheckValidate"));
-		if (autoCheckValidate)
-		{
-			invalids = FormUtil.checkValidity(this);
-			if (invalids.length > 0)
-			{
-				this.__cancelSubmit = true;
-			}
-		}
+		return this.callOrganizers("doCheckValidity", {"item":this.item, "validationName":this._settings.get("settings.validationName")});
 	}).then(() => {
 		return this.trigger("doValidate", sender);
 	}).then(() => {
-		return this.trigger("afterValidate", sender, {"invalids":invalids});
+		return this.trigger("afterValidate", sender);
 	}).then(() => {
-		let autoReportValidity = BITSMIST.v1.Util.safeGet(options, "autoReportValidity", this._settings.get("settings.autoReportValidity"));
-		if (autoReportValidity)
+		if (!this._validationResult["result"])
 		{
-			let form = this.querySelector("form");
-			if (form && form.reportValidity)
-			{
-				form.reportValidity();
-			}
+			this._cancelSubmit = true;
+
+			return Promise.resolve().then(() => {
+				return this.callOrganizers("doReportValidity", {"validationName":this._settings.get("settings.validationName")});
+			}).then(() => {
+				return this.trigger("doReportValidatidy", sender);
+			});
 		}
-	}).then(() => {
-		return this.trigger("doReportValidate", sender, {"invalids":invalids});
 	});
 
 }
@@ -225,19 +219,15 @@ Form.prototype.submit = function(options)
 
 	options = Object.assign({}, options);
 	let sender = ( options["sender"] ? options["sender"] : this );
-	this.__cancelSubmit = false;
+	this._cancelSubmit = false;
 
 	// Get values from the form
 	this._item = FormUtil.getFields(this);
 
 	return Promise.resolve().then(() => {
-		let autoValidate = BITSMIST.v1.Util.safeGet(options, "autoValidate", this._settings.get("settings.autoValidate"));
-		if (autoValidate)
-		{
-			return this.validate(options);
-		}
+		return this.validate(options);
 	}).then(() => {
-		if (!this.__cancelSubmit)
+		if (!this._cancelSubmit)
 		{
 			return Promise.resolve().then(() => {
 				return this.trigger("beforeSubmit", sender, {"item":this._item});

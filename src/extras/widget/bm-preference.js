@@ -31,6 +31,30 @@ export default function PreferenceManager(settings)
 BITSMIST.v1.ClassUtil.inherit(PreferenceManager, BITSMIST.v1.Component);
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Get component settings.
+ *
+ * @return  {Object}		Options.
+ */
+PreferenceManager.prototype._getSettings = function()
+{
+
+	return {
+		// Settings
+		"settings": {
+			"name":						"PreferenceManager",
+		},
+
+		// Organizers
+		"organizers": {
+			"ValidationOrganizer":		{"settings":{"attach":true}},
+		}
+	}
+
+}
+
+// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -72,16 +96,33 @@ PreferenceManager.prototype.get = function(key, defaultValue)
  * @param	{Object}		value				Value to store.
  * @param	{Object}		options				Options.
  */
-PreferenceManager.prototype.set = function(key, value, options)
+PreferenceManager.prototype.set = function(values, options)
 {
 
-	PreferenceOrganizer._store.set(key, value, options);
+	this._validationResult["result"] = true;
 
-	// Save preferences
-	if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
-	{
-		return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
-	}
+	Promise.resolve().then(() => {
+		// Validate
+		return this.callOrganizers("doCheckValidity", {"item":values, "validationName":this._settings.get("settings.validationName")});
+	}).then(() => {
+		return this.trigger("doValidate");
+	}).then(() => {
+		// Validation failed?
+		if (!this._validationResult["result"])
+		{
+			console.error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}`);
+			return;
+		}
+
+		// Store
+		PreferenceOrganizer._store.set("", values, options);
+
+		// Save preferences
+		if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
+		{
+			return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
+		}
+	});
 
 }
 

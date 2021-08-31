@@ -32,6 +32,9 @@ BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":P
 import ElementOrganizer from "./organizer/element-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":2100});
 
+import ValidationOrganizer from "./organizer/validation-organizer.js";
+BITSMIST.v1.OrganizerOrganizer.organizers.set("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["afterAppend", "doCheckValidity", "doReportValidity"], "order":2100});
+
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":2100});
 
@@ -56,6 +59,17 @@ window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 
 import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
 window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
+
+// Validation handler
+
+import ValidationHandler from "./validation-handler/validation-handler.js";
+window.BITSMIST.v1.ValidationHandler = ValidationHandler;
+
+import HTML5FormValidationHandler from "./validation-handler/html5form-validation-handler.js";
+window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
+
+import ObjectValidationHandler from "./validation-handler/object-validation-handler.js";
+window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
 
 // Ui
 

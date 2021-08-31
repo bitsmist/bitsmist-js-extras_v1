@@ -278,34 +278,6 @@ FormUtil.getValue = function(element)
 }
 
 // -----------------------------------------------------------------------------
-
-/**
- * Report validity of the form.
- *
- * @param	{HTMLElement}	rootNode			Root node to check.
- *
- * @return  {Array of HTMLElements}				Failed elements.
- */
-FormUtil.checkValidity = function(rootNode)
-{
-
-	let invalids = [];
-
-	let elements = rootNode.querySelectorAll("input")
-	elements = Array.prototype.slice.call(elements, 0);
-
-	elements.forEach((element) => {
-		if (!element.checkValidity())
-		{
-			invalids.push(element);
-		}
-	});
-
-	return invalids;
-
-}
-
-// -----------------------------------------------------------------------------
 //  Protected
 // -----------------------------------------------------------------------------
 
