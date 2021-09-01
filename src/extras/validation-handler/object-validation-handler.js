@@ -30,8 +30,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	static validate(values, rules)
 	{
 
-		let result = true;
-		let invalids = {};
+		let invalids = [];
 
 		Object.keys(values).forEach((key) => {
 			if (rules[key])
@@ -39,11 +38,10 @@ export default class ObjectValidationHandler extends ValidationHandler
 				let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
 				if (failed.length > 0)
 				{
-					invalids[key] = {"value":values[key], "failed":failed};
-					invalids[key]["message"] = ObjectValidationHandler.__getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = ObjectValidationHandler.__getFunctionValue(key, values[key], "fix", rules[key]);
-
-					result = false;
+					let invalid = {"key":key, "value":values[key], "failed":failed};
+					invalid["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+					invalid["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids.push(invalid);
 				}
 			}
 		});
@@ -185,39 +183,6 @@ export default class ObjectValidationHandler extends ValidationHandler
 		}
 
 		return result;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get a value from a custom function or a value.
-	 *
-	 * @param	{String}		key					Item name.
-	 * @param	{Object}		value				Value to validate.
-	 * @param	{String}		target				Target name.
-	 * @param	{Object}		rule				Validation rules.
-	 */
-	static __getFunctionValue(key, value, target, rule)
-	{
-
-		let ret;
-
-		if (target in rule)
-		{
-			if (typeof rule[target] == "function")
-			{
-				ret = rule[target](key, value, rule);
-			}
-			else
-			{
-				ret = rule[target];
-			}
-		}
-
-		return ret;
 
 	}
 

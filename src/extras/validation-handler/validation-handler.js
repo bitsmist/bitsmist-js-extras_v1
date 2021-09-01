@@ -90,37 +90,58 @@ export default class ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check validity.
+	 * Check validity (Need to override).
 	 *
-	 * @param	{String}		itemName			Target item name. All when not specified.
+	 * @param	{Object}		values				Values to validate.
+	 * @param	{Object}		rules				Validation rules.
 	 */
 	checkValidity(values, options)
 	{
-
-		console.log("@@@checkValidity", itemName);
-
 	}
 
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Report validity.
+	 * Report validity (Need to override).
 	 *
-	 * @param	{String}		itemName			Target item name. All when not specified.
+	 * @param	{Object}		values				Values to validate.
+	 * @param	{Object}		rules				Validation rules.
 	 */
 	reportValidity(values, options)
 	{
-
-		console.log("@@@reportValidity", itemName);
-
 	}
 
 	// -------------------------------------------------------------------------
 	//  Protected
 	// -------------------------------------------------------------------------
 
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
+	/**
+	 * Get a value from a custom function or a value.
+	 *
+	 * @param	{String}		key					Item name.
+	 * @param	{Object}		value				Value to validate.
+	 * @param	{String}		target				Target name.
+	 * @param	{Object}		rule				Validation rules.
+	 */
+	static _getFunctionValue(key, value, target, rule)
+	{
+
+		let ret;
+
+		if (target in rule)
+		{
+			if (typeof rule[target] == "function")
+			{
+				ret = rule[target](key, value, rule);
+			}
+			else
+			{
+				ret = rule[target];
+			}
+		}
+
+		return ret;
+
+	}
 
 }
