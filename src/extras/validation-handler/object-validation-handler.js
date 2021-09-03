@@ -58,10 +58,11 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
 	 */
-	checkValidity(values, rules)
+	checkValidity(values, rules, options)
 	{
 
-		let invalids = ObjectValidationHandler.validate(values, rules);
+		let invalids = ValidationHandler.validate(values, rules, options); // Check allow/disallow list
+		invalids = invalids.concat(ObjectValidationHandler.validate(values, rules));
 
 		this._component.validationResult["result"] = ( invalids.length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;

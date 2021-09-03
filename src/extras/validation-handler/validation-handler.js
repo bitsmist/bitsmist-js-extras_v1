@@ -89,6 +89,52 @@ export default class ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static validate(values, rules, options)
+	{
+
+		rules = rules || {};
+		options = options || {};
+		let invalids = [];
+
+		// Allow list
+		if (options["allowList"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (options["allowList"].indexOf(key) == -1)
+				{
+					invalids.push({"key":key, "value":values[key], "message":"notAllowed"});
+				}
+			});
+		}
+
+		// Allow only in rules
+		if (options["allowOnlyInRules"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (!(key in rules))
+				{
+					invalids.push({"key":key, "value":values[key], "message":"notAllowed"});
+				}
+			});
+		}
+
+		// Disallow list
+		if (options["disallowList"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (options["disallowList"].indexOf(key) > -1)
+				{
+					invalids.push({"key":key, "value":values[key], "message":"disallowed"});
+				}
+			});
+		}
+
+		return invalids;
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	/**
 	 * Check validity (Need to override).
 	 *

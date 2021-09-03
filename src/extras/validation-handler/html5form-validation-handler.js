@@ -88,11 +88,18 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
 	 */
-	checkValidity(values, rules)
+	checkValidity(values, rules, options)
 	{
 
+		let invalids = [];
 		let form = this._component.querySelector("form");
-		let invalids = HTML5FormValidationHandler.validate(form, rules);
+		if (rules || options)
+		{
+			// Check allow/disallow list
+			let values = FormUtil.getFields(form);
+			invalids = ValidationHandler.validate(values, rules, options);
+		}
+		invalids = invalids.concat(HTML5FormValidationHandler.validate(form, rules));
 
 		this._component.validationResult["result"] = ( invalids.length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;
@@ -151,5 +158,34 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		return failed;
 
 	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Collect values from form..
+	 *
+	 * @param	{Object}		form				Form.
+	 */
+	/*
+	static _collectValues(form)
+	{
+
+		let values = [];
+
+		BITSMIST.v1.Util.assert(form, `FormValidationHandler._collectValues(): Form tag does not exist.`, TypeError);
+
+		let elements = form.querySelectorAll("input:not([novalidate])")
+		elements = Array.prototype.slice.call(elements, 0);
+		elements.forEach((element) => {
+			let key = element.getAttribute("bm-bind");
+			let value = FormUtil.getValue(element);
+			values.push({"key":key, "value":value});
+		});
+
+		return values;
+
+	}
+	*/
+
 
 }
