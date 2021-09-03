@@ -67,9 +67,10 @@ export default class ValidationOrganizer extends BITSMIST.v1.Organizer
 			if (validationName)
 			{
 				let item = BITSMIST.v1.Util.safeGet(settings, "item");
-				let options = component.settings.get("validations." + validationName + ".rules");
+				let rules = component.settings.get("validations." + validationName + ".rules");
+				let options = component.settings.get("validations." + validationName + ".handlerOptions");
 				let method = (conditions == "doCheckValidity" ? "checkValidity" : "reportValidity" );
-				component.validators[validationName][method](item, options);
+				component.validators[validationName][method](item, rules, options);
 			}
 			break;
 		default:
