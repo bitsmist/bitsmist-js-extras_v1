@@ -32,19 +32,22 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		let invalids = [];
 
-		Object.keys(values).forEach((key) => {
-			if (rules[key])
-			{
-				let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
-				if (failed.length > 0)
+		if (rules)
+		{
+			Object.keys(values).forEach((key) => {
+				if (rules[key])
 				{
-					let invalid = {"key":key, "value":values[key], "failed":failed};
-					invalid["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-					invalid["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-					invalids.push(invalid);
+					let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
+					if (failed.length > 0)
+					{
+						let invalid = {"key":key, "value":values[key], "failed":failed};
+						invalid["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+						invalid["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+						invalids.push(invalid);
+					}
 				}
-			}
-		});
+			});
+		}
 
 		return invalids;
 
@@ -97,13 +100,16 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		let failed = [];
 
-		Object.keys(rules["constraints"]).forEach((constraintName) => {
-			let result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
-			if (result)
-			{
-				failed.push(result);
-			}
-		});
+		if (rules && rules["constraints"])
+		{
+			Object.keys(rules["constraints"]).forEach((constraintName) => {
+				let result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
+				if (result)
+				{
+					failed.push(result);
+				}
+			});
+		}
 
 		return failed;
 
