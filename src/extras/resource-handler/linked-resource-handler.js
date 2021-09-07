@@ -130,9 +130,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 			options["state"] = state;
 		}
 
-		return this._component.waitFor([options]).then(() => {
-			this._ref = document.querySelector(rootNode).resources[resourceName];
-		});
+		this._ref = document.querySelector(rootNode).resources[resourceName];
 
 	}
 
