@@ -214,7 +214,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	static __getTargetResources(component, options, target)
 	{
 
-		let resources = BITSMIST.v1.Util.safeGet(options, target, component._settings.get("settings." + target, []));
+		let resources = BITSMIST.v1.Util.safeGet(options, target, component.settings.get("settings." + target, []));
 
 		if (Array.isArray(resources))
 		{
