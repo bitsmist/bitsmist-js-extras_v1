@@ -29,7 +29,8 @@ export default class Plugin
 	{
 
 		this._component = component
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, this._getOptions(), options)});
+		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+		this._options.merge(this._getOptions());
 		this._options.set("name", this._options.get("name", this.constructor.name));
 
 		// Add event handlers
