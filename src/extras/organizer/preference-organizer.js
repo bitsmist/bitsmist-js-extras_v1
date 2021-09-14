@@ -107,16 +107,16 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	/**
  	 * Trigger preference changed events.
 	 *
-	 * @param	{Array}			keys				Changed keys.
+	 * @param	{Object}		item				Changed items.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _triggerEvent(keys)
+	static _triggerEvent(item)
 	{
 
 		let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 
-		return this.trigger(eventName, PreferenceOrganizer, {"keys":keys});
+		return this.trigger(eventName, {"sender":PreferenceOrganizer, "item":item});
 
 	}
 
@@ -141,11 +141,10 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		else
 		{
 			target = ( Array.isArray(target) ? target : [target] );
-			conditions = ( Array.isArray(conditions) ? conditions : [conditions] );
 
 			for (let i = 0; i < target.length; i++)
 			{
-				if (conditions.indexOf(target[i]) > -1)
+				if (conditions[target[i]])
 				{
 					result = true;
 					break;

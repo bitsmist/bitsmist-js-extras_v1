@@ -47,26 +47,26 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	set(key, value, options)
 	{
 
-		let changedKeys = [];
+		let changedItem = {};
 		let holder = ( key ? this.get(key) : this._items );
 
 		if (holder && typeof holder === "object")
 		{
-			this.__deepMerge(holder, value, changedKeys);
+			this.__deepMerge(holder, value, changedItem);
 		}
 		else
 		{
 			if (this.get(key) != value)
 			{
 				BITSMIST.v1.Util.safeSet(this._items, key, value);
-				changedKeys.push(key);
+				changedItem[key] = value;
 			}
 		}
 
 		let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
-		if (notify && changedKeys.length > 0)
+		if (notify && Object.keys(changedItem).length > 0)
 		{
-			return this.notify(changedKeys);
+			return this.notify(changedItem);
 		}
 
 	}
@@ -247,10 +247,10 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	 *
 	 * @return  {Object}		Merged array.
 	 */
-	__deepMerge(obj1, obj2, changedKeys)
+	__deepMerge(obj1, obj2, changedItem)
 	{
 
-		changedKeys = changedKeys || [];
+		changedItem = changedItem || {};
 		let key = "";
 
 		BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
@@ -259,7 +259,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			if (Array.isArray(obj1[key]))
 			{
 				obj1[key] = obj1[key].concat(obj2[key]);
-				changedKeys.push(key);
+				changedItem[key] = obj1[key];
 			}
 			else if (
 				obj1.hasOwnProperty(key) &&
@@ -275,7 +275,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 				if (obj1[key] != obj2[key])
 				{
 					obj1[key] = obj2[key];
-					changedKeys.push(key);
+					changedItem[key] = obj1[key];
 				}
 			}
 		});
