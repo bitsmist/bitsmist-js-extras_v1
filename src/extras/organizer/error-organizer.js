@@ -70,7 +70,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	 * @param	{Object}		target				Target component to check.
 	 * @param	{Object}		e					Event object.
 	 */
-	static __filter(conditions, options, sender, e)
+	static __filter(conditions, options, e)
 	{
 
 		let result = false;
@@ -216,7 +216,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	static __handleException(e)
 	{
 
-		return ErrorOrganizer._observers.notifyAsync("error", ErrorOrganizer, {"error": e});
+		return ErrorOrganizer._observers.notifyAsync("error", {"sender":ErrorOrganizer, "error": e});
 
 	}
 

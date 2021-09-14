@@ -148,7 +148,6 @@ Form.prototype.fill = function(options)
 {
 
 	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
 	let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
 
 	// Clear fields
@@ -159,11 +158,11 @@ Form.prototype.fill = function(options)
 	}
 
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeFill", sender, {"options":options});
+		return this.trigger("beforeFill", options);
 	}).then(() => {
 		FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
 
-		return this.trigger("afterFill", sender, {"options":options});
+		return this.trigger("afterFill", options);
 	});
 
 }
@@ -181,17 +180,16 @@ Form.prototype.validate = function(options)
 {
 
 	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
 	this._validationResult["result"] = true;
 
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeValidate", sender);
+		return this.trigger("beforeValidate");
 	}).then(() => {
 		return this.callOrganizers("doCheckValidity", {"item":this.item, "validationName":this._settings.get("settings.validationName")});
 	}).then(() => {
-		return this.trigger("doValidate", sender);
+		return this.trigger("doValidate");
 	}).then(() => {
-		return this.trigger("afterValidate", sender);
+		return this.trigger("afterValidate");
 	}).then(() => {
 		if (!this._validationResult["result"])
 		{
@@ -200,7 +198,7 @@ Form.prototype.validate = function(options)
 			return Promise.resolve().then(() => {
 				return this.callOrganizers("doReportValidity", {"validationName":this._settings.get("settings.validationName")});
 			}).then(() => {
-				return this.trigger("doReportValidatidy", sender);
+				return this.trigger("doReportValidatidy");
 			});
 		}
 	});
@@ -218,7 +216,6 @@ Form.prototype.submit = function(options)
 {
 
 	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
 	this._cancelSubmit = false;
 
 	// Get values from the form
@@ -230,13 +227,13 @@ Form.prototype.submit = function(options)
 		if (!this._cancelSubmit)
 		{
 			return Promise.resolve().then(() => {
-				return this.trigger("beforeSubmit", sender, {"item":this._item});
+				return this.trigger("beforeSubmit", {"item":this._item});
 			}).then(() => {
 				return this.callOrganizers("doSubmit", options);
 			}).then(() => {
-				return this.trigger("doSubmit", sender, {"item":this._item});
+				return this.trigger("doSubmit", {"item":this._item});
 			}).then(() => {
-				return this.trigger("afterSubmit", sender, {"item":this._item});
+				return this.trigger("afterSubmit", {"item":this._item});
 			});
 		}
 	});

@@ -129,7 +129,6 @@ List.prototype.switchRowTemplate = function(templateName, options)
 {
 
 	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
 
 	if (this._isActiveRowTemplate(templateName))
 	{
@@ -144,7 +143,7 @@ List.prototype.switchRowTemplate = function(templateName, options)
 	}).then(() => {
 		return this.callOrganizers("afterRowAppend", this._settings.items);
 	}).then(() => {
-		return this.trigger("afterRowAppend", sender, {"options":options});
+		return this.trigger("afterRowAppend", options);
 	}).then(() => {
 		console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
 	});
@@ -200,16 +199,14 @@ List.prototype.fill = function(options)
 	console.debug(`List.fill(): Filling list. name=${this.name}`);
 
 	options = Object.assign({}, options);
-	let sender = ( options["sender"] ? options["sender"] : this );
 
-	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this._settings.get("settings.async", true));
-	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
+	let builder = this._getBuilder(options);
 	let fragment = document.createDocumentFragment();
 	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
 	this._rows = [];
 
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeFill", sender, {"options":options});
+		return this.trigger("beforeFill", options);
 	}).then(() => {
 		return builder.call(this, fragment, this._items);
 	}).then(() => {
@@ -221,13 +218,33 @@ List.prototype.fill = function(options)
 	}).then(() => {
 		this._listRootNode.appendChild(fragment);
 	}).then(() => {
-		return this.trigger("afterFill", sender, {"options":options});
+		return this.trigger("afterFill", options);
 	});
 
 }
 
 // -----------------------------------------------------------------------------
 //  Protected
+// -----------------------------------------------------------------------------
+
+
+/**
+ * Fetch data.
+ *
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Function}		List builder function.
+ */
+List.prototype._getBuilder = function(options)
+{
+
+	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this._settings.get("settings.async", true));
+	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
+
+	return builder;
+
+}
+
 // -----------------------------------------------------------------------------
 
 /**
@@ -270,7 +287,7 @@ List.prototype._buildSync = function(fragment, items)
 	for (let i = 0; i < items.length; i++)
 	{
 		chain = chain.then(() => {
-			return this.__appendRowSync(fragment, i, items[i], template, rowEvents);
+			return this._appendRowSync(fragment, i, items[i], template, rowEvents);
 		});
 	}
 
@@ -293,7 +310,7 @@ List.prototype._buildAsync = function(fragment, items)
 
 	for (let i = 0; i < items.length; i++)
 	{
-		this.__appendRowAsync(fragment, i, items[i], template, rowEvents);
+		this._appendRowAsync(fragment, i, items[i], template, rowEvents);
 	}
 
 }
@@ -309,12 +326,11 @@ List.prototype._buildAsync = function(fragment, items)
  * @param	{integer}		no						Line no.
  * @param	{Object}		item					Row data.
  * @param	{String}		template				Template html.
- * @param	{Object}		clickHandler			Row's click handler info.
- * @param	{Object}		eventElements			Elements' event info.
+ * @param	{Object}		rowEvents				Row's event info.
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvents)
+List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
@@ -335,12 +351,12 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvent
 
 	// Call event handlers
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeFillRow", this, {"item":item, "no":no, "element":element});
+		return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
 	}).then(() => {
 		// Fill fields
 		FormUtil.setFields(element, item, {"masters":this.resources});
 	}).then(() => {
-		return this.trigger("afterFillRow", this, {"item":item, "no":no, "element":element});
+		return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
 	});
 
 }
@@ -354,10 +370,9 @@ List.prototype.__appendRowSync = function(rootNode, no, item, template, rowEvent
  * @param	{integer}		no						Line no.
  * @param	{Object}		item					Row data.
  * @param	{String}		template				Template html.
- * @param	{Object}		clickHandler			Row's click handler info.
- * @param	{Object}		eventElements			Elements' event info.
+ * @param	{Object}		rowEvents				Row's event info.
  */
-List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEvents)
+List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvents)
 {
 
 	// Append a row
@@ -377,8 +392,8 @@ List.prototype.__appendRowAsync = function(rootNode, no, item, template, rowEven
 	}
 
 	// Call event handlers
-	this.triggerAsync("beforeFillRow", this, {"item":item, "no":no, "element":element});
+	this.triggerAsync("beforeFillRow", {"item":item, "no":no, "element":element});
 	FormUtil.setFields(element, item, {"masters":this.resources});
-	this.triggerAsync("afterFillRow", this, {"item":item, "no":no, "element":element});
+	this.triggerAsync("afterFillRow", {"item":item, "no":no, "element":element});
 
 }
