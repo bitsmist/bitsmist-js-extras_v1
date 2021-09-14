@@ -30,7 +30,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	static validate(values, rules)
 	{
 
-		let invalids = [];
+		let invalids = {};
 
 		if (rules)
 		{
@@ -43,7 +43,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 						let invalid = {"key":key, "value":values[key], "failed":failed};
 						invalid["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
 						invalid["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-						invalids.push(invalid);
+						invalids[key] = invalid;
 					}
 				}
 			});
@@ -64,10 +64,11 @@ export default class ObjectValidationHandler extends ValidationHandler
 	checkValidity(values, rules, options)
 	{
 
-		let invalids = ValidationHandler.validate(values, rules, options); // Check allow/disallow list
-		invalids = invalids.concat(ObjectValidationHandler.validate(values, rules));
+		let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow list
+		let invalids2 = ObjectValidationHandler.validate(values, rules);
+		let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
 
-		this._component.validationResult["result"] = ( invalids.length > 0 ? false : true );
+		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;
 
 	}

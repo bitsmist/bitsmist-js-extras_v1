@@ -94,7 +94,7 @@ export default class ValidationHandler
 
 		rules = rules || {};
 		options = options || {};
-		let invalids = [];
+		let invalids = {};
 
 		// Allow list
 		if (options["allowList"])
@@ -102,7 +102,10 @@ export default class ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (options["allowList"].indexOf(key) == -1)
 				{
-					invalids.push({"key":key, "value":values[key], "message":"notAllowed"});
+					invalids[key] = {"key":key, "value":values[key]};
+					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids[key]["failed"] = [{"rule":"allowList", "message":"notAllowed"}];
 				}
 			});
 		}
@@ -113,7 +116,10 @@ export default class ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (!(key in rules))
 				{
-					invalids.push({"key":key, "value":values[key], "message":"notAllowed"});
+					invalids[key] = {"key":key, "value":values[key]};
+					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids[key]["failed"] = [{"rule":"allowOnlyInRules", "message":"notAllowed"}];
 				}
 			});
 		}
@@ -124,7 +130,10 @@ export default class ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (options["disallowList"].indexOf(key) > -1)
 				{
-					invalids.push({"key":key, "value":values[key], "message":"disallowed"});
+					invalids[key] = {"key":key, "value":values[key]};
+					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids[key]["failed"] = [{"rule":"disallowList", "message":"disallowed"}];
 				}
 			});
 		}
@@ -135,8 +144,10 @@ export default class ValidationHandler
 			{
 				if (!(key in values))
 				{
-					console.log("###missing", key, rules[key]);
-					invalids.push({"key":key, "value":undefined, "message":"valueMissing"});
+					invalids[key] = {"key":key, "value":undefined};
+					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
+					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
+					invalids[key]["failed"] = [{"rule":"required", "message":"valueMissing"}];
 				}
 			}
 		});
