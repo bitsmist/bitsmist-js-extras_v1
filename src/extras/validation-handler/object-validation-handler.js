@@ -134,6 +134,9 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		switch (constraintName)
 		{
+		case "type":
+			result = ObjectValidationHandler._checkType(key, value, constraintName, rule);
+			break;
 		case "required":
 			if (!value)
 			{
@@ -144,35 +147,35 @@ export default class ObjectValidationHandler extends ValidationHandler
 			len = String(value).length;
 			if (len < rule)
 			{
-				result = {"rule":"minlength", "message":"tooShort"};
+				result = {"rule":"minlength", "message":"tooShort(min:" + rule + ")"};
 			}
 			break;
 		case "maxlength":
 			len = String(value).length;
 			if (len > rule)
 			{
-				result = {"rule":"maxlength", "message":"tooLong"};
+				result = {"rule":"maxlength", "message":"tooLong(max:" + rule + ")"};
 			}
 			break;
 		case "min":
 			num = parseInt(value);
 			if (num < rule)
 			{
-				result = {"rule":"min", "message":"rangeUnderflow"};
+				result = {"rule":"min", "message":"rangeUnderflow(min:" + rule + ")"};
 			}
 			break;
 		case "max":
 			num = parseInt(value);
 			if (num > rule)
 			{
-				result = {"rule":"max", "message":"rangeOverflow"};
+				result = {"rule":"max", "message":"rangeOverflow(max:" + rule + ")"};
 			}
 			break;
 		case "pattern":
 			let re = new RegExp(rule);
 			if (!re.test(value))
 			{
-				result = {"rule":"pattern", "message":"patternMismatch"};
+				result = {"rule":"pattern", "message":"patternMismatch(pattern:" + rule + ")"};
 			}
 			break;
 		case "valids":
@@ -185,6 +188,54 @@ export default class ObjectValidationHandler extends ValidationHandler
 			if (!rule(key, value, rule))
 			{
 				result = {"rule":"custom", "message":"customMismatch"};
+			}
+			break;
+		}
+
+		return result;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Check a single type constraint.
+	 *
+	 * @param	{String}		key					Item name.
+	 * @param	{Object}		value				Value to validate.
+	 * @param	{String}		constraintName		Constraint name.
+	 * @param	{Object}		rule				Validation rules.
+	 */
+	static _checkType(key, value, constraintName, rule)
+	{
+
+		let result;
+
+		switch (rule)
+		{
+		case "object":
+			if (typeof value !== "object")
+			{
+				result = {"rule":"type", "message":"typeMismatch(object)"};
+			}
+			break;
+		case "function":
+			if (typeof value !== "function")
+			{
+				result = {"rule":"type", "message":"typeMismatch(function)"};
+			}
+			break;
+		case "string":
+			if (typeof value !== "string")
+			{
+				result = {"rule":"type", "message":"typeMismatch(string)"};
+			}
+			break;
+		case "number":
+			let parsed = parseInt(value);
+			if (isNaN(parsed))
+			{
+				result = {"rule":"type", "message":"typeMismatch(number)"};
 			}
 			break;
 		}

@@ -129,6 +129,18 @@ export default class ValidationHandler
 			});
 		}
 
+		// Required
+		Object.keys(rules).forEach((key) => {
+			if (rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
+			{
+				if (!(key in values))
+				{
+					console.log("###missing", key, rules[key]);
+					invalids.push({"key":key, "value":undefined, "message":"valueMissing"});
+				}
+			}
+		});
+
 		return invalids;
 
 	}
