@@ -35,8 +35,7 @@ FormUtil.setFields = function(rootNode, item, options)
 	let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
 
 	// Get elements with bm-bind attribute
-	let fields = rootNode.querySelectorAll("[bm-bind]");
-	let elements = Array.prototype.concat([rootNode], Array.prototype.slice.call(fields, 0));
+	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 
 	elements.forEach((element) => {
 		let fieldName = element.getAttribute("bm-bind");
@@ -89,8 +88,7 @@ FormUtil.getFields = function(rootNode)
 	let item = {};
 
 	// Get elements with bm-bind attribute
-	let elements = rootNode.querySelectorAll("[bm-bind]");
-	elements = Array.prototype.slice.call(elements, 0);
+	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 
 	elements.forEach((element) => {
 		// Get a value from the element
@@ -147,8 +145,9 @@ FormUtil.clearFields = function(rootNode, target)
 
 	target = (target ? target : "");
 
-	let elements = rootNode.querySelectorAll(target + " input");
-	elements = Array.prototype.slice.call(elements, 0);
+	// Get input elements
+	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, target + " input");
+
 	elements.forEach((element) => {
 		switch (element.type.toLowerCase())
 		{
