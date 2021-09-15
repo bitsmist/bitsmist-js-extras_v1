@@ -202,8 +202,11 @@ List.prototype.fill = function(options)
 
 	let builder = this._getBuilder(options);
 	let fragment = document.createDocumentFragment();
-	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
 	this._rows = [];
+
+	// Get list root node
+	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
+	BITSMIST.v1.Util.assert(this._listRootNode, `List root node not found. name=${this.name}, listRootNode=${this._settings.get("settings.listRootNode")}`);
 
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeFill", options);
