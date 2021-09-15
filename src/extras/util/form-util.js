@@ -31,11 +31,13 @@ export default function FormUtil() {}
 FormUtil.setFields = function(rootNode, item, options)
 {
 
+
 	let masters = BITSMIST.v1.Util.safeGet(options, "masters");
 	let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
 
 	// Get elements with bm-bind attribute
 	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+	elements.push(rootNode);
 
 	elements.forEach((element) => {
 		let fieldName = element.getAttribute("bm-bind");
@@ -89,6 +91,7 @@ FormUtil.getFields = function(rootNode)
 
 	// Get elements with bm-bind attribute
 	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+	elements.push(rootNode);
 
 	elements.forEach((element) => {
 		// Get a value from the element
