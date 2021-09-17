@@ -206,7 +206,7 @@ List.prototype.fill = function(options)
 
 	// Get list root node
 	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
-	BITSMIST.v1.Util.assert(this._listRootNode, `List root node not found. name=${this.name}, listRootNode=${this._settings.get("settings.listRootNode")}`);
+	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this._settings.get("settings.listRootNode")}`);
 
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeFill", options);
@@ -283,6 +283,8 @@ List.prototype._isActiveRowTemplate = function(templateName)
 List.prototype._buildSync = function(fragment, items)
 {
 
+	BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
+
 	let chain = Promise.resolve();
 	let rowEvents = this._settings.get("rowevents");
 	let template = this._templates[this._activeRowTemplateName].html;
@@ -307,6 +309,8 @@ List.prototype._buildSync = function(fragment, items)
  */
 List.prototype._buildAsync = function(fragment, items)
 {
+
+	BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
 	let rowEvents = this._settings.get("rowevents");
 	let template = this._templates[this._activeRowTemplateName].html;
