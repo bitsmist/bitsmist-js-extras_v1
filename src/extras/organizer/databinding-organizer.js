@@ -133,7 +133,9 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		rootNode = ( rootNode ? rootNode : component );
 
-		rootNode.querySelectorAll("[bm-bind]").forEach(elem => {
+		let nodes = rootNode.querySelectorAll("[bm-bind]");
+		nodes = Array.prototype.slice.call(nodes, 0);
+		nodes.forEach(elem => {
 			component.binds.bindTo(elem);
 		});
 

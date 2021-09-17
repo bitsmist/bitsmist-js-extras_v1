@@ -179,7 +179,9 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		let resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
 
 		// Get target keys to submit
-		component.querySelectorAll("[bm-submit]").forEach((elem) => {
+		let nodes = component.querySelectorAll("[bm-submit]");
+		nodes = Array.prototype.slice.call(nodes, 0);
+		nodes.forEach((elem) => {
 			let key = elem.getAttribute("bm-bind");
 			submitItem[key] = component.item[key];
 		});
