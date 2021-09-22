@@ -33,6 +33,7 @@ export default class CookieResourceHandler extends ResourceHandler
 
 		super(component, resourceName, options);
 
+		this._name = "CookieResourceHandler";
 		this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 	}

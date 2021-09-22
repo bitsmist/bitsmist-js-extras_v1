@@ -33,6 +33,7 @@ export default class ObjectResourceHandler extends ResourceHandler
 
 		super(component, resourceName, options);
 
+		this._name = "ObjectResourceHandler";
 		if (options["items"])
 		{
 			this.data = options["items"];

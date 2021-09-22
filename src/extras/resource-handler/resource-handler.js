@@ -28,10 +28,11 @@ export default class ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		this._name = resourceName;
+		this._resourceName = resourceName;
 		this._component = component;
 		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
 		this._data;
+		this._name = "ResourceHandler";
 		this._items = [];
 		this._item = {};
 		this._target = {};
@@ -44,7 +45,7 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Name.
+	 * Resource handler name.
 	 *
 	 * @type	{String}
 	 */
@@ -59,6 +60,27 @@ export default class ResourceHandler
 	{
 
 		this._name = value;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Resource name.
+	 *
+	 * @type	{String}
+	 */
+	get resourceName()
+	{
+
+		return this._resourceName;
+
+	}
+
+	set resourceName(value)
+	{
+
+		this._resourceName = value;
 
 	}
 
@@ -159,7 +181,12 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._get(id, parameters);
 		}).then((data) => {
-			this.data = data;
+//			BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+
+			if (data)
+			{
+				this.data = data;
+			}
 
 			return this._data;
 		});

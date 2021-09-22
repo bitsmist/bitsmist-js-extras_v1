@@ -35,6 +35,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 		super(component, resourceName, Object.assign(defaults, options));
 
+		this._name = "LinkedResourceHandler";
 		this._ref;
 
 	}
@@ -116,7 +117,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	get(id, parameters)
+	_get(id, parameters)
 	{
 
 		let handlerOptions = this._options.get("handlerOptions");
