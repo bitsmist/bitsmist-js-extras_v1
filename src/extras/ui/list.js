@@ -262,7 +262,7 @@ List.prototype._isActiveRowTemplate = function(templateName)
 
 	let ret = false;
 
-	if (this._activeRowTemplateName == templateName)
+	if (this._activeRowTemplateName === templateName)
 	{
 		ret = true;
 	}

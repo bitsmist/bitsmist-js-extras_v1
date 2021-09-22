@@ -56,7 +56,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		}
 		else
 		{
-			if (this.get(key) != value)
+			if (this.get(key) !== value)
 			{
 				BITSMIST.v1.Util.safeSet(this._items, key, value);
 				changedItem[key] = value;
@@ -123,7 +123,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 
 		for (let i = 0; i < this._observers.length; i++)
 		{
-			if (this._obvservers[i].id == id)
+			if (this._obvservers[i].id === id)
 			{
 				this._observers.splice(i, 1);
 				break;
@@ -272,7 +272,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 			}
 			else
 			{
-				if (obj1[key] != obj2[key])
+				if (obj1[key] !== obj2[key])
 				{
 					obj1[key] = obj2[key];
 					changedItem[key] = obj1[key];

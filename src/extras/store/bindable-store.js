@@ -34,7 +34,7 @@ export default class BindableStore extends ObservableStore
 
 		this.filter = (conditions, observerInfo, ...args) => {
 			let ret = false;
-			if (conditions == "*" || conditions.indexOf(observerInfo.id) > -1)
+			if (conditions === "*" || conditions.indexOf(observerInfo.id) > -1)
 			{
 				ret = true;
 			}

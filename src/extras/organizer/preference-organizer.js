@@ -134,7 +134,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		let result = false;
 		let target = options["targets"];
 
-		if (target == "*")
+		if (target === "*")
 		{
 			result = true;
 		}

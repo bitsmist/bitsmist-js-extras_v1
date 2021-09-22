@@ -107,7 +107,7 @@ FormatterUtil.formatDate = function(format, str)
 {
 
 	var result = "";
-	if (str && str.length == 8)
+	if (str && str.length === 8)
 	{
 		result = str.substr(0, 4) + "/" + str.substr(4, 2) + "/" + str.substr(6, 2);
 	}
@@ -245,7 +245,7 @@ FormatterUtil.getToday = function(dateDelimiter)
 FormatterUtil.sanitize = function(value)
 {
 
-	if (typeof value == "string")
+	if (typeof value === "string")
 	{
 		return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 	}

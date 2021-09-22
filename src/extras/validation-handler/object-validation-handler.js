@@ -184,7 +184,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 			}
 			break;
 		case "valids":
-			if (rule.indexOf(value) == -1)
+			if (rule.indexOf(value) === -1)
 			{
 				result = {"rule":"valids", "validity":"validsMismatch"};
 			}
@@ -218,33 +218,36 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		let result;
 
-		switch (rule)
+		if (value)
 		{
-		case "object":
-			if (typeof value !== "object")
+			switch (rule)
 			{
-				result = {"rule":"type", "validity":"typeMismatch(object)"};
+			case "object":
+				if (typeof value !== "object")
+				{
+					result = {"rule":"type", "validity":"typeMismatch(object)"};
+				}
+				break;
+			case "function":
+				if (typeof value !== "function")
+				{
+					result = {"rule":"type", "validity":"typeMismatch(function)"};
+				}
+				break;
+			case "string":
+				if (typeof value !== "string")
+				{
+					result = {"rule":"type", "validity":"typeMismatch(string)"};
+				}
+				break;
+			case "number":
+				let parsed = parseInt(value);
+				if (isNaN(parsed))
+				{
+					result = {"rule":"type", "validity":"typeMismatch(number)"};
+				}
+				break;
 			}
-			break;
-		case "function":
-			if (typeof value !== "function")
-			{
-				result = {"rule":"type", "validity":"typeMismatch(function)"};
-			}
-			break;
-		case "string":
-			if (typeof value !== "string")
-			{
-				result = {"rule":"type", "validity":"typeMismatch(string)"};
-			}
-			break;
-		case "number":
-			let parsed = parseInt(value);
-			if (isNaN(parsed))
-			{
-				result = {"rule":"type", "validity":"typeMismatch(number)"};
-			}
-			break;
 		}
 
 		return result;

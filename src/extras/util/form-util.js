@@ -185,7 +185,7 @@ FormUtil.clearFields = function(rootNode, target)
 FormUtil.setValue = function(element, value)
 {
 
-	if (value === undefined || value == null)
+	if (value === undefined || value === null)
 	{
 		value = "";
 	}
@@ -383,7 +383,7 @@ FormUtil._setValue_target = function(element, targets, value)
 		case "href":
 		case "src":
 		case "rel":
-			if (value.substring(0, 4) == "http" || value.substring(0, 1) == "/")
+			if (value.substring(0, 4) === "http" || value.substring(0, 1) === "/")
 			{
 				element.setAttribute(item, value);
 			}
@@ -410,8 +410,8 @@ FormUtil._setValue_value = function(element, value)
 {
 
 	if (
-		(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "checkbox") ||
-		(element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio")
+		(element.tagName.toLowerCase() === "input" && element.type.toLowerCase() === "checkbox") ||
+		(element.tagName.toLowerCase() === "input" && element.type.toLowerCase() === "radio")
 	)
 	{
 		if (Array.isArray(value))
@@ -423,7 +423,7 @@ FormUtil._setValue_value = function(element, value)
 		}
 		else
 		{
-			if (element.getAttribute("value") == value)
+			if (element.getAttribute("value") === value)
 			{
 				element.checked = true;
 			}
@@ -447,11 +447,11 @@ FormUtil._setValue_value = function(element, value)
 FormUtil._setValue_element = function(element, value)
 {
 
-	if (element.tagName.toLowerCase() == "select")
+	if (element.tagName.toLowerCase() === "select")
 	{
 		element.value = value;
 	}
-	else if (element.tagName.toLowerCase() == "input")
+	else if (element.tagName.toLowerCase() === "input")
 	{
 		switch (element.type.toLowerCase())
 		{
@@ -464,7 +464,7 @@ FormUtil._setValue_element = function(element, value)
 			element.checked = ( value ? true : false );
 			break;
 		case "radio":
-			if (element.value == value)
+			if (element.value === value)
 			{
 				element.checked = true;
 			}

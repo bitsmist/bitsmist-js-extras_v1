@@ -78,7 +78,7 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 
 		for (let i = 0; i < targets.length; i++)
 		{
-			if (e.error.name == targets[i] || targets[i] == "*")
+			if (e.error.name === targets[i] || targets[i] === "*")
 			{
 				result = true;
 				break;

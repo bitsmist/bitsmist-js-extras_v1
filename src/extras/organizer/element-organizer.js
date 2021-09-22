@@ -77,7 +77,7 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 
 		if (elementInfo["rootNode"])
 		{
-			if (elementInfo["rootNode"] == "this" || elementInfo["rootNode"] == component.tagName.toLowerCase())
+			if (elementInfo["rootNode"] === "this" || elementInfo["rootNode"] === component.tagName.toLowerCase())
 			{
 				elements = [component];
 			}
@@ -86,7 +86,7 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 				elements = component.querySelectorAll(elementInfo["rootNode"]);
 			}
 		}
-		else if (elementName == "this" || elementName == component.tagName.toLowerCase())
+		else if (elementName === "this" || elementName === component.tagName.toLowerCase())
 		{
 			elements = [component];
 		}

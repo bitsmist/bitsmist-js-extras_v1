@@ -78,7 +78,7 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	static onKeyDown(e, component)
 	{
 
-		component.__isComposing = ( e.keyCode == 229 ? true : false );
+		component.__isComposing = ( e.keyCode === 229 ? true : false );
 
 	}
 
