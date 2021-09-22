@@ -26,6 +26,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 *
+ 	 * @return  {Object}		Invalid results.
 	 */
 	static validate(values, rules)
 	{
@@ -40,10 +42,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 					let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
 					if (failed.length > 0)
 					{
-						let invalid = {"key":key, "value":values[key], "failed":failed};
-						invalid["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-						invalid["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-						invalids[key] = invalid;
+						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
 					}
 				}
 			});
@@ -60,11 +59,12 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 * @param	{Object}		options				Validation options.
 	 */
 	checkValidity(values, rules, options)
 	{
 
-		let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow list
+		let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
 		let invalids2 = ObjectValidationHandler.validate(values, rules);
 		let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
 
@@ -95,6 +95,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 *
+ 	 * @return  {Object}		Failed results.
 	 */
 	static _validateValue(key, value, rules)
 	{
@@ -125,6 +127,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{Object}		value				Value to validate.
 	 * @param	{String}		constraintName		Constraint name.
 	 * @param	{Object}		rule				Validation rules.
+	 *
+ 	 * @return  {Object}		Failed result.
 	 */
 	static _checkConstraint(key, value, constraintName, rule)
 	{
@@ -141,54 +145,54 @@ export default class ObjectValidationHandler extends ValidationHandler
 		case "required":
 			if (!value)
 			{
-				result = {"rule":"required", "message":"valueMissing"};
+				result = {"rule":"required", "validity":"valueMissing"};
 			}
 			break;
 		case "minlength":
 			len = String(value).length;
 			if (len < rule)
 			{
-				result = {"rule":"minlength", "message":"tooShort(min:" + rule + ")"};
+				result = {"rule":"minlength", "validity":"tooShort(min:" + rule + ")"};
 			}
 			break;
 		case "maxlength":
 			len = String(value).length;
 			if (len > rule)
 			{
-				result = {"rule":"maxlength", "message":"tooLong(max:" + rule + ")"};
+				result = {"rule":"maxlength", "validity":"tooLong(max:" + rule + ")"};
 			}
 			break;
 		case "min":
 			num = parseInt(value);
 			if (num < rule)
 			{
-				result = {"rule":"min", "message":"rangeUnderflow(min:" + rule + ")"};
+				result = {"rule":"min", "validity":"rangeUnderflow(min:" + rule + ")"};
 			}
 			break;
 		case "max":
 			num = parseInt(value);
 			if (num > rule)
 			{
-				result = {"rule":"max", "message":"rangeOverflow(max:" + rule + ")"};
+				result = {"rule":"max", "validity":"rangeOverflow(max:" + rule + ")"};
 			}
 			break;
 		case "pattern":
 			let re = new RegExp(rule);
 			if (!re.test(value))
 			{
-				result = {"rule":"pattern", "message":"patternMismatch(pattern:" + rule + ")"};
+				result = {"rule":"pattern", "validity":"patternMismatch(pattern:" + rule + ")"};
 			}
 			break;
 		case "valids":
 			if (rule.indexOf(value) == -1)
 			{
-				result = {"rule":"valids", "message":"validsMismatch"};
+				result = {"rule":"valids", "validity":"validsMismatch"};
 			}
 			break;
 		case "custom":
 			if (!rule(key, value, rule))
 			{
-				result = {"rule":"custom", "message":"customMismatch"};
+				result = {"rule":"custom", "validity":"customMismatch"};
 			}
 			break;
 		}
@@ -206,6 +210,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 * @param	{Object}		value				Value to validate.
 	 * @param	{String}		constraintName		Constraint name.
 	 * @param	{Object}		rule				Validation rules.
+	 *
+ 	 * @return  {Object}		Failed result.
 	 */
 	static _checkType(key, value, constraintName, rule)
 	{
@@ -217,26 +223,26 @@ export default class ObjectValidationHandler extends ValidationHandler
 		case "object":
 			if (typeof value !== "object")
 			{
-				result = {"rule":"type", "message":"typeMismatch(object)"};
+				result = {"rule":"type", "validity":"typeMismatch(object)"};
 			}
 			break;
 		case "function":
 			if (typeof value !== "function")
 			{
-				result = {"rule":"type", "message":"typeMismatch(function)"};
+				result = {"rule":"type", "validity":"typeMismatch(function)"};
 			}
 			break;
 		case "string":
 			if (typeof value !== "string")
 			{
-				result = {"rule":"type", "message":"typeMismatch(string)"};
+				result = {"rule":"type", "validity":"typeMismatch(string)"};
 			}
 			break;
 		case "number":
 			let parsed = parseInt(value);
 			if (isNaN(parsed))
 			{
-				result = {"rule":"type", "message":"typeMismatch(number)"};
+				result = {"rule":"type", "validity":"typeMismatch(number)"};
 			}
 			break;
 		}

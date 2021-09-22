@@ -27,6 +27,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 *
+ 	 * @return  {Object}		Invalid results.
 	 */
 	static validate(form, rules)
 	{
@@ -36,8 +38,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
 		BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
-		let elements = form.querySelectorAll("input:not([novalidate])")
-		elements = Array.prototype.slice.call(elements, 0);
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(form, "input:not([novalidate])")
 		elements.forEach((element) => {
 			let key = element.getAttribute("bm-bind");
 			let value = FormUtil.getValue(element);
@@ -46,13 +47,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 			let failed = HTML5FormValidationHandler._validateValue(element, key, value, rule);
 			if (failed.length > 0)
 			{
-				let invalid = {"element":element, "key":key, "value":value, "failed":failed, "message":element.validationMessage};
-				if (rule)
-				{
-					invalid["message"] = ValidationHandler._getFunctionValue(key, value, "message", rule);
-					invalid["fix"] = ValidationHandler._getFunctionValue(key, value, "fix", rule);
-				}
-				invalids[key] = invalid;
+				invalids[key] = ValidationHandler.createValidationResult(key, value, rule, failed, {"element": element});
+				invalids["message"] = invalids["message"] || element.validationMessage;
 			}
 		});
 
@@ -87,6 +83,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 * @param	{Object}		options				Validation options.
 	 */
 	checkValidity(values, rules, options)
 	{
@@ -139,6 +136,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 *
+ 	 * @return  {Object}		Failed results.
 	 */
 	static _validateValue(element, key, value, rules)
 	{
@@ -152,7 +151,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 			{
 				if (errorName !== "valid" && result[errorName])
 				{
-					failed.push({"message":errorName});
+					failed.push({"validity":errorName});
 				}
 			}
 		}

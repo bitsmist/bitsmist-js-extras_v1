@@ -64,12 +64,14 @@ export default class ValidationHandler
 	 *
 	 * @type	{Object}
 	 */
+	/*
 	get items()
 	{
 
 		return this._items;
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
@@ -89,6 +91,44 @@ export default class ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Validate.
+	 *
+	 * @param	{String}		key					Key.
+	 * @param	{*}				value				Value.
+	 * @param	{Object}		rule				Validation rule.
+	 * @param	{Object}		failed				Failed reports.
+	 * @param	{Object}		extra				Extra reports.
+	 *
+ 	 * @return  {Object}		Invalid result.
+	 */
+	static createValidationResult(key, value, rule, failed, extras)
+	{
+
+		let result = {
+			"key":			key,
+			"value":		value,
+			"message":		ValidationHandler._getFunctionValue(key, value, "message", rule),
+			"fix":			ValidationHandler._getFunctionValue(key, value, "fix", rule),
+			"failed":		failed,
+			"extras":		extras,
+		};
+
+		return result;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Validate.
+	 *
+	 * @param	{Object}		values				Values to validate.
+	 * @param	{Object}		rules				Validation rules.
+	 * @param	{Object}		options				Validation options.
+	 *
+ 	 * @return  {Object}		Invalid results.
+	 */
 	static validate(values, rules, options)
 	{
 
@@ -100,12 +140,10 @@ export default class ValidationHandler
 		if (options["allowList"])
 		{
 			Object.keys(values).forEach((key) => {
-				if (options["allowList"].indexOf(key) == -1)
+				if (options["allowList"].indexOf(key) === -1)
 				{
-					invalids[key] = {"key":key, "value":values[key]};
-					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-					invalids[key]["failed"] = [{"rule":"allowList", "message":"notAllowed"}];
+					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
@@ -116,10 +154,8 @@ export default class ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (!(key in rules))
 				{
-					invalids[key] = {"key":key, "value":values[key]};
-					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-					invalids[key]["failed"] = [{"rule":"allowOnlyInRules", "message":"notAllowed"}];
+					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
@@ -130,24 +166,20 @@ export default class ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (options["disallowList"].indexOf(key) > -1)
 				{
-					invalids[key] = {"key":key, "value":values[key]};
-					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-					invalids[key]["failed"] = [{"rule":"disallowList", "message":"disallowed"}];
+					let failed = [{"rule":"disallowList", "validity":"disallowed"}];
+					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
 
 		// Required
 		Object.keys(rules).forEach((key) => {
-			if (rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
+			if ("constraints" in rules[key] && rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
 			{
 				if (!(key in values))
 				{
-					invalids[key] = {"key":key, "value":undefined};
-					invalids[key]["message"] = ValidationHandler._getFunctionValue(key, values[key], "message", rules[key]);
-					invalids[key]["fix"] = ValidationHandler._getFunctionValue(key, values[key], "fix", rules[key]);
-					invalids[key]["failed"] = [{"rule":"required", "message":"valueMissing"}];
+					let failed = [{"rule":"required", "validity":"valueMissing"}];
+					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
 				}
 			}
 		});
@@ -163,8 +195,9 @@ export default class ValidationHandler
 	 *
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
+	 * @param	{Object}		options				Validation options.
 	 */
-	checkValidity(values, options)
+	checkValidity(values, rules, options)
 	{
 	}
 
@@ -176,7 +209,7 @@ export default class ValidationHandler
 	 * @param	{Object}		values				Values to validate.
 	 * @param	{Object}		rules				Validation rules.
 	 */
-	reportValidity(values, options)
+	reportValidity(values, rules)
 	{
 	}
 
@@ -197,9 +230,9 @@ export default class ValidationHandler
 
 		let ret;
 
-		if (target in rule)
+		if (rule && target in rule)
 		{
-			if (typeof rule[target] == "function")
+			if (typeof rule[target] === "function")
 			{
 				ret = rule[target](key, value, rule);
 			}
