@@ -84,7 +84,7 @@ export default class ApiResourceHandler extends ResourceHandler
 		let urlOptions = this._getOption("url", method);
 		let dataType = urlOptions["dataType"];
 
-		let url = this._buildApiUrl(this._resourceNname, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
 
@@ -110,7 +110,7 @@ export default class ApiResourceHandler extends ResourceHandler
 		let urlOptions = this._getOption("url", method);
 		let dataType = urlOptions["dataType"];
 
-		let url = this._buildApiUrl(this._resourceNname, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
@@ -136,7 +136,7 @@ export default class ApiResourceHandler extends ResourceHandler
 		let urlOptions = this._getOption("url", method);
 		let dataType = urlOptions["dataType"];
 
-		let url = this._buildApiUrl(this._resourceNname, id, parameters, urlOptions);
+		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
