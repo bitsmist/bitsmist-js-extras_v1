@@ -51,6 +51,24 @@ Object.defineProperty(Form.prototype, 'item', {
 })
 
 // -----------------------------------------------------------------------------
+
+/**
+ * Flag wheter to cancel submit.
+ *
+ * @type	{Object}
+ */
+Object.defineProperty(Form.prototype, 'cancelSubmit', {
+	get()
+	{
+		return this._cancelSubmit;
+	},
+	set(value)
+	{
+		this._cancelSubmit = value;
+	}
+})
+
+// -----------------------------------------------------------------------------
 //  Methods
 // -----------------------------------------------------------------------------
 
@@ -151,7 +169,7 @@ Form.prototype.fill = function(options)
 	let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
 
 	// Clear fields
-	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
+	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 	if (autoClear)
 	{
 		this.clear();
@@ -180,23 +198,23 @@ Form.prototype.validate = function(options)
 {
 
 	options = Object.assign({}, options);
-	this._validationResult["result"] = true;
+	this.validationResult["result"] = true;
 
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeValidate");
 	}).then(() => {
-		return this.callOrganizers("doCheckValidity", {"item":this.item, "validationName":this._settings.get("settings.validationName")});
+		return this.callOrganizers("doCheckValidity", {"item":this._item, "validationName":this.settings.get("settings.validationName")});
 	}).then(() => {
 		return this.trigger("doValidate");
 	}).then(() => {
 		return this.trigger("afterValidate");
 	}).then(() => {
-		if (!this._validationResult["result"])
+		if (!this.validationResult["result"])
 		{
 			this._cancelSubmit = true;
 
 			return Promise.resolve().then(() => {
-				return this.callOrganizers("doReportValidity", {"validationName":this._settings.get("settings.validationName")});
+				return this.callOrganizers("doReportValidity", {"validationName":this.settings.get("settings.validationName")});
 			}).then(() => {
 				return this.trigger("doReportValidatidy");
 			});
