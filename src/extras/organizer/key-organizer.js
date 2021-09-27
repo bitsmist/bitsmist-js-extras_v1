@@ -171,12 +171,12 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		component.submit().then(() => {
-			if (!component._cancelSubmit)
+			if (!component.cancelSubmit)
 			{
 				// Modal result
 				if (component._isModal)
 				{
-					component._modalResult["result"] = true;
+					component.modalResult["result"] = true;
 				}
 
 				// Auto close
