@@ -141,7 +141,7 @@ List.prototype.switchRowTemplate = function(templateName, options)
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
-		return this.callOrganizers("afterRowAppend", this._settings.items);
+		return this.callOrganizers("afterRowAppend", this.settings.items);
 	}).then(() => {
 		return this.trigger("afterRowAppend", options);
 	}).then(() => {
@@ -178,7 +178,7 @@ List.prototype.fetch = function(options)
 		let resourceName = this.settings.get("settings.resourceName");
 		if (resourceName && this.resources && this.resources[resourceName])
 		{
-			this.items = this.resources[resourceName]._items;
+			this.items = this.resources[resourceName].items;
 		}
 	});
 
@@ -205,15 +205,15 @@ List.prototype.fill = function(options)
 	this._rows = [];
 
 	// Get list root node
-	this._listRootNode = this.querySelector(this._settings.get("settings.listRootNode"));
-	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this._settings.get("settings.listRootNode")}`);
+	this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
+	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 	return Promise.resolve().then(() => {
 		return this.trigger("beforeFill", options);
 	}).then(() => {
 		return builder.call(this, fragment, this._items);
 	}).then(() => {
-		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this._settings.get("settings.autoClear"));
+		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 		if (autoClear)
 		{
 			this.clear();
@@ -241,7 +241,7 @@ List.prototype.fill = function(options)
 List.prototype._getBuilder = function(options)
 {
 
-	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this._settings.get("settings.async", true));
+	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this.settings.get("settings.async", true));
 	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
 
 	return builder;
@@ -286,8 +286,8 @@ List.prototype._buildSync = function(fragment, items)
 	BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
 	let chain = Promise.resolve();
-	let rowEvents = this._settings.get("rowevents");
-	let template = this._templates[this._activeRowTemplateName].html;
+	let rowEvents = this.settings.get("rowevents");
+	let template = this.templates[this._activeRowTemplateName].html;
 
 	for (let i = 0; i < items.length; i++)
 	{
@@ -310,10 +310,10 @@ List.prototype._buildSync = function(fragment, items)
 List.prototype._buildAsync = function(fragment, items)
 {
 
-	BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
+	BITSMIST.v1.Util.assert(this.templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
-	let rowEvents = this._settings.get("rowevents");
-	let template = this._templates[this._activeRowTemplateName].html;
+	let rowEvents = this.settings.get("rowevents");
+	let template = this.templates[this._activeRowTemplateName].html;
 
 	for (let i = 0; i < items.length; i++)
 	{
@@ -364,7 +364,7 @@ List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents
 	this.triggerAsync("beforeBuildRow", {"item":item});
 
 	let chain = Promise.resolve();
-	let items = ( this._eventResult["newItems"] ? this._eventResult["newItems"] : [item] );
+	let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
 	for (let i = 0; i < items.length; i++)
 	{
 		chain = chain.then(() => {
@@ -412,7 +412,7 @@ List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvent
 
 	this.triggerAsync("beforeBuildRow", {"item":item});
 
-	let items = ( this._eventResult["newItems"] ? this._eventResult["newItems"] : [item] );
+	let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
 	for (let i = 0; i < items.length; i++)
 	{
 		// Append a row
