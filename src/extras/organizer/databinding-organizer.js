@@ -96,7 +96,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		let resourceName = settings["resourceName"];
 
-		component._binds.replace(component.resources[resourceName]._item);
+		component._binds.replace(component.resources[resourceName].item);
 
 	}
 
@@ -111,7 +111,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 	static update(component, data)
 	{
 
-		component.binds.items = data;
+		component._binds.items = data;
 
 		// Bind data to elements
 		DatabindingOrganizer._bindData(component);
@@ -136,7 +136,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 		let nodes = rootNode.querySelectorAll("[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		nodes.forEach(elem => {
-			component.binds.bindTo(elem);
+			component._binds.bindTo(elem);
 		});
 
 	}

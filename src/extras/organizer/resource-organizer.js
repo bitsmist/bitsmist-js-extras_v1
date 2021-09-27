@@ -75,7 +75,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 							let id = resource.options.get("autoLoad.id");
 							let paramters = resource.options.get("autoLoad.parameters");
 
-							promises.push(component.resources[resourceName].get(id, paramters));
+							promises.push(component._resources[resourceName].get(id, paramters));
 						}
 					});
 				}
@@ -151,12 +151,12 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		for (let i = 0; i < resources.length; i++)
 		{
 			let resourceName = resources[i];
-			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
-			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
-			component.resources[resourceName].target["id"] = id;
-			component.resources[resourceName].target["parameters"] = parameters;
+			let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
+			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
+			component._resources[resourceName].target["id"] = id;
+			component._resources[resourceName].target["parameters"] = parameters;
 
-			promises.push(component.resources[resourceName].get(id, parameters));
+			promises.push(component._resources[resourceName].get(id, parameters));
 		}
 
 		return Promise.all(promises);
@@ -189,11 +189,11 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		for (let i = 0; i < resources.length; i++)
 		{
 			let resourceName = resources[i];
-			let method = BITSMIST.v1.Util.safeGet(options, "method", component.resources[resourceName].target["method"] || "put"); // Default is "put"
-			let id = BITSMIST.v1.Util.safeGet(options, "id", component.resources[resourceName].target["id"]);
-			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component.resources[resourceName].target["parameters"]);
+			let method = BITSMIST.v1.Util.safeGet(options, "method", component._resources[resourceName].target["method"] || "put"); // Default is "put"
+			let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
+			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
 
-			promises.push(component.resources[resourceName][method](id, submitItem, parameters));
+			promises.push(component._resources[resourceName][method](id, submitItem, parameters));
 		}
 
 		return Promise.all(promises);

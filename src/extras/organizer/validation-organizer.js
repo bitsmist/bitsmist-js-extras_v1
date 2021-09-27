@@ -73,8 +73,8 @@ export default class ValidationOrganizer extends BITSMIST.v1.Organizer
 				let options = component.settings.get("validations." + validationName + ".handlerOptions");
 				let method = (conditions === "doCheckValidity" ? "checkValidity" : "reportValidity" );
 
-				BITSMIST.v1.Util.assert(component.validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${component.name}, validationName=${validationName}`);
-				component.validators[validationName][method](item, rules, options);
+				BITSMIST.v1.Util.assert(component._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${component.name}, validationName=${validationName}`);
+				component._validators[validationName][method](item, rules, options);
 			}
 			break;
 		default:
