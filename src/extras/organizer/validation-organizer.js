@@ -64,7 +64,7 @@ export default class ValidationOrganizer extends BITSMIST.v1.Organizer
 		case "doCheckValidity":
 		case "doReportValidity":
 			let validationName = settings["validationName"];
-			BITSMIST.v1.Util.warn(validationName, `ValidationOrganizer.organize(): Validator not specified. name=${component.name}`);
+//			BITSMIST.v1.Util.warn(validationName, `ValidationOrganizer.organize(): Validator not specified. name=${component.name}`);
 
 			if (validationName)
 			{
