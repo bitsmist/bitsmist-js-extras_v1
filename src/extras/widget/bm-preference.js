@@ -92,8 +92,7 @@ PreferenceManager.prototype.get = function(key, defaultValue)
 /**
  * Set a value to the store.
  *
- * @param	{String}		key					Key to store.
- * @param	{Object}		value				Value to store.
+ * @param	{Object}		values				Values to store.
  * @param	{Object}		options				Options.
  */
 PreferenceManager.prototype.set = function(values, options)
