@@ -72,13 +72,13 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		let chain = Promise.resolve();
 
 		// Set default preferences
-		if (component.settings.get("preferences.defaults"))
+		if (BITSMIST.v1.Util.safeGet(settings, "preferences.defaults"))
 		{
 			PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
 		}
 
 		// Load preferences
-		if (component.settings.get("preferences.settings.load"))
+		if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.load"))
 		{
 			chain = component.resources["preferences"].get().then((preferences) => {
 				PreferenceOrganizer._store.merge(preferences);

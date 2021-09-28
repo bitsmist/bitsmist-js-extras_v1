@@ -47,7 +47,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	static organize(conditions, component, settings)
 	{
 
-		let plugins = component.settings.get("plugins");
+		let plugins = settings["plugins"];
 		if (plugins)
 		{
 			Object.keys(plugins).forEach((pluginName) => {
