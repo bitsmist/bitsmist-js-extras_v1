@@ -91,4 +91,3 @@ window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 // Widget
 
 import PreferenceManager from "./widget/bm-preference.js";
-import ErrorManager from "./widget/bm-error.js";
