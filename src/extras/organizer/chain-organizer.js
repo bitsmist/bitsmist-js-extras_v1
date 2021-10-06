@@ -73,30 +73,61 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 		let component = ex.component;
 		let targets = ex.options;
 		let promises = [];
+		let chain = Promise.resolve();
 
 		for (let i = 0; i < targets.length; i++)
 		{
 			let method = targets[i]["method"] || "refresh";
 			let state = targets[i]["state"] || "started";
+			let sync = targets[i]["sync"];
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			nodes = Array.prototype.slice.call(nodes, 0);
 			BITSMIST.v1.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
-			nodes.forEach((element) => {
-				BITSMIST.v1.Util.assert(element.state === "started" || element.state === "opened", `ChainOrganizer.onDoOrganizer(): Node not ready. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
-
-				promises.push(element[method]({"sender":component}));
-
-				/* wait for component to be ready
-				let promise = component.waitFor([{"object":element, "state":state}]).then(() => {
-					return element[method]({"sender":component});
+			if (sync)
+			{
+				chain = chain.then(() => {
+					return ChainOrganizer.__execTarget(component, nodes, method);
 				});
-
-				promises.push(promise);
-				*/
-			});
+			}
+			else
+			{
+				chain = ChainOrganizer.__execTarget(component, nodes, method);
+			}
+			promises.push(chain);
 		}
+
+		return chain.then(() => {
+			return Promise.all(promises);
+		});
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//	Privates
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Organize.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Array}			nodes				Nodes.
+	 * @param	{String}		string				Method name to exec.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static __execTarget(component, nodes, method)
+	{
+
+		let promises = [];
+
+		nodes.forEach((element) => {
+			let promise = component.waitFor([{"object":element}]).then(() => {
+				return element[method]({"sender":component});
+			});
+			promises.push(promise);
+		});
 
 		return Promise.all(promises);
 
