@@ -88,12 +88,12 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 			if (sync)
 			{
 				chain = chain.then(() => {
-					return ChainOrganizer.__execTarget(component, nodes, method);
+					return ChainOrganizer.__execTarget(component, nodes, method, state);
 				});
 			}
 			else
 			{
-				chain = ChainOrganizer.__execTarget(component, nodes, method);
+				chain = ChainOrganizer.__execTarget(component, nodes, method, state);
 			}
 			promises.push(chain);
 		}
@@ -117,13 +117,13 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __execTarget(component, nodes, method)
+	static __execTarget(component, nodes, method, state)
 	{
 
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.waitFor([{"object":element}]).then(() => {
+			let promise = component.waitFor([{"object":element, "state":state}]).then(() => {
 				return element[method]({"sender":component});
 			});
 			promises.push(promise);
