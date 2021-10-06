@@ -2541,32 +2541,63 @@
 			var component = ex.component;
 			var targets = ex.options;
 			var promises = [];
+			var chain = Promise.resolve();
 
 			var loop = function ( i ) {
 				var method = targets[i]["method"] || "refresh";
 				targets[i]["state"] || "started";
+				var sync = targets[i]["sync"];
 
 				var nodes = document.querySelectorAll(targets[i]["rootNode"]);
 				nodes = Array.prototype.slice.call(nodes, 0);
 				BITSMIST.v1.Util.assert(nodes.length > 0, ("ChainOrganizer.onDoOrganizer(): Node not found. name=" + (component.name) + ", eventName=" + (e.type) + ", rootNode=" + (targets[i]["rootNode"]) + ", method=" + method));
 
-				nodes.forEach(function (element) {
-					BITSMIST.v1.Util.assert(element.state === "started" || element.state === "opened", ("ChainOrganizer.onDoOrganizer(): Node not ready. name=" + (component.name) + ", eventName=" + (e.type) + ", rootNode=" + (targets[i]["rootNode"]) + ", method=" + method));
-
-					promises.push(element[method]({"sender":component}));
-
-					/* wait for component to be ready
-					let promise = component.waitFor([{"object":element, "state":state}]).then(() => {
-						return element[method]({"sender":component});
+				if (sync)
+				{
+					chain = chain.then(function () {
+						return ChainOrganizer.__execTarget(component, nodes, method);
 					});
-
-					promises.push(promise);
-					*/
-				});
+				}
+				else
+				{
+					chain = ChainOrganizer.__execTarget(component, nodes, method);
+				}
+				promises.push(chain);
 			};
 
 			for (var i = 0; i < targets.length; i++)
 			loop( i );
+
+			return chain.then(function () {
+				return Promise.all(promises);
+			});
+
+		};
+
+		// -----------------------------------------------------------------------------
+		//	Privates
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Organize.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Array}			nodes				Nodes.
+		 * @param	{String}		string				Method name to exec.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		ChainOrganizer.__execTarget = function __execTarget (component, nodes, method)
+		{
+
+			var promises = [];
+
+			nodes.forEach(function (element) {
+				var promise = component.waitFor([{"object":element}]).then(function () {
+					return element[method]({"sender":component});
+				});
+				promises.push(promise);
+			});
 
 			return Promise.all(promises);
 
