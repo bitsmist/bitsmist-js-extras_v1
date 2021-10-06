@@ -222,6 +222,8 @@ List.prototype.fill = function(options)
 		this._listRootNode.appendChild(fragment);
 	}).then(() => {
 		return this.trigger("afterFill", options);
+	}).then(() => {
+		console.debug(`List.fill(): Filled list. name=${this.name}`);
 	});
 
 }
@@ -229,7 +231,6 @@ List.prototype.fill = function(options)
 // -----------------------------------------------------------------------------
 //  Protected
 // -----------------------------------------------------------------------------
-
 
 /**
  * Fetch data.
