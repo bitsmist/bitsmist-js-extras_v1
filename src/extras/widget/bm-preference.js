@@ -43,6 +43,7 @@ PreferenceManager.prototype._getSettings = function()
 	return {
 		// Settings
 		"settings": {
+			"hasTemplate":				false,
 			"name":						"PreferenceManager",
 		},
 

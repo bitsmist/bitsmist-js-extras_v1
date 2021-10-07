@@ -24,11 +24,11 @@ import FormUtil from "../util/form-util.js";
 export default function Form(settings)
 {
 
-	return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
+	return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Pad);
+BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
@@ -97,7 +97,7 @@ Form.prototype.start = function(settings)
 	});
 
 	// super()
-	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
 
@@ -143,7 +143,7 @@ Form.prototype.clear = function(target)
 Form.prototype.fetch = function(options)
 {
 
-	return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(() => {
+	return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(() => {
 		let resourceName = this.settings.get("settings.resourceName");
 		if (resourceName && this.resources && this.resources[resourceName])
 		{

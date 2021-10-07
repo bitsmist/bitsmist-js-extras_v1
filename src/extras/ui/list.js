@@ -24,11 +24,11 @@ import FormUtil from "../util/form-util.js";
 export default function List()
 {
 
-	return Reflect.construct(BITSMIST.v1.Pad, [], this.constructor);
+	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
+BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Component);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter
@@ -92,7 +92,7 @@ List.prototype.start = function(settings)
 	});
 
 	// super()
-	return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
 
@@ -109,7 +109,7 @@ List.prototype.start = function(settings)
 List.prototype.switchTemplate = function(templateName, options)
 {
 
-	return BITSMIST.v1.Pad.prototype.switchTemplate.call(this, templateName, options).then(() => {
+	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
 		return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
 	});
 
@@ -174,7 +174,7 @@ List.prototype.clear = function()
 List.prototype.fetch = function(options)
 {
 
-	return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(() => {
+	return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(() => {
 		let resourceName = this.settings.get("settings.resourceName");
 		if (resourceName && this.resources && this.resources[resourceName])
 		{
