@@ -43,6 +43,8 @@ PreferenceManager.prototype._getSettings = function()
 	return {
 		// Settings
 		"settings": {
+			"autoRefresh":				false,
+			"autoSetup":				false,
 			"hasTemplate":				false,
 			"name":						"PreferenceManager",
 		},
