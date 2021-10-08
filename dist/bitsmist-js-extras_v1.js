@@ -2545,7 +2545,7 @@
 
 			var loop = function ( i ) {
 				var method = targets[i]["method"] || "refresh";
-				targets[i]["state"] || "started";
+				var state = targets[i]["state"] || "started";
 				var sync = targets[i]["sync"];
 
 				var nodes = document.querySelectorAll(targets[i]["rootNode"]);
@@ -2555,12 +2555,12 @@
 				if (sync)
 				{
 					chain = chain.then(function () {
-						return ChainOrganizer.__execTarget(component, nodes, method);
+						return ChainOrganizer.__execTarget(component, nodes, method, state);
 					});
 				}
 				else
 				{
-					chain = ChainOrganizer.__execTarget(component, nodes, method);
+					chain = ChainOrganizer.__execTarget(component, nodes, method, state);
 				}
 				promises.push(chain);
 			};
@@ -2587,13 +2587,13 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		ChainOrganizer.__execTarget = function __execTarget (component, nodes, method)
+		ChainOrganizer.__execTarget = function __execTarget (component, nodes, method, state)
 		{
 
 			var promises = [];
 
 			nodes.forEach(function (element) {
-				var promise = component.waitFor([{"object":element}]).then(function () {
+				var promise = component.waitFor([{"object":element, "state":state}]).then(function () {
 					return element[method]({"sender":component});
 				});
 				promises.push(promise);
@@ -2604,6 +2604,199 @@
 		};
 
 		return ChainOrganizer;
+	}(BITSMIST.v1.Organizer));
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
+	//	Dialog organizer class
+	// =============================================================================
+
+	var DialogOrganizer = /*@__PURE__*/(function (superclass) {
+		function DialogOrganizer () {
+			superclass.apply(this, arguments);
+		}
+
+		if ( superclass ) DialogOrganizer.__proto__ = superclass;
+		DialogOrganizer.prototype = Object.create( superclass && superclass.prototype );
+		DialogOrganizer.prototype.constructor = DialogOrganizer;
+
+		DialogOrganizer.init = function init (component, settings)
+		{
+
+			// Add properties
+			Object.defineProperty(component, 'modalResult', {
+				get: function get() { return this._modalResult; },
+			});
+			Object.defineProperty(component, 'isModal', {
+				get: function get() { return this._isModal; },
+			});
+
+			// Add methods
+			component.open = function(options) { return DialogOrganizer._open(this, options); };
+			component.openModal = function(options) { return DialogOrganizer._openModal(this, options); };
+			component.close = function(options) { return DialogOrganizer._close(this, options); };
+
+			// Init vars
+			component._isModal = false;
+			component._modalResult;
+			component._modalPromise;
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		DialogOrganizer.organize = function organize (conditions, component, settings)
+		{
+
+			settings["dialog"];
+
+			switch (conditions)
+			{
+				case "beforeStart":
+			//		if (dialog["overrideSettings"])
+					{
+						component.settings.set("settings.autoRefresh", false);
+						component.settings.set("settings.autoRefreshOnOpen", true);
+						component.settings.set("settings.autoSetup", false);
+						component.settings.set("settings.autoSetupOnOpen", true);
+					}
+					break;
+				case "afterStart":
+					if (component.settings.get("settings.autoOpen"))
+					{
+						component.open();
+					}
+					break;
+			}
+
+		};
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Open component.
+		 *
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		DialogOrganizer._open = function _open (component, options)
+		{
+
+			options = Object.assign({}, options);
+
+			return Promise.resolve().then(function () {
+				console.debug(("Opening component. name=" + (component.name) + ", id=" + (component.id)));
+				return component.trigger("beforeOpen", options);
+			}).then(function () {
+				// Setup
+				if (BITSMIST.v1.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+				{
+					return component.setup(options);
+				}
+			}).then(function () {
+				// Refresh
+				if (BITSMIST.v1.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
+				{
+					return component.refresh(options);
+				}
+			}).then(function () {
+				return component.trigger("doOpen", options);
+			}).then(function () {
+				// Auto focus
+				var autoFocus = component.settings.get("settings.autoFocus");
+				if (autoFocus)
+				{
+					var target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
+					if (target)
+					{
+						target.focus();
+					}
+				}
+			}).then(function () {
+				return component.trigger("afterOpen", options);
+			}).then(function () {
+				console.debug(("Opened component. name=" + (component.name) + ", id=" + (component.id)));
+			});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Open component modally.
+		 *
+		 * @param	{array}			options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		DialogOrganizer._openModal = function _openModal (component, options)
+		{
+
+			console.debug(("Opening component modally. name=" + (component.name) + ", id=" + (component.id)));
+
+			return new Promise(function (resolve, reject) {
+				component._isModal = true;
+				component._modalResult = {"result":false};
+				component._modalPromise = { "resolve": resolve, "reject": reject };
+				DialogOrganizer._open(component, options);
+			});
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Close component.
+		 *
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		DialogOrganizer._close = function _close (component, options)
+		{
+
+			options = Object.assign({}, options);
+
+			return Promise.resolve().then(function () {
+				console.debug(("Closing component. name=" + (component.name) + ", id=" + (component.id)));
+				return component.trigger("beforeClose", options);
+			}).then(function () {
+				return component.trigger("doClose", options);
+			}).then(function () {
+				return component.trigger("afterClose", options);
+			}).then(function () {
+				if (component._isModal)
+				{
+					component._modalPromise.resolve(component._modalResult);
+				}
+			}).then(function () {
+				console.debug(("Closed component. name=" + (component.name) + ", id=" + (component.id)));
+			});
+
+		};
+
+		return DialogOrganizer;
 	}(BITSMIST.v1.Organizer));
 
 	// =============================================================================
@@ -4561,11 +4754,11 @@
 	function Form(settings)
 	{
 
-		return Reflect.construct(BITSMIST.v1.Pad, [settings], this.constructor);
+		return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Pad);
+	BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
 
 	// -----------------------------------------------------------------------------
 	//  Setter/Getter
@@ -4634,7 +4827,7 @@
 		});
 
 		// super()
-		return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+		return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 	};
 
@@ -4682,7 +4875,7 @@
 		var this$1$1 = this;
 
 
-		return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(function () {
+		return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(function () {
 			var resourceName = this$1$1.settings.get("settings.resourceName");
 			if (resourceName && this$1$1.resources && this$1$1.resources[resourceName])
 			{
@@ -4819,11 +5012,11 @@
 	function List()
 	{
 
-		return Reflect.construct(BITSMIST.v1.Pad, [], this.constructor);
+		return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Pad);
+	BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Component);
 
 	// -----------------------------------------------------------------------------
 	//  Setter/Getter
@@ -4887,7 +5080,7 @@
 		});
 
 		// super()
-		return BITSMIST.v1.Pad.prototype.start.call(this, settings);
+		return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 	};
 
@@ -4906,7 +5099,7 @@
 		var this$1$1 = this;
 
 
-		return BITSMIST.v1.Pad.prototype.switchTemplate.call(this, templateName, options).then(function () {
+		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(function () {
 			return this$1$1.switchRowTemplate(this$1$1.settings.get("settings.rowTemplateName"));
 		});
 
@@ -4929,7 +5122,7 @@
 
 		options = Object.assign({}, options);
 
-		if (this._isActiveRowTemplate(templateName))
+		if (this._activeRowTemplateName === templateName)
 		{
 			return Promise.resolve();
 		}
@@ -4975,7 +5168,7 @@
 		var this$1$1 = this;
 
 
-		return BITSMIST.v1.Pad.prototype.fetch.call(this, options).then(function () {
+		return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(function () {
 			var resourceName = this$1$1.settings.get("settings.resourceName");
 			if (resourceName && this$1$1.resources && this$1$1.resources[resourceName])
 			{
@@ -5025,6 +5218,8 @@
 			this$1$1._listRootNode.appendChild(fragment);
 		}).then(function () {
 			return this$1$1.trigger("afterFill", options);
+		}).then(function () {
+			console.debug(("List.fill(): Filled list. name=" + (this$1$1.name)));
 		});
 
 	};
@@ -5032,7 +5227,6 @@
 	// -----------------------------------------------------------------------------
 	//  Protected
 	// -----------------------------------------------------------------------------
-
 
 	/**
 	 * Fetch data.
@@ -5048,29 +5242,6 @@
 		var builder = ( rowAsync ? this._buildAsync : this._buildSync );
 
 		return builder;
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Check if the template is active.
-	 *
-	 * @param	{String}		templateName		Template name.
-	 *
-	 * @return  {Boolean}		True when active.
-	 */
-	List.prototype._isActiveRowTemplate = function(templateName)
-	{
-
-		var ret = false;
-
-		if (this._activeRowTemplateName === templateName)
-		{
-			ret = true;
-		}
-
-		return ret;
 
 	};
 
@@ -5287,6 +5458,9 @@
 		return {
 			// Settings
 			"settings": {
+				"autoRefresh":				false,
+				"autoSetup":				false,
+				"hasTemplate":				false,
 				"name":						"PreferenceManager",
 			},
 
@@ -5383,12 +5557,13 @@
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart", "afterSpecLoad"], "order":120});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":220});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["afterAppend", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":800});
 	BITSMIST.v1.OrganizerOrganizer.organizers.set("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":310});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("DialogOrganizer", {"object":DialogOrganizer, "targetWords":"dialog", "targetEvents":["beforeStart", "afterStart"], "order":800});
+	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":900});
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
 	window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
