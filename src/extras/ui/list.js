@@ -130,7 +130,7 @@ List.prototype.switchRowTemplate = function(templateName, options)
 
 	options = Object.assign({}, options);
 
-	if (this._isActiveRowTemplate(templateName))
+	if (this._activeRowTemplateName === templateName)
 	{
 		return Promise.resolve();
 	}
@@ -246,29 +246,6 @@ List.prototype._getBuilder = function(options)
 	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
 
 	return builder;
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Check if the template is active.
- *
- * @param	{String}		templateName		Template name.
- *
- * @return  {Boolean}		True when active.
- */
-List.prototype._isActiveRowTemplate = function(templateName)
-{
-
-	let ret = false;
-
-	if (this._activeRowTemplateName === templateName)
-	{
-		ret = true;
-	}
-
-	return ret;
 
 }
 
