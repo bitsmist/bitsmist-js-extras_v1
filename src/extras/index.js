@@ -92,4 +92,6 @@ window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
 // Widget
 
+import TagLoader from "./widget/bm-tagloader.js";
+import SettingManager from "./widget/bm-setting.js";
 import PreferenceManager from "./widget/bm-preference.js";
