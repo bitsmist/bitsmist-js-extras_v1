@@ -31,6 +31,32 @@ export default class ObservableStore extends BITSMIST.v1.Store
 		super(Object.assign(defaults, options));
 
 		this._observers = [];
+		this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", () => { return true; } );
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Filter function.
+	 *
+	 * @type	{Function}
+	 */
+	get filter()
+	{
+
+		this._filter;
+
+	}
+
+	set filter(value)
+	{
+
+		BITSMIST.v1.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
+
+		this._filter = value;
 
 	}
 
