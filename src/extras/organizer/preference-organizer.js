@@ -8,8 +8,7 @@
  */
 // =============================================================================
 
-import ObservableStoreMixin from "../store/observable-store-mixin.js";
-class ObservableChainableStore extends ObservableStoreMixin(BITSMIST.v1.ChainableStore) {};
+import ObservableStore from "../store/observable-store.js";
 
 // =============================================================================
 //	Preference organizer class
@@ -30,7 +29,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 		// Init vars
 		PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
-		PreferenceOrganizer._store = new ObservableChainableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
+		PreferenceOrganizer._store = new ObservableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
 		PreferenceOrganizer.__loaded =  {};
 		PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
 			PreferenceOrganizer.__loaded["resolve"] = resolve;

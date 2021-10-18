@@ -12,7 +12,7 @@
 //	Observable store class
 // =============================================================================
 
-export default class ObservableStore extends BITSMIST.v1.Store
+export default class ObservableStore extends BITSMIST.v1.ChainableStore
 {
 
 	// -------------------------------------------------------------------------
@@ -27,10 +27,13 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	constructor(options)
 	{
 
+
 		let defaults = {"notifyOnChange":true, "async":false};
 		super(Object.assign(defaults, options));
 
+		this._filter;
 		this._observers = [];
+
 		this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", () => { return true; } );
 
 	}
@@ -47,7 +50,7 @@ export default class ObservableStore extends BITSMIST.v1.Store
 	get filter()
 	{
 
-		this._filter;
+		return this._filter;
 
 	}
 
