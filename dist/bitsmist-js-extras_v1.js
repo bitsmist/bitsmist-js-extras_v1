@@ -19,16 +19,47 @@
 		function ObservableStore(options)
 		{
 
+
 			var defaults = {"notifyOnChange":true, "async":false};
 			superclass.call(this, Object.assign(defaults, options));
 
+			this._filter;
 			this._observers = [];
+
+			this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", function () { return true; } );
 
 		}
 
 		if ( superclass ) ObservableStore.__proto__ = superclass;
 		ObservableStore.prototype = Object.create( superclass && superclass.prototype );
 		ObservableStore.prototype.constructor = ObservableStore;
+
+		var prototypeAccessors = { filter: { configurable: true } };
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Filter function.
+		 *
+		 * @type	{Function}
+		 */
+		prototypeAccessors.filter.get = function ()
+		{
+
+			return this._filter;
+
+		};
+
+		prototypeAccessors.filter.set = function (value)
+		{
+
+			BITSMIST.v1.Util.assert(typeof value === "function", ("Store.filter(setter): Filter is not a function. filter=" + value), TypeError);
+
+			this._filter = value;
+
+		};
 
 		// -------------------------------------------------------------------------
 		//  Method
@@ -295,34 +326,10 @@
 
 		};
 
+		Object.defineProperties( ObservableStore.prototype, prototypeAccessors );
+
 		return ObservableStore;
-	}(BITSMIST.v1.Store));
-
-	// =============================================================================
-
-	// =============================================================================
-	//	ObservableStoreMixin
-	// =============================================================================
-
-	function ObservableStoreMixin (superClass) { return /*@__PURE__*/(function (superClass) {
-			function anonymous(options)
-		{
-
-			var defaults = {"notifyOnChange":true, "async":false};
-			superClass.call(this, Object.assign(defaults, options));
-
-			Object.assign(this, ObservableStore.prototype);
-
-			this._observers = [];
-
-		}
-
-			if ( superClass ) anonymous.__proto__ = superClass;
-			anonymous.prototype = Object.create( superClass && superClass.prototype );
-			anonymous.prototype.constructor = anonymous;
-
-			return anonymous;
-		}(superClass)); }
+	}(BITSMIST.v1.ChainableStore));
 
 	// =============================================================================
 	/**
@@ -2800,17 +2807,7 @@
 	}(BITSMIST.v1.Organizer));
 
 	// =============================================================================
-	var ObservableChainableStore = /*@__PURE__*/(function (superclass) {
-		function ObservableChainableStore () {
-			superclass.apply(this, arguments);
-		}if ( superclass ) ObservableChainableStore.__proto__ = superclass;
-		ObservableChainableStore.prototype = Object.create( superclass && superclass.prototype );
-		ObservableChainableStore.prototype.constructor = ObservableChainableStore;
 
-		
-
-		return ObservableChainableStore;
-	}(ObservableStoreMixin(BITSMIST.v1.ChainableStore)));
 	// =============================================================================
 	//	Preference organizer class
 	// =============================================================================
@@ -2829,7 +2826,7 @@
 
 			// Init vars
 			PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
-			PreferenceOrganizer._store = new ObservableChainableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
+			PreferenceOrganizer._store = new ObservableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
 			PreferenceOrganizer.__loaded =  {};
 			PreferenceOrganizer.__loaded["promise"] = new Promise(function (resolve, reject) {
 				PreferenceOrganizer.__loaded["resolve"] = resolve;
@@ -5424,6 +5421,135 @@
 	};
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
+	//	TagLoader class
+	// =============================================================================
+
+	// -----------------------------------------------------------------------------
+	//  Constructor
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Constructor.
+	 */
+	function TagLoader()
+	{
+
+		// super()
+		return Reflect.construct(HTMLElement, [], this.constructor);
+
+	}
+
+	BITSMIST.v1.ClassUtil.inherit(TagLoader, BITSMIST.v1.Component);
+
+	// -----------------------------------------------------------------------------
+	//  Methods
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Start components.
+	 *
+	 * @param	{Object}		settings			Settings.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	TagLoader.prototype.start = function(settings)
+	{
+		var this$1$1 = this;
+
+
+		// Defaults
+		var defaults = {
+			"settings": {
+				"name": "TagLoader",
+			},
+		};
+		settings = ( settings ? BITSMIST.v1.Util.deepMerge(defaults, settings) : defaults );
+
+		// super()
+		return BITSMIST.v1.Component.prototype.start.call(this, settings).then(function () {
+			if (document.readyState !== "loading")
+			{
+				BITSMIST.v1.LoaderOrganizer.load(document.body, this$1$1.settings);
+			}
+			else
+			{
+				document.addEventListener("DOMContentLoaded", function () {
+					BITSMIST.v1.LoaderOrganizer.load(document.body, this$1$1.settings);
+				});
+			}
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	customElements.define("bm-tagloader", TagLoader);
+
+	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
+	// =============================================================================
+	//	SettingManager class
+	// =============================================================================
+
+	// -----------------------------------------------------------------------------
+	//  Constructor
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Constructor.
+	 */
+	function SettingManager()
+	{
+
+		// super()
+		return Reflect.construct(HTMLElement, [], this.constructor);
+
+	}
+
+	BITSMIST.v1.ClassUtil.inherit(SettingManager, BITSMIST.v1.Component);
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get component settings.
+	 *
+	 * @return  {Object}		Options.
+	 */
+	SettingManager.prototype._getSettings = function()
+	{
+
+		return {
+			"settings": {
+				"name":					"SettingManager",
+				"autoSetup":			false,
+			}
+		};
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	customElements.define("bm-setting", SettingManager);
+
+	// =============================================================================
 
 	// =============================================================================
 	//	Preference manager class
@@ -5551,19 +5677,18 @@
 	window.BITSMIST = window.BITSMIST || {};
 	window.BITSMIST.v1 = window.BITSMIST.v1 || {};
 	window.BITSMIST.v1.ObservableStore = ObservableStore;
-	window.BITSMIST.v1.ObservableStoreMixin = ObservableStoreMixin;
 	window.BITSMIST.v1.BindableStore = BindableStore;
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["beforeStart", "afterSpecLoad"], "order":110});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart", "afterSpecLoad"], "order":120});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":220});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("DialogOrganizer", {"object":DialogOrganizer, "targetWords":"dialog", "targetEvents":["beforeStart", "afterStart"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.organizers.set("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":900});
+	BITSMIST.v1.OrganizerOrganizer.register("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["beforeStart", "afterSpecLoad"], "order":110});
+	BITSMIST.v1.OrganizerOrganizer.register("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart", "afterSpecLoad"], "order":120});
+	BITSMIST.v1.OrganizerOrganizer.register("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":220});
+	BITSMIST.v1.OrganizerOrganizer.register("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
+	BITSMIST.v1.OrganizerOrganizer.register("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
+	BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
+	BITSMIST.v1.OrganizerOrganizer.register("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
+	BITSMIST.v1.OrganizerOrganizer.register("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":800});
+	BITSMIST.v1.OrganizerOrganizer.register("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
+	BITSMIST.v1.OrganizerOrganizer.register("DialogOrganizer", {"object":DialogOrganizer, "targetWords":"dialog", "targetEvents":["beforeStart", "afterStart"], "order":800});
+	BITSMIST.v1.OrganizerOrganizer.register("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":900});
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
 	window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
