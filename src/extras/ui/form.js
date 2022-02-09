@@ -134,28 +134,6 @@ Form.prototype.clear = function(target)
 // -----------------------------------------------------------------------------
 
 /**
- * Fetch data.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-Form.prototype.fetch = function(options)
-{
-
-	return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(() => {
-		let resourceName = this.settings.get("settings.resourceName");
-		if (resourceName && this.resources && this.resources[resourceName])
-		{
-			this._item = this.resources[resourceName]._item;
-		}
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * Fill the form.
  *
  * @param	{Object}		options				Options.

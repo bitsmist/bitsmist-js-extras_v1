@@ -165,28 +165,6 @@ List.prototype.clear = function()
 // -----------------------------------------------------------------------------
 
 /**
- * Fetch data.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-List.prototype.fetch = function(options)
-{
-
-	return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(() => {
-		let resourceName = this.settings.get("settings.resourceName");
-		if (resourceName && this.resources && this.resources[resourceName])
-		{
-			this.items = this.resources[resourceName].items;
-		}
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
  * Fill list with data.
  *
  * @param	{Object}		options				Options.
@@ -414,5 +392,3 @@ List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvent
 	}
 
 }
-
-
