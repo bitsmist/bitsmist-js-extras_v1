@@ -34,7 +34,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		});
 
 		// Add methods
-		component.addResource = function(resourceName, options, ajaxSettings) { return ResourceOrganizer._addResource(this, resourceName, options); }
+		component.addResource = function(resourceName, options) { return ResourceOrganizer._addResource(this, resourceName, options); }
 		component.switchResource = function(resourceName) { return ResourceOrganizer._switchResource(this, resourceName); }
 
 		// Init vars
@@ -70,10 +70,10 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 						let resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
 
 						// Load data
-						if (resource.options.get("autoLoad"))
+						if (resources[resourceName]["autoLoad"])
 						{
-							let id = resource.options.get("autoLoad.id");
-							let paramters = resource.options.get("autoLoad.parameters");
+							let id = resource.options.get("autoLoadOptions.id");
+							let paramters = resource.options.get("autoLoadOptions.parameters");
 
 							promises.push(component._resources[resourceName].get(id, paramters));
 						}
@@ -110,7 +110,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 
 		if (options["handlerClassName"])
 		{
-			resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options);
+			resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 			component._resources[resourceName] = resource;
 		}
 
@@ -159,7 +159,14 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 			promises.push(component._resources[resourceName].get(id, parameters));
 		}
 
-		return Promise.all(promises);
+		return Promise.all(promises).then(() => {
+			let resourceName = component.settings.get("settings.resourceName");
+			if (resourceName && component._resources[resourceName])
+			{
+				component.items = component._resources[resourceName].items;
+				component.item = component._resources[resourceName].item;
+			}
+		});
 
 	}
 

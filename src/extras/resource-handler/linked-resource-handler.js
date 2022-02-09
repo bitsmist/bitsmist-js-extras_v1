@@ -120,7 +120,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	_get(id, parameters)
 	{
 
-		let handlerOptions = this._options.get("handlerOptions");
+		let handlerOptions = this._options.items;
 		let rootNode = handlerOptions["rootNode"];
 		let resourceName = handlerOptions["resourceName"];
 		let state = handlerOptions["state"];

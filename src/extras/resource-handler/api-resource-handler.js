@@ -216,7 +216,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	_getOption(target, method)
 	{
 
-		let settings = this._options.get("handlerOptions", {});
+		let settings = this._options.get("ajaxOptions", {});
 		let options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
 		let options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
 
