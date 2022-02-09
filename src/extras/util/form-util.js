@@ -293,6 +293,7 @@ FormUtil.getValue = function(element)
 FormUtil._build_select = function(element, items, options)
 {
 
+	options = options || {};
 	element.options.length = 0;
 
 	if ("emptyItem" in options)
