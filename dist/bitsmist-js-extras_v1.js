@@ -874,6 +874,7 @@
 	FormUtil._build_select = function(element, items, options)
 	{
 
+		options = options || {};
 		element.options.length = 0;
 
 		if ("emptyItem" in options)
@@ -1598,7 +1599,7 @@
 			});
 
 			// Add methods
-			component.addResource = function(resourceName, options, ajaxSettings) { return ResourceOrganizer._addResource(this, resourceName, options); };
+			component.addResource = function(resourceName, options) { return ResourceOrganizer._addResource(this, resourceName, options); };
 			component.switchResource = function(resourceName) { return ResourceOrganizer._switchResource(this, resourceName); };
 
 			// Init vars
@@ -1634,10 +1635,10 @@
 							var resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
 
 							// Load data
-							if (resource.options.get("autoLoad"))
+							if (resources[resourceName]["autoLoad"])
 							{
-								var id = resource.options.get("autoLoad.id");
-								var paramters = resource.options.get("autoLoad.parameters");
+								var id = resource.options.get("autoLoadOptions.id");
+								var paramters = resource.options.get("autoLoadOptions.parameters");
 
 								promises.push(component._resources[resourceName].get(id, paramters));
 							}
@@ -1674,7 +1675,7 @@
 
 			if (options["handlerClassName"])
 			{
-				resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options);
+				resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 				component._resources[resourceName] = resource;
 			}
 
@@ -1723,7 +1724,14 @@
 				promises.push(component._resources[resourceName].get(id, parameters));
 			}
 
-			return Promise.all(promises);
+			return Promise.all(promises).then(function () {
+				var resourceName = component.settings.get("settings.resourceName");
+				if (resourceName && component._resources[resourceName])
+				{
+					component.items = component._resources[resourceName].items;
+					component.item = component._resources[resourceName].item;
+				}
+			});
 
 		};
 
@@ -3811,7 +3819,7 @@
 		ApiResourceHandler.prototype._getOption = function _getOption (target, method)
 		{
 
-			var settings = this._options.get("handlerOptions", {});
+			var settings = this._options.get("ajaxOptions", {});
 			var options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
 			var options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
 
@@ -4059,7 +4067,7 @@
 		LinkedResourceHandler.prototype._get = function _get (id, parameters)
 		{
 
-			var handlerOptions = this._options.get("handlerOptions");
+			var handlerOptions = this._options.items;
 			var rootNode = handlerOptions["rootNode"];
 			var resourceName = handlerOptions["resourceName"];
 			handlerOptions["state"];
@@ -4861,30 +4869,6 @@
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Fetch data.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.fetch = function(options)
-	{
-		var this$1$1 = this;
-
-
-		return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(function () {
-			var resourceName = this$1$1.settings.get("settings.resourceName");
-			if (resourceName && this$1$1.resources && this$1$1.resources[resourceName])
-			{
-				this$1$1._item = this$1$1.resources[resourceName]._item;
-			}
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
 	 * Fill the form.
 	 *
 	 * @param	{Object}		options				Options.
@@ -5148,30 +5132,6 @@
 	{
 
 		this._listRootNode.innerHTML = "";
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fetch data.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.fetch = function(options)
-	{
-		var this$1$1 = this;
-
-
-		return BITSMIST.v1.Component.prototype.fetch.call(this, options).then(function () {
-			var resourceName = this$1$1.settings.get("settings.resourceName");
-			if (resourceName && this$1$1.resources && this$1$1.resources[resourceName])
-			{
-				this$1$1.items = this$1$1.resources[resourceName].items;
-			}
-		});
 
 	};
 
