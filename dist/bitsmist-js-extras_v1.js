@@ -15,26 +15,31 @@
 	//	Observable store class
 	// =============================================================================
 
-	var ObservableStore = /*@__PURE__*/(function (superclass) {
-		function ObservableStore(options)
+	class ObservableStore extends BITSMIST.v1.ChainableStore
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		options				Options.
+	     */
+		constructor(options)
 		{
 
 
-			var defaults = {"notifyOnChange":true, "async":false};
-			superclass.call(this, Object.assign(defaults, options));
+			let defaults = {"notifyOnChange":true, "async":false};
+			super(Object.assign(defaults, options));
 
 			this._filter;
 			this._observers = [];
 
-			this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", function () { return true; } );
+			this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", () => { return true; } );
 
 		}
-
-		if ( superclass ) ObservableStore.__proto__ = superclass;
-		ObservableStore.prototype = Object.create( superclass && superclass.prototype );
-		ObservableStore.prototype.constructor = ObservableStore;
-
-		var prototypeAccessors = { filter: { configurable: true } };
 
 		// -------------------------------------------------------------------------
 		//  Setter/Getter
@@ -45,21 +50,21 @@
 		 *
 		 * @type	{Function}
 		 */
-		prototypeAccessors.filter.get = function ()
+		get filter()
 		{
 
 			return this._filter;
 
-		};
+		}
 
-		prototypeAccessors.filter.set = function (value)
+		set filter(value)
 		{
 
-			BITSMIST.v1.Util.assert(typeof value === "function", ("Store.filter(setter): Filter is not a function. filter=" + value), TypeError);
+			BITSMIST.v1.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
 			this._filter = value;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Method
@@ -71,11 +76,11 @@
 		 * @param	{String}		key					Key to store.
 		 * @param	{Object}		value				Value to store.
 		 */
-		ObservableStore.prototype.set = function set (key, value, options)
+		set(key, value, options)
 		{
 
-			var changedItem = {};
-			var holder = ( key ? this.get(key) : this._items );
+			let changedItem = {};
+			let holder = ( key ? this.get(key) : this._items );
 
 			if (holder && typeof holder === "object")
 			{
@@ -90,13 +95,13 @@
 				}
 			}
 
-			var notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+			let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
 			if (notify && Object.keys(changedItem).length > 0)
 			{
 				return this.notify(changedItem);
 			}
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 
@@ -106,19 +111,19 @@
 	     * @param   {String}        key                 Key to store.
 	     * @param   {Object}        value               Value to store.
 	     */
-	    ObservableStore.prototype.replace = function replace (value, options)
+	    replace(value, options)
 	    {
 
 	        this._items = {};
 	        this.__deepMerge(this._items, value);
 
-	        var notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+	        let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
 	        if (notify)
 	        {
 	            return this.notify("*");
 	        }
 
-	    };
+	    }
 
 		// -----------------------------------------------------------------------------
 
@@ -129,14 +134,14 @@
 		 * @param	{Function}		handler				Handler function on notification.
 		 * @param	{Object}		optons				Options passed to the handler on notification.
 		 */
-		ObservableStore.prototype.subscribe = function subscribe (id, handler, options)
+		subscribe(id, handler, options)
 		{
 
-			BITSMIST.v1.Util.assert(typeof handler === "function", ("ObservableStore.subscribe(): Notification handler is not a function. id=" + id), TypeError);
+			BITSMIST.v1.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 			this._observers.push({"id":id, "handler":handler, "options":options});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -145,10 +150,10 @@
 		 *
 		 * @param	{String}		id					Subscriber's id.
 		 */
-		ObservableStore.prototype.unsubscribe = function unsubscribe (id)
+		unsubscribe(id)
 		{
 
-			for (var i = 0; i < this._observers.length; i++)
+			for (let i = 0; i < this._observers.length; i++)
 			{
 				if (this._obvservers[i].id === id)
 				{
@@ -157,7 +162,7 @@
 				}
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -169,23 +174,19 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ObservableStore.prototype.notify = function notify (conditions)
+		notify(conditions, ...args)
 		{
-			var ref, ref$1;
-
-			var args = [], len = arguments.length - 1;
-			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
 			if (BITSMIST.v1.Util.safeGet(this._options, "async", false))
 			{
-				return (ref = this).notifyAsync.apply(ref, [ conditions ].concat( args ));
+				return this.notifyAsync(conditions, ...args);
 			}
 			else
 			{
-				return (ref$1 = this).notifySync.apply(ref$1, [ conditions ].concat( args ));
+				return this.notifySync(conditions, ...args);
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -197,33 +198,25 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ObservableStore.prototype.notifySync = function notifySync (conditions)
+		notifySync(conditions, ...args)
 		{
-			var this$1$1 = this;
-			var args = [], len = arguments.length - 1;
-			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
+			let chain = Promise.resolve();
 
-			var chain = Promise.resolve();
-
-			var loop = function ( i ) {
-				chain = chain.then(function () {
-					var ref, ref$1;
-
-					if ((ref = this$1$1)._filter.apply(ref, [ conditions, this$1$1._observers[i] ].concat( args )))
+			for (let i = 0; i < this._observers.length; i++)
+			{
+				chain = chain.then(() => {
+					if (this._filter(conditions, this._observers[i], ...args))
 					{
-						console.debug(("ObservableStore.notifySync(): Notifying. conditions=" + conditions + ", observer=" + (this$1$1._observers[i].id)));
-						return (ref$1 = this$1$1._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
+						console.debug(`ObservableStore.notifySync(): Notifying. conditions=${conditions}, observer=${this._observers[i].id}`);
+						return this._observers[i]["handler"](conditions, ...args);
 					}
 				});
-			};
-
-			for (var i = 0; i < this$1$1._observers.length; i++)
-			loop( i );
+			}
 
 			return chain;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -236,49 +229,45 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ObservableStore.prototype.notifyAsync = function notifyAsync (conditions)
+		notifyAsync(conditions, ...args)
 		{
-			var ref, ref$1;
 
-			var args = [], len = arguments.length - 1;
-			while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
-
-			for (var i = 0; i < this._observers.length; i++)
+			for (let i = 0; i < this._observers.length; i++)
 			{
-				if ((ref = this)._filter.apply(ref, [ conditions, this._observers[i]["options"] ].concat( args )))
+				if (this._filter(conditions, this._observers[i]["options"], ...args))
 				{
-					console.debug(("ObservableStore.notifyAsync(): Notifying asynchronously. conditions=" + conditions + ", observer=" + (this._observers[i].id)));
-					(ref$1 = this._observers[i])["handler"].apply(ref$1, [ conditions ].concat( args ));
+					console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this._observers[i].id}`);
+					this._observers[i]["handler"](conditions, ...args);
 				}
 			}
 
 			return Promise.resolve();
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
 		/**
 		 * Mute notification.
 		 */
-		ObservableStore.prototype.mute = function mute ()
+		mute()
 		{
 
 			this._options["notifyOnChange"] = false;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
 		/**
 		 * Unmute notification.
 		 */
-		ObservableStore.prototype.unmute = function unmute ()
+		unmute()
 		{
 
 			this._options["notifyOnChange"] = true;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -290,14 +279,14 @@
 		 *
 		 * @return  {Object}		Merged array.
 		 */
-		ObservableStore.prototype.__deepMerge = function __deepMerge (obj1, obj2, changedItem)
+		__deepMerge(obj1, obj2, changedItem)
 		{
 
 			changedItem = changedItem || {};
 
 			BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
 
-			Object.keys(obj2).forEach(function (key) {
+			Object.keys(obj2).forEach((key) => {
 				if (Array.isArray(obj1[key]))
 				{
 					obj1[key] = obj1[key].concat(obj2[key]);
@@ -324,12 +313,9 @@
 
 			return obj1;
 
-		};
+		}
 
-		Object.defineProperties( ObservableStore.prototype, prototypeAccessors );
-
-		return ObservableStore;
-	}(BITSMIST.v1.ChainableStore));
+	}
 
 	// =============================================================================
 	/**
@@ -363,7 +349,7 @@
 	FormatterUtil.format = function(type, format, value)
 	{
 
-		var ret = value;
+		let ret = value;
 
 		switch (format.toLowerCase())
 		{
@@ -463,7 +449,7 @@
 	FormatterUtil.deformat = function(type, format, value)
 	{
 
-		var ret = value;
+		let ret = value;
 
 		switch (format)
 		{
@@ -613,25 +599,25 @@
 	{
 
 
-		var masters = BITSMIST.v1.Util.safeGet(options, "masters");
-		var triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
+		let masters = BITSMIST.v1.Util.safeGet(options, "masters");
+		let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
 
 		// Get elements with bm-bind attribute
-		var elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		elements.push(rootNode);
 
-		elements.forEach(function (element) {
-			var fieldName = element.getAttribute("bm-bind");
+		elements.forEach((element) => {
+			let fieldName = element.getAttribute("bm-bind");
 			if (fieldName in item)
 			{
-				var value = item[fieldName] || "";
+				let value = item[fieldName] || "";
 
 				// Get master value
 				if (element.hasAttribute("bm-bindtext"))
 				{
-					var arr = element.getAttribute("bm-bindtext").split(".");
-					var type = arr[0];
-					var field = arr[1] || "";
+					let arr = element.getAttribute("bm-bindtext").split(".");
+					let type = arr[0];
+					let field = arr[1] || "";
 					value = FormUtil._getMasterValue(masters, type, item[fieldName], field);
 				}
 
@@ -647,7 +633,7 @@
 				// Trigger change event
 				if (triggerEvent)
 				{
-					var e = document.createEvent("HTMLEvents");
+					let e = document.createEvent("HTMLEvents");
 					e.initEvent(triggerEvent, true, true);
 					element.dispatchEvent(e);
 				}
@@ -668,16 +654,16 @@
 	FormUtil.getFields = function(rootNode)
 	{
 
-		var item = {};
+		let item = {};
 
 		// Get elements with bm-bind attribute
-		var elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		elements.push(rootNode);
 
-		elements.forEach(function (element) {
+		elements.forEach((element) => {
 			// Get a value from the element
-			var key = element.getAttribute("bm-bind");
-			var value = FormUtil.getValue(element);
+			let key = element.getAttribute("bm-bind");
+			let value = FormUtil.getValue(element);
 
 			// Deformat
 			if (element.hasAttribute("bm-format"))
@@ -700,7 +686,7 @@
 				// ---> create an array and add existing value and the value to the array
 				if (value)
 				{
-					var items = [];
+					let items = [];
 					items.push(item[key]);
 					items.push(value);
 					item[key]= items;
@@ -730,9 +716,9 @@
 		target = (target ? target : "");
 
 		// Get input elements
-		var elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, target + " input");
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, target + " input");
 
-		elements.forEach(function (element) {
+		elements.forEach((element) => {
 			switch (element.type.toLowerCase())
 			{
 			case "search":
@@ -749,7 +735,7 @@
 
 		elements = rootNode.querySelectorAll(target + " select");
 		elements = Array.prototype.slice.call(elements, 0);
-		elements.forEach(function (element) {
+		elements.forEach((element) => {
 			element.selectedIndex = -1;
 		});
 
@@ -775,7 +761,7 @@
 		//value = FormatterUtil.sanitize(value);
 
 		// Set value
-		var targets = element.getAttribute("bm-target");
+		let targets = element.getAttribute("bm-target");
 		if (targets)
 		{
 			FormUtil._setValue_target(element, targets, value);
@@ -825,7 +811,7 @@
 	FormUtil.getValue = function(element)
 	{
 
-		var ret = undefined;
+		let ret = undefined;
 
 		switch (element.tagName.toLowerCase())
 		{
@@ -879,17 +865,17 @@
 
 		if ("emptyItem" in options)
 		{
-			var text = ( "text" in options["emptyItem"] ? options["emptyItem"]["text"] : "");
-			var value = ( "value" in options["emptyItem"] ? options["emptyItem"]["value"] : "");
-			var option = document.createElement("option");
+			let text = ( "text" in options["emptyItem"] ? options["emptyItem"]["text"] : "");
+			let value = ( "value" in options["emptyItem"] ? options["emptyItem"]["value"] : "");
+			let option = document.createElement("option");
 			option.text = text;
 			option.value = value;
 			option.setAttribute("selected", "");
 			element.appendChild(option);
 		}
 
-		Object.keys(items).forEach(function (id) {
-			var option = document.createElement("option");
+		Object.keys(items).forEach((id) => {
+			let option = document.createElement("option");
 
 			option.text = ( options["text"] ? items[id][options["text"]] : id );
 			option.value = ( options["value"] ? items[id][options["value"]] : id );
@@ -916,9 +902,9 @@
 	FormUtil._build_radio = function(rootNode, fieldName, item)
 	{
 
-		Object.keys(item.items).forEach(function (id) {
-			var label = document.createElement("label");
-			var option = document.createElement("input");
+		Object.keys(item.items).forEach((id) => {
+			let label = document.createElement("label");
+			let option = document.createElement("input");
 			option.type = "radio";
 			option.id = key;
 			option.name = key;
@@ -944,10 +930,10 @@
 	FormUtil._setValue_target = function(element, targets, value)
 	{
 
-		var items = targets.split(",");
-		for (var i = 0; i < items.length; i++)
+		let items = targets.split(",");
+		for (let i = 0; i < items.length; i++)
 		{
-			var item = items[i].toLowerCase();
+			let item = items[i].toLowerCase();
 			switch (item)
 			{
 			case "text":
@@ -971,7 +957,7 @@
 				}
 				break;
 			default:
-				var attr = element.getAttribute(item);
+				let attr = element.getAttribute(item);
 				attr = ( attr ? attr + " " + value : value );
 				element.setAttribute(item, attr);
 				break;
@@ -1074,11 +1060,11 @@
 	FormUtil._getMasterValue = function(masters, type, code, fieldName)
 	{
 
-		var ret = code;
+		let ret = code;
 
 		if (masters && (type in masters))
 		{
-			var item = masters[type].getItem(code);
+			let item = masters[type].getItem(code);
 			if (item)
 			{
 				ret = item[fieldName];
@@ -1095,17 +1081,25 @@
 	//	Bindable store class
 	// =============================================================================
 
-	var BindableStore = /*@__PURE__*/(function (ObservableStore) {
-		function BindableStore(options)
+	class BindableStore extends ObservableStore
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		options				Options.
+	     */
+		constructor(options)
 		{
 
-			ObservableStore.call(this, options);
+			super(options);
 
-			this.filter = function (conditions, observerInfo) {
-				var args = [], len = arguments.length - 2;
-				while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
-				var ret = false;
+			this.filter = (conditions, observerInfo, ...args) => {
+				let ret = false;
 				if (conditions === "*" || conditions.indexOf(observerInfo.id) > -1)
 				{
 					ret = true;
@@ -1114,10 +1108,6 @@
 			};
 
 		}
-
-		if ( ObservableStore ) BindableStore.__proto__ = ObservableStore;
-		BindableStore.prototype = Object.create( ObservableStore && ObservableStore.prototype );
-		BindableStore.prototype.constructor = BindableStore;
 
 		// -------------------------------------------------------------------------
 		//  Method
@@ -1129,37 +1119,34 @@
 		 * @param	{Element}		elem				HTML Element.
 		 * @param	{String}		key					Key to store.
 		 */
-		BindableStore.prototype.bindTo = function bindTo (elem)
+		bindTo(elem)
 		{
-			var this$1$1 = this;
 
-
-			var key = elem.getAttribute("bm-bind");
+			let key = elem.getAttribute("bm-bind");
 
 			// Init element's value
 	//		FormUtil.setValue(elem, this.get(key));
 
-			var bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
+			let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
 			if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
 			{
 				// Change element's value when store value changed
-				this.subscribe(key, function () {
-					FormUtil.setValue(elem, this$1$1.get(key));
+				this.subscribe(key, () => {
+					FormUtil.setValue(elem, this.get(key));
 				});
 
 				// Set store value when element's value changed
-				var eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
-				elem.addEventListener(eventName, (function () {
-					this$1$1.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
+				let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
+				elem.addEventListener(eventName, (() => {
+					this.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
 				}).bind(this));
 
 				elem.__bm_bindinfo = { "bound": true };
 			}
 
-		};
+		}
 
-		return BindableStore;
-	}(ObservableStore));
+	}
 
 	// =============================================================================
 	/**
@@ -1175,34 +1162,40 @@
 	//	File organizer class
 	// =============================================================================
 
-	var FileOrganizer = /*@__PURE__*/(function (superclass) {
-		function FileOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class FileOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) FileOrganizer.__proto__ = superclass;
-		FileOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		FileOrganizer.prototype.constructor = FileOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		FileOrganizer.organize = function organize (conditions, component, settings)
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static organize(conditions, component, settings)
 		{
 
-			var promises = [];
+			let promises = [];
 
-			var files = settings["files"];
+			let files = settings["files"];
 			if (files)
 			{
-				Object.keys(files).forEach(function (fileName) {
+				Object.keys(files).forEach((fileName) => {
 					promises.push(BITSMIST.v1.AjaxUtil.loadScript(files[fileName]["href"]));
 				});
 			}
 
 			return Promise.all(promises);
 
-		};
+		}
 
-		return FileOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -1218,29 +1211,30 @@
 	//	Error organizer class
 	// =============================================================================
 
-	var ErrorOrganizer = /*@__PURE__*/(function (superclass) {
-		function ErrorOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class ErrorOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) ErrorOrganizer.__proto__ = superclass;
-		ErrorOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		ErrorOrganizer.prototype.constructor = ErrorOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ErrorOrganizer.globalInit = function globalInit ()
+		/**
+		 * Global init.
+		 */
+		static globalInit()
 		{
 
 			ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
 
 			// Install error listner
-			document.addEventListener("DOMContentLoaded", function () {
+			document.addEventListener("DOMContentLoaded", () => {
 				if (BITSMIST.v1.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
 				{
 					ErrorOrganizer.__initErrorListeners();
 				}
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1253,16 +1247,16 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		ErrorOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
-			var errors = settings["errors"];
+			let errors = settings["errors"];
 			if (errors)
 			{
 				ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Privates
@@ -1275,13 +1269,13 @@
 		 * @param	{Object}		target				Target component to check.
 		 * @param	{Object}		e					Event object.
 		 */
-		ErrorOrganizer.__filter = function __filter (conditions, options, e)
+		static __filter(conditions, options, e)
 		{
 
-			var result = false;
-			var targets = options["component"].settings.get("errors.targets");
+			let result = false;
+			let targets = options["component"].settings.get("errors.targets");
 
-			for (var i = 0; i < targets.length; i++)
+			for (let i = 0; i < targets.length; i++)
 			{
 				if (e.error.name === targets[i] || targets[i] === "*")
 				{
@@ -1292,18 +1286,18 @@
 
 			return result;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
 		/**
 		* Init error handling listeners.
 		*/
-		ErrorOrganizer.__initErrorListeners = function __initErrorListeners ()
+		static __initErrorListeners()
 		{
 
-			window.addEventListener("unhandledrejection", function (error) {
-				var e = {};
+			window.addEventListener("unhandledrejection", (error) => {
+				let e = {};
 
 				//try
 				{
@@ -1346,8 +1340,8 @@
 				//return true;
 			});
 
-			window.addEventListener("error", function (error, file, line, col) {
-				var e = {};
+			window.addEventListener("error", (error, file, line, col) => {
+				let e = {};
 
 				e.type = "error";
 				e.name = ErrorOrganizer.__getErrorName(error);
@@ -1367,7 +1361,7 @@
 				//return true;
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1378,29 +1372,29 @@
 		*
 		* @return  {String}			Error name.
 		*/
-		ErrorOrganizer.__getErrorName = function __getErrorName (error)
+		static __getErrorName(error)
 		{
 
-			var name;
-			var e;
+			let name;
+			let e;
 
-			if (error.reason instanceof XMLHttpRequest)		{ e = error.reason; }
-			else if (error.reason)	{ e = error.reason; }
-			else if (error.error)	{ e = error.error; }
-			else					{ e = error.message; }
+			if (error.reason instanceof XMLHttpRequest)		e = error.reason;
+			else if (error.reason)	e = error.reason;
+			else if (error.error)	e = error.error;
+			else					e = error.message;
 
-			if (e.name)									{ name = e.name; }
-			else if (e instanceof TypeError)			{ name = "TypeError"; }
-			else if (e instanceof XMLHttpRequest)		{ name = "AjaxError"; }
-			else if (e instanceof EvalError)			{ name = "EvalError"; }
+			if (e.name)									name = e.name;
+			else if (e instanceof TypeError)			name = "TypeError";
+			else if (e instanceof XMLHttpRequest)		name = "AjaxError";
+			else if (e instanceof EvalError)			name = "EvalError";
 		//	else if (e instanceof InternalError)		name = "InternalError";
-			else if (e instanceof RangeError)			{ name = "RangeError"; }
-			else if (e instanceof ReferenceError)		{ name = "ReferenceError"; }
-			else if (e instanceof SyntaxError)			{ name = "SyntaxError"; }
-			else if (e instanceof URIError)				{ name = "URIError"; }
+			else if (e instanceof RangeError)			name = "RangeError";
+			else if (e instanceof ReferenceError)		name = "ReferenceError";
+			else if (e instanceof SyntaxError)			name = "SyntaxError";
+			else if (e instanceof URIError)				name = "URIError";
 			else
 			{
-				var pos = e.indexOf(":");
+				let pos = e.indexOf(":");
 				if (pos > -1)
 				{
 					name = e.substring(0, pos);
@@ -1409,7 +1403,7 @@
 
 			return name;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1418,15 +1412,14 @@
 		*
 		* @param	{Object}		e					Error object.
 		*/
-		ErrorOrganizer.__handleException = function __handleException (e)
+		static __handleException(e)
 		{
 
 			return ErrorOrganizer._observers.notifyAsync("error", {"sender":ErrorOrganizer, "error": e});
 
-		};
+		}
 
-		return ErrorOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 
@@ -1434,27 +1427,34 @@
 	//	Element organizer class
 	// =============================================================================
 
-	var ElementOrganizer = /*@__PURE__*/(function (superclass) {
-		function ElementOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class ElementOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) ElementOrganizer.__proto__ = superclass;
-		ElementOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		ElementOrganizer.prototype.constructor = ElementOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ElementOrganizer.organize = function organize (conditions, component, settings)
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static organize(conditions, component, settings)
 		{
 
-			var elements = settings["elements"];
+			let elements = settings["elements"];
 			if (elements)
 			{
-				Object.keys(elements).forEach(function (eventName) {
+				Object.keys(elements).forEach((eventName) => {
 					component.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
 				});
 			}
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 		//	Event handlers
@@ -1467,26 +1467,26 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Object}		ex					Extra event info.
 		 */
-		ElementOrganizer.onDoOrganize = function onDoOrganize (sender, e, ex)
+		static onDoOrganize(sender, e, ex)
 		{
 
-			var component = ex.component;
-			var settings = ex.options["attrs"];
+			let component = ex.component;
+			let settings = ex.options["attrs"];
 
-			Object.keys(settings).forEach(function (elementName) {
+			Object.keys(settings).forEach((elementName) => {
 				ElementOrganizer.__initAttr(component, elementName, settings[elementName]);
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Private
 		// -------------------------------------------------------------------------
 
-		ElementOrganizer.__getTargetElements = function __getTargetElements (component, elementName, elementInfo)
+		static __getTargetElements(component, elementName, elementInfo)
 		{
 
-			var elements;
+			let elements;
 
 			if (elementInfo["rootNode"])
 			{
@@ -1510,7 +1510,7 @@
 
 			return elements;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1522,32 +1522,33 @@
 		 * @param	{String}		elementName			Element name.
 		 * @param	{Object}		elementInfo			Element info.
 		 */
-		ElementOrganizer.__initAttr = function __initAttr (component, elementName, elementInfo)
+		static __initAttr(component, elementName, elementInfo)
 		{
 
 			if (elementInfo)
 			{
-				var elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
-				var loop = function ( i ) {
-					Object.keys(elementInfo).forEach(function (key) {
+				let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
+				for (let i = 0; i < elements.length; i++)
+				{
+					Object.keys(elementInfo).forEach((key) => {
 						switch (key)
 						{
 							case "build":
-								var resourceName = elementInfo[key]["resourceName"];
+								let resourceName = elementInfo[key]["resourceName"];
 								FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
 								break;
 							case "attribute":
-								Object.keys(elementInfo[key]).forEach(function (attrName) {
+								Object.keys(elementInfo[key]).forEach((attrName) => {
 									elements[i].setAttribute(attrName, elementInfo[key][attrName]);
 								});
 								break;
 							case "style":
-								Object.keys(elementInfo[key]).forEach(function (styleName) {
+								Object.keys(elementInfo[key]).forEach((styleName) => {
 									elements[i].style[styleName] = elementInfo[key][styleName];
 								});
 								break;
 							case "property":
-								Object.keys(elementInfo[key]).forEach(function (propertyName) {
+								Object.keys(elementInfo[key]).forEach((propertyName) => {
 									elements[i][propertyName] = elementInfo[key][propertyName];
 								});
 								break;
@@ -1556,16 +1557,12 @@
 								break;
 						}
 					});
-				};
-
-				for (var i = 0; i < elements.length; i++)
-				loop( i );
+				}
 			}
 
-		};
+		}
 
-		return ElementOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -1581,21 +1578,25 @@
 	//	Resource organizer class
 	// =============================================================================
 
-	var ResourceOrganizer = /*@__PURE__*/(function (superclass) {
-		function ResourceOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class ResourceOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) ResourceOrganizer.__proto__ = superclass;
-		ResourceOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		ResourceOrganizer.prototype.constructor = ResourceOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ResourceOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		static init(component, settings)
 		{
 
 			// Add properties
 			Object.defineProperty(component, 'resources', {
-				get: function get() { return this._resources; },
+				get() { return this._resources; },
 			});
 
 			// Add methods
@@ -1605,7 +1606,7 @@
 			// Init vars
 			component._resources = {};
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1618,27 +1619,27 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		ResourceOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
-			var promises = [];
+			let promises = [];
 
 			switch (conditions)
 			{
 				case "beforeStart":
 				case "afterSpecLoad":
-					var resources = settings["resources"];
+					let resources = settings["resources"];
 					if (resources)
 					{
-						Object.keys(resources).forEach(function (resourceName) {
+						Object.keys(resources).forEach((resourceName) => {
 							// Add resource
-							var resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
+							let resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
 
 							// Load data
 							if (resources[resourceName]["autoLoad"])
 							{
-								var id = resource.options.get("autoLoadOptions.id");
-								var paramters = resource.options.get("autoLoadOptions.parameters");
+								let id = resource.options.get("autoLoadOptions.id");
+								let paramters = resource.options.get("autoLoadOptions.parameters");
 
 								promises.push(component._resources[resourceName].get(id, paramters));
 							}
@@ -1655,7 +1656,7 @@
 
 			return Promise.all(promises);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -1668,10 +1669,10 @@
 	     * @param	{string}		resourceName		Resource name.
 	     * @param	{array}			options				Options.
 	     */
-		ResourceOrganizer._addResource = function _addResource (component, resourceName, options)
+		static _addResource(component, resourceName, options)
 		{
 
-			var resource;
+			let resource;
 
 			if (options["handlerClassName"])
 			{
@@ -1681,7 +1682,7 @@
 
 			return resource;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1690,12 +1691,12 @@
 	     *
 	     * @param	{string}		resourceName		Resource name.
 	     */
-		ResourceOrganizer._switchResource = function _switchResource (resourceName)
+		static _switchResource(resourceName)
 		{
 
 			this._defaultResource = this._resources[resourceName];
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -1707,25 +1708,25 @@
 		 * @param	{Component}		component				Component.
 		 * @param	{Object}		options					Options
 		 */
-		ResourceOrganizer.doFetch = function doFetch (component, options)
+		static doFetch(component, options)
 		{
 
-			var promises = [];
-			var resources = ResourceOrganizer.__getTargetResources(component, options, "autoFetch");
+			let promises = [];
+			let resources = ResourceOrganizer.__getTargetResources(component, options, "autoFetch");
 
-			for (var i = 0; i < resources.length; i++)
+			for (let i = 0; i < resources.length; i++)
 			{
-				var resourceName = resources[i];
-				var id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-				var parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
+				let resourceName = resources[i];
+				let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
+				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
 				component._resources[resourceName].target["id"] = id;
 				component._resources[resourceName].target["parameters"] = parameters;
 
 				promises.push(component._resources[resourceName].get(id, parameters));
 			}
 
-			return Promise.all(promises).then(function () {
-				var resourceName = component.settings.get("settings.resourceName");
+			return Promise.all(promises).then(() => {
+				let resourceName = component.settings.get("settings.resourceName");
 				if (resourceName && component._resources[resourceName])
 				{
 					component.items = component._resources[resourceName].items;
@@ -1733,7 +1734,7 @@
 				}
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1743,34 +1744,34 @@
 		 * @param	{Component}		component				Component.
 		 * @param	{Object}		options					Options
 		 */
-		ResourceOrganizer.doSubmit = function doSubmit (component, options)
+		static doSubmit(component, options)
 		{
 
-			var promises = [];
-			var submitItem = {};
-			var resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
+			let promises = [];
+			let submitItem = {};
+			let resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
 
 			// Get target keys to submit
-			var nodes = component.querySelectorAll("[bm-submit]");
+			let nodes = component.querySelectorAll("[bm-submit]");
 			nodes = Array.prototype.slice.call(nodes, 0);
-			nodes.forEach(function (elem) {
-				var key = elem.getAttribute("bm-bind");
+			nodes.forEach((elem) => {
+				let key = elem.getAttribute("bm-bind");
 				submitItem[key] = component.item[key];
 			});
 
-			for (var i = 0; i < resources.length; i++)
+			for (let i = 0; i < resources.length; i++)
 			{
-				var resourceName = resources[i];
-				var method = BITSMIST.v1.Util.safeGet(options, "method", component._resources[resourceName].target["method"] || "put"); // Default is "put"
-				var id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-				var parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
+				let resourceName = resources[i];
+				let method = BITSMIST.v1.Util.safeGet(options, "method", component._resources[resourceName].target["method"] || "put"); // Default is "put"
+				let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
+				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
 
 				promises.push(component._resources[resourceName][method](id, submitItem, parameters));
 			}
 
 			return Promise.all(promises);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Privates
@@ -1785,10 +1786,10 @@
 	 	 *
 		 * @return  {Array}			Array of target resource names.
 		 */
-		ResourceOrganizer.__getTargetResources = function __getTargetResources (component, options, target)
+		static __getTargetResources(component, options, target)
 		{
 
-			var resources = BITSMIST.v1.Util.safeGet(options, target, component.settings.get("settings." + target, []));
+			let resources = BITSMIST.v1.Util.safeGet(options, target, component.settings.get("settings." + target, []));
 
 			if (Array.isArray(resources))
 			;
@@ -1806,10 +1807,9 @@
 
 			return resources;
 
-		};
+		}
 
-		return ResourceOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -1825,24 +1825,28 @@
 	//	Validation organizer class
 	// =============================================================================
 
-	var ValidationOrganizer = /*@__PURE__*/(function (superclass) {
-		function ValidationOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class ValidationOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) ValidationOrganizer.__proto__ = superclass;
-		ValidationOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		ValidationOrganizer.prototype.constructor = ValidationOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ValidationOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		static init(component, settings)
 		{
 
 			// Add properties
 			Object.defineProperty(component, 'validators', {
-				get: function get() { return this._validators; },
+				get() { return this._validators; },
 			});
 			Object.defineProperty(component, 'validationResult', {
-				get: function get() { return this._validationResult; },
+				get() { return this._validationResult; },
 			});
 
 			// Add methods
@@ -1852,7 +1856,7 @@
 			component._validators = {};
 			component._validationResult = {};
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1865,39 +1869,39 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		ValidationOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
 			switch (conditions)
 			{
 			case "doCheckValidity":
 			case "doReportValidity":
-				var validationName = settings["validationName"];
+				let validationName = settings["validationName"];
 	//			BITSMIST.v1.Util.warn(validationName, `ValidationOrganizer.organize(): Validator not specified. name=${component.name}`);
 
 				if (validationName)
 				{
-					var item = BITSMIST.v1.Util.safeGet(settings, "item");
-					var rules = component.settings.get("validations." + validationName + ".rules");
-					var options = component.settings.get("validations." + validationName + ".handlerOptions");
-					var method = (conditions === "doCheckValidity" ? "checkValidity" : "reportValidity" );
+					let item = BITSMIST.v1.Util.safeGet(settings, "item");
+					let rules = component.settings.get("validations." + validationName + ".rules");
+					let options = component.settings.get("validations." + validationName + ".handlerOptions");
+					let method = (conditions === "doCheckValidity" ? "checkValidity" : "reportValidity" );
 
-					BITSMIST.v1.Util.assert(component._validators[validationName], ("ValidationOrganizer.organize(): Validator not found. name=" + (component.name) + ", validationName=" + validationName));
+					BITSMIST.v1.Util.assert(component._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${component.name}, validationName=${validationName}`);
 					component._validators[validationName][method](item, rules, options);
 				}
 				break;
 			default:
-				var validations = settings["validations"];
+				let validations = settings["validations"];
 				if (validations)
 				{
-					Object.keys(validations).forEach(function (validatorName) {
+					Object.keys(validations).forEach((validatorName) => {
 						ValidationOrganizer._addValidator(component, validatorName, validations[validatorName]);
 					});
 				}
 				break;
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -1910,10 +1914,10 @@
 	     * @param	{string}		validatorName		Validator name.
 	     * @param	{array}			options				Options.
 	     */
-		ValidationOrganizer._addValidator = function _addValidator (component, validatorName, options)
+		static _addValidator(component, validatorName, options)
 		{
 
-			var validator;
+			let validator;
 
 			if (options["handlerClassName"])
 			{
@@ -1923,10 +1927,9 @@
 
 			return validator;
 
-		};
+		}
 
-		return ValidationOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 
@@ -1934,22 +1937,28 @@
 	//	Databinding organizer class
 	// =============================================================================
 
-	var DatabindingOrganizer = /*@__PURE__*/(function (superclass) {
-		function DatabindingOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class DatabindingOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) DatabindingOrganizer.__proto__ = superclass;
-		DatabindingOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		DatabindingOrganizer.prototype.constructor = DatabindingOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		DatabindingOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static init(component, settings)
 		{
 
 			// Add properties
 			Object.defineProperty(component, 'binds', {
-				get: function get() { return this._binds; },
-				set: function set(newValue) {
+				get() { return this._binds; },
+				set(newValue) {
 					DatabindingOrganizer.update(this, newValue);
 				},
 			});
@@ -1961,7 +1970,7 @@
 			// Init vars
 			component._binds = new BindableStore();
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -1974,7 +1983,7 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		DatabindingOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
 			switch (conditions)
@@ -1983,7 +1992,7 @@
 					DatabindingOrganizer._bindData(component);
 					break;
 				case "afterFetch":
-					var bindings = settings["bindings"];
+					let bindings = settings["bindings"];
 					if (bindings)
 					{
 
@@ -1992,7 +2001,7 @@
 					break;
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2005,14 +2014,14 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		DatabindingOrganizer.setResource = function setResource (component, settings)
+		static setResource(component, settings)
 		{
 
-			var resourceName = settings["resourceName"];
+			let resourceName = settings["resourceName"];
 
 			component._binds.replace(component.resources[resourceName].item);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2022,7 +2031,7 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{HTMLElement}	rootNode			Root node.
 		 */
-		DatabindingOrganizer.update = function update (component, data)
+		static update(component, data)
 		{
 
 			component._binds.items = data;
@@ -2030,7 +2039,7 @@
 			// Bind data to elements
 			DatabindingOrganizer._bindData(component);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -2042,21 +2051,20 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{HTMLElement}	rootNode			Root node.
 		 */
-		DatabindingOrganizer._bindData = function _bindData (component, rootNode)
+		static _bindData(component, rootNode)
 		{
 
 			rootNode = ( rootNode ? rootNode : component );
 
-			var nodes = rootNode.querySelectorAll("[bm-bind]");
+			let nodes = rootNode.querySelectorAll("[bm-bind]");
 			nodes = Array.prototype.slice.call(nodes, 0);
-			nodes.forEach(function (elem) {
+			nodes.forEach(elem => {
 				component._binds.bindTo(elem);
 			});
 
-		};
+		}
 
-		return DatabindingOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -2072,22 +2080,26 @@
 	//	Plugin organizer class
 	// =============================================================================
 
-	var PluginOrganizer = /*@__PURE__*/(function (superclass) {
-		function PluginOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class PluginOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) PluginOrganizer.__proto__ = superclass;
-		PluginOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		PluginOrganizer.prototype.constructor = PluginOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		PluginOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		static init(component, settings)
 		{
 
 			// Init vars
 			component._plugins = {};
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2100,18 +2112,18 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		PluginOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
-			var plugins = settings["plugins"];
+			let plugins = settings["plugins"];
 			if (plugins)
 			{
-				Object.keys(plugins).forEach(function (pluginName) {
+				Object.keys(plugins).forEach((pluginName) => {
 					PluginOrganizer._addPlugin(component, pluginName, plugins[pluginName]);
 				});
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -2125,14 +2137,14 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		PluginOrganizer._addPlugin = function _addPlugin (component, pluginName, options)
+		static _addPlugin(component, pluginName, options)
 		{
 
-			console.debug(("PluginOrganizer._addPlugin(): Adding a plugin. name=" + (component.name) + ", pluginName=" + pluginName));
+			console.debug(`PluginOrganizer._addPlugin(): Adding a plugin. name=${component.name}, pluginName=${pluginName}`);
 
 			options = Object.assign({}, options);
-			var className = ( "className" in options ? options["className"] : pluginName );
-			var plugin = null;
+			let className = ( "className" in options ? options["className"] : pluginName );
+			let plugin = null;
 
 			// CreatePlugin
 			plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
@@ -2140,10 +2152,9 @@
 
 			return plugin;
 
-		};
+		}
 
-		return PluginOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -2159,22 +2170,26 @@
 	//	Key organizer class
 	// =============================================================================
 
-	var KeyOrganizer = /*@__PURE__*/(function (superclass) {
-		function KeyOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class KeyOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) KeyOrganizer.__proto__ = superclass;
-		KeyOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		KeyOrganizer.prototype.constructor = KeyOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		KeyOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 */
+		static init(component, settings)
 		{
 
 			// Init vars
 			component.__isComposing = false;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2187,26 +2202,26 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		KeyOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
-			var keys = settings["keys"];
+			let keys = settings["keys"];
 			if (keys)
 			{
 				// Init keys
-				var actions = KeyOrganizer.__getActions(keys);
+				let actions = KeyOrganizer.__getActions(keys);
 				component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component);});
 				component.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, component, keys, actions);});
 				// component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
 				// component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
 
 				// Init buttons
-				Object.keys(keys).forEach(function (key) {
+				Object.keys(keys).forEach((key) => {
 					KeyOrganizer.__initButtons(component, key, keys[key]);
 				});
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Event handlers
@@ -2218,12 +2233,12 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Component}		component			Component.
 		 */
-		KeyOrganizer.onKeyDown = function onKeyDown (e, component)
+		static onKeyDown(e, component)
 		{
 
 			component.__isComposing = ( e.keyCode === 229 ? true : false );
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2235,7 +2250,7 @@
 		 * @param	{Object}		options				Options.
 		 * @param	{Object}		actions				Action info.
 		 */
-		KeyOrganizer.onKeyUp = function onKeyUp (e, component, options, actions)
+		static onKeyUp(e, component, options, actions)
 		{
 
 			// Ignore all key input when composing.
@@ -2244,7 +2259,7 @@
 				return;
 			}
 
-			var key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
+			let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
 			switch (key)
 			{
 				case "Esc":		key = "Escape";		break;
@@ -2261,7 +2276,7 @@
 				actions[key]["handler"].call(this, e, component, actions[key]["option"]);
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2310,10 +2325,10 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer._defaultSubmit = function _defaultSubmit (e, component, options)
+		static _defaultSubmit(e, component, options)
 		{
 
-			component.submit().then(function () {
+			component.submit().then(() => {
 				if (!component.cancelSubmit)
 				{
 					// Modal result
@@ -2330,7 +2345,7 @@
 				}
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2341,12 +2356,12 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer._defaultCancel = function _defaultCancel (e, component, options)
+		static _defaultCancel(e, component, options)
 		{
 
 			component.close();
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2357,10 +2372,10 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer._defaultClear = function _defaultClear (e, component, options)
+		static _defaultClear(e, component, options)
 		{
 
-			var target;
+			let target;
 
 			if (this.hasAttribute("bm-cleartarget"))
 			{
@@ -2369,7 +2384,7 @@
 
 			component.clear(target);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Privates
@@ -2380,10 +2395,10 @@
 		 *
 		 * @param	{Integer}		code				Key code.
 		 */
-		KeyOrganizer.__getKeyfromKeyCode = function __getKeyfromKeyCode (code)
+		static __getKeyfromKeyCode(code)
 		{
 
-			var ret;
+			let ret;
 
 			switch(code)
 			{
@@ -2397,7 +2412,7 @@
 
 			return ret;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2408,21 +2423,21 @@
 		 * @param	{String}		action				Action.
 		 * @param	{Object}		options				Options.
 		 */
-		KeyOrganizer.__initButtons = function __initButtons (component, action, options)
+		static __initButtons(component, action, options)
 		{
 
 			if (options && options["rootNode"])
 			{
-				var handler = ( options["handler"] ? options["handler"] : KeyOrganizer.__getDefaultHandler(action) );
-				var elements = component.querySelectorAll(options["rootNode"]);
+				let handler = ( options["handler"] ? options["handler"] : KeyOrganizer.__getDefaultHandler(action) );
+				let elements = component.querySelectorAll(options["rootNode"]);
 				elements = Array.prototype.slice.call(elements, 0);
 
-				elements.forEach(function (element) {
+				elements.forEach((element) => {
 					element.addEventListener("click", function(e){handler.call(this, e, component, options);});
 				});
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2433,15 +2448,15 @@
 		 *
 		 * @return 	{Object}		Action info.
 		 */
-		KeyOrganizer.__getActions = function __getActions (settings)
+		static __getActions(settings)
 		{
 
-			var actions = {};
+			let actions = {};
 
-			Object.keys(settings).forEach(function (key) {
-				var keys = ( Array.isArray(settings[key]["key"]) ? settings[key]["key"] : [settings[key]["key"]]);
+			Object.keys(settings).forEach((key) => {
+				let keys = ( Array.isArray(settings[key]["key"]) ? settings[key]["key"] : [settings[key]["key"]]);
 
-				for (var i = 0; i < keys.length; i++)
+				for (let i = 0; i < keys.length; i++)
 				{
 					actions[keys[i]] = {};
 					actions[keys[i]]["type"] = key;
@@ -2452,7 +2467,7 @@
 
 			return actions;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2463,10 +2478,10 @@
 		 *
 		 * @return 	{Function}		Handler.
 		 */
-		KeyOrganizer.__getDefaultHandler = function __getDefaultHandler (action)
+		static __getDefaultHandler(action)
 		{
 
-			var handler;
+			let handler;
 
 			switch (action)
 			{
@@ -2483,10 +2498,9 @@
 
 			return handler;
 
-		};
+		}
 
-		return KeyOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -2502,42 +2516,49 @@
 	//	Chain organizer class
 	// =============================================================================
 
-	var ChainOrganizer = /*@__PURE__*/(function (superclass) {
-		function ChainOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class ChainOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) ChainOrganizer.__proto__ = superclass;
-		ChainOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		ChainOrganizer.prototype.constructor = ChainOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ChainOrganizer.organize = function organize (conditions, component, settings)
+		/**
+		 * Organize.
+		 *
+		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static organize(conditions, component, settings)
 		{
 
-			var chains = settings["chains"];
+			let chains = settings["chains"];
 			if (chains)
 			{
-				Object.keys(chains).forEach(function (eventName) {
+				Object.keys(chains).forEach((eventName) => {
 					component.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
 				});
 			}
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 
-		ChainOrganizer.unorganize = function unorganize (conditions, component, settings)
+		static unorganize(conditions, component, settings)
 		{
 
-			var chains = settings["chains"];
+			let chains = settings["chains"];
 			if (chains)
 			{
-				Object.keys(chains).forEach(function (eventName) {
+				Object.keys(chains).forEach((eventName) => {
 					component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
 				});
 			}
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 		//	Event handlers
@@ -2550,26 +2571,27 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Object}		ex					Extra event info.
 		 */
-		ChainOrganizer.onDoOrganize = function onDoOrganize (sender, e, ex)
+		static onDoOrganize(sender, e, ex)
 		{
 
-			var component = ex.component;
-			var targets = ex.options;
-			var promises = [];
-			var chain = Promise.resolve();
+			let component = ex.component;
+			let targets = ex.options;
+			let promises = [];
+			let chain = Promise.resolve();
 
-			var loop = function ( i ) {
-				var method = targets[i]["method"] || "refresh";
-				var state = targets[i]["state"] || "started";
-				var sync = targets[i]["sync"];
+			for (let i = 0; i < targets.length; i++)
+			{
+				let method = targets[i]["method"] || "refresh";
+				let state = targets[i]["state"] || "started";
+				let sync = targets[i]["sync"];
 
-				var nodes = document.querySelectorAll(targets[i]["rootNode"]);
+				let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 				nodes = Array.prototype.slice.call(nodes, 0);
-				BITSMIST.v1.Util.assert(nodes.length > 0, ("ChainOrganizer.onDoOrganizer(): Node not found. name=" + (component.name) + ", eventName=" + (e.type) + ", rootNode=" + (targets[i]["rootNode"]) + ", method=" + method));
+				BITSMIST.v1.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`);
 
 				if (sync)
 				{
-					chain = chain.then(function () {
+					chain = chain.then(() => {
 						return ChainOrganizer.__execTarget(component, nodes, method, state);
 					});
 				}
@@ -2578,16 +2600,13 @@
 					chain = ChainOrganizer.__execTarget(component, nodes, method, state);
 				}
 				promises.push(chain);
-			};
+			}
 
-			for (var i = 0; i < targets.length; i++)
-			loop( i );
-
-			return chain.then(function () {
+			return chain.then(() => {
 				return Promise.all(promises);
 			});
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 		//	Privates
@@ -2602,13 +2621,13 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		ChainOrganizer.__execTarget = function __execTarget (component, nodes, method, state)
+		static __execTarget(component, nodes, method, state)
 		{
 
-			var promises = [];
+			let promises = [];
 
-			nodes.forEach(function (element) {
-				var promise = component.waitFor([{"object":element, "state":state}]).then(function () {
+			nodes.forEach((element) => {
+				let promise = component.waitFor([{"object":element, "state":state}]).then(() => {
 					return element[method]({"sender":component});
 				});
 				promises.push(promise);
@@ -2616,10 +2635,9 @@
 
 			return Promise.all(promises);
 
-		};
+		}
 
-		return ChainOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -2635,24 +2653,30 @@
 	//	Dialog organizer class
 	// =============================================================================
 
-	var DialogOrganizer = /*@__PURE__*/(function (superclass) {
-		function DialogOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class DialogOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) DialogOrganizer.__proto__ = superclass;
-		DialogOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		DialogOrganizer.prototype.constructor = DialogOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		DialogOrganizer.init = function init (component, settings)
+		/**
+		 * Init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		settings			Settings.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static init(component, settings)
 		{
 
 			// Add properties
 			Object.defineProperty(component, 'modalResult', {
-				get: function get() { return this._modalResult; },
+				get() { return this._modalResult; },
 			});
 			Object.defineProperty(component, 'isModal', {
-				get: function get() { return this._isModal; },
+				get() { return this._isModal; },
 			});
 
 			// Add methods
@@ -2665,7 +2689,7 @@
 			component._modalResult;
 			component._modalPromise;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2678,7 +2702,7 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		DialogOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
 			settings["dialog"];
@@ -2702,7 +2726,7 @@
 					break;
 			}
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -2715,46 +2739,46 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		DialogOrganizer._open = function _open (component, options)
+		static _open(component, options)
 		{
 
 			options = Object.assign({}, options);
 
-			return Promise.resolve().then(function () {
-				console.debug(("Opening component. name=" + (component.name) + ", id=" + (component.id)));
+			return Promise.resolve().then(() => {
+				console.debug(`Opening component. name=${component.name}, id=${component.id}`);
 				return component.trigger("beforeOpen", options);
-			}).then(function () {
+			}).then(() => {
 				// Setup
 				if (BITSMIST.v1.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
 				{
 					return component.setup(options);
 				}
-			}).then(function () {
+			}).then(() => {
 				// Refresh
 				if (BITSMIST.v1.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
 				{
 					return component.refresh(options);
 				}
-			}).then(function () {
+			}).then(() => {
 				return component.trigger("doOpen", options);
-			}).then(function () {
+			}).then(() => {
 				// Auto focus
-				var autoFocus = component.settings.get("settings.autoFocus");
+				let autoFocus = component.settings.get("settings.autoFocus");
 				if (autoFocus)
 				{
-					var target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
+					let target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
 					if (target)
 					{
 						target.focus();
 					}
 				}
-			}).then(function () {
+			}).then(() => {
 				return component.trigger("afterOpen", options);
-			}).then(function () {
-				console.debug(("Opened component. name=" + (component.name) + ", id=" + (component.id)));
+			}).then(() => {
+				console.debug(`Opened component. name=${component.name}, id=${component.id}`);
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2765,19 +2789,19 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		DialogOrganizer._openModal = function _openModal (component, options)
+		static _openModal(component, options)
 		{
 
-			console.debug(("Opening component modally. name=" + (component.name) + ", id=" + (component.id)));
+			console.debug(`Opening component modally. name=${component.name}, id=${component.id}`);
 
-			return new Promise(function (resolve, reject) {
+			return new Promise((resolve, reject) => {
 				component._isModal = true;
 				component._modalResult = {"result":false};
 				component._modalPromise = { "resolve": resolve, "reject": reject };
 				DialogOrganizer._open(component, options);
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2788,31 +2812,30 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		DialogOrganizer._close = function _close (component, options)
+		static _close(component, options)
 		{
 
 			options = Object.assign({}, options);
 
-			return Promise.resolve().then(function () {
-				console.debug(("Closing component. name=" + (component.name) + ", id=" + (component.id)));
+			return Promise.resolve().then(() => {
+				console.debug(`Closing component. name=${component.name}, id=${component.id}`);
 				return component.trigger("beforeClose", options);
-			}).then(function () {
+			}).then(() => {
 				return component.trigger("doClose", options);
-			}).then(function () {
+			}).then(() => {
 				return component.trigger("afterClose", options);
-			}).then(function () {
+			}).then(() => {
 				if (component._isModal)
 				{
 					component._modalPromise.resolve(component._modalResult);
 				}
-			}).then(function () {
-				console.debug(("Closed component. name=" + (component.name) + ", id=" + (component.id)));
+			}).then(() => {
+				console.debug(`Closed component. name=${component.name}, id=${component.id}`);
 			});
 
-		};
+		}
 
-		return DialogOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 
@@ -2820,28 +2843,29 @@
 	//	Preference organizer class
 	// =============================================================================
 
-	var PreferenceOrganizer = /*@__PURE__*/(function (superclass) {
-		function PreferenceOrganizer () {
-			superclass.apply(this, arguments);
-		}
+	class PreferenceOrganizer extends BITSMIST.v1.Organizer
+	{
 
-		if ( superclass ) PreferenceOrganizer.__proto__ = superclass;
-		PreferenceOrganizer.prototype = Object.create( superclass && superclass.prototype );
-		PreferenceOrganizer.prototype.constructor = PreferenceOrganizer;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		PreferenceOrganizer.globalInit = function globalInit ()
+		/**
+		 * Global init.
+		 */
+		static globalInit()
 		{
 
 			// Init vars
 			PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
 			PreferenceOrganizer._store = new ObservableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
 			PreferenceOrganizer.__loaded =  {};
-			PreferenceOrganizer.__loaded["promise"] = new Promise(function (resolve, reject) {
+			PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
 				PreferenceOrganizer.__loaded["resolve"] = resolve;
 				PreferenceOrganizer.__loaded["reject"] = reject;
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2851,13 +2875,13 @@
 		 * @param	{Component}		component			Component.
 		 * @param	{Object}		settings			Settings.
 		 */
-		PreferenceOrganizer.init = function init (component, settings)
+		static init(component, settings)
 		{
 
 			// Register a component as an observer
 			PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2870,10 +2894,10 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		PreferenceOrganizer.organize = function organize (conditions, component, settings)
+		static organize(conditions, component, settings)
 		{
 
-			var chain = Promise.resolve();
+			let chain = Promise.resolve();
 
 			// Set default preferences
 			if (BITSMIST.v1.Util.safeGet(settings, "preferences.defaults"))
@@ -2884,25 +2908,25 @@
 			// Load preferences
 			if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.load"))
 			{
-				chain = component.resources["preferences"].get().then(function (preferences) {
+				chain = component.resources["preferences"].get().then((preferences) => {
 					PreferenceOrganizer._store.merge(preferences);
 					PreferenceOrganizer.__loaded.resolve();
 				});
 			}
 
 			// Wait for preference to be loaded
-			var timer;
-			return chain.then(function () {
-				var timeout = component.settings.get("system.preferenceTimeout", 10000);
-				timer = setTimeout(function () {
-					throw new ReferenceError(("Time out waiting for loading preferences. name=" + (component.name)));
+			let timer;
+			return chain.then(() => {
+				let timeout = component.settings.get("system.preferenceTimeout", 10000);
+				timer = setTimeout(() => {
+					throw new ReferenceError(`Time out waiting for loading preferences. name=${component.name}`);
 				}, timeout);
 				return PreferenceOrganizer.__loaded.promise;
-			}).then(function () {
+			}).then(() => {
 				clearTimeout(timer);
 			});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -2915,14 +2939,14 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		PreferenceOrganizer._triggerEvent = function _triggerEvent (item)
+		static _triggerEvent(item)
 		{
 
-			var eventName = this.settings.get("preferences.settings.eventName", "doSetup");
+			let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 
 			return this.trigger(eventName, {"sender":PreferenceOrganizer, "item":item});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -2932,11 +2956,11 @@
 		 * @param	{Object}		conditions			Conditions.
 		 * @param	{Object}		options				Options.
 		 */
-		PreferenceOrganizer._filter = function _filter (conditions, options)
+		static _filter(conditions, options)
 		{
 
-			var result = false;
-			var target = options["targets"];
+			let result = false;
+			let target = options["targets"];
 
 			if (target === "*")
 			{
@@ -2946,7 +2970,7 @@
 			{
 				target = ( Array.isArray(target) ? target : [target] );
 
-				for (var i = 0; i < target.length; i++)
+				for (let i = 0; i < target.length; i++)
 				{
 					if (conditions[target[i]])
 					{
@@ -2958,10 +2982,9 @@
 
 			return result;
 
-		};
+		}
 
-		return PreferenceOrganizer;
-	}(BITSMIST.v1.Organizer));
+	}
 
 	// =============================================================================
 	/**
@@ -2977,92 +3000,101 @@
 	//	Plugin base class
 	// =============================================================================
 
-	var Plugin = function Plugin(component, options)
+	class Plugin
 	{
-		var this$1$1 = this;
 
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
 
-		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
-		this._options.merge(this._getOptions());
-		this._options.set("name", this._options.get("name", this.constructor.name));
-
-		// Add event handlers
-		var events = this._options.get("events", {});
-		Object.keys(events).forEach(function (eventName) {
-			component.addEventHandler(eventName, events[eventName], null, this$1$1);
-		});
-
-		// Expose plugin
-		if (this._options.get("expose"))
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		component			Component to attach.
+		 * @param	{Object}		options				Options.
+	     */
+		constructor(component, options)
 		{
-			var plugin = this;
-			Object.defineProperty(component.__proto__, this._options.get("expose"), {
-				get: function get()
-				{
-					return plugin;
-				}
+
+			this._component = component;
+			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+			this._options.merge(this._getOptions());
+			this._options.set("name", this._options.get("name", this.constructor.name));
+
+			// Add event handlers
+			let events = this._options.get("events", {});
+			Object.keys(events).forEach((eventName) => {
+				component.addEventHandler(eventName, events[eventName], null, this);
 			});
+
+			// Expose plugin
+			if (this._options.get("expose"))
+			{
+				let plugin = this;
+				Object.defineProperty(component.__proto__, this._options.get("expose"), {
+					get()
+					{
+						return plugin;
+					}
+				});
+			}
+
 		}
 
-	};
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
 
-	var prototypeAccessors$2 = { name: { configurable: true },component: { configurable: true } };
+		/**
+		* Component name.
+		*
+		* @type	{String}
+		*/
+		get name()
+		{
 
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
+			return this._options.get("name");
 
-	/**
-	* Component name.
-	*
-	* @type{String}
-	*/
-	prototypeAccessors$2.name.get = function ()
-	{
+		}
 
-		return this._options.get("name");
+		// -------------------------------------------------------------------------
 
-	};
+		/**
+		* Component.
+		*
+		* @type	{String}
+		*/
+		get component()
+		{
 
-	// -------------------------------------------------------------------------
+			return this._component;
 
-	/**
-	* Component.
-	*
-	* @type{String}
-	*/
-	prototypeAccessors$2.component.get = function ()
-	{
+		}
 
-		return this._component;
+		set component(value)
+		{
 
-	};
+			this._component = value;
 
-	prototypeAccessors$2.component.set = function (value)
-	{
+		}
 
-		this._component = value;
+		// -----------------------------------------------------------------------------
+		//  Protected
+		// -----------------------------------------------------------------------------
 
-	};
-
-	// -----------------------------------------------------------------------------
-	//  Protected
-	// -----------------------------------------------------------------------------
-
-	/**
+		/**
 		 * Get plugin options.  Need to override.
 		 *
-		 * @return  {Object}	Options.
+		 * @return  {Object}		Options.
 		 */
-	Plugin.prototype._getOptions = function _getOptions ()
-	{
+		_getOptions()
+		{
 
-		return {};
+			return {};
 
-	};
+		}
 
-	Object.defineProperties( Plugin.prototype, prototypeAccessors$2 );
+	}
 
 	// =============================================================================
 	/**
@@ -3078,452 +3110,156 @@
 	//	Resource Handler class
 	// =============================================================================
 
-	var ResourceHandler = function ResourceHandler(component, resourceName, options)
+	class ResourceHandler
 	{
 
-		this._resourceName = resourceName;
-		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
-		this._data;
-		this._name = "ResourceHandler";
-		this._items = [];
-		this._item = {};
-		this._target = {};
-		this._currentIndex = 0;
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
 
-	};
+		/**
+	     * Constructor.
+	     *
+	     * @param	{String}		resourceName		Resource name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, resourceName, options)
+		{
 
-	var prototypeAccessors$1 = { name: { configurable: true },resourceName: { configurable: true },target: { configurable: true },data: { configurable: true },items: { configurable: true },item: { configurable: true },options: { configurable: true } };
+			this._resourceName = resourceName;
+			this._component = component;
+			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+			this._data;
+			this._name = "ResourceHandler";
+			this._items = [];
+			this._item = {};
+			this._target = {};
+			this._currentIndex = 0;
 
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
+		}
 
-	/**
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		/**
 		 * Resource handler name.
 		 *
-		 * @type{String}
+		 * @type	{String}
 		 */
-	prototypeAccessors$1.name.get = function ()
-	{
+		get name()
+		{
 
-		return this._name;
+			return this._name;
 
-	};
+		}
 
-	prototypeAccessors$1.name.set = function (value)
-	{
+		set name(value)
+		{
 
-		this._name = value;
+			this._name = value;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Resource name.
 		 *
-		 * @type{String}
+		 * @type	{String}
 		 */
-	prototypeAccessors$1.resourceName.get = function ()
-	{
+		get resourceName()
+		{
 
-		return this._resourceName;
+			return this._resourceName;
 
-	};
+		}
 
-	prototypeAccessors$1.resourceName.set = function (value)
-	{
+		set resourceName(value)
+		{
 
-		this._resourceName = value;
+			this._resourceName = value;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Fetch target.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors$1.target.get = function ()
-	{
+		get target()
+		{
 
-		return this._target;
+			return this._target;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Raw data.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors$1.data.get = function ()
-	{
+		get data()
+		{
 
-		return this._data;
+			return this._data;
 
-	};
+		}
 
-	prototypeAccessors$1.data.set = function (value)
-	{
+		set data(value)
+		{
 
-		this._data = value;
-		this._items = this.__reshapeItems(value);
-		this._item = ( Array.isArray(this._items) ? this._items[this._currentIndex] : this._items );
+			this._data = value;
+			this._items = this.__reshapeItems(value);
+			this._item = ( Array.isArray(this._items) ? this._items[this._currentIndex] : this._items );
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Items.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors$1.items.get = function ()
-	{
+		get items()
+		{
 
-		return this._items;
+			return this._items;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Item.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors$1.item.get = function ()
-	{
+		get item()
+		{
 
-		return this._item;
+			return this._item;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Options.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors$1.options.get = function ()
-	{
-
-		return this._options;
-
-	};
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Get data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype.get = function get (id, parameters)
-	{
-			var this$1$1 = this;
-
-
-		return Promise.resolve().then(function () {
-			return this$1$1._get(id, parameters);
-		}).then(function (data) {
-	//		BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
-
-			if (data)
-			{
-				this$1$1.data = data;
-			}
-
-			return this$1$1._data;
-		});
-
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Delete data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype.delete = function delete$1 (id, parameters)
-	{
-			var this$1$1 = this;
-
-
-		return Promise.resolve().then(function () {
-			return this$1$1._delete(id, parameters);
-		});
-
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Insert data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	data			Data to insert.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype.post = function post (id, data, parameters)
-	{
-			var this$1$1 = this;
-
-
-		data = this.__reshapeData(data);
-
-		return Promise.resolve().then(function () {
-			return this$1$1._post(id, data, parameters);
-		});
-
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Update data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	data			Data to update.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype.put = function put (id, data, parameters)
-	{
-			var this$1$1 = this;
-
-
-		data = this.__reshapeData(data);
-
-		return Promise.resolve().then(function () {
-			return this$1$1._put(id, data, parameters);
-		});
-
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Get resource text for the code.
-		 *
-		 * @param{String}	code			Code value.
-		 *
-		 * @return  {String}	Resource text.
-		 */
-	ResourceHandler.prototype.getText = function getText (code)
-	{
-
-		var ret = code;
-		var title = this._options.get("fieldOptions.text");
-
-		if (this._items && code in this._items)
-		{
-			ret = this._items[code][title];
-		}
-
-		return ret;
-
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Get resource item for the code.
-		 *
-		 * @param{String}	code			Code value.
-		 *
-		 * @return  {Object}	Resource data.
-		 */
-	ResourceHandler.prototype.getItem = function getItem (code)
-	{
-
-		var ret;
-
-		if (this._items && code in this._items)
-		{
-			ret = this._items[code];
-		}
-
-		return ret;
-
-	};
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Get data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype._get = function _get (id, parameters)
-	{
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Delete data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype._delete = function _delete (id, parameters)
-	{
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Insert data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	data			Data to insert.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype._post = function _post (id, data, parameters)
-	{
-	};
-
-	    // -------------------------------------------------------------------------
-
-	/**
-		 * Update data.
-		 *
-		 * @param{String}	id				Target id.
-		 * @param{Object}	data			Data to update.
-		 * @param{Object}	parameters		Query parameters.
-		 *
-		 * @return  {Promise}	Promise.
-		 */
-	ResourceHandler.prototype._put = function _put (id, data, parameters)
-	{
-	};
-
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Get and reshape items from raw data on get.
-		 *
-		 * @param{Object}	data			Raw data from which items are retrieved.
-		 *
-		 * @return  {Object}	Reshaped items.
-		 */
-	ResourceHandler.prototype.__reshapeItems = function __reshapeItems (data)
-	{
-
-		// Get items
-		var itemsField = this._options.get("fieldOptions.items");
-		var items = ( itemsField ? BITSMIST.v1.Util.safeGet(data, itemsField) : data );
-
-		// Reshape
-		if (this._options.get("reshapeOptions.get.reshape"))
-		{
-			var reshaper = this._options.get("reshapeOptions.get.reshaper", this.__reshaper_get.bind(this));
-			items = reshaper(items);
-		}
-
-		return items;
-
-	};
-
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Reshape request data on post/put.
-		 *
-		 * @param{Object}	data			Data to reshape.
-		 *
-		 * @return  {Object}	Reshaped data.
-		 */
-	ResourceHandler.prototype.__reshapeData = function __reshapeData (data)
-	{
-
-		if (this._options.get("reshapeOptions.put.reshape"))
-		{
-			var reshaper = this._options.get("reshapeOptions.put.reshaper", function () { return data; });
-			data = reshaper(data);
-		}
-
-		return data;
-
-	};
-
-	// -------------------------------------------------------------------------
-
-	/**
-	     * Reshape items on get.
-	     *
-	     * @param{Object}	target			Target to reshape.
-		 *
-		 * @return  {Object}	Master object.
-	     */
-	ResourceHandler.prototype.__reshaper_get = function __reshaper_get (target)
-	{
-
-		var idField = this._options.get("fieldOptions.id");
-
-		var items = target.reduce(function (result, current) {
-			var id = current[idField];
-			result[id] = current;
-
-			return result;
-		}, {});
-
-		return items;
-
-	};
-
-	Object.defineProperties( ResourceHandler.prototype, prototypeAccessors$1 );
-
-	// =============================================================================
-
-	// =============================================================================
-	//	Cookie resource handler class
-	// =============================================================================
-
-	var CookieResourceHandler = /*@__PURE__*/(function (ResourceHandler) {
-		function CookieResourceHandler(component, resourceName, options)
+		get options()
 		{
 
-			ResourceHandler.call(this, component, resourceName, options);
-
-			this._name = "CookieResourceHandler";
-			this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
+			return this._options;
 
 		}
-
-		if ( ResourceHandler ) CookieResourceHandler.__proto__ = ResourceHandler;
-		CookieResourceHandler.prototype = Object.create( ResourceHandler && ResourceHandler.prototype );
-		CookieResourceHandler.prototype.constructor = CookieResourceHandler;
 
 		// -------------------------------------------------------------------------
 		//  Methods
@@ -3537,12 +3273,320 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		CookieResourceHandler.prototype._get = function _get (id, parameters)
+		get(id, parameters)
+		{
+
+			return Promise.resolve().then(() => {
+				return this._get(id, parameters);
+			}).then((data) => {
+	//			BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+
+				if (data)
+				{
+					this.data = data;
+				}
+
+				return this._data;
+			});
+
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Delete data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		delete(id, parameters)
+		{
+
+			return Promise.resolve().then(() => {
+				return this._delete(id, parameters);
+			});
+
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Insert data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		data				Data to insert.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		post(id, data, parameters)
+		{
+
+			data = this.__reshapeData(data);
+
+			return Promise.resolve().then(() => {
+				return this._post(id, data, parameters);
+			});
+
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Update data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		data				Data to update.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		put(id, data, parameters)
+		{
+
+			data = this.__reshapeData(data);
+
+			return Promise.resolve().then(() => {
+				return this._put(id, data, parameters);
+			});
+
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Get resource text for the code.
+		 *
+		 * @param	{String}		code				Code value.
+		 *
+		 * @return  {String}		Resource text.
+		 */
+		getText(code)
+		{
+
+			let ret = code;
+			let title = this._options.get("fieldOptions.text");
+
+			if (this._items && code in this._items)
+			{
+				ret = this._items[code][title];
+			}
+
+			return ret;
+
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Get resource item for the code.
+		 *
+		 * @param	{String}		code				Code value.
+		 *
+		 * @return  {Object}		Resource data.
+		 */
+		getItem(code)
+		{
+
+			let ret;
+
+			if (this._items && code in this._items)
+			{
+				ret = this._items[code];
+			}
+
+			return ret;
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		_get(id, parameters)
+		{
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Delete data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		_delete(id, parameters)
+		{
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Insert data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		data				Data to insert.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		_post(id, data, parameters)
+		{
+		}
+
+	    // -------------------------------------------------------------------------
+
+		/**
+		 * Update data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		data				Data to update.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		_put(id, data, parameters)
+		{
+		}
+
+		// -------------------------------------------------------------------------
+		//  Privates
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get and reshape items from raw data on get.
+		 *
+		 * @param	{Object}		data				Raw data from which items are retrieved.
+		 *
+		 * @return  {Object}		Reshaped items.
+		 */
+		__reshapeItems(data)
+		{
+
+			// Get items
+			let itemsField = this._options.get("fieldOptions.items");
+			let items = ( itemsField ? BITSMIST.v1.Util.safeGet(data, itemsField) : data );
+
+			// Reshape
+			if (this._options.get("reshapeOptions.get.reshape"))
+			{
+				let reshaper = this._options.get("reshapeOptions.get.reshaper", this.__reshaper_get.bind(this));
+				items = reshaper(items);
+			}
+
+			return items;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Reshape request data on post/put.
+		 *
+		 * @param	{Object}		data				Data to reshape.
+		 *
+		 * @return  {Object}		Reshaped data.
+		 */
+		__reshapeData(data)
+		{
+
+			if (this._options.get("reshapeOptions.put.reshape"))
+			{
+				let reshaper = this._options.get("reshapeOptions.put.reshaper", () => { return data; });
+				data = reshaper(data);
+			}
+
+			return data;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Reshape items on get.
+	     *
+	     * @param	{Object}		target				Target to reshape.
+		 *
+		 * @return  {Object}		Master object.
+	     */
+		__reshaper_get(target)
+		{
+
+			let idField = this._options.get("fieldOptions.id");
+
+			let items = target.reduce((result, current) => {
+				let id = current[idField];
+				result[id] = current;
+
+				return result;
+			}, {});
+
+			return items;
+
+		}
+
+	}
+
+	// =============================================================================
+
+	// =============================================================================
+	//	Cookie resource handler class
+	// =============================================================================
+
+	class CookieResourceHandler extends ResourceHandler
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		component			Component.
+	     * @param	{String}		resourceName		Resource name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, resourceName, options)
+		{
+
+			super(component, resourceName, options);
+
+			this._name = "CookieResourceHandler";
+			this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get data.
+		 *
+		 * @param	{String}		id					Target id.
+		 * @param	{Object}		parameters			Query parameters.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		_get(id, parameters)
 		{
 
 			return this.__getCookie(this._cookieName);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -3555,12 +3599,12 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		CookieResourceHandler.prototype._put = function _put (id, data, parameters)
+		_put(id, data, parameters)
 		{
 
 			this.__setCookie(this._cookieName, data);
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 		//  Privates
@@ -3571,13 +3615,11 @@
 		*
 		* @param	{String}		key					Key.
 		*/
-		CookieResourceHandler.prototype.__getCookie = function __getCookie (key)
+		__getCookie(key)
 		{
 
-			var decoded = document.cookie.split(';').reduce(function (result, current) {
-				var ref = current.split('=');
-				var key = ref[0];
-				var value = ref[1];
+			let decoded = document.cookie.split(';').reduce((result, current) => {
+				const [key, value] = current.split('=');
 				if (key)
 				{
 					result[key.trim()] = ( value ? decodeURIComponent(value.trim()) : undefined );
@@ -3588,7 +3630,7 @@
 
 			return ( decoded[key] ? JSON.parse(decoded[key]) : {});
 
-		};
+		}
 
 		// -----------------------------------------------------------------------------
 
@@ -3598,13 +3640,13 @@
 		* @param	{String}		key					Key.
 		* @param	{Object}		value				Value.
 		*/
-		CookieResourceHandler.prototype.__setCookie = function __setCookie (key, value)
+		__setCookie(key, value)
 		{
 
-			var cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
-			var options = this._options.get("cookieOptions");
+			let cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
+			let options = this._options.get("cookieOptions");
 
-			cookie += Object.keys(options).reduce(function (result, current) {
+			cookie += Object.keys(options).reduce((result, current) => {
 				result += current + "=" + options[current] + "; ";
 
 				return result;
@@ -3612,10 +3654,9 @@
 
 			document.cookie = cookie;
 
-		};
+		}
 
-		return CookieResourceHandler;
-	}(ResourceHandler));
+	}
 
 	// =============================================================================
 
@@ -3623,19 +3664,27 @@
 	//	API Resource Handler class
 	// =============================================================================
 
-	var ApiResourceHandler = /*@__PURE__*/(function (ResourceHandler) {
-		function ApiResourceHandler(component, resourceName, options)
+	class ApiResourceHandler extends ResourceHandler
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+	     * @param	{String}		resourceName		Resource name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, resourceName, options)
 		{
 
-			ResourceHandler.call(this, component, resourceName, options);
+			super(component, resourceName, options);
 
 			this._name = "ApiResourceHandler";
 
 		}
-
-		if ( ResourceHandler ) ApiResourceHandler.__proto__ = ResourceHandler;
-		ApiResourceHandler.prototype = Object.create( ResourceHandler && ResourceHandler.prototype );
-		ApiResourceHandler.prototype.constructor = ApiResourceHandler;
 
 		// -------------------------------------------------------------------------
 		//  Methods
@@ -3649,24 +3698,22 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ApiResourceHandler.prototype._get = function _get (id, parameters)
+		_get(id, parameters)
 		{
-			var this$1$1 = this;
 
+			let method = "GET";
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
 
-			var method = "GET";
-			var headers = this._getOption("headers", method);
-			var options = this._getOption("options", method);
-			var urlOptions = this._getOption("url", method);
-			var dataType = urlOptions["dataType"];
+			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			var url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
-
-			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then(function (xhr) {
-				return this$1$1._convertResponseData(xhr.responseText, dataType);
+			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+				return this._convertResponseData(xhr.responseText, dataType);
 			});
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -3678,20 +3725,20 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ApiResourceHandler.prototype._delete = function _delete (id, parameters)
+		_delete(id, parameters)
 		{
 
-			var method = "DELETE";
-			var headers = this._getOption("headers", method);
-			var options = this._getOption("options", method);
-			var urlOptions = this._getOption("url", method);
+			let method = "DELETE";
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
 			urlOptions["dataType"];
 
-			var url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
+			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -3704,20 +3751,20 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ApiResourceHandler.prototype._post = function _post (id, data, parameters)
+		_post(id, data, parameters)
 		{
 
-			var method = "POST";
-			var headers = this._getOption("headers", method);
-			var options = this._getOption("options", method);
-			var urlOptions = this._getOption("url", method);
-			var dataType = urlOptions["dataType"];
+			let method = "POST";
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
 
-			var url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
+			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -3730,20 +3777,20 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ApiResourceHandler.prototype._put = function _put (id, data, parameters)
+		_put(id, data, parameters)
 		{
 
-			var method = "PUT";
-			var headers = this._getOption("headers", method);
-			var options = this._getOption("options", method);
-			var urlOptions = this._getOption("url", method);
-			var dataType = urlOptions["dataType"];
+			let method = "PUT";
+			let headers = this._getOption("headers", method);
+			let options = this._getOption("options", method);
+			let urlOptions = this._getOption("url", method);
+			let dataType = urlOptions["dataType"];
 
-			var url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
+			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
 			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Privates
@@ -3757,10 +3804,10 @@
 		 *
 		 * @return  {String}		Converted data.
 		 */
-		ApiResourceHandler.prototype._convertRequestData = function _convertRequestData (items, dataType)
+		_convertRequestData(items, dataType)
 		{
 
-			var data;
+			let data;
 
 			switch (dataType)
 			{
@@ -3777,7 +3824,7 @@
 
 			return data;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -3789,10 +3836,10 @@
 		 *
 		 * @return  {String}		Converted data.
 		 */
-		ApiResourceHandler.prototype._convertResponseData = function _convertResponseData (items, dataType)
+		_convertResponseData(items, dataType)
 		{
 
-			var data;
+			let data;
 
 			switch (dataType)
 			{
@@ -3804,7 +3851,7 @@
 
 			return data;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -3816,16 +3863,16 @@
 		 *
 		 * @return  {Object}		Options.
 		 */
-		ApiResourceHandler.prototype._getOption = function _getOption (target, method)
+		_getOption(target, method)
 		{
 
-			var settings = this._options.get("ajaxOptions", {});
-			var options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
-			var options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
+			let settings = this._options.get("ajaxOptions", {});
+			let options1 = (target in settings && "COMMON" in settings[target] ? settings[target]["COMMON"] : {} );
+			let options2 = (target in settings && method in settings[target] ? settings[target][method] : {} );
 
 			return Object.assign(options1, options2);
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -3838,16 +3885,16 @@
 		 *
 		 * @return  {String}		Url.
 		 */
-		ApiResourceHandler.prototype._buildApiUrl = function _buildApiUrl (resourceName, id, parameters, options)
+		_buildApiUrl(resourceName, id, parameters, options)
 		{
 
-			var baseUrl = options["baseUrl"] || this._component.settings.get("system.apiBaseUrl", "");
-			var scheme = options["scheme"] || "";
-			var host = options["host"] || "";
-			var dataType = options["dataType"] || "";
-			var version = options["version"] || "";
-			var format = options["format"] || "";
-			var url = format.
+			let baseUrl = options["baseUrl"] || this._component.settings.get("system.apiBaseUrl", "");
+			let scheme = options["scheme"] || "";
+			let host = options["host"] || "";
+			let dataType = options["dataType"] || "";
+			let version = options["version"] || "";
+			let format = options["format"] || "";
+			let url = format.
 						replace("@scheme@", scheme).
 						replace("@host@", host).
 						replace("@baseUrl@", baseUrl).
@@ -3859,7 +3906,7 @@
 
 			return url
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -3870,14 +3917,14 @@
 		 *
 		 * @return  {String}		Query string.
 		 */
-		ApiResourceHandler.prototype._buildUrlQuery = function _buildUrlQuery (parameters)
+		_buildUrlQuery(parameters)
 		{
 
-			var query = "";
+			let query = "";
 
 			if (parameters)
 			{
-				query = Object.keys(parameters).reduce(function (result, current) {
+				query = Object.keys(parameters).reduce((result, current) => {
 					if (Array.isArray(parameters[current]))
 					{
 						result += encodeURIComponent(current) + "=" + encodeURIComponent(parameters[current].join()) + "&";
@@ -3893,10 +3940,9 @@
 
 			return ( query ? "?" + query.slice(0, -1) : "");
 
-		};
+		}
 
-		return ApiResourceHandler;
-	}(ResourceHandler));
+	}
 
 	// =============================================================================
 
@@ -3904,11 +3950,24 @@
 	//	Object Resource Handler class
 	// =============================================================================
 
-	var ObjectResourceHandler = /*@__PURE__*/(function (ResourceHandler) {
-		function ObjectResourceHandler(component, resourceName, options)
+	class ObjectResourceHandler extends ResourceHandler
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		component			Component.
+	     * @param	{String}		resourceName		Resource name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, resourceName, options)
 		{
 
-			ResourceHandler.call(this, component, resourceName, options);
+			super(component, resourceName, options);
 
 			this._name = "ObjectResourceHandler";
 			if (options["items"])
@@ -3917,10 +3976,6 @@
 			}
 
 		}
-
-		if ( ResourceHandler ) ObjectResourceHandler.__proto__ = ResourceHandler;
-		ObjectResourceHandler.prototype = Object.create( ResourceHandler && ResourceHandler.prototype );
-		ObjectResourceHandler.prototype.constructor = ObjectResourceHandler;
 
 		// -------------------------------------------------------------------------
 		//  Methods
@@ -3934,12 +3989,12 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ObjectResourceHandler.prototype._get = function _get (id, parameters)
+		_get(id, parameters)
 		{
 
 			return this._data;
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -3952,15 +4007,14 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		ObjectResourceHandler.prototype._put = function _put (id, data, parameters)
+		_put(id, data, parameters)
 		{
 
 			this.data = data;
 
-		};
+		}
 
-		return ObjectResourceHandler;
-	}(ResourceHandler));
+	}
 
 	// =============================================================================
 
@@ -3968,24 +4022,31 @@
 	//	Linked Resource Handler class
 	// =============================================================================
 
-	var LinkedResourceHandler = /*@__PURE__*/(function (ResourceHandler) {
-		function LinkedResourceHandler(component, resourceName, options)
+	class LinkedResourceHandler extends ResourceHandler
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		/**
+	     * Constructor.
+	     *
+		 * @param	{Object}		component			Component.
+	     * @param	{String}		resourceName		Resource name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, resourceName, options)
 		{
 
-			var defaults = {"autoLoad":true};
+			let defaults = {"autoLoad":true};
 
-			ResourceHandler.call(this, component, resourceName, Object.assign(defaults, options));
+			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "LinkedResourceHandler";
 			this._ref;
 
 		}
-
-		if ( ResourceHandler ) LinkedResourceHandler.__proto__ = ResourceHandler;
-		LinkedResourceHandler.prototype = Object.create( ResourceHandler && ResourceHandler.prototype );
-		LinkedResourceHandler.prototype.constructor = LinkedResourceHandler;
-
-		var prototypeAccessors = { target: { configurable: true },data: { configurable: true },items: { configurable: true },item: { configurable: true } };
 
 		// -------------------------------------------------------------------------
 		//  Setter/Getter
@@ -3996,12 +4057,12 @@
 		 *
 		 * @type	{Object}
 		 */
-		prototypeAccessors.target.get = function ()
+		get target()
 		{
 
 			return this._ref.target;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4010,19 +4071,19 @@
 		 *
 		 * @type	{Object}
 		 */
-		prototypeAccessors.data.get = function ()
+		get data()
 		{
 
 			return this._ref.data;
 
-		};
+		}
 
-		prototypeAccessors.data.set = function (value)
+		set data(value)
 		{
 
 			this._ref.data = value;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4031,12 +4092,12 @@
 		 *
 		 * @type	{Object}
 		 */
-		prototypeAccessors.items.get = function ()
+		get items()
 		{
 
 			return this._ref.items;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4045,12 +4106,12 @@
 		 *
 		 * @type	{Object}
 		 */
-		prototypeAccessors.item.get = function ()
+		get item()
 		{
 
 			return this._ref.item;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
@@ -4064,17 +4125,17 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		LinkedResourceHandler.prototype._get = function _get (id, parameters)
+		_get(id, parameters)
 		{
 
-			var handlerOptions = this._options.items;
-			var rootNode = handlerOptions["rootNode"];
-			var resourceName = handlerOptions["resourceName"];
+			let handlerOptions = this._options.items;
+			let rootNode = handlerOptions["rootNode"];
+			let resourceName = handlerOptions["resourceName"];
 			handlerOptions["state"];
 
 			this._ref = document.querySelector(rootNode).resources[resourceName];
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -4085,12 +4146,12 @@
 		 *
 		 * @return  {String}		Resource text.
 		 */
-		LinkedResourceHandler.prototype.getText = function getText (code)
+		getText(code)
 		{
 
 			return this._ref.getText(code);
 
-		};
+		}
 
 	    // -------------------------------------------------------------------------
 
@@ -4101,17 +4162,14 @@
 		 *
 		 * @return  {Object}		Resource data.
 		 */
-		LinkedResourceHandler.prototype.getItem = function getItem (code)
+		getItem(code)
 		{
 
 			return this._ref.getItem(code);
 
-		};
+		}
 
-		Object.defineProperties( LinkedResourceHandler.prototype, prototypeAccessors );
-
-		return LinkedResourceHandler;
-	}(ResourceHandler));
+	}
 
 	// =============================================================================
 	/**
@@ -4127,230 +4185,241 @@
 	//	Validation Handler class
 	// =============================================================================
 
-	var ValidationHandler = function ValidationHandler(component, validatorName, options)
+	class ValidationHandler
 	{
 
-		this._name = validatorName;
-		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
 
-	};
+		/**
+	     * Constructor.
+	     *
+	     * @param	{String}		validatorName		Validator name.
+	     * @param	{Object}		options				Options.
+	     */
+		constructor(component, validatorName, options)
+		{
 
-	var prototypeAccessors = { name: { configurable: true },options: { configurable: true } };
+			this._name = validatorName;
+			this._component = component;
+			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
 
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
+		}
 
-	/**
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		/**
 		 * Name.
 		 *
-		 * @type{String}
+		 * @type	{String}
 		 */
-	prototypeAccessors.name.get = function ()
-	{
+		get name()
+		{
 
-		return this._name;
+			return this._name;
 
-	};
+		}
 
-	prototypeAccessors.name.set = function (value)
-	{
+		set name(value)
+		{
 
-		this._name = value;
+			this._name = value;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Items.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	/*
-	get items()
-	{
+		/*
+		get items()
+		{
 
-		return this._items;
+			return this._items;
 
-	}
-	*/
+		}
+		*/
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Options.
 		 *
-		 * @type{Object}
+		 * @type	{Object}
 		 */
-	prototypeAccessors.options.get = function ()
-	{
+		get options()
+		{
 
-		return this._options;
+			return this._options;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Validate.
 		 *
-		 * @param{String}	key				Key.
-		 * @param{*}			value			Value.
-		 * @param{Object}	rule			Validation rule.
-		 * @param{Object}	failed			Failed reports.
-		 * @param{Object}	extra			Extra reports.
+		 * @param	{String}		key					Key.
+		 * @param	{*}				value				Value.
+		 * @param	{Object}		rule				Validation rule.
+		 * @param	{Object}		failed				Failed reports.
+		 * @param	{Object}		extra				Extra reports.
 		 *
-	 	 * @return  {Object}	Invalid result.
+	 	 * @return  {Object}		Invalid result.
 		 */
-	ValidationHandler.createValidationResult = function createValidationResult (key, value, rule, failed, extras)
-	{
+		static createValidationResult(key, value, rule, failed, extras)
+		{
 
-		var result = {
-			"key":		key,
-			"value":	value,
-			"message":	ValidationHandler._getFunctionValue(key, value, "message", rule),
-			"fix":		ValidationHandler._getFunctionValue(key, value, "fix", rule),
-			"failed":	failed,
-			"extras":	extras,
-		};
+			let result = {
+				"key":			key,
+				"value":		value,
+				"message":		ValidationHandler._getFunctionValue(key, value, "message", rule),
+				"fix":			ValidationHandler._getFunctionValue(key, value, "fix", rule),
+				"failed":		failed,
+				"extras":		extras,
+			};
 
-		return result;
+			return result;
 
-	};
+		}
 
-	// -------------------------------------------------------------------------
+		// -------------------------------------------------------------------------
 
-	/**
+		/**
 		 * Validate.
 		 *
-		 * @param{Object}	values			Values to validate.
-		 * @param{Object}	rules			Validation rules.
-		 * @param{Object}	options			Validation options.
+		 * @param	{Object}		values				Values to validate.
+		 * @param	{Object}		rules				Validation rules.
+		 * @param	{Object}		options				Validation options.
 		 *
-	 	 * @return  {Object}	Invalid results.
+	 	 * @return  {Object}		Invalid results.
 		 */
-	ValidationHandler.validate = function validate (values, rules, options)
-	{
-
-		rules = rules || {};
-		options = options || {};
-		var invalids = {};
-
-		// Allow list
-		if (options["allowList"])
+		static validate(values, rules, options)
 		{
-			Object.keys(values).forEach(function (key) {
-				if (options["allowList"].indexOf(key) === -1)
-				{
-					var failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
 
-		// Allow only in rules
-		if (options["allowOnlyInRules"])
-		{
-			Object.keys(values).forEach(function (key) {
-				if (!(key in rules))
-				{
-					var failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
+			rules = rules || {};
+			options = options || {};
+			let invalids = {};
 
-		// Disallow list
-		if (options["disallowList"])
-		{
-			Object.keys(values).forEach(function (key) {
-				if (options["disallowList"].indexOf(key) > -1)
-				{
-					var failed = [{"rule":"disallowList", "validity":"disallowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
-
-		// Required
-		Object.keys(rules).forEach(function (key) {
-			if ("constraints" in rules[key] && rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
+			// Allow list
+			if (options["allowList"])
 			{
-				if (!(key in values))
-				{
-					var failed = [{"rule":"required", "validity":"valueMissing"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
-				}
+				Object.keys(values).forEach((key) => {
+					if (options["allowList"].indexOf(key) === -1)
+					{
+						let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					}
+				});
 			}
-		});
 
-		return invalids;
+			// Allow only in rules
+			if (options["allowOnlyInRules"])
+			{
+				Object.keys(values).forEach((key) => {
+					if (!(key in rules))
+					{
+						let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					}
+				});
+			}
 
-	};
+			// Disallow list
+			if (options["disallowList"])
+			{
+				Object.keys(values).forEach((key) => {
+					if (options["disallowList"].indexOf(key) > -1)
+					{
+						let failed = [{"rule":"disallowList", "validity":"disallowed"}];
+						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					}
+				});
+			}
 
-	// -------------------------------------------------------------------------
+			// Required
+			Object.keys(rules).forEach((key) => {
+				if ("constraints" in rules[key] && rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
+				{
+					if (!(key in values))
+					{
+						let failed = [{"rule":"required", "validity":"valueMissing"}];
+						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					}
+				}
+			});
 
-	/**
+			return invalids;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
 		 * Check validity (Need to override).
 		 *
-		 * @param{Object}	values			Values to validate.
-		 * @param{Object}	rules			Validation rules.
-		 * @param{Object}	options			Validation options.
+		 * @param	{Object}		values				Values to validate.
+		 * @param	{Object}		rules				Validation rules.
+		 * @param	{Object}		options				Validation options.
 		 */
-	ValidationHandler.prototype.checkValidity = function checkValidity (values, rules, options)
-	{
-	};
-
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Report validity (Need to override).
-		 *
-		 * @param{Object}	values			Values to validate.
-		 * @param{Object}	rules			Validation rules.
-		 */
-	ValidationHandler.prototype.reportValidity = function reportValidity (values, rules)
-	{
-	};
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-		 * Get a value from a custom function or a value.
-		 *
-		 * @param{String}	key				Item name.
-		 * @param{Object}	value			Value to validate.
-		 * @param{String}	target			Target name.
-		 * @param{Object}	rule			Validation rules.
-		 */
-	ValidationHandler._getFunctionValue = function _getFunctionValue (key, value, target, rule)
-	{
-
-		var ret;
-
-		if (rule && target in rule)
+		checkValidity(values, rules, options)
 		{
-			if (typeof rule[target] === "function")
-			{
-				ret = rule[target](key, value, rule);
-			}
-			else
-			{
-				ret = rule[target];
-			}
 		}
 
-		return ret;
+		// -------------------------------------------------------------------------
 
-	};
+		/**
+		 * Report validity (Need to override).
+		 *
+		 * @param	{Object}		values				Values to validate.
+		 * @param	{Object}		rules				Validation rules.
+		 */
+		reportValidity(values, rules)
+		{
+		}
 
-	Object.defineProperties( ValidationHandler.prototype, prototypeAccessors );
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get a value from a custom function or a value.
+		 *
+		 * @param	{String}		key					Item name.
+		 * @param	{Object}		value				Value to validate.
+		 * @param	{String}		target				Target name.
+		 * @param	{Object}		rule				Validation rules.
+		 */
+		static _getFunctionValue(key, value, target, rule)
+		{
+
+			let ret;
+
+			if (rule && target in rule)
+			{
+				if (typeof rule[target] === "function")
+				{
+					ret = rule[target](key, value, rule);
+				}
+				else
+				{
+					ret = rule[target];
+				}
+			}
+
+			return ret;
+
+		}
+
+	}
 
 	// =============================================================================
 
@@ -4358,30 +4427,36 @@
 	//	HTML5 Form validation Handler class
 	// =============================================================================
 
-	var HTML5FormValidationHandler = /*@__PURE__*/(function (ValidationHandler) {
-		function HTML5FormValidationHandler () {
-			ValidationHandler.apply(this, arguments);
-		}
+	class HTML5FormValidationHandler extends ValidationHandler
+	{
 
-		if ( ValidationHandler ) HTML5FormValidationHandler.__proto__ = ValidationHandler;
-		HTML5FormValidationHandler.prototype = Object.create( ValidationHandler && ValidationHandler.prototype );
-		HTML5FormValidationHandler.prototype.constructor = HTML5FormValidationHandler;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		HTML5FormValidationHandler.validate = function validate (form, rules)
+		/**
+		 * Validate.
+		 *
+		 * @param	{Object}		values				Values to validate.
+		 * @param	{Object}		rules				Validation rules.
+		 *
+	 	 * @return  {Object}		Invalid results.
+		 */
+		static validate(form, rules)
 		{
 
-			var invalids = {};
+			let invalids = {};
 
-			BITSMIST.v1.Util.assert(form, "FormValidationHandler.checkValidity(): Form tag does not exist.", TypeError);
-			BITSMIST.v1.Util.assert(form.checkValidity, "FormValidationHandler.checkValidity(): check validity not supported.", TypeError);
+			BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+			BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
-			var elements = BITSMIST.v1.Util.scopedSelectorAll(form, "input:not([novalidate])");
-			elements.forEach(function (element) {
-				var key = element.getAttribute("bm-bind");
-				var value = FormUtil.getValue(element);
-				var rule = ( rules && rules[key] ? rules[key] : null );
+			let elements = BITSMIST.v1.Util.scopedSelectorAll(form, "input:not([novalidate])");
+			elements.forEach((element) => {
+				let key = element.getAttribute("bm-bind");
+				let value = FormUtil.getValue(element);
+				let rule = ( rules && rules[key] ? rules[key] : null );
 
-				var failed = HTML5FormValidationHandler._validateValue(element, key, value, rule);
+				let failed = HTML5FormValidationHandler._validateValue(element, key, value, rule);
 				if (failed.length > 0)
 				{
 					invalids[key] = ValidationHandler.createValidationResult(key, value, rule, failed, {"element": element});
@@ -4391,7 +4466,7 @@
 
 			return invalids;
 
-		};
+		}
 
 		/*
 		static validate(form, rules)
@@ -4422,25 +4497,25 @@
 		 * @param	{Object}		rules				Validation rules.
 		 * @param	{Object}		options				Validation options.
 		 */
-		HTML5FormValidationHandler.prototype.checkValidity = function checkValidity (values, rules, options)
+		checkValidity(values, rules, options)
 		{
 
-			var invalids1 = {};
-			var invalids2;
-			var form = this._component.querySelector("form");
+			let invalids1 = {};
+			let invalids2;
+			let form = this._component.querySelector("form");
 			if (rules || options)
 			{
 				// Check allow/disallow list
-				var values$1 = FormUtil.getFields(form);
-				invalids1 = ValidationHandler.validate(values$1, rules, options);
+				let values = FormUtil.getFields(form);
+				invalids1 = ValidationHandler.validate(values, rules, options);
 			}
 			invalids2 = HTML5FormValidationHandler.validate(form, rules);
-			var invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+			let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
 
 			this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 			this._component.validationResult["invalids"] = invalids;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4450,17 +4525,17 @@
 		 * @param	{Object}		values				Values to validate.
 		 * @param	{Object}		rules				Validation rules.
 		 */
-		HTML5FormValidationHandler.prototype.reportValidity = function reportValidity (values, rules)
+		reportValidity(values, rules)
 		{
 
-			var form = this._component.querySelector("form");
+			let form = this._component.querySelector("form");
 
-			BITSMIST.v1.Util.assert(form, "FormValidationHandler.reportValidity(): Form tag does not exist.", TypeError);
-			BITSMIST.v1.Util.assert(form.reportValidity, "FormValidationHandler.reportValidity(): Report validity not supported.", TypeError);
+			BITSMIST.v1.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+			BITSMIST.v1.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
 
 			form.reportValidity();
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -4476,15 +4551,15 @@
 		 *
 	 	 * @return  {Object}		Failed results.
 		 */
-		HTML5FormValidationHandler._validateValue = function _validateValue (element, key, value, rules)
+		static _validateValue(element, key, value, rules)
 		{
 
-			var failed = [];
+			let failed = [];
 
-			var result = element.validity;
+			let result = element.validity;
 			if (!result.valid)
 			{
-				for (var errorName in result)
+				for (const errorName in result)
 				{
 					if (errorName !== "valid" && result[errorName])
 					{
@@ -4495,10 +4570,9 @@
 
 			return failed;
 
-		};
+		}
 
-		return HTML5FormValidationHandler;
-	}(ValidationHandler));
+	}
 
 	// =============================================================================
 
@@ -4506,26 +4580,32 @@
 	//	Object validation Handler class
 	// =============================================================================
 
-	var ObjectValidationHandler = /*@__PURE__*/(function (ValidationHandler) {
-		function ObjectValidationHandler () {
-			ValidationHandler.apply(this, arguments);
-		}
+	class ObjectValidationHandler extends ValidationHandler
+	{
 
-		if ( ValidationHandler ) ObjectValidationHandler.__proto__ = ValidationHandler;
-		ObjectValidationHandler.prototype = Object.create( ValidationHandler && ValidationHandler.prototype );
-		ObjectValidationHandler.prototype.constructor = ObjectValidationHandler;
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
 
-		ObjectValidationHandler.validate = function validate (values, rules)
+		/**
+		 * Validate.
+		 *
+		 * @param	{Object}		values				Values to validate.
+		 * @param	{Object}		rules				Validation rules.
+		 *
+	 	 * @return  {Object}		Invalid results.
+		 */
+		static validate(values, rules)
 		{
 
-			var invalids = {};
+			let invalids = {};
 
 			if (rules)
 			{
-				Object.keys(values).forEach(function (key) {
+				Object.keys(values).forEach((key) => {
 					if (rules[key])
 					{
-						var failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
+						let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
 						if (failed.length > 0)
 						{
 							invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
@@ -4536,7 +4616,7 @@
 
 			return invalids;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4547,17 +4627,17 @@
 		 * @param	{Object}		rules				Validation rules.
 		 * @param	{Object}		options				Validation options.
 		 */
-		ObjectValidationHandler.prototype.checkValidity = function checkValidity (values, rules, options)
+		checkValidity(values, rules, options)
 		{
 
-			var invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
-			var invalids2 = ObjectValidationHandler.validate(values, rules);
-			var invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+			let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
+			let invalids2 = ObjectValidationHandler.validate(values, rules);
+			let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
 
 			this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 			this._component.validationResult["invalids"] = invalids;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4567,9 +4647,9 @@
 		 * @param	{Object}		values				Values to validate.
 		 * @param	{Object}		rules				Validation rules.
 		 */
-		ObjectValidationHandler.prototype.reportValidity = function reportValidity (values, rules)
+		reportValidity(values, rules)
 		{
-		};
+		}
 
 		// -------------------------------------------------------------------------
 		//  Protected
@@ -4584,15 +4664,15 @@
 		 *
 	 	 * @return  {Object}		Failed results.
 		 */
-		ObjectValidationHandler._validateValue = function _validateValue (key, value, rules)
+		static _validateValue(key, value, rules)
 		{
 
-			var failed = [];
+			let failed = [];
 
 			if (rules && rules["constraints"])
 			{
-				Object.keys(rules["constraints"]).forEach(function (constraintName) {
-					var result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
+				Object.keys(rules["constraints"]).forEach((constraintName) => {
+					let result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
 					if (result)
 					{
 						failed.push(result);
@@ -4602,7 +4682,7 @@
 
 			return failed;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4616,12 +4696,12 @@
 		 *
 	 	 * @return  {Object}		Failed result.
 		 */
-		ObjectValidationHandler._checkConstraint = function _checkConstraint (key, value, constraintName, rule)
+		static _checkConstraint(key, value, constraintName, rule)
 		{
 
-			var result;
-			var len;
-			var num;
+			let result;
+			let len;
+			let num;
 
 			switch (constraintName)
 			{
@@ -4663,7 +4743,7 @@
 				}
 				break;
 			case "pattern":
-				var re = new RegExp(rule);
+				let re = new RegExp(rule);
 				if (!re.test(value))
 				{
 					result = {"rule":"pattern", "validity":"patternMismatch(pattern:" + rule + ")"};
@@ -4685,7 +4765,7 @@
 
 			return result;
 
-		};
+		}
 
 		// -------------------------------------------------------------------------
 
@@ -4699,10 +4779,10 @@
 		 *
 	 	 * @return  {Object}		Failed result.
 		 */
-		ObjectValidationHandler._checkType = function _checkType (key, value, constraintName, rule)
+		static _checkType(key, value, constraintName, rule)
 		{
 
-			var result;
+			let result;
 
 			if (value)
 			{
@@ -4727,7 +4807,7 @@
 					}
 					break;
 				case "number":
-					var parsed = parseInt(value);
+					let parsed = parseInt(value);
 					if (isNaN(parsed))
 					{
 						result = {"rule":"type", "validity":"typeMismatch(number)"};
@@ -4738,10 +4818,9 @@
 
 			return result;
 
-		};
+		}
 
-		return ObjectValidationHandler;
-	}(ValidationHandler));
+	}
 
 	// =============================================================================
 
@@ -4775,11 +4854,11 @@
 	 * @type	{Object}
 	 */
 	Object.defineProperty(Form.prototype, 'item', {
-		get: function get()
+		get()
 		{
 			return this._item;
 		},
-		set: function set(value)
+		set(value)
 		{
 			this._item = value;
 		}
@@ -4793,11 +4872,11 @@
 	 * @type	{Object}
 	 */
 	Object.defineProperty(Form.prototype, 'cancelSubmit', {
-		get: function get()
+		get()
 		{
 			return this._cancelSubmit;
 		},
-		set: function set(value)
+		set(value)
 		{
 			this._cancelSubmit = value;
 		}
@@ -4877,25 +4956,23 @@
 	 */
 	Form.prototype.fill = function(options)
 	{
-		var this$1$1 = this;
-
 
 		options = Object.assign({}, options);
-		var rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
+		let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
 
 		// Clear fields
-		var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
+		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 		if (autoClear)
 		{
 			this.clear();
 		}
 
-		return Promise.resolve().then(function () {
-			return this$1$1.trigger("beforeFill", options);
-		}).then(function () {
-			FormUtil.setFields(rootNode, this$1$1._item, {"masters":this$1$1.resources, "triggerEvent":"change"});
+		return Promise.resolve().then(() => {
+			return this.trigger("beforeFill", options);
+		}).then(() => {
+			FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
 
-			return this$1$1.trigger("afterFill", options);
+			return this.trigger("afterFill", options);
 		});
 
 	};
@@ -4911,29 +4988,27 @@
 	 */
 	Form.prototype.validate = function(options)
 	{
-		var this$1$1 = this;
-
 
 		options = Object.assign({}, options);
 		this.validationResult["result"] = true;
 
-		return Promise.resolve().then(function () {
-			return this$1$1.trigger("beforeValidate");
-		}).then(function () {
-			return this$1$1.callOrganizers("doCheckValidity", {"item":this$1$1._item, "validationName":this$1$1.settings.get("settings.validationName")});
-		}).then(function () {
-			return this$1$1.trigger("doValidate");
-		}).then(function () {
-			return this$1$1.trigger("afterValidate");
-		}).then(function () {
-			if (!this$1$1.validationResult["result"])
+		return Promise.resolve().then(() => {
+			return this.trigger("beforeValidate");
+		}).then(() => {
+			return this.callOrganizers("doCheckValidity", {"item":this._item, "validationName":this.settings.get("settings.validationName")});
+		}).then(() => {
+			return this.trigger("doValidate");
+		}).then(() => {
+			return this.trigger("afterValidate");
+		}).then(() => {
+			if (!this.validationResult["result"])
 			{
-				this$1$1._cancelSubmit = true;
+				this._cancelSubmit = true;
 
-				return Promise.resolve().then(function () {
-					return this$1$1.callOrganizers("doReportValidity", {"validationName":this$1$1.settings.get("settings.validationName")});
-				}).then(function () {
-					return this$1$1.trigger("doReportValidatidy");
+				return Promise.resolve().then(() => {
+					return this.callOrganizers("doReportValidity", {"validationName":this.settings.get("settings.validationName")});
+				}).then(() => {
+					return this.trigger("doReportValidatidy");
 				});
 			}
 		});
@@ -4949,8 +5024,6 @@
 	 */
 	Form.prototype.submit = function(options)
 	{
-		var this$1$1 = this;
-
 
 		options = Object.assign({}, options);
 		this._cancelSubmit = false;
@@ -4958,19 +5031,19 @@
 		// Get values from the form
 		this._item = FormUtil.getFields(this);
 
-		return Promise.resolve().then(function () {
-			return this$1$1.validate(options);
-		}).then(function () {
-			if (!this$1$1._cancelSubmit)
+		return Promise.resolve().then(() => {
+			return this.validate(options);
+		}).then(() => {
+			if (!this._cancelSubmit)
 			{
-				return Promise.resolve().then(function () {
-					return this$1$1.trigger("beforeSubmit", {"item":this$1$1._item});
-				}).then(function () {
-					return this$1$1.callOrganizers("doSubmit", options);
-				}).then(function () {
-					return this$1$1.trigger("doSubmit", {"item":this$1$1._item});
-				}).then(function () {
-					return this$1$1.trigger("afterSubmit", {"item":this$1$1._item});
+				return Promise.resolve().then(() => {
+					return this.trigger("beforeSubmit", {"item":this._item});
+				}).then(() => {
+					return this.callOrganizers("doSubmit", options);
+				}).then(() => {
+					return this.trigger("doSubmit", {"item":this._item});
+				}).then(() => {
+					return this.trigger("afterSubmit", {"item":this._item});
 				});
 			}
 		});
@@ -5009,7 +5082,7 @@
 	 * @type	{Object}
 	 */
 	Object.defineProperty(List.prototype, 'rows', {
-		get: function get()
+		get()
 		{
 			return this._rows;
 		},
@@ -5023,11 +5096,11 @@
 	 * @type	{Object}
 	 */
 	Object.defineProperty(List.prototype, 'items', {
-		get: function get()
+		get()
 		{
 			return this._items;
 		},
-		set: function set(value)
+		set(value)
 		{
 			this._items = value;
 		}
@@ -5077,11 +5150,9 @@
 	 */
 	List.prototype.switchTemplate = function(templateName, options)
 	{
-		var this$1$1 = this;
 
-
-		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(function () {
-			return this$1$1.switchRowTemplate(this$1$1.settings.get("settings.rowTemplateName"));
+		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+			return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
 		});
 
 	};
@@ -5098,8 +5169,6 @@
 	 */
 	List.prototype.switchRowTemplate = function(templateName, options)
 	{
-		var this$1$1 = this;
-
 
 		options = Object.assign({}, options);
 
@@ -5108,17 +5177,17 @@
 			return Promise.resolve();
 		}
 
-		return Promise.resolve().then(function () {
-			console.debug(("List.switchRowTemplate(): Switching a row template. name=" + (this$1$1.name) + ", rowTemplateName=" + templateName + ", id=" + (this$1$1.id)));
-			return this$1$1.addTemplate(templateName);
-		}).then(function () {
-			this$1$1._activeRowTemplateName = templateName;
-		}).then(function () {
-			return this$1$1.callOrganizers("afterRowAppend", this$1$1.settings.items);
-		}).then(function () {
-			return this$1$1.trigger("afterRowAppend", options);
-		}).then(function () {
-			console.debug(("List.switchRowTemplate(): Switched a row template. name=" + (this$1$1.name) + ", rowTemplateName=" + templateName + ", id=" + (this$1$1.id)));
+		return Promise.resolve().then(() => {
+			console.debug(`List.switchRowTemplate(): Switching a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
+			return this.addTemplate(templateName);
+		}).then(() => {
+			this._activeRowTemplateName = templateName;
+		}).then(() => {
+			return this.callOrganizers("afterRowAppend", this.settings.items);
+		}).then(() => {
+			return this.trigger("afterRowAppend", options);
+		}).then(() => {
+			console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
 		});
 
 	};
@@ -5146,37 +5215,35 @@
 	 */
 	List.prototype.fill = function(options)
 	{
-		var this$1$1 = this;
 
-
-		console.debug(("List.fill(): Filling list. name=" + (this.name)));
+		console.debug(`List.fill(): Filling list. name=${this.name}`);
 
 		options = Object.assign({}, options);
 
-		var builder = this._getBuilder(options);
-		var fragment = document.createDocumentFragment();
+		let builder = this._getBuilder(options);
+		let fragment = document.createDocumentFragment();
 		this._rows = [];
 
 		// Get list root node
 		this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
-		BITSMIST.v1.Util.assert(this._listRootNode, ("List.fill(): List root node not found. name=" + (this.name) + ", listRootNode=" + (this.settings.get("settings.listRootNode"))));
+		BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
-		return Promise.resolve().then(function () {
-			return this$1$1.trigger("beforeFill", options);
-		}).then(function () {
-			return builder.call(this$1$1, fragment, this$1$1._items);
-		}).then(function () {
-			var autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this$1$1.settings.get("settings.autoClear"));
+		return Promise.resolve().then(() => {
+			return this.trigger("beforeFill", options);
+		}).then(() => {
+			return builder.call(this, fragment, this._items);
+		}).then(() => {
+			let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 			if (autoClear)
 			{
-				this$1$1.clear();
+				this.clear();
 			}
-		}).then(function () {
-			this$1$1._listRootNode.appendChild(fragment);
-		}).then(function () {
-			return this$1$1.trigger("afterFill", options);
-		}).then(function () {
-			console.debug(("List.fill(): Filled list. name=" + (this$1$1.name)));
+		}).then(() => {
+			this._listRootNode.appendChild(fragment);
+		}).then(() => {
+			return this.trigger("afterFill", options);
+		}).then(() => {
+			console.debug(`List.fill(): Filled list. name=${this.name}`);
 		});
 
 	};
@@ -5195,8 +5262,8 @@
 	List.prototype._getBuilder = function(options)
 	{
 
-		var rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this.settings.get("settings.async", true));
-		var builder = ( rowAsync ? this._buildAsync : this._buildSync );
+		let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this.settings.get("settings.async", true));
+		let builder = ( rowAsync ? this._buildAsync : this._buildSync );
 
 		return builder;
 
@@ -5213,23 +5280,19 @@
 	 */
 	List.prototype._buildSync = function(fragment, items)
 	{
-		var this$1$1 = this;
 
+		BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
-		BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], ("List._buildSync(): Row template not loaded yet. name=" + (this.name) + ", rowTemplateName=" + (this._activeRowTemplateName)));
+		let chain = Promise.resolve();
+		let rowEvents = this.settings.get("rowevents");
+		let template = this.templates[this._activeRowTemplateName].html;
 
-		var chain = Promise.resolve();
-		var rowEvents = this.settings.get("rowevents");
-		var template = this.templates[this._activeRowTemplateName].html;
-
-		var loop = function ( i ) {
-			chain = chain.then(function () {
-				return this$1$1._appendRowSync(fragment, i, items[i], template, rowEvents);
+		for (let i = 0; i < items.length; i++)
+		{
+			chain = chain.then(() => {
+				return this._appendRowSync(fragment, i, items[i], template, rowEvents);
 			});
-		};
-
-		for (var i = 0; i < items.length; i++)
-		loop( i );
+		}
 
 		return chain;
 
@@ -5245,12 +5308,12 @@
 	List.prototype._buildAsync = function(fragment, items)
 	{
 
-		BITSMIST.v1.Util.assert(this.templates[this._activeRowTemplateName], ("List._buildAsync(): Row template not loaded yet. name=" + (this.name) + ", rowTemplateName=" + (this._activeRowTemplateName)));
+		BITSMIST.v1.Util.assert(this.templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
-		var rowEvents = this.settings.get("rowevents");
-		var template = this.templates[this._activeRowTemplateName].html;
+		let rowEvents = this.settings.get("rowevents");
+		let template = this.templates[this._activeRowTemplateName].html;
 
-		for (var i = 0; i < items.length; i++)
+		for (let i = 0; i < items.length; i++)
 		{
 			this._appendRowAsync(fragment, i, items[i], template, rowEvents);
 		}
@@ -5271,9 +5334,9 @@
 	List.prototype._createRow = function(template)
 	{
 
-		var ele = document.createElement("div");
+		let ele = document.createElement("div");
 		ele.innerHTML = template;
-		var element = ele.firstElementChild;
+		let element = ele.firstElementChild;
 		element.setAttribute("bm-powered", "");
 
 		return element;
@@ -5295,43 +5358,39 @@
 	 */
 	List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents)
 	{
-		var this$1$1 = this;
-
 
 		this.triggerAsync("beforeBuildRow", {"item":item});
 
-		var chain = Promise.resolve();
-		var items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-		var loop = function ( i ) {
-			chain = chain.then(function () {
+		let chain = Promise.resolve();
+		let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
+		for (let i = 0; i < items.length; i++)
+		{
+			chain = chain.then(() => {
 				// Append a row
-				var element = this$1$1._createRow(template);
+				let element = this._createRow(template);
 				rootNode.appendChild(element);
-				this$1$1._rows.push(element);
+				this._rows.push(element);
 
 				// set row elements click event handler
 				if (rowEvents)
 				{
-					Object.keys(rowEvents).forEach(function (elementName) {
-						this$1$1.initEvents(elementName, rowEvents[elementName], element);
+					Object.keys(rowEvents).forEach((elementName) => {
+						this.initEvents(elementName, rowEvents[elementName], element);
 					});
 				}
 
 				// Call event handlers
-				return Promise.resolve().then(function () {
-					return this$1$1.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
-				}).then(function () {
+				return Promise.resolve().then(() => {
+					return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
+				}).then(() => {
 					// Fill fields
 					BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
-					FormUtil.setFields(element, item, {"masters":this$1$1.resources});
-				}).then(function () {
-					return this$1$1.trigger("afterFillRow", {"item":item, "no":no, "element":element});
+					FormUtil.setFields(element, item, {"masters":this.resources});
+				}).then(() => {
+					return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
 				});
 			});
-		};
-
-		for (var i = 0; i < items.length; i++)
-		loop( i );
+		}
 
 	};
 
@@ -5348,35 +5407,31 @@
 	 */
 	List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvents)
 	{
-		var this$1$1 = this;
-
 
 		this.triggerAsync("beforeBuildRow", {"item":item});
 
-		var items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-		var loop = function ( i ) {
+		let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
+		for (let i = 0; i < items.length; i++)
+		{
 			// Append a row
-			var element = this$1$1._createRow(template);
+			let element = this._createRow(template);
 			rootNode.appendChild(element);
-			this$1$1._rows.push(element);
+			this._rows.push(element);
 
 			// set row elements click event handler
 			if (rowEvents)
 			{
-				Object.keys(rowEvents).forEach(function (elementName) {
-					this$1$1.initEvents(elementName, rowEvents[elementName], element);
+				Object.keys(rowEvents).forEach((elementName) => {
+					this.initEvents(elementName, rowEvents[elementName], element);
 				});
 			}
 
 			// Call event handlers
-			this$1$1.triggerAsync("beforeFillRow", {"item":items[i], "no":no, "element":element});
+			this.triggerAsync("beforeFillRow", {"item":items[i], "no":no, "element":element});
 			BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
-			FormUtil.setFields(element, items[i], {"masters":this$1$1.resources});
-			this$1$1.triggerAsync("afterFillRow", {"item":items[i], "no":no, "element":element});
-		};
-
-		for (var i = 0; i < items.length; i++)
-		loop( i );
+			FormUtil.setFields(element, items[i], {"masters":this.resources});
+			this.triggerAsync("afterFillRow", {"item":items[i], "no":no, "element":element});
+		}
 
 	};
 
@@ -5424,11 +5479,9 @@
 	 */
 	TagLoader.prototype.start = function(settings)
 	{
-		var this$1$1 = this;
-
 
 		// Defaults
-		var defaults = {
+		let defaults = {
 			"settings": {
 				"name": "TagLoader",
 			},
@@ -5436,15 +5489,15 @@
 		settings = ( settings ? BITSMIST.v1.Util.deepMerge(defaults, settings) : defaults );
 
 		// super()
-		return BITSMIST.v1.Component.prototype.start.call(this, settings).then(function () {
+		return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
 			if (document.readyState !== "loading")
 			{
-				BITSMIST.v1.LoaderOrganizer.load(document.body, this$1$1.settings);
+				BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
 			}
 			else
 			{
-				document.addEventListener("DOMContentLoaded", function () {
-					BITSMIST.v1.LoaderOrganizer.load(document.body, this$1$1.settings);
+				document.addEventListener("DOMContentLoaded", () => {
+					BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
 				});
 			}
 		});
@@ -5568,7 +5621,7 @@
 	 * @type	{Object}
 	 */
 	Object.defineProperty(PreferenceManager.prototype, "items", {
-		get: function get()
+		get()
 		{
 			return PreferenceOrganizer._store.items;
 		},
@@ -5601,30 +5654,28 @@
 	 */
 	PreferenceManager.prototype.set = function(values, options)
 	{
-		var this$1$1 = this;
-
 
 		this._validationResult["result"] = true;
 
-		Promise.resolve().then(function () {
+		Promise.resolve().then(() => {
 			// Validate
-			return this$1$1.callOrganizers("doCheckValidity", {"item":values, "validationName":this$1$1._settings.get("settings.validationName")});
-		}).then(function () {
-			return this$1$1.trigger("doValidate");
-		}).then(function () {
+			return this.callOrganizers("doCheckValidity", {"item":values, "validationName":this._settings.get("settings.validationName")});
+		}).then(() => {
+			return this.trigger("doValidate");
+		}).then(() => {
 			// Validation failed?
-			if (!this$1$1._validationResult["result"])
+			if (!this._validationResult["result"])
 			{
-				throw new Error(("PreferenceManager.set(): Validation failed. values=" + (JSON.stringify(values)) + ", invalids=" + (JSON.stringify(this$1$1._validationResult["invalids"]))));
+				throw new Error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}, invalids=${JSON.stringify(this._validationResult["invalids"])}`);
 			}
 
 			// Store
 			PreferenceOrganizer._store.set("", values, options);
 
 			// Save preferences
-			if (BITSMIST.v1.Util.safeGet(options, "autoSave", this$1$1.settings.get("preferences.settings.autoSave")))
+			if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
 			{
-				return this$1$1.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
+				return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
 			}
 		});
 
@@ -5661,5 +5712,5 @@
 	window.BITSMIST.v1.List = List;
 	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
-}());
+})();
 //# sourceMappingURL=bitsmist-js-extras_v1.js.map
