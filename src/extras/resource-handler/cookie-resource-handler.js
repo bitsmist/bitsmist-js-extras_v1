@@ -31,7 +31,8 @@ export default class CookieResourceHandler extends ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		super(component, resourceName, options);
+		let defaults = {"autoLoad":true};
+		super(component, resourceName, Object.assign(defaults, options));
 
 		this._name = "CookieResourceHandler";
 		this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");

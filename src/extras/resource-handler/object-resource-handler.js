@@ -31,7 +31,8 @@ export default class ObjectResourceHandler extends ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		super(component, resourceName, options);
+		let defaults = {"autoLoad":true};
+		super(component, resourceName, Object.assign(defaults, options));
 
 		this._name = "ObjectResourceHandler";
 		if (options["items"])
