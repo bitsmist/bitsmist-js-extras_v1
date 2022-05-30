@@ -43,7 +43,7 @@ FormUtil.setFields = function(rootNode, item, options)
 		let fieldName = element.getAttribute("bm-bind");
 		if (fieldName in item)
 		{
-			let value = item[fieldName] || "";
+			let value = BITSMIST.v1.Util.safeGet(item, fieldName, "");
 
 			// Get master value
 			if (element.hasAttribute("bm-bindtext"))
