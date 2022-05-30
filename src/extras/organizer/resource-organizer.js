@@ -67,10 +67,11 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 				{
 					Object.keys(resources).forEach((resourceName) => {
 						// Add resource
-						let resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
+						let apiResourceName = BITSMIST.v1.Util.safeGet(resources[resourceName], "handlerOptions.resourceName", resourceName);
+						let resource = ResourceOrganizer._addResource(component, apiResourceName, resources[resourceName]);
 
 						// Load data
-						if (resources[resourceName]["autoLoad"])
+						if (resource.options.get("autoLoad"))
 						{
 							let id = resource.options.get("autoLoadOptions.id");
 							let paramters = resource.options.get("autoLoadOptions.parameters");
