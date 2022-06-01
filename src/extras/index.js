@@ -74,20 +74,18 @@ window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
 import ObjectValidationHandler from "./validation-handler/object-validation-handler.js";
 window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
 
-// Ui
-
-import Form from "./ui/form.js";
-window.BITSMIST.v1.Form = Form;
-
-import List from "./ui/list.js";
-window.BITSMIST.v1.List = List;
-
 // Util
 
 import FormatterUtil from "./util/formatter-util.js";
 window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
 // Component
+
+import Form from "./component/bm-form.js";
+window.BITSMIST.v1.Form = Form;
+
+import List from "./component/bm-list.js";
+window.BITSMIST.v1.List = List;
 
 import TagLoader from "./component/bm-tagloader.js";
 import SettingManager from "./component/bm-setting.js";
