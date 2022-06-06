@@ -21,6 +21,55 @@ export default function FormUtil() {}
 // -----------------------------------------------------------------------------
 
 /**
+ * Show "bm-visible" elements if condition match.
+ *
+ * @param	{HTMLElement}	rootNode			Root node.
+ * @param	{Object}		item				Item used to judge condition.
+ */
+FormUtil.showConditionalElements = function(rootNode, item)
+{
+
+	// Get elements with bm-visible attribute
+	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+
+	// Show elements
+	elements.forEach((element) => {
+		let condition = element.getAttribute("bm-visible");
+		if (BITSMIST.v1.Util.safeEval(condition, item, item))
+		{
+			element.style.removeProperty("display");
+		}
+		else
+		{
+			element.style.display = "none";
+		}
+	});
+
+}
+
+// -------------------------------------------------------------------------
+
+/**
+ * Hide "bm-visible" elements.
+ *
+ * @param	{HTMLElement}	rootNode			Root node.
+ */
+FormUtil.hideConditionalElements = function(rootNode)
+{
+
+	// Get elements with bm-visible attribute
+	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+
+	// Hide elements
+	elements.forEach((element) => {
+		element.style.display = "none";
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Fill the form.
  *
  * @param	{HTMLElement}	rootNode			Form node.
@@ -30,7 +79,6 @@ export default function FormUtil() {}
  */
 FormUtil.setFields = function(rootNode, item, options)
 {
-
 
 	let masters = BITSMIST.v1.Util.safeGet(options, "masters");
 	let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
@@ -194,7 +242,7 @@ FormUtil.setValue = function(element, value)
 	//value = FormatterUtil.sanitize(value);
 
 	// Set value
-	let targets = element.getAttribute("bm-target");
+	let targets = element.getAttribute("bm-bindtarget");
 	if (targets)
 	{
 		FormUtil._setValue_target(element, targets, value);

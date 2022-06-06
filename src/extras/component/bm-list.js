@@ -110,6 +110,8 @@ List.prototype.switchTemplate = function(templateName, options)
 {
 
 	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+		FormUtil.hideConditionalElements(this);
+
 		return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
 	});
 
@@ -187,6 +189,7 @@ List.prototype.fill = function(options)
 	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 	return Promise.resolve().then(() => {
+		FormUtil.showConditionalElements(this, this.item);
 		return this.trigger("beforeFill", options);
 	}).then(() => {
 		return builder.call(this, fragment, this._items);
@@ -342,7 +345,7 @@ List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents
 				return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
 			}).then(() => {
 				// Fill fields
-				BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
+				FormUtil.showConditionalElements(element, items[i]);
 				FormUtil.setFields(element, item, {"masters":this.resources});
 			}).then(() => {
 				return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
@@ -386,7 +389,7 @@ List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvent
 
 		// Call event handlers
 		this.triggerAsync("beforeFillRow", {"item":items[i], "no":no, "element":element});
-		BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
+		FormUtil.showConditionalElements(element, items[i]);
 		FormUtil.setFields(element, items[i], {"masters":this.resources});
 		this.triggerAsync("afterFillRow", {"item":items[i], "no":no, "element":element});
 	}

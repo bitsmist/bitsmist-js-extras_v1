@@ -104,6 +104,25 @@ Form.prototype.start = function(settings)
 // -----------------------------------------------------------------------------
 
 /**
+ * Change a template html.
+ *
+ * @param	{String}		templateName		Template name.
+ * @param	{Object}		options				Options.
+ *
+ * @return  {Promise}		Promise.
+ */
+Form.prototype.switchTemplate = function(templateName, options)
+{
+
+	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+		FormUtil.hideConditionalElements(this);
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
  * Build a element.
  *
  * @param	{HTMLElement}	element				HTMLElement to build.
@@ -154,6 +173,7 @@ Form.prototype.fill = function(options)
 	}
 
 	return Promise.resolve().then(() => {
+		FormUtil.showConditionalElements(this, this._item);
 		return this.trigger("beforeFill", options);
 	}).then(() => {
 		FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
