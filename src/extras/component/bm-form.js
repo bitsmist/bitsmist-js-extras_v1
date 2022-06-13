@@ -172,11 +172,13 @@ Form.prototype.fill = function(options)
 		this.clear();
 	}
 
+	let item = ("item" in options ? options["item"] : this._item);
+
 	return Promise.resolve().then(() => {
-		FormUtil.showConditionalElements(this, this._item);
+		FormUtil.showConditionalElements(this, item);
 		return this.trigger("beforeFill", options);
 	}).then(() => {
-		FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
+		FormUtil.setFields(rootNode, item, {"masters":this.resources, "triggerEvent":"change"});
 
 		return this.trigger("afterFill", options);
 	});
