@@ -323,35 +323,31 @@ List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents
 	this.triggerAsync("beforeBuildRow", {"item":item});
 
 	let chain = Promise.resolve();
-	let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-	for (let i = 0; i < items.length; i++)
-	{
-		chain = chain.then(() => {
-			// Append a row
-			let element = this._createRow(template);
-			rootNode.appendChild(element);
-			this._rows.push(element);
+	chain = chain.then(() => {
+		// Append a row
+		let element = this._createRow(template);
+		rootNode.appendChild(element);
+		this._rows.push(element);
 
-			// set row elements click event handler
-			if (rowEvents)
-			{
-				Object.keys(rowEvents).forEach((elementName) => {
-					this.initEvents(elementName, rowEvents[elementName], element);
-				});
-			}
-
-			// Call event handlers
-			return Promise.resolve().then(() => {
-				return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
-			}).then(() => {
-				// Fill fields
-				FormUtil.showConditionalElements(element, items[i]);
-				FormUtil.setFields(element, item, {"masters":this.resources});
-			}).then(() => {
-				return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
+		// set row elements click event handler
+		if (rowEvents)
+		{
+			Object.keys(rowEvents).forEach((elementName) => {
+				this.initEvents(elementName, rowEvents[elementName], element);
 			});
+		}
+
+		// Call event handlers
+		return Promise.resolve().then(() => {
+			return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
+		}).then(() => {
+			// Fill fields
+			FormUtil.showConditionalElements(element, item);
+			FormUtil.setFields(element, item, {"masters":this.resources});
+		}).then(() => {
+			return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
 		});
-	}
+	});
 
 }
 
@@ -371,27 +367,23 @@ List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvent
 
 	this.triggerAsync("beforeBuildRow", {"item":item});
 
-	let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-	for (let i = 0; i < items.length; i++)
+	// Append a row
+	let element = this._createRow(template);
+	rootNode.appendChild(element);
+	this._rows.push(element);
+
+	// set row elements click event handler
+	if (rowEvents)
 	{
-		// Append a row
-		let element = this._createRow(template);
-		rootNode.appendChild(element);
-		this._rows.push(element);
-
-		// set row elements click event handler
-		if (rowEvents)
-		{
-			Object.keys(rowEvents).forEach((elementName) => {
-				this.initEvents(elementName, rowEvents[elementName], element);
-			});
-		}
-
-		// Call event handlers
-		this.triggerAsync("beforeFillRow", {"item":items[i], "no":no, "element":element});
-		FormUtil.showConditionalElements(element, items[i]);
-		FormUtil.setFields(element, items[i], {"masters":this.resources});
-		this.triggerAsync("afterFillRow", {"item":items[i], "no":no, "element":element});
+		Object.keys(rowEvents).forEach((elementName) => {
+			this.initEvents(elementName, rowEvents[elementName], element);
+		});
 	}
+
+	// Call event handlers
+	this.triggerAsync("beforeFillRow", {"item":item, "no":no, "element":element});
+	FormUtil.showConditionalElements(element, item);
+	FormUtil.setFields(element, item, {"masters":this.resources});
+	this.triggerAsync("afterFillRow", {"item":item, "no":no, "element":element});
 
 }
