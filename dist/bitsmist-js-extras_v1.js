@@ -588,6 +588,55 @@
 	// -----------------------------------------------------------------------------
 
 	/**
+	 * Show "bm-visible" elements if condition match.
+	 *
+	 * @param	{HTMLElement}	rootNode			Root node.
+	 * @param	{Object}		item				Item used to judge condition.
+	 */
+	FormUtil.showConditionalElements = function(rootNode, item)
+	{
+
+		// Get elements with bm-visible attribute
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+
+		// Show elements
+		elements.forEach((element) => {
+			let condition = element.getAttribute("bm-visible");
+			if (BITSMIST.v1.Util.safeEval(condition, item, item))
+			{
+				element.style.removeProperty("display");
+			}
+			else
+			{
+				element.style.display = "none";
+			}
+		});
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Hide "bm-visible" elements.
+	 *
+	 * @param	{HTMLElement}	rootNode			Root node.
+	 */
+	FormUtil.hideConditionalElements = function(rootNode)
+	{
+
+		// Get elements with bm-visible attribute
+		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+
+		// Hide elements
+		elements.forEach((element) => {
+			element.style.display = "none";
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
 	 * Fill the form.
 	 *
 	 * @param	{HTMLElement}	rootNode			Form node.
@@ -597,7 +646,6 @@
 	 */
 	FormUtil.setFields = function(rootNode, item, options)
 	{
-
 
 		let masters = BITSMIST.v1.Util.safeGet(options, "masters");
 		let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
@@ -610,7 +658,7 @@
 			let fieldName = element.getAttribute("bm-bind");
 			if (fieldName in item)
 			{
-				let value = item[fieldName] || "";
+				let value = BITSMIST.v1.Util.safeGet(item, fieldName, "");
 
 				// Get master value
 				if (element.hasAttribute("bm-bindtext"))
@@ -761,7 +809,7 @@
 		//value = FormatterUtil.sanitize(value);
 
 		// Set value
-		let targets = element.getAttribute("bm-target");
+		let targets = element.getAttribute("bm-bindtarget");
 		if (targets)
 		{
 			FormUtil._setValue_target(element, targets, value);
@@ -1633,10 +1681,11 @@
 					{
 						Object.keys(resources).forEach((resourceName) => {
 							// Add resource
-							let resource = ResourceOrganizer._addResource(component, resourceName, resources[resourceName]);
+							let apiResourceName = BITSMIST.v1.Util.safeGet(resources[resourceName], "handlerOptions.resourceName", resourceName);
+							let resource = ResourceOrganizer._addResource(component, apiResourceName, resources[resourceName]);
 
 							// Load data
-							if (resources[resourceName]["autoLoad"])
+							if (resource.options.get("autoLoad"))
 							{
 								let id = resource.options.get("autoLoadOptions.id");
 								let paramters = resource.options.get("autoLoadOptions.parameters");
@@ -3562,7 +3611,8 @@
 		constructor(component, resourceName, options)
 		{
 
-			super(component, resourceName, options);
+			let defaults = {"autoLoad":true};
+			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "CookieResourceHandler";
 			this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
@@ -3967,7 +4017,8 @@
 		constructor(component, resourceName, options)
 		{
 
-			super(component, resourceName, options);
+			let defaults = {"autoLoad":true};
+			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "ObjectResourceHandler";
 			if (options["items"])
@@ -4918,6 +4969,25 @@
 	// -----------------------------------------------------------------------------
 
 	/**
+	 * Change a template html.
+	 *
+	 * @param	{String}		templateName		Template name.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	Form.prototype.switchTemplate = function(templateName, options)
+	{
+
+		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+			FormUtil.hideConditionalElements(this);
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
 	 * Build a element.
 	 *
 	 * @param	{HTMLElement}	element				HTMLElement to build.
@@ -4967,10 +5037,13 @@
 			this.clear();
 		}
 
+		let item = ("item" in options ? options["item"] : this._item);
+
 		return Promise.resolve().then(() => {
+			FormUtil.showConditionalElements(this, item);
 			return this.trigger("beforeFill", options);
 		}).then(() => {
-			FormUtil.setFields(rootNode, this._item, {"masters":this.resources, "triggerEvent":"change"});
+			FormUtil.setFields(rootNode, item, {"masters":this.resources, "triggerEvent":"change"});
 
 			return this.trigger("afterFill", options);
 		});
@@ -5152,6 +5225,8 @@
 	{
 
 		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+			FormUtil.hideConditionalElements(this);
+
 			return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
 		});
 
@@ -5229,6 +5304,7 @@
 		BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 		return Promise.resolve().then(() => {
+			FormUtil.showConditionalElements(this, this.item);
 			return this.trigger("beforeFill", options);
 		}).then(() => {
 			return builder.call(this, fragment, this._items);
@@ -5362,35 +5438,31 @@
 		this.triggerAsync("beforeBuildRow", {"item":item});
 
 		let chain = Promise.resolve();
-		let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-		for (let i = 0; i < items.length; i++)
-		{
-			chain = chain.then(() => {
-				// Append a row
-				let element = this._createRow(template);
-				rootNode.appendChild(element);
-				this._rows.push(element);
+		chain = chain.then(() => {
+			// Append a row
+			let element = this._createRow(template);
+			rootNode.appendChild(element);
+			this._rows.push(element);
 
-				// set row elements click event handler
-				if (rowEvents)
-				{
-					Object.keys(rowEvents).forEach((elementName) => {
-						this.initEvents(elementName, rowEvents[elementName], element);
-					});
-				}
-
-				// Call event handlers
-				return Promise.resolve().then(() => {
-					return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
-				}).then(() => {
-					// Fill fields
-					BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
-					FormUtil.setFields(element, item, {"masters":this.resources});
-				}).then(() => {
-					return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
+			// set row elements click event handler
+			if (rowEvents)
+			{
+				Object.keys(rowEvents).forEach((elementName) => {
+					this.initEvents(elementName, rowEvents[elementName], element);
 				});
+			}
+
+			// Call event handlers
+			return Promise.resolve().then(() => {
+				return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
+			}).then(() => {
+				// Fill fields
+				FormUtil.showConditionalElements(element, item);
+				FormUtil.setFields(element, item, {"masters":this.resources});
+			}).then(() => {
+				return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
 			});
-		}
+		});
 
 	};
 
@@ -5410,28 +5482,24 @@
 
 		this.triggerAsync("beforeBuildRow", {"item":item});
 
-		let items = ( this.eventResult["newItems"] ? this.eventResult["newItems"] : [item] );
-		for (let i = 0; i < items.length; i++)
+		// Append a row
+		let element = this._createRow(template);
+		rootNode.appendChild(element);
+		this._rows.push(element);
+
+		// set row elements click event handler
+		if (rowEvents)
 		{
-			// Append a row
-			let element = this._createRow(template);
-			rootNode.appendChild(element);
-			this._rows.push(element);
-
-			// set row elements click event handler
-			if (rowEvents)
-			{
-				Object.keys(rowEvents).forEach((elementName) => {
-					this.initEvents(elementName, rowEvents[elementName], element);
-				});
-			}
-
-			// Call event handlers
-			this.triggerAsync("beforeFillRow", {"item":items[i], "no":no, "element":element});
-			BITSMIST.v1.TemplateOrganizer._showConditionalElements(element, items[i]);
-			FormUtil.setFields(element, items[i], {"masters":this.resources});
-			this.triggerAsync("afterFillRow", {"item":items[i], "no":no, "element":element});
+			Object.keys(rowEvents).forEach((elementName) => {
+				this.initEvents(elementName, rowEvents[elementName], element);
+			});
 		}
+
+		// Call event handlers
+		this.triggerAsync("beforeFillRow", {"item":item, "no":no, "element":element});
+		FormUtil.showConditionalElements(element, item);
+		FormUtil.setFields(element, item, {"masters":this.resources});
+		this.triggerAsync("afterFillRow", {"item":item, "no":no, "element":element});
 
 	};
 
@@ -5708,9 +5776,9 @@
 	window.BITSMIST.v1.ValidationHandler = ValidationHandler;
 	window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
 	window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
+	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 	window.BITSMIST.v1.Form = Form;
 	window.BITSMIST.v1.List = List;
-	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
 })();
 //# sourceMappingURL=bitsmist-js-extras_v1.js.map
