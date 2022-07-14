@@ -189,16 +189,15 @@ List.prototype.fill = function(options)
 	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 	return Promise.resolve().then(() => {
-		FormUtil.showConditionalElements(this, this.item);
-		return this.trigger("beforeFill", options);
-	}).then(() => {
-		return builder.call(this, fragment, this._items);
-	}).then(() => {
 		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 		if (autoClear)
 		{
 			this.clear();
 		}
+		FormUtil.showConditionalElements(this, this.item);
+		return this.trigger("beforeFill", options);
+	}).then(() => {
+		return builder.call(this, fragment, this._items);
 	}).then(() => {
 		this._listRootNode.appendChild(fragment);
 	}).then(() => {
