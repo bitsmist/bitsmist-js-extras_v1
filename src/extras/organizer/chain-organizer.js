@@ -78,7 +78,7 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 		for (let i = 0; i < targets.length; i++)
 		{
 			let method = targets[i]["method"] || "refresh";
-			let state = targets[i]["state"] || "started";
+			let state = targets[i]["state"] || "ready";
 			let sync = targets[i]["sync"];
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
