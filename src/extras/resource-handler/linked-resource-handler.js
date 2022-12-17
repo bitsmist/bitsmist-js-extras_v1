@@ -72,9 +72,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	set data(value)
 	{
-
-		this._ref.data = value;
-
 	}
 
 	// -------------------------------------------------------------------------
@@ -123,6 +120,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 		let handlerOptions = this._options.items;
 		let rootNode = handlerOptions["rootNode"];
 		let resourceName = handlerOptions["resourceName"];
+		/*
 		let state = handlerOptions["state"];
 
 		let options = { "rootNode": rootNode };
@@ -130,6 +128,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 		{
 			options["state"] = state;
 		}
+		*/
 
 		this._ref = document.querySelector(rootNode).resources[resourceName];
 
