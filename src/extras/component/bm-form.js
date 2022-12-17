@@ -143,8 +143,10 @@ Form.prototype.build = function(element, items, options)
  *
  * @param	{String}		target				Target selector.
  */
-Form.prototype.clear = function(target)
+Form.prototype.clear = function(options)
 {
+
+	let target = BITSMIST.v1.Util.safeGet(options, "target", "");
 
 	return FormUtil.clearFields(this, target);
 

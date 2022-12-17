@@ -224,7 +224,7 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		component.clear(target);
+		component.clear({"target":target});
 
 	}
 

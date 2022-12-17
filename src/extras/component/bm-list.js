@@ -157,7 +157,7 @@ List.prototype.switchRowTemplate = function(templateName, options)
 /**
  * Clear list.
  */
-List.prototype.clear = function()
+List.prototype.clear = function(options)
 {
 
 	this._listRootNode.innerHTML = "";
