@@ -183,10 +183,7 @@ export default class ResourceHandler
 		}).then((data) => {
 //			BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
-			if (data)
-			{
-				this.data = data;
-			}
+			this.data = data;
 
 			return this._data;
 		});
@@ -426,14 +423,18 @@ export default class ResourceHandler
 	__reshaper_get(target)
 	{
 
-		let idField = this._options.get("fieldOptions.id");
+		let items;
 
-		let items = target.reduce((result, current) => {
-			let id = current[idField];
-			result[id] = current;
+		if (target)
+		{
+			let idField = this._options.get("fieldOptions.id");
+			items = target.reduce((result, current) => {
+				let id = current[idField];
+				result[id] = current;
 
-			return result;
-		}, {});
+				return result;
+			}, {});
+		}
 
 		return items;
 
