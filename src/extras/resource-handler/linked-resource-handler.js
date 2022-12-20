@@ -32,7 +32,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	{
 
 		let defaults = {"autoLoad":true};
-
 		super(component, resourceName, Object.assign(defaults, options));
 
 		this._name = "LinkedResourceHandler";
