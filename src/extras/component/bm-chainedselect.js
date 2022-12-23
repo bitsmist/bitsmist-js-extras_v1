@@ -30,12 +30,6 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 					"handlers": {
 						"beforeStart":	["onChainedSelect_BeforeStart"],
 						"afterAppend":	["onChainedSelect_AfterAppend"],
-						"beforeAdd":	["onChainedSelect_BeforeAdd"],
-						"doAdd":		["onChainedSelect_DoAdd"],
-						"beforeEdit":	["onChainedSelect_BeforeEdit"],
-						"doEdit":		["onChainedSelect_DoEdit"],
-						"beforeRemove":	["onChainedSelect_BeforeRemove"],
-						"doRemove":		["onChainedSelect_DoRemove"],
 					}
 				},
 				"cmb-item": {
@@ -71,10 +65,23 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	//	Properties
 	// -------------------------------------------------------------------------
 
-	getSelected(level)
-	{
+	/**
+	 * Length.
+	 *
+	 * @type	{Number}
+	 */
+	get length() {
 
-		return this.querySelector(":scope [data-level='" + level + "'] " + this.rootNodes["select"]);
+		let length = 0;
+		let level = 1;
+
+		while (this.querySelector(":scope .item[data-level='" + level + "'] select"))
+		{
+			level++;
+			length++;
+		}
+
+		return length;
 
 	}
 
@@ -94,17 +101,6 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		this.rootNodes = this.settings.get("settings.rootNodes");
 
-		if (!this.settings.get("settings.useDefaultInput", true))
-		{
-			this.removeEventHandler("beforeAdd", "onChainedSelect_BeforeAdd");
-			this.removeEventHandler("doAdd", "onChainedSelect_DoAdd");
-			this.removeEventHandler("beforeEdit", "onChainedSelect_BeforeEdit");
-			this.removeEventHandler("doEdit", "onChainedSelect_DoEdit");
-			this.removeEventHandler("beforeRemove", "onChainedSelect_BeforeRemove");
-			this.removeEventHandler("doRemove", "onChainedSelect_DoRemove");
-		}
-
-			/*
 		if (this.settings.get("settings.useDefaultInput", true))
 		{
 			this.addEventHandler("beforeAdd", this.onChainedSelect_BeforeAdd);
@@ -114,7 +110,6 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			this.addEventHandler("beforeRemove", this.onChainedSelect_BeforeRemove);
 			this.addEventHandler("doRemove", this.onChainedSelect_DoRemove);
 		}
-		*/
 
 	}
 
@@ -130,17 +125,8 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_AfterAppend(sender, e, ex)
 	{
 
-		// Init selectboxes (disable all)
-		let i = 1;
-		while (this.querySelector(":scope .item[data-level='" + i + "'] select"))
-		{
-			//this.querySelector(":scope .item[data-level='" + i + "'] select").options.length = 0;
-			this._initElement("select", i);
-			this._initElement("newitem", i);
-			this._initElement("edititem", i);
-			this._initElement("removeitem", i);
-			i++;
-		}
+		// Init select elements (disable all)
+		this.clear({"fromLevel":1, "toLevel":this.length});
 
 	}
 
@@ -177,6 +163,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
+		this.result = undefined;
 
 		return Promise.resolve().then(() => {
 			return this.trigger("beforeAdd", {"level":level});
@@ -186,7 +173,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			return this.trigger("afterAdd", {"level":level});
 		}).then(() => {
 			// Save to storage
-			if (this.settings.get("settings.autoSubmit"))
+			if (this.result && this.settings.get("settings.autoSubmit"))
 			{
 				return this.submit({"level":level});
 			}
@@ -211,6 +198,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
+		this.result = undefined;
 
 		return Promise.resolve().then(() => {
 			return this.trigger("beforeEdit", {"level":level});
@@ -220,7 +208,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			return this.trigger("afterEdit", {"level":level});
 		}).then(() => {
 			// Save to storage
-			if (this.settings.get("settings.autoSubmit"))
+			if (this.result && this.settings.get("settings.autoSubmit"))
 			{
 				return this.submit({"level":level});
 			}
@@ -245,6 +233,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
+		this.result = undefined;
 
 		return Promise.resolve().then(() => {
 			return this.trigger("beforeRemove", {"level":level});
@@ -254,7 +243,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			return this.trigger("afterRemove", {"level":level});
 		}).then(() => {
 			// Save to storage
-			if (this.settings.get("settings.autoSubmit"))
+			if (this.result && this.settings.get("settings.autoSubmit"))
 			{
 				return this.submit({"level":level});
 			}
@@ -276,7 +265,10 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		return new Promise((resolve, reject) => {
 			let text = window.prompt("アイテム名を入力してください", "");
-			this.result = text;
+			if (text)
+			{
+				this.result = {"text":text, "value":text};
+			}
 			resolve();
 		});
 
@@ -295,7 +287,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	{
 
 		if (this.result) {
-			return this.newItem(e.detail.level, this.result);
+			return this.newItem(e.detail.level, this.result.text, this.result.value);
 		}
 
 	}
@@ -312,9 +304,15 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_BeforeEdit(sender, e, ex)
 	{
 
+		let level = parseInt(BITSMIST.v1.Util.safeGet(e.detail, "level", 1));
+		let selectBox = this.getSelect(level);
+
 		return new Promise((resolve, reject) => {
 			let text = window.prompt("アイテム名を入力してください", "");
-			this.result = text;
+			if (text)
+			{
+				this.result = {"old":{"text":selectBox.options[selectBox.selectedIndex].text, "value":selectBox.value}, "new":{"text":text, "value":text}};
+			}
 			resolve();
 		});
 
@@ -333,7 +331,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	{
 
 		if (this.result) {
-			this.editItem(e.detail.level, this.result);
+			this.editItem(e.detail.level, this.result.new.text, this.result.new.value);
 		}
 
 	}
@@ -351,7 +349,14 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	{
 
 		return new Promise((resolve, reject) => {
-			this.result = window.confirm("削除しますか？");
+			//this.result = window.confirm("削除しますか？");
+			if (window.confirm("削除しますか？"))
+			{
+				let level = parseInt(BITSMIST.v1.Util.safeGet(e.detail, "level", 1));
+				let selectBox = this.getSelect(level);
+
+				this.result = {"text":selectBox.options[selectBox.selectedIndex].text, "value":selectBox.value};
+			}
 			resolve();
 		});
 
@@ -380,21 +385,40 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Clear the selectbox.
+	 *  Get the specified level select element.
+	 *
+	 * @param	{Number}		level				Level to retrieve.
+	 */
+	getSelect(level)
+	{
+
+		return this.querySelector(":scope [data-level='" + level + "'] " + this.rootNodes["select"]);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Clear the select element.
 	 *
 	 * @param	{String}		target				Target selector.
 	 */
 	clear(options)
 	{
 
-		console.debug(`ChainedSelectbox.fill(): Clearing selectbox. name=${this.name}, level=BITSMIST.v1.Util.safeGet(options, "level", 1);`);
+		console.debug(`ChainedSelect.fill(): Clearing select element. name=${this.name}, level=BITSMIST.v1.Util.safeGet(options, "level", 1);`);
 
-		// Prerequisite check
-		let level = BITSMIST.v1.Util.safeGet(options, "level", 1);
-		let selectBox = this.querySelector(":scope [data-level='" + level + "'] > select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+		let fromLevel = BITSMIST.v1.Util.safeGet(options, "fromLevel", 1);
+		let toLevel = BITSMIST.v1.Util.safeGet(options, "toLevel", this.length);
 
-		selectBox.options.length = 0;
+		for (let i = fromLevel; i <= toLevel; i++)
+		{
+			this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).options.length = 0;
+			this._initElement("select", i);
+			this._initElement("newitem", i);
+			this._initElement("edititem", i);
+			this._initElement("removeitem", i);
+		}
 
 	}
 
@@ -410,7 +434,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	fill(options)
 	{
 
-		console.debug(`ChainedSelectbox.fill(): Filling selectbox. name=${this.name}`);
+		console.debug(`ChainedSelect.fill(): Filling select element. name=${this.name}`);
 
 		options = Object.assign({}, options);
 		let level = BITSMIST.v1.Util.safeGet(options, "level", 1);
@@ -419,7 +443,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
 			if (autoClear)
 			{
-				this.clear({"level":level, "options":options});
+				this.clear({"fromLevel":level, "toLevel":level});
 			}
 			return this.trigger("beforeFill", {"options":options});
 		}).then(() => {
@@ -442,7 +466,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	submit(options)
 	{
 
-		console.debug(`ChainedSelectbox.fill(): Submitting selectbox. name=${this.name}`);
+		console.debug(`ChainedSelect.fill(): Submitting select element. name=${this.name}`);
 
 		options = Object.assign({}, options);
 		let items;
@@ -462,7 +486,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Assign objects to a selectbox.
+	 * Assign objects to a select element.
 	 *
 	 * @param	{Number}		level				Level.
 	 * @param	{Object}		parentObject		Parent object.
@@ -521,25 +545,14 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		selectBox.value = itemId;
-		//this.querySelector(":scope .item[data-level='" + level + "'] select").value = itemId;
 
 		this._initElement("edititem", level, true);
 		this._initElement("removeitem", level, true);
 
 		// Clear children
-		level = parseInt(level);
-		let i = 1;
-		while (this.querySelector(":scope .item[data-level='" + (level + i) + "'] select"))
-		{
-			this.querySelector(":scope .item[data-level='" + (level + i) + "'] select").options.length = 0;
-			this._initElement("select", level + i);
-			this._initElement("newitem", level + i);
-			this._initElement("edititem", level + i);
-			this._initElement("removeitem", level + i);
-			i++;
-		}
+		this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
-		// Refresh the child selectbox
+		// Refresh the child select element
 		return Promise.resolve().then(() => {
 			level++;
 			let nextSelectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
@@ -597,7 +610,6 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		// Edit the selectbox
-		console.log("@@editting", itemName);
 		selectBox.options[selectBox.selectedIndex].text = itemName;
 		selectBox.options[selectBox.selectedIndex].value = (itemId ? itemId : itemName);
 
@@ -617,24 +629,14 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
 		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.name}, level=${level}`);
 
-		// Remove from the selectbox
+		// Remove from the select element
 		selectBox.remove(selectBox.selectedIndex);
 		selectBox.value = "";
 		this._initElement("edititem", level);
 		this._initElement("removeitem", level);
 
-		// Clear children selectboxes
-		level = parseInt(level);
-		let i = 1;
-		while (this.querySelector(":scope .item[data-level='" + (level + i) + "'] select"))
-		{
-			this.querySelector(":scope .item[data-level='" + (level + i) + "'] select").options.length = 0;
-			this._initElement("select", level + i);
-			this._initElement("newitem", level + i);
-			this._initElement("edititem", level + i);
-			this._initElement("removeitem", level + i);
-			i++;
-		}
+		// Reset children select elements
+		this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 	}
 
