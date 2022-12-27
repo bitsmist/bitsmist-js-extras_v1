@@ -203,13 +203,13 @@ Form.prototype.validate = function(options)
 	this.validationResult["result"] = true;
 
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeValidate");
+		return this.trigger("beforeValidate", options);
 	}).then(() => {
 		return this.callOrganizers("doCheckValidity", {"item":this._item, "validationName":this.settings.get("settings.validationName")});
 	}).then(() => {
-		return this.trigger("doValidate");
+		return this.trigger("doValidate", options);
 	}).then(() => {
-		return this.trigger("afterValidate");
+		return this.trigger("afterValidate", options);
 	}).then(() => {
 		if (!this.validationResult["result"])
 		{
@@ -218,7 +218,7 @@ Form.prototype.validate = function(options)
 			return Promise.resolve().then(() => {
 				return this.callOrganizers("doReportValidity", {"validationName":this.settings.get("settings.validationName")});
 			}).then(() => {
-				return this.trigger("doReportValidatidy");
+				return this.trigger("doReportValidatidy", options);
 			});
 		}
 	});
@@ -246,14 +246,15 @@ Form.prototype.submit = function(options)
 	}).then(() => {
 		if (!this._cancelSubmit)
 		{
+			options["item"] = this._item;
 			return Promise.resolve().then(() => {
-				return this.trigger("beforeSubmit", {"item":this._item});
+				return this.trigger("beforeSubmit", options);
 			}).then(() => {
 				return this.callOrganizers("doSubmit", options);
 			}).then(() => {
-				return this.trigger("doSubmit", {"item":this._item});
+				return this.trigger("doSubmit", options);
 			}).then(() => {
-				return this.trigger("afterSubmit", {"item":this._item});
+				return this.trigger("afterSubmit", options);
 			});
 		}
 	});
