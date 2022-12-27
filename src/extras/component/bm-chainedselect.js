@@ -17,6 +17,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 				"name":					"ChainedSelect",
 				"autoClear":			true,
 				"autoSubmit":			true,
+				"autoValidate":			false,
 				"useDefaultInput":		true,
 				"rootNodes": {
 					"newitem": 			".btn-newitem",
@@ -30,6 +31,8 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 					"handlers": {
 						"beforeStart":	["onChainedSelect_BeforeStart"],
 						"afterAppend":	["onChainedSelect_AfterAppend"],
+						"doClear":		["onChainedSelect_DoClear"],
+						"doFill":		["onChainedSelect_DoFill"],
 					}
 				},
 				"cmb-item": {
@@ -56,6 +59,8 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 						"click": 		["onChainedSelect_BtnRemoveItemClick"],
 					}
 				}
+			},
+			"forms": {
 			}
 		}
 
@@ -128,6 +133,73 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		// Init select elements (disable all)
 		this.clear({"fromLevel":1, "toLevel":this.length});
 
+		if (!this.settings.get("settings.isAddable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["newitem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+		if (!this.settings.get("settings.isEditable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["edititem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+		if (!this.settings.get("settings.isRemovable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["removeitem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Do clear event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 * @param	{Object}		ex					Extra event info.
+	 */
+	onChainedSelect_DoClear(sender, e, ex)
+	{
+
+		let fromLevel = BITSMIST.v1.Util.safeGet(e.detail, "fromLevel", 1);
+		let toLevel = BITSMIST.v1.Util.safeGet(e.detail, "toLevel", this.length);
+
+		for (let i = fromLevel; i <= toLevel; i++)
+		{
+			if (this.settings.get("settings.autoClear")) {
+				this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).options.length = 0;
+			}
+			this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).selectedIndex = -1;
+			this._initElement("select", i);
+			this._initElement("newitem", i);
+			this._initElement("edititem", i);
+			this._initElement("removeitem", i);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Do fill event handler.
+	 *
+	 * @param	{Object}		sender				Sender.
+	 * @param	{Object}		e					Event info.
+	 * @param	{Object}		ex					Extra event info.
+	 */
+	onChainedSelect_DoFill(sender, e, ex)
+	{
+
+		let level = BITSMIST.v1.Util.safeGet(e.detail, "level", 1);
+		this.assignItems(level, this.items);
+
 	}
 
 	// -------------------------------------------------------------------------
@@ -163,19 +235,27 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.result = undefined;
+		this.modalResult = {"result":false};
+		let options = {"level":level};
 
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeAdd", {"level":level});
-		}).then(() => {
-			return this.trigger("doAdd", {"level":level});
-		}).then(() => {
-			return this.trigger("afterAdd", {"level":level});
-		}).then(() => {
-			// Save to storage
-			if (this.result && this.settings.get("settings.autoSubmit"))
+		return this.trigger("beforeAdd", options).then(() => {
+			if (this.modalResult["result"])
 			{
-				return this.submit({"level":level});
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doAdd", options);
+						}).then(() => {
+							return this.trigger("afterAdd", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
+				});
 			}
 		});
 
@@ -198,19 +278,27 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.result = undefined;
+		this.modalResult = {"result":false};
+		let options = {"level":level};
 
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeEdit", {"level":level});
-		}).then(() => {
-			return this.trigger("doEdit", {"level":level});
-		}).then(() => {
-			return this.trigger("afterEdit", {"level":level});
-		}).then(() => {
-			// Save to storage
-			if (this.result && this.settings.get("settings.autoSubmit"))
+		return this.trigger("beforeEdit", options).then(() => {
+			if (this.modalResult["result"])
 			{
-				return this.submit({"level":level});
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doEdit", options);
+						}).then(() => {
+							return this.trigger("afterEdit", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
+				});
 			}
 		});
 
@@ -233,19 +321,27 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.result = undefined;
+		this.modalResult = {"result":false};
+		let options = {"level":level};
 
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeRemove", {"level":level});
-		}).then(() => {
-			return this.trigger("doRemove", {"level":level});
-		}).then(() => {
-			return this.trigger("afterRemove", {"level":level});
-		}).then(() => {
-			// Save to storage
-			if (this.result && this.settings.get("settings.autoSubmit"))
+		return this.trigger("beforeRemove", options).then(() => {
+			if (this.modalResult["result"])
 			{
-				return this.submit({"level":level});
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doRemove", options);
+						}).then(() => {
+							return this.trigger("afterRemove", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
+				});
 			}
 		});
 
@@ -267,7 +363,9 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.result = {"text":text, "value":text};
+				this.modalResult["text"] = text;
+				this.modalResult["value"] = text;
+				this.modalResult["result"] = true;
 			}
 			resolve();
 		});
@@ -286,9 +384,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_DoAdd(sender, e, ex)
 	{
 
-		if (this.result) {
-			return this.newItem(e.detail.level, this.result.text, this.result.value);
-		}
+		return this.newItem(e.detail.level, this.modalResult.text, this.modalResult.value);
 
 	}
 
@@ -311,7 +407,15 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.result = {"old":{"text":selectBox.options[selectBox.selectedIndex].text, "value":selectBox.value}, "new":{"text":text, "value":text}};
+				this.modalResult["old"] = {
+					"text": selectBox.options[selectBox.selectedIndex].text,
+					"value": selectBox.value
+				};
+				this.modalResult["new"] = {
+					"text": text,
+					"value": text
+				}
+				this.modalResult["result"] = true;
 			}
 			resolve();
 		});
@@ -330,9 +434,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_DoEdit(sender, e, ex)
 	{
 
-		if (this.result) {
-			this.editItem(e.detail.level, this.result.new.text, this.result.new.value);
-		}
+		this.editItem(e.detail.level, this.modalResult.new.text, this.modalResult.new.value);
 
 	}
 
@@ -349,13 +451,14 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	{
 
 		return new Promise((resolve, reject) => {
-			//this.result = window.confirm("削除しますか？");
 			if (window.confirm("削除しますか？"))
 			{
 				let level = parseInt(BITSMIST.v1.Util.safeGet(e.detail, "level", 1));
 				let selectBox = this.getSelect(level);
 
-				this.result = {"text":selectBox.options[selectBox.selectedIndex].text, "value":selectBox.value};
+				this.modalResult["text"] = selectBox.options[selectBox.selectedIndex].text;
+				this.modalResult["value"] = selectBox.value;
+				this.modalResult["result"] = true;
 			}
 			resolve();
 		});
@@ -374,9 +477,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_DoRemove(sender, e, ex)
 	{
 
-		if (this.result) {
-			return this.removeItem(e.detail.level);
-		}
+		return this.removeItem(e.detail.level);
 
 	}
 
@@ -393,93 +494,6 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	{
 
 		return this.querySelector(":scope [data-level='" + level + "'] " + this.rootNodes["select"]);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Clear the select element.
-	 *
-	 * @param	{String}		target				Target selector.
-	 */
-	clear(options)
-	{
-
-		console.debug(`ChainedSelect.fill(): Clearing select element. name=${this.name}, level=BITSMIST.v1.Util.safeGet(options, "level", 1);`);
-
-		let fromLevel = BITSMIST.v1.Util.safeGet(options, "fromLevel", 1);
-		let toLevel = BITSMIST.v1.Util.safeGet(options, "toLevel", this.length);
-
-		for (let i = fromLevel; i <= toLevel; i++)
-		{
-			this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).options.length = 0;
-			this._initElement("select", i);
-			this._initElement("newitem", i);
-			this._initElement("edititem", i);
-			this._initElement("removeitem", i);
-		}
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fill list with data.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	fill(options)
-	{
-
-		console.debug(`ChainedSelect.fill(): Filling select element. name=${this.name}`);
-
-		options = Object.assign({}, options);
-		let level = BITSMIST.v1.Util.safeGet(options, "level", 1);
-
-		return Promise.resolve().then(() => {
-			let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
-			if (autoClear)
-			{
-				this.clear({"fromLevel":level, "toLevel":level});
-			}
-			return this.trigger("beforeFill", {"options":options});
-		}).then(() => {
-			this.assignItems(level, this.items);
-		}).then(() => {
-			return this.trigger("afterFill", {"options":options});
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Submit the form.
-	 *
- 	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	submit(options)
-	{
-
-		console.debug(`ChainedSelect.fill(): Submitting select element. name=${this.name}`);
-
-		options = Object.assign({}, options);
-		let items;
-
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeSubmit", {"items":items, "options":options});
-		}).then(() => {
-			return this.callOrganizers("doSubmit", options);
-		}).then(() => {
-			return this.trigger("doSubmit", {"items":items, "options":options});
-		}).then(() => {
-			return this.trigger("afterSubmit", {"items":items, "options":options});
-		});
 
 	}
 
@@ -506,8 +520,22 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			for (let i = 0; i < items.length; i++)
 			{
 				let item = document.createElement("option");
-				item.value = items[i];
-				item.text = items[i];
+				if (typeof(items[i] === "object"))
+				{
+					item.value = BITSMIST.v1.Util.safeGet(items[i], "value", items[i]);
+					item.text = BITSMIST.v1.Util.safeGet(items[i], "text", items[i]);
+					let css = BITSMIST.v1.Util.safeGet(items[i], "css");
+					if (css) {
+						Object.keys(css).forEach((style) => {
+							item.css[style] = css[style];
+						});
+					}
+				}
+				else
+				{
+					item.value = items[i];
+					item.text = items[i];
+				}
 				selectBox.add(item);
 			}
 		}
@@ -516,8 +544,14 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			// items is an object
 			Object.keys(items).forEach((key) => {
 				let item = document.createElement("option");
-				item.value = key;
-				item.text = BITSMIST.v1.Util.safeGet(items[key], "title", key);
+				item.value = BITSMIST.v1.Util.safeGet(items[key], "value", key);
+				item.text = BITSMIST.v1.Util.safeGet(items[key], "text", key);
+				let css = BITSMIST.v1.Util.safeGet(items[key], "css");
+				if (css) {
+					Object.keys(css).forEach((style) => {
+						item.css[style] = css[style];
+					});
+				}
 				selectBox.add(item);
 			});
 		}
