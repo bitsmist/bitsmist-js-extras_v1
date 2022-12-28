@@ -92,7 +92,7 @@ Form.prototype.start = function(settings)
 			"autoClear":				true,
 		},
 		"organizers": {
-			"ValidationOrganizer":		{"settings":{"attach":true}},
+			"FormOrganizer":			{"settings":{"attach":true}},
 		}
 	});
 
@@ -183,80 +183,6 @@ Form.prototype.fill = function(options)
 		FormUtil.setFields(rootNode, item, {"masters":this.resources, "triggerEvent":"change"});
 
 		return this.trigger("afterFill", options);
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Validate.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-Form.prototype.validate = function(options)
-{
-
-	options = Object.assign({}, options);
-	this.validationResult["result"] = true;
-
-	return Promise.resolve().then(() => {
-		return this.trigger("beforeValidate", options);
-	}).then(() => {
-		return this.callOrganizers("doCheckValidity", {"item":this._item, "validationName":this.settings.get("settings.validationName")});
-	}).then(() => {
-		return this.trigger("doValidate", options);
-	}).then(() => {
-		return this.trigger("afterValidate", options);
-	}).then(() => {
-		if (!this.validationResult["result"])
-		{
-			this._cancelSubmit = true;
-
-			return Promise.resolve().then(() => {
-				return this.callOrganizers("doReportValidity", {"validationName":this.settings.get("settings.validationName")});
-			}).then(() => {
-				return this.trigger("doReportValidatidy", options);
-			});
-		}
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Submit the form.
- *
- * @return  {Promise}		Promise.
- */
-Form.prototype.submit = function(options)
-{
-
-	options = Object.assign({}, options);
-	this._cancelSubmit = false;
-
-	// Get values from the form
-	this._item = FormUtil.getFields(this);
-
-	return Promise.resolve().then(() => {
-		return this.validate(options);
-	}).then(() => {
-		if (!this._cancelSubmit)
-		{
-			options["item"] = this._item;
-			return Promise.resolve().then(() => {
-				return this.trigger("beforeSubmit", options);
-			}).then(() => {
-				return this.callOrganizers("doSubmit", options);
-			}).then(() => {
-				return this.trigger("doSubmit", options);
-			}).then(() => {
-				return this.trigger("afterSubmit", options);
-			});
-		}
 	});
 
 }
