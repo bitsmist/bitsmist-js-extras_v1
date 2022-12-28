@@ -157,7 +157,7 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 			component._isModal = true;
 			component._modalResult = {"result":false};
 			component._modalPromise = { "resolve": resolve, "reject": reject };
-			DialogOrganizer._open(component, options);
+			return DialogOrganizer._open(component, options);
 		});
 
 	}
