@@ -74,9 +74,9 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 						if (resource.options.get("autoLoad"))
 						{
 							let id = resource.options.get("autoLoadOptions.id");
-							let paramters = resource.options.get("autoLoadOptions.parameters");
+							let parameters = resource.options.get("autoLoadOptions.parameters");
 
-							promises.push(component._resources[resourceName].get(id, paramters));
+							promises.push(component._resources[resourceName].get(id, parameters, conditions));
 						}
 					});
 				}
