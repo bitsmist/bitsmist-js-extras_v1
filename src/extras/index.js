@@ -23,8 +23,8 @@ BITSMIST.v1.OrganizerOrganizer.register("ElementOrganizer", {"object":ElementOrg
 import ResourceOrganizer from "./organizer/resource-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.register("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
 
-import ValidationOrganizer from "./organizer/validation-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
+import FormOrganizer from "./organizer/form-organizer.js";
+BITSMIST.v1.OrganizerOrganizer.register("FormOrganizer", {"object":FormOrganizer, "targetWords":["forms", "validations"], "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
@@ -63,6 +63,9 @@ window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
 window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
 
+import WebstorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
+window.BITSMIST.v1.WebstorageResourceHandler = WebstorageResourceHandler;
+
 // Validation handler
 
 import ValidationHandler from "./validation-handler/validation-handler.js";
@@ -86,6 +89,15 @@ window.BITSMIST.v1.Form = Form;
 
 import List from "./component/bm-list.js";
 window.BITSMIST.v1.List = List;
+
+import ChainedSelect from "./component/bm-chainedselect.js";
+window.BITSMIST.v1.ChainedSelect = ChainedSelect;
+
+import BmTabindex from "./component/bm-tabindex.js";
+window.BITSMIST.v1.BmTabindex  = BmTabindex;
+
+import BmTabcontent from "./component/bm-tabcontent.js";
+window.BITSMIST.v1.BmTabcontent = BmTabcontent;
 
 import TagLoader from "./component/bm-tagloader.js";
 import SettingManager from "./component/bm-setting.js";
