@@ -180,8 +180,8 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		let submitItem = BITSMIST.v1.Util.safeGet(options, "items", component.item);
 
 		Object.keys(component._resources).forEach((resourceName) => {
+			let resource = component._resources[resourceName];
 			if (resource.options.get("autoSubmit", true)) {
-				let resource = component._resources[resourceName];
 				let method = BITSMIST.v1.Util.safeGet(options, "method", resource.target["method"] || "put"); // Default is "put"
 				let id = BITSMIST.v1.Util.safeGet(options, "id", resource.target["id"]);
 				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", resource.target["parameters"]);
