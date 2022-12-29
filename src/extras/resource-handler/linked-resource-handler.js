@@ -51,7 +51,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get target()
 	{
 
-		return this._ref.target;
+		return (this._ref ? this._ref.target : this._target);
 
 	}
 
@@ -65,7 +65,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get data()
 	{
 
-		return this._ref.data;
+		return (this._ref ? this._ref.data : this._data);
 
 	}
 
@@ -83,7 +83,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get items()
 	{
 
-		return this._ref.items;
+		return (this._ref ? this._ref.items : this._items);
 
 	}
 
@@ -97,7 +97,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get item()
 	{
 
-		return this._ref.item;
+		return (this._ref ? this._ref.item : this._item);
 
 	}
 
