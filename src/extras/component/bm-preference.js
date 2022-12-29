@@ -51,7 +51,7 @@ PreferenceManager.prototype._getSettings = function()
 
 		// Organizers
 		"organizers": {
-			"ValidationOrganizer":		{"settings":{"attach":true}},
+			"FormOrganizer":			{"settings":{"attach":true}},
 		}
 	}
 
