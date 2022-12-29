@@ -31,7 +31,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		let defaults = {"autoLoad":true};
+		let defaults = {"autoLoad":true, "autoFetch":false};
 		super(component, resourceName, Object.assign(defaults, options));
 
 		this._name = "LinkedResourceHandler";
@@ -118,7 +118,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 		let handlerOptions = this._options.items;
 		let rootNode = handlerOptions["rootNode"];
-		let resourceName = handlerOptions["resourceName"];
+		let resourceName = handlerOptions["resourceName"] || this._resourceName;
 		/*
 		let state = handlerOptions["state"];
 
