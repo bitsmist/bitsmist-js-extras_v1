@@ -179,15 +179,16 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 		let submitItem = {};
 		options = Object.assign({}, options);
 		component._cancelSubmit = false;
-		component._item = FormUtil.getFields(component);
+		let items = FormUtil.getFields(component);
 
 		// Get target keys to submit
 		let nodes = component.querySelectorAll("[bm-submit]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		nodes.forEach((elem) => {
 			let key = elem.getAttribute("bm-bind");
-			submitItem[key] = component.item[key];
+			submitItem[key] = items[key];
 		});
+		options["items"] = submitItem;
 
 		return Promise.resolve().then(() => {
 			if (component.settings.get("settings.autoValidate", true))
