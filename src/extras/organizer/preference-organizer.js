@@ -77,7 +77,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		}
 
 		// Load preferences
-		if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.load"))
+		if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.autoLoad"))
 		{
 			chain = component.resources["preferences"].get().then((preferences) => {
 				PreferenceOrganizer._store.merge(preferences);
