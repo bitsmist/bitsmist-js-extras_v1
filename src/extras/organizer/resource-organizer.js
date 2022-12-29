@@ -67,17 +67,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 				{
 					Object.keys(resources).forEach((resourceName) => {
 						// Add resource
-						let apiResourceName = BITSMIST.v1.Util.safeGet(resources[resourceName], "handlerOptions.resourceName", resourceName);
-						let resource = ResourceOrganizer._addResource(component, apiResourceName, resources[resourceName]);
-
-						// Load data
-						if (resource.options.get("autoLoad"))
-						{
-							let id = resource.options.get("autoLoadOptions.id");
-							let parameters = resource.options.get("autoLoadOptions.parameters");
-
-							promises.push(component._resources[resourceName].get(id, parameters, conditions));
-						}
+						promises.push(ResourceOrganizer._addResource(component, resourceName, resources[resourceName]));
 					});
 				}
 				break;
@@ -98,24 +88,29 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-     * Add a resource.
+     * Add resource. Load data if "autoLoad" option is true using added resource.
      *
      * @param	{Component}		component			Component.
      * @param	{string}		resourceName		Resource name.
      * @param	{array}			options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
      */
 	static _addResource(component, resourceName, options)
 	{
 
-		let resource;
+		BITSMIST.v1.Util.assert(options["handlerClassName"], `ResourceOrganizer._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
 
-		if (options["handlerClassName"])
+		let resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
+		component._resources[resourceName] = resource;
+
+		if (resource.options.get("autoLoad"))
 		{
-			resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
-			component._resources[resourceName] = resource;
-		}
+			let id = resource.options.get("autoLoadOptions.id");
+			let parameters = resource.options.get("autoLoadOptions.parameters");
 
-		return resource;
+			return resource.get(id, parameters);
+		}
 
 	}
 
@@ -147,18 +142,17 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		let promises = [];
-		let resources = ResourceOrganizer.__getTargetResources(component, options, "autoFetch");
 
-		for (let i = 0; i < resources.length; i++)
-		{
-			let resourceName = resources[i];
-			let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
-			component._resources[resourceName].target["id"] = id;
-			component._resources[resourceName].target["parameters"] = parameters;
+		Object.keys(component._resources).forEach((resourceName) => {
+			let resource = component._resources[resourceName];
+			if (resource.options.get("autoFetch", true))
+			{
+				resource.target["id"] = BITSMIST.v1.Util.safeGet(options, "id", resource.target["id"]);
+				resource.target["parameters"] = BITSMIST.v1.Util.safeGet(options, "parameters", resource.target["parameters"]);
 
-			promises.push(component._resources[resourceName].get(id, parameters));
-		}
+				promises.push(resource.get(resource.target["id"], resource.target["parameters"]));
+			}
+		});
 
 		return Promise.all(promises).then(() => {
 			let resourceName = component.settings.get("settings.resourceName");
@@ -184,56 +178,19 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 
 		let promises = [];
 		let submitItem = BITSMIST.v1.Util.safeGet(options, "items", component.item);
-		let resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
 
-		for (let i = 0; i < resources.length; i++)
-		{
-			let resourceName = resources[i];
-			let method = BITSMIST.v1.Util.safeGet(options, "method", component._resources[resourceName].target["method"] || "put"); // Default is "put"
-			let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-			let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
+		Object.keys(component._resources).forEach((resourceName) => {
+			if (resource.options.get("autoSubmit", true)) {
+				let resource = component._resources[resourceName];
+				let method = BITSMIST.v1.Util.safeGet(options, "method", resource.target["method"] || "put"); // Default is "put"
+				let id = BITSMIST.v1.Util.safeGet(options, "id", resource.target["id"]);
+				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", resource.target["parameters"]);
 
-			promises.push(component._resources[resourceName][method](id, submitItem, parameters));
-		}
+				promises.push(component._resources[resourceName][method](id, submitItem, parameters));
+			}
+		});
 
 		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get target resource names.
-	 *
-	 * @param	{Component}		component				Component.
-	 * @param	{Object}		options					Options
-	 * @param	{String}		target					Target event
- 	 *
-	 * @return  {Array}			Array of target resource names.
-	 */
-	static __getTargetResources(component, options, target)
-	{
-
-		let resources = BITSMIST.v1.Util.safeGet(options, target, component.settings.get("settings." + target, []));
-
-		if (Array.isArray(resources))
-		{
-		}
-		else if (typeof resources === "string")
-		{
-			resources = [component.settings.get("settings." + target)];
-		}
-		else if (resources === true)
-		{
-			if (component.settings.get("settings.resourceName"))
-			{
-				resources = [component.settings.get("settings.resourceName")];
-			}
-		}
-
-		return resources;
 
 	}
 
