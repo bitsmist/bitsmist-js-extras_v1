@@ -104,10 +104,16 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 		let resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 		component._resources[resourceName] = resource;
 
+		if (resource.options.get("target"))
+		{
+			resource.target.id = resource.options.get("target.id");
+			resource.target.parameters = resource.options.get("target.parameters");
+		}
+
 		if (resource.options.get("autoLoad"))
 		{
-			let id = resource.options.get("autoLoadOptions.id");
-			let parameters = resource.options.get("autoLoadOptions.parameters");
+			let id = resource.options.get("autoLoadOptions.id", resource.target.id);
+			let parameters = resource.options.get("autoLoadOptions.parameters", resource.target.parameters);
 
 			return resource.get(id, parameters);
 		}
