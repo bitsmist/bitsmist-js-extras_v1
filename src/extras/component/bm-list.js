@@ -110,7 +110,6 @@ List.prototype.switchTemplate = function(templateName, options)
 {
 
 	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
-		FormUtil.hideConditionalElements(this);
 
 		return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
 	});
@@ -194,7 +193,6 @@ List.prototype.fill = function(options)
 		{
 			this.clear();
 		}
-		FormUtil.showConditionalElements(this, this.item);
 		return this.trigger("beforeFill", options);
 	}).then(() => {
 		return builder.call(this, fragment, this._items);
