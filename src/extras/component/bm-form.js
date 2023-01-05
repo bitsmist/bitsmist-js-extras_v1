@@ -39,32 +39,14 @@ BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
  *
  * @type	{Object}
  */
-Object.defineProperty(Form.prototype, 'item', {
+Object.defineProperty(Form.prototype, 'items', {
 	get()
 	{
-		return this._item;
+		return this._items;
 	},
 	set(value)
 	{
-		this._item = value;
-	}
-})
-
-// -----------------------------------------------------------------------------
-
-/**
- * Flag wheter to cancel submit.
- *
- * @type	{Object}
- */
-Object.defineProperty(Form.prototype, 'cancelSubmit', {
-	get()
-	{
-		return this._cancelSubmit;
-	},
-	set(value)
-	{
-		this._cancelSubmit = value;
+		this._items = value;
 	}
 })
 
@@ -83,8 +65,7 @@ Form.prototype.start = function(settings)
 {
 
 	// Init vars
-	this._item = {};
-	this._cancelSubmit = false;
+	this._items = {};
 
 	// Init component settings
 	settings = Object.assign({}, settings, {
@@ -174,7 +155,7 @@ Form.prototype.fill = function(options)
 		this.clear();
 	}
 
-	let item = ("item" in options ? options["item"] : this._item);
+	let item = ("items" in options ? options["items"] : this._items);
 
 	return Promise.resolve().then(() => {
 		FormUtil.showConditionalElements(this, item);
