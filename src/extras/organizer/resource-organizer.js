@@ -165,7 +165,6 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 			if (resourceName && component._resources[resourceName])
 			{
 				component.items = component._resources[resourceName].items;
-				component.item = component._resources[resourceName].item;
 			}
 		});
 
@@ -183,7 +182,7 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		let promises = [];
-		let submitItem = BITSMIST.v1.Util.safeGet(options, "items", component.item);
+		let submitItem = BITSMIST.v1.Util.safeGet(options, "items");
 
 		Object.keys(component._resources).forEach((resourceName) => {
 			let resource = component._resources[resourceName];

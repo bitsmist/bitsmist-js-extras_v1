@@ -32,9 +32,8 @@ export default class ResourceHandler
 		this._component = component;
 		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
 		this._data;
-		this._name = "ResourceHandler";
 		this._items = [];
-		this._item = {};
+		this._name = "ResourceHandler";
 		this._target = {};
 		this._currentIndex = 0;
 
@@ -117,7 +116,6 @@ export default class ResourceHandler
 
 		this._data = value;
 		this._items = this.__reshapeItems(value);
-		this._item = ( Array.isArray(this._items) ? this._items[this._currentIndex] : this._items );
 
 	}
 
@@ -132,20 +130,6 @@ export default class ResourceHandler
 	{
 
 		return this._items;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Item.
-	 *
-	 * @type	{Object}
-	 */
-	get item()
-	{
-
-		return this._item;
 
 	}
 

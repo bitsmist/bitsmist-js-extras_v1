@@ -105,7 +105,7 @@ PreferenceManager.prototype.set = function(values, options)
 
 	Promise.resolve().then(() => {
 		// Validate
-		return this.callOrganizers("doCheckValidity", {"item":values, "validationName":this._settings.get("settings.validationName")});
+		return this.callOrganizers("doCheckValidity", {"items":values, "validationName":this._settings.get("settings.validationName")});
 	}).then(() => {
 		return this.trigger("doValidate", options);
 	}).then(() => {
