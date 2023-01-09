@@ -28,9 +28,11 @@ export default class ValidationHandler
 	constructor(component, validatorName, options)
 	{
 
+		options = options || {};
+
 		this._name = validatorName;
 		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+		this._options = new BITSMIST.v1.Store({"items":options});
 
 	}
 

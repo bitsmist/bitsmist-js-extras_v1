@@ -28,10 +28,12 @@ export default class ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
+		options = options || {};
+
 		this._resourceName = resourceName;
 		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
-		this._data;
+		this._options = new BITSMIST.v1.Store({"items":options});
+		this._data = {};
 		this._items = [];
 		this._name = "ResourceHandler";
 		this._target = {};

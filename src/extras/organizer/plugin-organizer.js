@@ -74,7 +74,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 
 		console.debug(`PluginOrganizer._addPlugin(): Adding a plugin. name=${component.name}, pluginName=${pluginName}`);
 
-		options = Object.assign({}, options);
+		options = options || {};
 		let className = ( "className" in options ? options["className"] : pluginName );
 		let plugin = null;
 

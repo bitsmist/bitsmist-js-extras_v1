@@ -138,7 +138,7 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 	static _validate(component, options)
 	{
 
-		options = Object.assign({}, options);
+		options = options || {};
 		options["validationName"] = component.settings.get("settings.validationName");
 		component._validationResult = {"result":true};
 
@@ -179,7 +179,7 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		let submitItem = {};
-		options = Object.assign({}, options);
+		options = options || {};
 		component._cancelSubmit = false;
 		let items = FormUtil.getFields(component);
 
