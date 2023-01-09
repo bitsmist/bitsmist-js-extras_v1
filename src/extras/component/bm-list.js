@@ -31,6 +31,31 @@ export default function List()
 BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Component);
 
 // -----------------------------------------------------------------------------
+//  Settings
+// -----------------------------------------------------------------------------
+
+List.prototype._getSettings = function(settings)
+{
+
+	return {
+		"settings": {
+			"autoClear": true,
+		},
+		"events": {
+			"this": {
+				"handlers": {
+					"beforeStart": 		[this.onBeforeStart],
+					"afterAppend":		[this.onAfterAppend],
+					"doClear": 			[this.onDoClear],
+					"doFill": 			[this.onDoFill]
+				}
+			}
+		},
+	};
+
+}
+
+// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -65,57 +90,85 @@ Object.defineProperty(List.prototype, 'items', {
 })
 
 // -----------------------------------------------------------------------------
-//  Methods
+//  Event Handlers
 // -----------------------------------------------------------------------------
 
 /**
- * Start component.
+ * Before start event handler.
  *
- * @param	{Object}		settings			Settings.
- *
- * @return  {Promise}		Promise.
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-List.prototype.start = function(settings)
+List.prototype.onBeforeStart = function(sender, e, ex)
 {
 
-	// Init vars
 	this._items = [];
-	this._activeRowTemplateName = "";
-	this._listRootNode;
-	this._rows;
-
-	// Init component settings
-	settings = Object.assign({}, settings, {
-		"settings": {
-			"autoClear": true,
-		},
-	});
-
-	// super()
-	return BITSMIST.v1.Component.prototype.start.call(this, settings);
 
 }
 
 // -----------------------------------------------------------------------------
 
 /**
- * Change template html.
+ * After append event handler.
  *
- * @param	{String}		templateName		Template name.
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-List.prototype.switchTemplate = function(templateName, options)
+List.prototype.onAfterAppend = function(sender, e, ex)
 {
 
-	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
+	this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
+	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
-		return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
+	return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Before start event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+List.prototype.onDoClear = function(sender, e, ex)
+{
+
+	this._listRootNode.innerHTML = "";
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Before start event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+List.prototype.onDoFill = function(sender, e, ex)
+{
+
+	this._rows = [];
+	let builder = this._getBuilder(e.detail);
+	let fragment = document.createDocumentFragment();
+	let items = BITSMIST.v1.Util.safeGet(e.detail, "items", this._items);
+
+	return Promise.resolve().then(() => {
+		return builder.call(this, fragment, items);
+	}).then(() => {
+		this._listRootNode.appendChild(fragment);
 	});
 
 }
 
+// -----------------------------------------------------------------------------
+//  Methods
 // -----------------------------------------------------------------------------
 
 /**
@@ -129,7 +182,7 @@ List.prototype.switchTemplate = function(templateName, options)
 List.prototype.switchRowTemplate = function(templateName, options)
 {
 
-	options = Object.assign({}, options);
+	options = options || {};
 
 	if (this._activeRowTemplateName === templateName)
 	{
@@ -142,66 +195,11 @@ List.prototype.switchRowTemplate = function(templateName, options)
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
-		return this.callOrganizers("afterRowAppend", this.settings.items);
+		return this.callOrganizers("afterRowAppend", options);
 	}).then(() => {
 		return this.trigger("afterRowAppend", options);
 	}).then(() => {
 		console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
-	});
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Clear list.
- */
-List.prototype.clear = function(options)
-{
-
-	this._listRootNode.innerHTML = "";
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Fill list with data.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-List.prototype.fill = function(options)
-{
-
-	console.debug(`List.fill(): Filling list. name=${this.name}`);
-
-	options = Object.assign({}, options);
-
-	let builder = this._getBuilder(options);
-	let fragment = document.createDocumentFragment();
-	this._rows = [];
-
-	// Get list root node
-	this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
-	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
-
-	return Promise.resolve().then(() => {
-		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
-		if (autoClear)
-		{
-			this.clear();
-		}
-		return this.trigger("beforeFill", options);
-	}).then(() => {
-		return builder.call(this, fragment, this._items);
-	}).then(() => {
-		this._listRootNode.appendChild(fragment);
-	}).then(() => {
-		return this.trigger("afterFill", options);
-	}).then(() => {
-		console.debug(`List.fill(): Filled list. name=${this.name}`);
 	});
 
 }

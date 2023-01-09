@@ -31,6 +31,34 @@ export default function Form(settings)
 BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
 
 // -----------------------------------------------------------------------------
+//  Settings
+// -----------------------------------------------------------------------------
+
+Form.prototype._getSettings = function(settings)
+{
+
+	return {
+		"settings": {
+			"autoClear":				true,
+		},
+		"organizers": {
+			"FormOrganizer":			{"settings":{"attach":true}},
+		},
+		"events": {
+			"this": {
+				"handlers": {
+					"beforeStart": 		[this.onBeforeStart],
+					"afterAppend":		[this.onAfterAppend],
+					"doClear": 			[this.onDoClear],
+					"doFill": 			[this.onDoFill]
+				}
+			}
+		},
+	};
+
+}
+
+// -----------------------------------------------------------------------------
 //  Setter/Getter
 // -----------------------------------------------------------------------------
 
@@ -51,56 +79,79 @@ Object.defineProperty(Form.prototype, 'items', {
 })
 
 // -----------------------------------------------------------------------------
-//  Methods
+//  Event Handlers
 // -----------------------------------------------------------------------------
 
 /**
- * Start component.
+ * Before start event handler.
  *
- * @param	{Object}		settings			Settings.
- *
- * @return  {Promise}		Promise.
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-Form.prototype.start = function(settings)
+Form.prototype.onBeforeStart = function(sender, e, ex)
 {
 
-	// Init vars
 	this._items = {};
 
-	// Init component settings
-	settings = Object.assign({}, settings, {
-		"settings": {
-			"autoClear":				true,
-		},
-		"organizers": {
-			"FormOrganizer":			{"settings":{"attach":true}},
-		}
-	});
+}
 
-	// super()
-	return BITSMIST.v1.Component.prototype.start.call(this, settings);
+// -----------------------------------------------------------------------------
+
+/**
+ * After append event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+Form.prototype.onAfterAppend = function(sender, e, ex)
+{
+
+	FormUtil.hideConditionalElements(this);
 
 }
 
 // -----------------------------------------------------------------------------
 
 /**
- * Change a template html.
+ * Do clear event handler.
  *
- * @param	{String}		templateName		Template name.
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
  */
-Form.prototype.switchTemplate = function(templateName, options)
+Form.prototype.onDoClear = function(sender, e, ex)
 {
 
-	return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
-		FormUtil.hideConditionalElements(this);
-	});
+	let target = BITSMIST.v1.Util.safeGet(e.detail, "target", "");
+
+	return FormUtil.clearFields(this, target);
 
 }
 
+// -----------------------------------------------------------------------------
+
+/**
+ * Do fill event handler.
+ *
+ * @param	{Object}		sender				Sender.
+ * @param	{Object}		e					Event info.
+ * @param	{Object}		ex					Extra event info.
+ */
+Form.prototype.onDoFill = function(sender, e, ex)
+{
+
+	let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
+	let items = BITSMIST.v1.Util.safeGet(e.detail, "items", this._items);
+
+	FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
+	FormUtil.showConditionalElements(this, items);
+
+}
+
+// -----------------------------------------------------------------------------
+//  Methods
 // -----------------------------------------------------------------------------
 
 /**
@@ -114,56 +165,5 @@ Form.prototype.build = function(element, items, options)
 {
 
 	FormUtil.build(element, items, options);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Clear the form.
- *
- * @param	{String}		target				Target selector.
- */
-Form.prototype.clear = function(options)
-{
-
-	let target = BITSMIST.v1.Util.safeGet(options, "target", "");
-
-	return FormUtil.clearFields(this, target);
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Fill the form.
- *
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-Form.prototype.fill = function(options)
-{
-
-	options = Object.assign({}, options);
-	let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
-
-	// Clear fields
-	let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
-	if (autoClear)
-	{
-		this.clear();
-	}
-
-	let item = ("items" in options ? options["items"] : this._items);
-
-	return Promise.resolve().then(() => {
-		FormUtil.showConditionalElements(this, item);
-		return this.trigger("beforeFill", options);
-	}).then(() => {
-		FormUtil.setFields(rootNode, item, {"masters":this.resources, "triggerEvent":"change"});
-
-		return this.trigger("afterFill", options);
-	});
 
 }
