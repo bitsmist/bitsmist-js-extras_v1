@@ -101,7 +101,7 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 	static _open(component, options)
 	{
 
-		options = Object.assign({}, options);
+		options = options || {};
 
 		return Promise.resolve().then(() => {
 			console.debug(`Opening component. name=${component.name}, id=${component.id}`);
@@ -174,7 +174,7 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 	static _close(component, options)
 	{
 
-		options = Object.assign({}, options);
+		options = options || {};
 
 		return Promise.resolve().then(() => {
 			console.debug(`Closing component. name=${component.name}, id=${component.id}`);
