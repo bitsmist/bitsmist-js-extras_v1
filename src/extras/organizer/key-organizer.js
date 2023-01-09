@@ -170,11 +170,11 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	static _defaultSubmit(e, component, options)
 	{
 
-		component.submit().then(() => {
+		return component.submit().then(() => {
 			if (!component.cancelSubmit)
 			{
 				// Modal result
-				if (component._isModal)
+				if (component.isModal)
 				{
 					component.modalResult["result"] = true;
 				}
@@ -201,7 +201,7 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	static _defaultCancel(e, component, options)
 	{
 
-		component.close();
+		return component.close();
 
 	}
 
@@ -224,7 +224,7 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		component.clear({"target":target});
+		return component.clear({"target":target});
 
 	}
 
