@@ -48,7 +48,7 @@ Form.prototype._getSettings = function(settings)
 			"this": {
 				"handlers": {
 					"beforeStart": 		[this.onBeforeStart],
-					"afterAppend":		[this.onAfterAppend],
+					"afterTransform":	[this.onAfterTransform],
 					"doClear": 			[this.onDoClear],
 					"doFill": 			[this.onDoFill]
 				}
@@ -99,13 +99,13 @@ Form.prototype.onBeforeStart = function(sender, e, ex)
 // -----------------------------------------------------------------------------
 
 /**
- * After append event handler.
+ * After transform event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-Form.prototype.onAfterAppend = function(sender, e, ex)
+Form.prototype.onAfterTransform = function(sender, e, ex)
 {
 
 	FormUtil.hideConditionalElements(this);

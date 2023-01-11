@@ -65,7 +65,7 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 
 		switch (conditions)
 		{
-			case "afterAppend":
+			case "afterTransform":
 				DatabindingOrganizer._bindData(component);
 				break;
 			case "afterFetch":

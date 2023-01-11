@@ -27,13 +27,13 @@ import FormOrganizer from "./organizer/form-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.register("FormOrganizer", {"object":FormOrganizer, "targetWords":["forms", "validations"], "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
+BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterTransform"], "order":320});
 
 import PluginOrganizer from "./organizer/plugin-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.register("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
 
 import KeyOrganizer from "./organizer/key-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":800});
+BITSMIST.v1.OrganizerOrganizer.register("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterTransform"], "order":800});
 
 import ChainOrganizer from "./organizer/chain-organizer.js";
 BITSMIST.v1.OrganizerOrganizer.register("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});

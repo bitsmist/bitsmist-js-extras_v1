@@ -30,7 +30,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 				"this": {
 					"handlers": {
 						"beforeStart":	["onChainedSelect_BeforeStart"],
-						"afterAppend":	["onChainedSelect_AfterAppend"],
+						"afterTransform":	["onChainedSelect_AfterTransform"],
 						"doClear":		["onChainedSelect_DoClear"],
 						"doFill":		["onChainedSelect_DoFill"],
 					}
@@ -121,13 +121,13 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	// -------------------------------------------------------------------------
 
 	/**
-	 * After append event handler.
+	 * After transform event handler.
 	 *
 	 * @param	{Object}		sender				Sender.
 	 * @param	{Object}		e					Event info.
 	 * @param	{Object}		ex					Extra event info.
 	 */
-	onChainedSelect_AfterAppend(sender, e, ex)
+	onChainedSelect_AfterTransform(sender, e, ex)
 	{
 
 		// Init select elements (disable all)

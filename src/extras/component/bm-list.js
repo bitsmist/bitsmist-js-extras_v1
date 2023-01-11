@@ -39,13 +39,13 @@ List.prototype._getSettings = function(settings)
 
 	return {
 		"settings": {
-			"autoClear": true,
+			"autoClear":				true,
 		},
 		"events": {
 			"this": {
 				"handlers": {
 					"beforeStart": 		[this.onBeforeStart],
-					"afterAppend":		[this.onAfterAppend],
+					"afterTransform":	[this.onAfterTransform],
 					"doClear": 			[this.onDoClear],
 					"doFill": 			[this.onDoFill]
 				}
@@ -110,19 +110,19 @@ List.prototype.onBeforeStart = function(sender, e, ex)
 // -----------------------------------------------------------------------------
 
 /**
- * After append event handler.
+ * After transform event handler.
  *
  * @param	{Object}		sender				Sender.
  * @param	{Object}		e					Event info.
  * @param	{Object}		ex					Extra event info.
  */
-List.prototype.onAfterAppend = function(sender, e, ex)
+List.prototype.onAfterTransform = function(sender, e, ex)
 {
 
 	this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
 	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
-	return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
+	return this.transformRow(this.settings.get("settings.rowTemplateName"));
 
 }
 
@@ -172,14 +172,14 @@ List.prototype.onDoFill = function(sender, e, ex)
 // -----------------------------------------------------------------------------
 
 /**
- * Change a template html.
+ * Change a row template html.
  *
  * @param	{String}		templateName		Template name.
  * @param	{Object}		options				Options.
  *
  * @return  {Promise}		Promise.
  */
-List.prototype.switchRowTemplate = function(templateName, options)
+List.prototype.transformRow = function(templateName, options)
 {
 
 	options = options || {};
@@ -195,7 +195,7 @@ List.prototype.switchRowTemplate = function(templateName, options)
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
-		return this.callOrganizers("afterRowAppend", options);
+		return this.callOrganizers("afterRowAppend", this.settings.items);
 	}).then(() => {
 		return this.trigger("afterRowAppend", options);
 	}).then(() => {
