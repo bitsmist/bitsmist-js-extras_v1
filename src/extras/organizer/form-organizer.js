@@ -21,16 +21,10 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 */
-	static init(component, settings)
+	static attach(component, options)
 	{
 
-		// Add properties
+		// Add properties to component
 		Object.defineProperty(component, 'validators', {
 			get() { return this._validators; },
 		});
@@ -41,60 +35,90 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 			get() { return this._cancelSubmit; },
 		})
 
-		// Add methods
+		// Add methods to component
 		component.addValidator = function(validatorName, options) { return FormOrganizer._addValidator(this, validatorName, options); }
 		component.validate = function(options) { return FormOrganizer._validate(this, options); }
 		component.submit = function(options) { return FormOrganizer._submit(this, options); }
 
-		// Init vars
+		// Init component vars
 		component._validators = {};
 		component._validationResult = {};
 		component._cancelSubmit = false;
 
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", FormOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterSpecLoad", FormOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "doValidate", FormOrganizer.onDoValidate);
+		this._addOrganizerHandler(component, "doReportValidity", FormOrganizer.onDoReportValidity);
+
 	}
 
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	//	Event handlers
+	// -----------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static onBeforeStart(sender, e, ex)
 	{
 
-		switch (conditions)
+		let validations = this.settings.get("validations");
+		if (validations)
 		{
-		case "doCheckValidity":
-		case "doReportValidity":
-			let validationName = settings["validationName"];
-//			BITSMIST.v1.Util.warn(validationName, `FormOrganizer.organize(): Validator not specified. name=${component.name}`);
+			Object.keys(validations).forEach((validatorName) => {
+				FormOrganizer._addValidator(this, validatorName, validations[validatorName]);
+			});
+		}
 
-			if (validationName)
-			{
-				BITSMIST.v1.Util.assert(component._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${component.name}, validationName=${validationName}`);
+	}
 
-				let items = BITSMIST.v1.Util.safeGet(settings, "items");
-				let rules = component.settings.get("validations." + validationName + ".rules");
-				let options = component.settings.get("validations." + validationName + ".handlerOptions");
-				let method = (conditions === "doCheckValidity" ? "checkValidity" : "reportValidity" );
+	// -----------------------------------------------------------------------------
 
-				component._validators[validationName][method](items, rules, options);
-			}
-			break;
-		default:
-			let validations = settings["validations"];
-			if (validations)
-			{
-				Object.keys(validations).forEach((validatorName) => {
-					FormOrganizer._addValidator(component, validatorName, validations[validatorName]);
-				});
-			}
-			break;
+	static onAfterSpecLoad(sender, e, ex)
+	{
+
+		let validations = e.detail.spec["validations"]
+		if (validations)
+		{
+			Object.keys(validations).forEach((validatorName) => {
+				FormOrganizer._addValidator(this, validatorName, validations[validatorName]);
+			});
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static onDoValidate(sender, e, ex)
+	{
+
+		let validationName = this.settings.get("settings.validationName");
+		if (validationName)
+		{
+			BITSMIST.v1.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+
+			let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
+			let rules = this.settings.get("validations." + validationName + ".rules");
+			let options = this.settings.get("validations." + validationName + ".handlerOptions");
+
+			this._validators[validationName].checkValidity(items, rules, options);
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static onDoReportValidity(sender, e, ex)
+	{
+
+		let validationName = this.settings.get("settings.validationName");
+		if (validationName)
+		{
+			BITSMIST.v1.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+
+			let items = BITSMIST.v1.Util.safeGet(e.detail.settings, "items");
+			let rules = this.settings.get("validations." + validationName + ".rules");
+			let options = this.settings.get("validations." + validationName + ".handlerOptions");
+
+			this._validators[validationName].reportValidity(items, rules, options);
 		}
 
 	}
@@ -145,8 +169,6 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 		return Promise.resolve().then(() => {
 			return component.trigger("beforeValidate", options);
 		}).then(() => {
-			return component.callOrganizers("doCheckValidity", options);
-		}).then(() => {
 			return component.trigger("doValidate", options);
 		}).then(() => {
 			return component.trigger("afterValidate", options);
@@ -155,11 +177,7 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 			{
 				component._cancelSubmit = true;
 
-				return Promise.resolve().then(() => {
-					return component.callOrganizers("doReportValidity", options);
-				}).then(() => {
-					return component.trigger("doReportValidity", options);
-				});
+				return component.trigger("doReportValidity", options);
 			}
 		});
 
@@ -202,8 +220,6 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 			{
 				return Promise.resolve().then(() => {
 					return component.trigger("beforeSubmit", options);
-				}).then(() => {
-					return component.callOrganizers("doSubmit", options);
 				}).then(() => {
 					return component.trigger("doSubmit", options);
 				}).then(() => {

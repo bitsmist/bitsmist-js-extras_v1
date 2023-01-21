@@ -19,18 +19,10 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static init(component, settings)
+	static attach(component, options)
 	{
 
-		// Add properties
+		// Add properties to component
 		Object.defineProperty(component, 'modalResult', {
 			get() { return this._modalResult; },
 		});
@@ -38,51 +30,44 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 			get() { return this._isModal; },
 		});
 
-		// Add methods
+		// Add methods to component
 		component.open = function(options) { return DialogOrganizer._open(this, options); }
 		component.openModal = function(options) { return DialogOrganizer._openModal(this, options); }
 		component.close = function(options) { return DialogOrganizer._close(this, options); }
 
-		// Init vars
+		// Init component vars
 		component._isModal = false;
 		component._modalResult;
 		component._modalPromise;
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", DialogOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterStart", DialogOrganizer.onAfterStart);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event Handlers
+	// -------------------------------------------------------------------------
+
+	static onBeforeStart(sender, e, ex)
+	{
+
+		this.settings.set("settings.autoRefresh", false);
+		this.settings.set("settings.autoRefreshOnOpen", true);
+		this.settings.set("settings.autoSetup", false);
+		this.settings.set("settings.autoSetupOnOpen", true);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static onAfterStart(sender, e, ex)
 	{
 
-		let dialog = settings["dialog"];
-
-		switch (conditions)
+		if (this.settings.get("settings.autoOpen"))
 		{
-			case "beforeStart":
-		//		if (dialog["overrideSettings"])
-				{
-					component.settings.set("settings.autoRefresh", false);
-					component.settings.set("settings.autoRefreshOnOpen", true);
-					component.settings.set("settings.autoSetup", false);
-					component.settings.set("settings.autoSetupOnOpen", true);
-				}
-				break;
-			case "afterStart":
-				if (component.settings.get("settings.autoOpen"))
-				{
-					component.open();
-				}
-				break;
+			return this.open();
 		}
 
 	}

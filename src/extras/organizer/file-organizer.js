@@ -19,16 +19,40 @@ export default class FileOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static attach(component, options)
+	{
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", FileOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterSpecLoad", FileOrganizer.onAfterSpecLoad);
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//	Event handlers
+	// -----------------------------------------------------------------------------
+
+	static onBeforeStart(sender, e, ex)
+	{
+
+		return FileOrganizer._loadFiles(this.settings.items);
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static onAfterSpecLoad(sender, e, ex)
+	{
+
+		return FileOrganizer._loadFiles(e.detail.spec);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
+	static _loadFiles(settings)
 	{
 
 		let promises = [];

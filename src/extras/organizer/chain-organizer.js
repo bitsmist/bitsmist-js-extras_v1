@@ -19,34 +19,21 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static attach(component, options)
 	{
 
-		let chains = settings["chains"];
-		if (chains)
-		{
-			Object.keys(chains).forEach((eventName) => {
-				component.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-			});
-		}
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", ChainOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterSpecLoad", ChainOrganizer.onAfterSpecLoad);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
-	static unorganize(conditions, component, settings)
+	static detach(component, options)
 	{
 
-		let chains = settings["chains"];
+		let chains = this.settings.get("chains");
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
@@ -60,13 +47,24 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * DoOrganize event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
+	static onBeforeStart(sender, e, ex)
+	{
+
+		return ChainOrganizer.__installHandlers(this, this.settings.items);
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static onAfterSpecLoad(sender, e, ex)
+	{
+
+		return ChainOrganizer.__installHandlers(this, e.detail.spec);
+
+	}
+
+	// -----------------------------------------------------------------------------
+
 	static onDoOrganize(sender, e, ex)
 	{
 
@@ -106,6 +104,27 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 
 	// -----------------------------------------------------------------------------
 	//	Privates
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Install setup event handlers.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		settings			Component settings.
+	 */
+	static __installHandlers(component, settings)
+	{
+
+		let chains = settings["chains"];
+		if (chains)
+		{
+			Object.keys(chains).forEach((eventName) => {
+				component.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
+			});
+		}
+
+	}
+
 	// -----------------------------------------------------------------------------
 
 	/**

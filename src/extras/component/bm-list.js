@@ -195,8 +195,6 @@ List.prototype.transformRow = function(templateName, options)
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
-		return this.callOrganizers("afterRowAppend", this.settings.items);
-	}).then(() => {
 		return this.trigger("afterRowAppend", options);
 	}).then(() => {
 		console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);

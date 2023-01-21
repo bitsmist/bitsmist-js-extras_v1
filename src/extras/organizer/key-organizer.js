@@ -19,54 +19,42 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 */
-	static init(component, settings)
+	static attach(component, options)
 	{
 
-		// Init vars
+		// Init component vars
 		component.__isComposing = false;
 
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
-	{
-
-		let keys = settings["keys"];
-		if (keys)
-		{
-			// Init keys
-			let actions = KeyOrganizer.__getActions(keys);
-			component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component);});
-			component.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, component, keys, actions);});
-			// component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
-			// component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
-
-			// Init buttons
-			Object.keys(keys).forEach((key) => {
-				KeyOrganizer.__initButtons(component, key, keys[key]);
-			});
-		}
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "afterTransform", KeyOrganizer.onAfterTransform);
 
 	}
 
 	// -------------------------------------------------------------------------
 	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static onAfterTransform(sender, e, ex)
+	{
+
+		let keys = this.settings.get("keys");
+		if (keys)
+		{
+			// Init keys
+			let actions = KeyOrganizer.__getActions(keys);
+			this.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, this);});
+			this.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, this, keys, actions);});
+			//this.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, this, keys);});
+			//this.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, this, keys);});
+
+			// Init buttons
+			Object.keys(keys).forEach((key) => {
+				KeyOrganizer.__initButtons(this, key, keys[key]);
+			});
+		}
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**

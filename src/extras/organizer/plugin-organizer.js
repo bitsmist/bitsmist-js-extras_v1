@@ -19,39 +19,29 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 */
-	static init(component, settings)
+	static attach(component, options)
 	{
 
-		// Init vars
+		// Init component vars
 		component._plugins = {};
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", PluginOrganizer.onBeforeStart);
 
 	}
 
 	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static onBeforeStart(sender, e, ex)
 	{
 
-		let plugins = settings["plugins"];
+		let plugins = this.settings.get("plugins");
 		if (plugins)
 		{
 			Object.keys(plugins).forEach((pluginName) => {
-				PluginOrganizer._addPlugin(component, pluginName, plugins[pluginName]);
+				PluginOrganizer._addPlugin(this, pluginName, plugins[pluginName]);
 			});
 		}
 
@@ -67,7 +57,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	 * @param	{String}		pluginName			Plugin name.
 	 * @param	{Object}		options				Options for the plugin.
 	 *
-	 * @return  {Promise}		Promise.
+	 * @return  {Object}		Added plugin.
 	 */
 	static _addPlugin(component, pluginName, options)
 	{

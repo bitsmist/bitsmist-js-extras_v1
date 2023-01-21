@@ -104,13 +104,10 @@ PreferenceManager.prototype.set = function(values, options)
 	this._validationResult["result"] = true;
 
 	Promise.resolve().then(() => {
-		// Validate
-		return this.callOrganizers("doCheckValidity", {"items":values, "validationName":this._settings.get("settings.validationName")});
-	}).then(() => {
-		return this.trigger("doValidate", options);
+		return this.trigger("doValidate", {"items":values, "options":options});
 	}).then(() => {
 		// Validation failed?
-		if (!this._validationResult["result"])
+		if (!this.validationResult["result"])
 		{
 			throw new Error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}, invalids=${JSON.stringify(this._validationResult["invalids"])}`);
 		}

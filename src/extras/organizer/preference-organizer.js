@@ -21,9 +21,6 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Global init.
-	 */
 	static globalInit()
 	{
 
@@ -40,32 +37,51 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 */
-	static init(component, settings)
+	static attach(component, options)
 	{
 
-		// Register a component as an observer
-		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
+		// Register component as an observer
+		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(options, "preferences.targets")});
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", PreferenceOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterSpecLoad", PreferenceOrganizer.onAfterSpecLoad);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static onBeforeStart(sender, e, ex)
+	{
+
+		return PreferenceOrganizer._organize(this, this.settings.items);
 
 	}
 
 	// -------------------------------------------------------------------------
 
+	static onAfterSpecLoad(sender, e, ex)
+	{
+
+		return PreferenceOrganizer._organize(this, e.detail.spec);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
 	/**
 	 * Organize.
 	 *
-	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		settings			Settings.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static organize(conditions, component, settings)
+	static _organize(component, settings)
 	{
 
 		let chain = Promise.resolve();
@@ -99,8 +115,6 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Protected
 	// -------------------------------------------------------------------------
 
 	/**

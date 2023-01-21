@@ -21,25 +21,11 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static attach(component, options)
 	{
 
-		let elements = settings["elements"];
-		if (elements)
-		{
-			Object.keys(elements).forEach((eventName) => {
-				component.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
-			});
-		}
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "beforeStart", ElementOrganizer.onBeforeStart);
 
 	}
 
@@ -47,13 +33,21 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * DoOrganize event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
+	static onBeforeStart(sender, e, ex)
+	{
+
+		let elements = this.settings.get("elements");
+		if (elements)
+		{
+			Object.keys(elements).forEach((eventName) => {
+				this.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
+			});
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
 	static onDoOrganize(sender, e, ex)
 	{
 
