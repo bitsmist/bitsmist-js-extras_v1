@@ -21,6 +21,19 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"PreferenceOrganizer",
+			"targetWords":	"preferences",
+			"order":		900,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static globalInit()
 	{
 

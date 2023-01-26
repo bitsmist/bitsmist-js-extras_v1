@@ -19,6 +19,19 @@ export default class ErrorOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"ErrorOrganizer",
+			"targetWords":	"errors",
+			"order":		120,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static globalInit()
 	{
 

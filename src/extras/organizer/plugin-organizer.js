@@ -19,6 +19,19 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"PluginOrganizer",
+			"targetWords":	"plugins",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

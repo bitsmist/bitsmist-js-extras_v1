@@ -19,6 +19,19 @@ export default class KeyOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"KeyOrganizer",
+			"targetWords":	"keys",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

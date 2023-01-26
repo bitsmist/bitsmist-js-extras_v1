@@ -21,6 +21,19 @@ export default class ElementOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"ElementOrganizer",
+			"targetWords":	"elements",
+			"order":		220,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

@@ -21,6 +21,19 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"FormOrganizer",
+			"targetWords":	["forms", "validations"],
+			"order":		310,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

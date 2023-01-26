@@ -19,6 +19,19 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"ResourceOrganizer",
+			"targetWords":	"resources",
+			"order":		300,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

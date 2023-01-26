@@ -12,37 +12,37 @@ window.BITSMIST.v1.BindableStore = BindableStore;
 // Organizer
 
 import FileOrganizer from "./organizer/file-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["beforeStart", "afterSpecLoad"], "order":110});
+BITSMIST.v1.OrganizerOrganizer.register(FileOrganizer);
 
 import ErrorOrganizer from "./organizer/error-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart", "afterSpecLoad"], "order":120});
+BITSMIST.v1.OrganizerOrganizer.register(ErrorOrganizer);
 
 import ElementOrganizer from "./organizer/element-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":220});
+BITSMIST.v1.OrganizerOrganizer.register(ElementOrganizer);
 
 import ResourceOrganizer from "./organizer/resource-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
+BITSMIST.v1.OrganizerOrganizer.register(ResourceOrganizer);
 
 import FormOrganizer from "./organizer/form-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("FormOrganizer", {"object":FormOrganizer, "targetWords":["forms", "validations"], "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
+BITSMIST.v1.OrganizerOrganizer.register(FormOrganizer);
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterTransform"], "order":320});
+BITSMIST.v1.OrganizerOrganizer.register(DatabindingOrganizer);
 
 import PluginOrganizer from "./organizer/plugin-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
+BITSMIST.v1.OrganizerOrganizer.register(PluginOrganizer);
 
 import KeyOrganizer from "./organizer/key-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterTransform"], "order":800});
+BITSMIST.v1.OrganizerOrganizer.register(KeyOrganizer);
 
 import ChainOrganizer from "./organizer/chain-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
+BITSMIST.v1.OrganizerOrganizer.register(ChainOrganizer);
 
 import DialogOrganizer from "./organizer/dialog-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("DialogOrganizer", {"object":DialogOrganizer, "targetWords":"dialog", "targetEvents":["beforeStart", "afterStart"], "order":800});
+BITSMIST.v1.OrganizerOrganizer.register(DialogOrganizer);
 
 import PreferenceOrganizer from "./organizer/preference-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":900});
+BITSMIST.v1.OrganizerOrganizer.register(PreferenceOrganizer);
 
 // Plugin
 

@@ -21,15 +21,20 @@ export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static init(component, settings)
+	static getInfo()
+	{
+
+		return {
+			"name":			"DatabindingOrganizer",
+			"targetWords":	"binds",
+			"order":		320,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static attach(component, options)
 	{
 
 		// Add properties

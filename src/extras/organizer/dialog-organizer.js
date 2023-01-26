@@ -19,6 +19,19 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"DialogOrganizer",
+			"targetWords":	"dialog",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 

@@ -19,6 +19,19 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	static getInfo()
+	{
+
+		return {
+			"name":			"ChainOrganizer",
+			"targetWords":	"chains",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static attach(component, options)
 	{
 
