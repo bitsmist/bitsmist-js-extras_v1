@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	TagLoader class
 // =============================================================================
@@ -27,7 +29,7 @@ export default function TagLoader()
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(TagLoader, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(TagLoader, BM.Component);
 
 // -----------------------------------------------------------------------------
 //  Methods
@@ -49,18 +51,18 @@ TagLoader.prototype.start = function(settings)
 			"name": "TagLoader",
 		},
 	};
-	settings = ( settings ? BITSMIST.v1.Util.deepMerge(defaults, settings) : defaults );
+	settings = ( settings ? BM.Util.deepMerge(defaults, settings) : defaults );
 
 	// super()
-	return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+	return BM.Component.prototype.start.call(this, settings).then(() => {
 		if (document.readyState !== "loading")
 		{
-			BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
+			BM.LoaderOrganizer.load(document.body, this.settings);
 		}
 		else
 		{
 			document.addEventListener("DOMContentLoaded", () => {
-				BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
+				BM.LoaderOrganizer.load(document.body, this.settings);
 			});
 		}
 	});

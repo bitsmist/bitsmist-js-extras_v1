@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
@@ -24,11 +25,11 @@ import FormUtil from "../util/form-util.js";
 export default function List()
 {
 
-	return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
+	return Reflect.construct(BM.Component, [], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(List, BM.Component);
 
 // -----------------------------------------------------------------------------
 //  Settings
@@ -120,7 +121,7 @@ List.prototype.onAfterTransform = function(sender, e, ex)
 {
 
 	this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
-	BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
+	BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 	return this.transformRow(this.settings.get("settings.rowTemplateName"));
 
@@ -157,7 +158,7 @@ List.prototype.onDoFill = function(sender, e, ex)
 	this._rows = [];
 	let builder = this._getBuilder(e.detail);
 	let fragment = document.createDocumentFragment();
-	let items = BITSMIST.v1.Util.safeGet(e.detail, "items", this._items);
+	let items = BM.Util.safeGet(e.detail, "items", this._items);
 
 	return Promise.resolve().then(() => {
 		return builder.call(this, fragment, items);
@@ -216,7 +217,7 @@ List.prototype.transformRow = function(templateName, options)
 List.prototype._getBuilder = function(options)
 {
 
-	let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this.settings.get("settings.async", true));
+	let rowAsync = BM.Util.safeGet(options, "async", this.settings.get("settings.async", true));
 	let builder = ( rowAsync ? this._buildAsync : this._buildSync );
 
 	return builder;
@@ -235,7 +236,7 @@ List.prototype._getBuilder = function(options)
 List.prototype._buildSync = function(fragment, items)
 {
 
-	BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
+	BM.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
 	let chain = Promise.resolve();
 	let rowEvents = this.settings.get("rowevents");
@@ -262,7 +263,7 @@ List.prototype._buildSync = function(fragment, items)
 List.prototype._buildAsync = function(fragment, items)
 {
 
-	BITSMIST.v1.Util.assert(this.templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
+	BM.Util.assert(this.templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
 
 	let rowEvents = this.settings.get("rowevents");
 	let template = this.templates[this._activeRowTemplateName].html;

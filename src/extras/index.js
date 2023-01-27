@@ -1,5 +1,4 @@
-window.BITSMIST = window.BITSMIST || {};
-window.BITSMIST.v1 = window.BITSMIST.v1 || {};
+import BM from "./bm";
 
 // Store
 
@@ -12,37 +11,37 @@ window.BITSMIST.v1.BindableStore = BindableStore;
 // Organizer
 
 import FileOrganizer from "./organizer/file-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(FileOrganizer);
+BM.OrganizerOrganizer.register(FileOrganizer);
 
 import ErrorOrganizer from "./organizer/error-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(ErrorOrganizer);
+BM.OrganizerOrganizer.register(ErrorOrganizer);
 
 import ElementOrganizer from "./organizer/element-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(ElementOrganizer);
+BM.OrganizerOrganizer.register(ElementOrganizer);
 
 import ResourceOrganizer from "./organizer/resource-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(ResourceOrganizer);
+BM.OrganizerOrganizer.register(ResourceOrganizer);
 
 import FormOrganizer from "./organizer/form-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(FormOrganizer);
+BM.OrganizerOrganizer.register(FormOrganizer);
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(DatabindingOrganizer);
+BM.OrganizerOrganizer.register(DatabindingOrganizer);
 
 import PluginOrganizer from "./organizer/plugin-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(PluginOrganizer);
+BM.OrganizerOrganizer.register(PluginOrganizer);
 
 import KeyOrganizer from "./organizer/key-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(KeyOrganizer);
+BM.OrganizerOrganizer.register(KeyOrganizer);
 
 import ChainOrganizer from "./organizer/chain-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(ChainOrganizer);
+BM.OrganizerOrganizer.register(ChainOrganizer);
 
 import DialogOrganizer from "./organizer/dialog-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(DialogOrganizer);
+BM.OrganizerOrganizer.register(DialogOrganizer);
 
 import PreferenceOrganizer from "./organizer/preference-organizer.js";
-BITSMIST.v1.OrganizerOrganizer.register(PreferenceOrganizer);
+BM.OrganizerOrganizer.register(PreferenceOrganizer);
 
 // Plugin
 

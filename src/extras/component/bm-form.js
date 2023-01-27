@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
@@ -24,11 +25,11 @@ import FormUtil from "../util/form-util.js";
 export default function Form(settings)
 {
 
-	return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
+	return Reflect.construct(BM.Component, [settings], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(Form, BM.Component);
 
 // -----------------------------------------------------------------------------
 //  Settings
@@ -124,7 +125,7 @@ Form.prototype.onAfterTransform = function(sender, e, ex)
 Form.prototype.onDoClear = function(sender, e, ex)
 {
 
-	let target = BITSMIST.v1.Util.safeGet(e.detail, "target", "");
+	let target = BM.Util.safeGet(e.detail, "target", "");
 
 	return FormUtil.clearFields(this, target);
 
@@ -143,7 +144,7 @@ Form.prototype.onDoFill = function(sender, e, ex)
 {
 
 	let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
-	let items = BITSMIST.v1.Util.safeGet(e.detail, "items", this._items);
+	let items = BM.Util.safeGet(e.detail, "items", this._items);
 
 	FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
 	FormUtil.showConditionalElements(this, items);

@@ -9,12 +9,13 @@
 // =============================================================================
 
 import BindableStore from "../store/bindable-store.js";
+import BM from "../bm";
 
 // =============================================================================
 //	Databinding organizer class
 // =============================================================================
 
-export default class DatabindingOrganizer extends BITSMIST.v1.Organizer
+export default class DatabindingOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------

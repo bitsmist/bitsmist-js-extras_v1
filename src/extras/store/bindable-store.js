@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 import ObservableStore from "./observable-store.js";
 
@@ -62,7 +63,7 @@ export default class BindableStore extends ObservableStore
 //		FormUtil.setValue(elem, this.get(key));
 
 		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
-		if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
+		if (!bound && BM.Util.safeGet(this._options, "2way", true))
 		{
 			// Change element's value when store value changed
 			this.subscribe(key, () => {
@@ -70,7 +71,7 @@ export default class BindableStore extends ObservableStore
 			});
 
 			// Set store value when element's value changed
-			let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
+			let eventName = BM.Util.safeGet(this._options, "eventName", "change");
 			elem.addEventListener(eventName, (() => {
 				this.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
 			}).bind(this));

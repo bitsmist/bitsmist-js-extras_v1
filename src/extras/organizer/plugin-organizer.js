@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Plugin organizer class
 // =============================================================================
 
-export default class PluginOrganizer extends BITSMIST.v1.Organizer
+export default class PluginOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -82,7 +84,7 @@ export default class PluginOrganizer extends BITSMIST.v1.Organizer
 		let plugin = null;
 
 		// CreatePlugin
-		plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
+		plugin = BM.ClassUtil.createObject(className, component, options);
 		component._plugins[pluginName] = plugin;
 
 		return plugin;

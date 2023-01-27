@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Resource Handler class
 // =============================================================================
@@ -32,7 +34,7 @@ export default class ResourceHandler
 
 		this._resourceName = resourceName;
 		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":options});
+		this._options = new BM.Store({"items":options});
 		this._data = {};
 		this._items = [];
 		this._name = "ResourceHandler";
@@ -167,7 +169,7 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._get(id, parameters);
 		}).then((data) => {
-//			BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+//			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 			this.data = data;
 
@@ -362,7 +364,7 @@ export default class ResourceHandler
 
 		// Get items
 		let itemsField = this._options.get("fieldOptions.items");
-		let items = ( itemsField ? BITSMIST.v1.Util.safeGet(data, itemsField) : data );
+		let items = ( itemsField ? BM.Util.safeGet(data, itemsField) : data );
 
 		// Reshape
 		if (this._options.get("reshapeOptions.get.reshape"))

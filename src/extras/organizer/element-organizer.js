@@ -8,13 +8,14 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
 //	Element organizer class
 // =============================================================================
 
-export default class ElementOrganizer extends BITSMIST.v1.Organizer
+export default class ElementOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------

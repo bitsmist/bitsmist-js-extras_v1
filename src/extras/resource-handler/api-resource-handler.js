@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import ResourceHandler from "./resource-handler.js";
 
 // =============================================================================
@@ -59,7 +60,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
 			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
@@ -86,7 +87,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
+		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
 
 	}
 
@@ -112,7 +113,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
@@ -138,7 +139,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 

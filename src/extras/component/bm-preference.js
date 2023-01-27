@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import PreferenceOrganizer from "../organizer/preference-organizer.js";
 
 // =============================================================================
@@ -24,11 +25,11 @@ import PreferenceOrganizer from "../organizer/preference-organizer.js";
 export default function PreferenceManager(settings)
 {
 
-	return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
+	return Reflect.construct(BM.Component, [settings], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(PreferenceManager, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(PreferenceManager, BM.Component);
 
 // -----------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ PreferenceManager.prototype.set = function(values, options)
 		PreferenceOrganizer._store.set("", values, options);
 
 		// Save preferences
-		if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
+		if (BM.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
 		{
 			return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
 		}

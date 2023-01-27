@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Validation Handler class
 // =============================================================================
@@ -32,7 +34,7 @@ export default class ValidationHandler
 
 		this._name = validatorName;
 		this._component = component;
-		this._options = new BITSMIST.v1.Store({"items":options});
+		this._options = new BM.Store({"items":options});
 
 	}
 

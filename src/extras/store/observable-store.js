@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Observable store class
 // =============================================================================
 
-export default class ObservableStore extends BITSMIST.v1.ChainableStore
+export default class ObservableStore extends BM.ChainableStore
 {
 
 	// -------------------------------------------------------------------------
@@ -34,7 +36,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 		this._filter;
 		this._observers = [];
 
-		this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", () => { return true; } );
+		this.filter = BM.Util.safeGet(this._options, "filter", () => { return true; } );
 
 	}
 
@@ -57,7 +59,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 	set filter(value)
 	{
 
-		BITSMIST.v1.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
+		BM.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
 		this._filter = value;
 
@@ -87,12 +89,12 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 		{
 			if (this.get(key) !== value)
 			{
-				BITSMIST.v1.Util.safeSet(this._items, key, value);
+				BM.Util.safeSet(this._items, key, value);
 				changedItem[key] = value;
 			}
 		}
 
-		let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+		let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
 		if (notify && Object.keys(changedItem).length > 0)
 		{
 			return this.notify(changedItem);
@@ -114,7 +116,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
         this._items = {};
         this.__deepMerge(this._items, value);
 
-        let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+        let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
         if (notify)
         {
             return this.notify("*");
@@ -134,7 +136,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 	subscribe(id, handler, options)
 	{
 
-		BITSMIST.v1.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
+		BM.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 		this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -174,7 +176,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 	notify(conditions, ...args)
 	{
 
-		if (BITSMIST.v1.Util.safeGet(this._options, "async", false))
+		if (BM.Util.safeGet(this._options, "async", false))
 		{
 			return this.notifyAsync(conditions, ...args);
 		}
@@ -282,7 +284,7 @@ export default class ObservableStore extends BITSMIST.v1.ChainableStore
 		changedItem = changedItem || {};
 		let key = "";
 
-		BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+		BM.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
 
 		Object.keys(obj2).forEach((key) => {
 			if (Array.isArray(obj1[key]))

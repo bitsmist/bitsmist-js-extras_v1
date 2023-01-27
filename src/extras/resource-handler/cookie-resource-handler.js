@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import ResourceHandler from "./resource-handler.js";
 
 // =============================================================================
@@ -35,7 +36,7 @@ export default class CookieResourceHandler extends ResourceHandler
 		super(component, resourceName, Object.assign(defaults, options));
 
 		this._name = "CookieResourceHandler";
-		this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
+		this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 	}
 

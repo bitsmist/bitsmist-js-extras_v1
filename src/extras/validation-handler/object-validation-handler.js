@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import ValidationHandler from "./validation-handler.js";
 
 // =============================================================================
@@ -66,7 +67,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
 		let invalids2 = ObjectValidationHandler.validate(values, rules);
-		let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;

@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Plugin base class
 // =============================================================================
@@ -29,7 +31,7 @@ export default class Plugin
 	{
 
 		this._component = component
-		this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+		this._options = new BM.Store({"items":Object.assign({}, options)});
 		this._options.merge(this._getOptions());
 		this._options.set("name", this._options.get("name", this.constructor.name));
 

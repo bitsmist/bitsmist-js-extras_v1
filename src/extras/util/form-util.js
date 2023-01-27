@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormatterUtil from "./formatter-util.js";
 
 // =============================================================================
@@ -30,12 +31,12 @@ FormUtil.showConditionalElements = function(rootNode, item)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 	// Show elements
 	elements.forEach((element) => {
 		let condition = element.getAttribute("bm-visible");
-		if (BITSMIST.v1.Util.safeEval(condition, item, item))
+		if (BM.Util.safeEval(condition, item, item))
 		{
 			element.style.removeProperty("display");
 		}
@@ -58,7 +59,7 @@ FormUtil.hideConditionalElements = function(rootNode)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 	// Hide elements
 	elements.forEach((element) => {
@@ -80,18 +81,18 @@ FormUtil.hideConditionalElements = function(rootNode)
 FormUtil.setFields = function(rootNode, item, options)
 {
 
-	let masters = BITSMIST.v1.Util.safeGet(options, "masters");
-	let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
+	let masters = BM.Util.safeGet(options, "masters");
+	let triggerEvent = BM.Util.safeGet(options, "triggerEvent");
 
 	// Get elements with bm-bind attribute
-	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 	elements.push(rootNode);
 
 	elements.forEach((element) => {
 		let fieldName = element.getAttribute("bm-bind");
 		if (fieldName in item)
 		{
-			let value = BITSMIST.v1.Util.safeGet(item, fieldName, "");
+			let value = BM.Util.safeGet(item, fieldName, "");
 
 			// Get master value
 			if (element.hasAttribute("bm-bindtext"))
@@ -138,7 +139,7 @@ FormUtil.getFields = function(rootNode)
 	let item = {};
 
 	// Get elements with bm-bind attribute
-	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 	elements.push(rootNode);
 
 	elements.forEach((element) => {
@@ -149,7 +150,7 @@ FormUtil.getFields = function(rootNode)
 		// Deformat
 		if (element.hasAttribute("bm-format"))
 		{
-			value = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
+			value = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
 		}
 
 		if (Array.isArray(item[key]))
@@ -197,7 +198,7 @@ FormUtil.clearFields = function(rootNode, target)
 	target = (target ? target : "");
 
 	// Get input elements
-	let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, target + " input");
+	let elements = BM.Util.scopedSelectorAll(rootNode, target + " input");
 
 	elements.forEach((element) => {
 		switch (element.type.toLowerCase())

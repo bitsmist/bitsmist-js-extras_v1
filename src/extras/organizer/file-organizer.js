@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	File organizer class
 // =============================================================================
 
-export default class FileOrganizer extends BITSMIST.v1.Organizer
+export default class FileOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -74,7 +76,7 @@ export default class FileOrganizer extends BITSMIST.v1.Organizer
 		if (files)
 		{
 			Object.keys(files).forEach((fileName) => {
-				promises.push(BITSMIST.v1.AjaxUtil.loadScript(files[fileName]["href"]));
+				promises.push(BM.AjaxUtil.loadScript(files[fileName]["href"]));
 			});
 		}
 

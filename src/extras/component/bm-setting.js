@@ -8,6 +8,8 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	SettingManager class
 // =============================================================================
@@ -27,7 +29,7 @@ export default function SettingManager()
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(SettingManager, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(SettingManager, BM.Component);
 
 // -----------------------------------------------------------------------------
 

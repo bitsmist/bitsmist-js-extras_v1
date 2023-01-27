@@ -1,8 +1,20 @@
 // =============================================================================
+/**
+ * BitsmistJS - Javascript Web Client Framework
+ *
+ * @copyright		Masaki Yasutake
+ * @link			https://bitsmist.com/
+ * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+ */
+// =============================================================================
+
+import BM from "../bm";
+
+// =============================================================================
 //	Chained Select Class
 // =============================================================================
 
-export default class ChainedSelect extends BITSMIST.v1.Component
+export default class ChainedSelect extends BM.Component
 {
 
 	// -------------------------------------------------------------------------
@@ -168,8 +180,8 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_DoClear(sender, e, ex)
 	{
 
-		let fromLevel = BITSMIST.v1.Util.safeGet(e.detail, "fromLevel", 1);
-		let toLevel = BITSMIST.v1.Util.safeGet(e.detail, "toLevel", this.length);
+		let fromLevel = BM.Util.safeGet(e.detail, "fromLevel", 1);
+		let toLevel = BM.Util.safeGet(e.detail, "toLevel", this.length);
 
 		for (let i = fromLevel; i <= toLevel; i++)
 		{
@@ -197,7 +209,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_DoFill(sender, e, ex)
 	{
 
-		let level = BITSMIST.v1.Util.safeGet(e.detail, "level", 1);
+		let level = BM.Util.safeGet(e.detail, "level", 1);
 		this.assignItems(level, this.items);
 
 	}
@@ -400,7 +412,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 	onChainedSelect_BeforeEdit(sender, e, ex)
 	{
 
-		let level = parseInt(BITSMIST.v1.Util.safeGet(e.detail, "level", 1));
+		let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
 		let selectBox = this.getSelect(level);
 
 		return new Promise((resolve, reject) => {
@@ -453,7 +465,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 		return new Promise((resolve, reject) => {
 			if (window.confirm("削除しますか？"))
 			{
-				let level = parseInt(BITSMIST.v1.Util.safeGet(e.detail, "level", 1));
+				let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
 				let selectBox = this.getSelect(level);
 
 				this.modalResult["text"] = selectBox.options[selectBox.selectedIndex].text;
@@ -510,7 +522,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		// Prerequisite check
 		let selectBox = this.querySelector(":scope [data-level='" + level + "'] > select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		items = items || {};
 
@@ -522,9 +534,9 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 				let item = document.createElement("option");
 				if (typeof(items[i] === "object"))
 				{
-					item.value = BITSMIST.v1.Util.safeGet(items[i], "value", items[i]);
-					item.text = BITSMIST.v1.Util.safeGet(items[i], "text", items[i]);
-					let css = BITSMIST.v1.Util.safeGet(items[i], "css");
+					item.value = BM.Util.safeGet(items[i], "value", items[i]);
+					item.text = BM.Util.safeGet(items[i], "text", items[i]);
+					let css = BM.Util.safeGet(items[i], "css");
 					if (css) {
 						Object.keys(css).forEach((style) => {
 							item.css[style] = css[style];
@@ -544,9 +556,9 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 			// items is an object
 			Object.keys(items).forEach((key) => {
 				let item = document.createElement("option");
-				item.value = BITSMIST.v1.Util.safeGet(items[key], "value", key);
-				item.text = BITSMIST.v1.Util.safeGet(items[key], "text", key);
-				let css = BITSMIST.v1.Util.safeGet(items[key], "css");
+				item.value = BM.Util.safeGet(items[key], "value", key);
+				item.text = BM.Util.safeGet(items[key], "text", key);
+				let css = BM.Util.safeGet(items[key], "css");
 				if (css) {
 					Object.keys(css).forEach((style) => {
 						item.css[style] = css[style];
@@ -576,7 +588,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		// Prerequisite check
 		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		selectBox.value = itemId;
 
@@ -612,7 +624,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		// Prerequisite check
 		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		// Backup current index since it changes after an option is added when select has no option.
 		let curIndex = selectBox.selectedIndex;
@@ -641,7 +653,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		// Prerequisite check
 		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 		// Edit the selectbox
 		selectBox.options[selectBox.selectedIndex].text = itemName;
@@ -661,7 +673,7 @@ export default class ChainedSelect extends BITSMIST.v1.Component
 
 		// Prerequisite check
 		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
-		BITSMIST.v1.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.name}, level=${level}`);
+		BM.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.name}, level=${level}`);
 
 		// Remove from the select element
 		selectBox.remove(selectBox.selectedIndex);

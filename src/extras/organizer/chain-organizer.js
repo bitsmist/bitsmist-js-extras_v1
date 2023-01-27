@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Chain organizer class
 // =============================================================================
 
-export default class ChainOrganizer extends BITSMIST.v1.Organizer
+export default class ChainOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -94,7 +96,7 @@ export default class ChainOrganizer extends BITSMIST.v1.Organizer
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			nodes = Array.prototype.slice.call(nodes, 0);
-			BITSMIST.v1.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			BM.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
 			if (sync)
 			{

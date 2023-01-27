@@ -8,13 +8,14 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import ObservableStore from "../store/observable-store.js";
 
 // =============================================================================
 //	Preference organizer class
 // =============================================================================
 
-export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
+export default class PreferenceOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -38,7 +39,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		// Init vars
-		PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
+		PreferenceOrganizer._defaults = new BM.ChainableStore();
 		PreferenceOrganizer._store = new ObservableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
 		PreferenceOrganizer.__loaded =  {};
 		PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
@@ -54,7 +55,7 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		// Register component as an observer
-		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(options, "preferences.targets")});
+		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BM.Util.safeGet(options, "preferences.targets")});
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "beforeStart", PreferenceOrganizer.onBeforeStart);
@@ -100,13 +101,13 @@ export default class PreferenceOrganizer extends BITSMIST.v1.Organizer
 		let chain = Promise.resolve();
 
 		// Set default preferences
-		if (BITSMIST.v1.Util.safeGet(settings, "preferences.defaults"))
+		if (BM.Util.safeGet(settings, "preferences.defaults"))
 		{
 			PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
 		}
 
 		// Load preferences
-		if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.autoLoad"))
+		if (BM.Util.safeGet(settings, "preferences.settings.autoLoad"))
 		{
 			chain = component.resources["preferences"].get().then((preferences) => {
 				PreferenceOrganizer._store.merge(preferences);

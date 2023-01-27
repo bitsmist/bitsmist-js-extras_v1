@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 import ValidationHandler from "./validation-handler.js";
 
@@ -35,10 +36,10 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids = {};
 
-		BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-		BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+		BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(form, "input:not([novalidate])")
+		let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])")
 		elements.forEach((element) => {
 			let key = element.getAttribute("bm-bind");
 			let value = FormUtil.getValue(element);
@@ -62,8 +63,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids = [];
 
-		BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-		BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+		BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
 		if (!form.checkValidity())
 		{
@@ -98,7 +99,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 			invalids1 = ValidationHandler.validate(values, rules, options);
 		}
 		invalids2 = HTML5FormValidationHandler.validate(form, rules);
-		let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 		this._component.validationResult["invalids"] = invalids;
@@ -118,8 +119,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let form = this._component.querySelector("form");
 
-		BITSMIST.v1.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
-		BITSMIST.v1.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
+		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
 
 		form.reportValidity();
 

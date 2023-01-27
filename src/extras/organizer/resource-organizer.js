@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Resource organizer class
 // =============================================================================
 
-export default class ResourceOrganizer extends BITSMIST.v1.Organizer
+export default class ResourceOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -127,8 +129,8 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 			let resource = this._resources[resourceName];
 			if (resource.options.get("autoFetch", true))
 			{
-				resource.target["id"] = BITSMIST.v1.Util.safeGet(e.detail, "id", resource.target["id"]);
-				resource.target["parameters"] = BITSMIST.v1.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 				promises.push(resource.get(resource.target["id"], resource.target["parameters"]));
 			}
@@ -157,14 +159,14 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	{
 
 		let promises = [];
-		let submitItem = BITSMIST.v1.Util.safeGet(e.detail, "items");
+		let submitItem = BM.Util.safeGet(e.detail, "items");
 
 		Object.keys(this._resources).forEach((resourceName) => {
 			let resource = this._resources[resourceName];
 			if (resource.options.get("autoSubmit", true)) {
-				let method = BITSMIST.v1.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
-				let id = BITSMIST.v1.Util.safeGet(e.detail, "id", resource.target["id"]);
-				let parameters = BITSMIST.v1.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
+				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 				promises.push(this._resources[resourceName][method](id, submitItem, parameters));
 			}
@@ -190,9 +192,9 @@ export default class ResourceOrganizer extends BITSMIST.v1.Organizer
 	static _addResource(component, resourceName, options)
 	{
 
-		BITSMIST.v1.Util.assert(options["handlerClassName"], `ResourceOrganizer._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourceOrganizer._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
 
-		let resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
+		let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 		component._resources[resourceName] = resource;
 
 		if (resource.options.get("target"))

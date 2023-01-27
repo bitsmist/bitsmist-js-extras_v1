@@ -8,11 +8,13 @@
  */
 // =============================================================================
 
+import BM from "../bm";
+
 // =============================================================================
 //	Dialog organizer class
 // =============================================================================
 
-export default class DialogOrganizer extends BITSMIST.v1.Organizer
+export default class DialogOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -106,13 +108,13 @@ export default class DialogOrganizer extends BITSMIST.v1.Organizer
 			return component.trigger("beforeOpen", options);
 		}).then(() => {
 			// Setup
-			if (BITSMIST.v1.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+			if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
 			{
 				return component.setup(options);
 			}
 		}).then(() => {
 			// Refresh
-			if (BITSMIST.v1.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
+			if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
 			{
 				return component.refresh(options);
 			}

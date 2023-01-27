@@ -8,6 +8,7 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 //import PreferenceOrganizer from "../organizer/preference-organizer.js";
 
 // =============================================================================
@@ -24,11 +25,11 @@
 export default function ErrorManager(settings)
 {
 
-	return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
+	return Reflect.construct(BM.Component, [settings], this.constructor);
 
 }
 
-BITSMIST.v1.ClassUtil.inherit(ErrorManager, BITSMIST.v1.Component);
+BM.ClassUtil.inherit(ErrorManager, BM.Component);
 
 // -----------------------------------------------------------------------------
 //  Setter/Getter

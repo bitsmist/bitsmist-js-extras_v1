@@ -8,13 +8,14 @@
  */
 // =============================================================================
 
+import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
 //	Form organizer class
 // =============================================================================
 
-export default class FormOrganizer extends BITSMIST.v1.Organizer
+export default class FormOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -106,9 +107,9 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 		let validationName = this.settings.get("settings.validationName");
 		if (validationName)
 		{
-			BITSMIST.v1.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+			BM.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
 
-			let items = BITSMIST.v1.Util.safeGet(e.detail, "items");
+			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.settings.get("validations." + validationName + ".rules");
 			let options = this.settings.get("validations." + validationName + ".handlerOptions");
 
@@ -125,9 +126,9 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 		let validationName = this.settings.get("settings.validationName");
 		if (validationName)
 		{
-			BITSMIST.v1.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+			BM.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
 
-			let items = BITSMIST.v1.Util.safeGet(e.detail.settings, "items");
+			let items = BM.Util.safeGet(e.detail.settings, "items");
 			let rules = this.settings.get("validations." + validationName + ".rules");
 			let options = this.settings.get("validations." + validationName + ".handlerOptions");
 
@@ -154,7 +155,7 @@ export default class FormOrganizer extends BITSMIST.v1.Organizer
 
 		if (options["handlerClassName"])
 		{
-			validator = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
+			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
 			component._validators[validatorName] = validator;
 		}
 
