@@ -1,3 +1,13 @@
+// =============================================================================
+/**
+ * BitsmistJS - Javascript Web Client Framework
+ *
+ * @copyright		Masaki Yasutake
+ * @link			https://bitsmist.com/
+ * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+ */
+// =============================================================================
+
 import BM from "./bm";
 
 // Store
