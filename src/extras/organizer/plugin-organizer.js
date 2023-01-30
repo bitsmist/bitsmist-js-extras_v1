@@ -94,7 +94,6 @@ export default class PluginOrganizer extends BM.Organizer
 	{
 
 		console.debug(`PluginOrganizer._addPlugin(): Adding a plugin. name=${component.name}, pluginName=${pluginName}`);
-		console.log(`PluginOrganizer._addPlugin(): Adding a plugin. name=${component.name}, pluginName=${pluginName}`, options);
 
 		options = options || {};
 		let className = ( "className" in options ? options["className"] : pluginName );
