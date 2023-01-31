@@ -50,8 +50,7 @@ export default class ResourceOrganizer extends BM.Organizer
 		component._resources = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", ResourceOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", ResourceOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", ResourceOrganizer.onAfterLoadSettings);
 		this._addOrganizerHandler(component, "doFetch", ResourceOrganizer.onDoFetch);
 		this._addOrganizerHandler(component, "doSubmit", ResourceOrganizer.onDoSubmit);
 
@@ -61,18 +60,11 @@ export default class ResourceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Before start event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
-	static onBeforeStart(sender, e, ex)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
 		let promises = [];
-		let resources = this.settings.get("resources");
+		let resources = e.detail.settings["resources"];
 		if (resources)
 		{
 			Object.keys(resources).forEach((resourceName) => {
@@ -87,39 +79,6 @@ export default class ResourceOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * After spec load event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		let promises = [];
-		let resources = e.detail.spec["resources"];
-		if (resources)
-		{
-			Object.keys(resources).forEach((resourceName) => {
-				// Add resource
-				promises.push(ResourceOrganizer._addResource(this, resourceName, resources[resourceName]));
-			});
-		}
-
-		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Do fetch event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
 	static onDoFetch(sender, e, ex)
 	{
 
@@ -148,13 +107,6 @@ export default class ResourceOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Do submit event handler.
-	 *
-	 * @param	{Object}		sender				Sender.
-	 * @param	{Object}		e					Event info.
-	 * @param	{Object}		ex					Extra event info.
-	 */
 	static onDoSubmit(sender, e, ex)
 	{
 
@@ -197,16 +149,10 @@ export default class ResourceOrganizer extends BM.Organizer
 		let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 		component._resources[resourceName] = resource;
 
-		if (resource.options.get("target"))
-		{
-			resource.target.id = resource.options.get("target.id");
-			resource.target.parameters = resource.options.get("target.parameters");
-		}
-
 		if (resource.options.get("autoLoad"))
 		{
-			let id = resource.options.get("autoLoadOptions.id", resource.target.id);
-			let parameters = resource.options.get("autoLoadOptions.parameters", resource.target.parameters);
+			let id = resource.options.get("autoLoadOptions.id");
+			let parameters = resource.options.get("autoLoadOptions.parameters");
 
 			return resource.get(id, parameters);
 		}

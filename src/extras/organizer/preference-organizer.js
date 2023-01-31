@@ -58,8 +58,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BM.Util.safeGet(options, "preferences.targets")});
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", PreferenceOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", PreferenceOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", PreferenceOrganizer.onAfterLoadSettings);
 
 	}
 
@@ -67,49 +66,21 @@ export default class PreferenceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
-	{
-
-		return PreferenceOrganizer._organize(this, this.settings.items);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		return PreferenceOrganizer._organize(this, e.detail.spec);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Organize.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _organize(component, settings)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
 		let chain = Promise.resolve();
 
 		// Set default preferences
-		if (BM.Util.safeGet(settings, "preferences.defaults"))
+		if (BM.Util.safeGet(e.detail.settings, "preferences.defaults"))
 		{
-			PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
+			PreferenceOrganizer._defaults.items = this.settings.get("preferences.defaults");
 		}
 
 		// Load preferences
-		if (BM.Util.safeGet(settings, "preferences.settings.autoLoad"))
+		if (BM.Util.safeGet(e.detail.settings, "preferences.settings.autoLoad"))
 		{
-			chain = component.resources["preferences"].get().then((preferences) => {
+			chain = this.resources["preferences"].get().then((preferences) => {
 				PreferenceOrganizer._store.merge(preferences);
 				PreferenceOrganizer.__loaded.resolve();
 			});
@@ -118,9 +89,9 @@ export default class PreferenceOrganizer extends BM.Organizer
 		// Wait for preference to be loaded
 		let timer;
 		return chain.then(() => {
-			let timeout = component.settings.get("system.preferenceTimeout", 10000);
+			let timeout = this.settings.get("system.preferenceTimeout", 10000);
 			timer = setTimeout(() => {
-				throw new ReferenceError(`Time out waiting for loading preferences. name=${component.name}`);
+				throw new ReferenceError(`Time out waiting for loading preferences. name=${this.name}`);
 			}, timeout);
 			return PreferenceOrganizer.__loaded.promise;
 		}).then(() => {
@@ -129,6 +100,8 @@ export default class PreferenceOrganizer extends BM.Organizer
 
 	}
 
+	// -------------------------------------------------------------------------
+	//  Protected
 	// -------------------------------------------------------------------------
 
 	/**

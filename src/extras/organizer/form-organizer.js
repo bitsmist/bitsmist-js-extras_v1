@@ -60,8 +60,7 @@ export default class FormOrganizer extends BM.Organizer
 		component._cancelSubmit = false;
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", FormOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", FormOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", FormOrganizer.onAfterLoadSettings);
 		this._addOrganizerHandler(component, "doValidate", FormOrganizer.onDoValidate);
 		this._addOrganizerHandler(component, "doReportValidity", FormOrganizer.onDoReportValidity);
 
@@ -71,25 +70,10 @@ export default class FormOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let validations = this.settings.get("validations");
-		if (validations)
-		{
-			Object.keys(validations).forEach((validatorName) => {
-				FormOrganizer._addValidator(this, validatorName, validations[validatorName]);
-			});
-		}
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		let validations = e.detail.spec["validations"]
+		let validations = e.detail.settings["validations"]
 		if (validations)
 		{
 			Object.keys(validations).forEach((validatorName) => {

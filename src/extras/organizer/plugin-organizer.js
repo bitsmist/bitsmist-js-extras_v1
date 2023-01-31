@@ -41,8 +41,7 @@ export default class PluginOrganizer extends BM.Organizer
 		component._plugins = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", PluginOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", PluginOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", PluginOrganizer.onAfterLoadSettings);
 
 	}
 
@@ -50,25 +49,10 @@ export default class PluginOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let plugins = this.settings.get("plugins");
-		if (plugins)
-		{
-			Object.keys(plugins).forEach((pluginName) => {
-				PluginOrganizer._addPlugin(this, pluginName, plugins[pluginName]);
-			});
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		let plugins = e.detail.spec["plugins"];
+		let plugins = e.detail.settings["plugins"];
 		if (plugins)
 		{
 			Object.keys(plugins).forEach((pluginName) => {

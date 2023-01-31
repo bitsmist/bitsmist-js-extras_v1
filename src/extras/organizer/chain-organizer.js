@@ -38,8 +38,7 @@ export default class ChainOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", ChainOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", ChainOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", ChainOrganizer.onAfterLoadSettings);
 
 	}
 
@@ -48,7 +47,7 @@ export default class ChainOrganizer extends BM.Organizer
 	static detach(component, options)
 	{
 
-		let chains = this.settings.get("chains");
+		let chains = e.details.setting["chains"];
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
@@ -62,19 +61,16 @@ export default class ChainOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		return ChainOrganizer.__installHandlers(this, this.settings.items);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		return ChainOrganizer.__installHandlers(this, e.detail.spec);
+		let chains = e.detail.settings["chains"];
+		if (chains)
+		{
+			Object.keys(chains).forEach((eventName) => {
+				this.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
+			});
+		}
 
 	}
 
@@ -119,27 +115,6 @@ export default class ChainOrganizer extends BM.Organizer
 
 	// -----------------------------------------------------------------------------
 	//	Privates
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Install setup event handlers.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Component settings.
-	 */
-	static __installHandlers(component, settings)
-	{
-
-		let chains = settings["chains"];
-		if (chains)
-		{
-			Object.keys(chains).forEach((eventName) => {
-				component.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-			});
-		}
-
-	}
-
 	// -----------------------------------------------------------------------------
 
 	/**

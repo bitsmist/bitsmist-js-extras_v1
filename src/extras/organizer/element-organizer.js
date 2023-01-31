@@ -39,7 +39,7 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", ElementOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "afterLoadSettings", ElementOrganizer.onAfterLoadSettings);
 
 	}
 
@@ -47,10 +47,10 @@ export default class ElementOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let elements = this.settings.get("elements");
+		let elements = e.detail.settings["elements"];
 		if (elements)
 		{
 			Object.keys(elements).forEach((eventName) => {

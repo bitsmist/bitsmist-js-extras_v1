@@ -38,8 +38,7 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", FileOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterSpecLoad", FileOrganizer.onAfterSpecLoad);
+		this._addOrganizerHandler(component, "afterLoadSettings", FileOrganizer.onAfterLoadSettings);
 
 	}
 
@@ -47,32 +46,12 @@ export default class FileOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
-	{
-
-		return FileOrganizer._loadFiles(this.settings.items);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static onAfterSpecLoad(sender, e, ex)
-	{
-
-		return FileOrganizer._loadFiles(e.detail.spec);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	static _loadFiles(settings)
+	static onAfterLoadSettings(sender, e, ex)
 	{
 
 		let promises = [];
 
-		let files = settings["files"];
+		let files = e.detail.settings["files"];
 		if (files)
 		{
 			Object.keys(files).forEach((fileName) => {
