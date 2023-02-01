@@ -191,14 +191,14 @@ List.prototype.transformRow = function(templateName, options)
 	}
 
 	return Promise.resolve().then(() => {
-		console.debug(`List.switchRowTemplate(): Switching a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
+		console.debug(`List.switchRowTemplate(): Switching a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}, uniqueId=${this.uniqueId}`);
 		return this.addTemplate(templateName);
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
 		return this.trigger("afterRowAppend", options);
 	}).then(() => {
-		console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
+		console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}, uniqueId=${this.uniqueId}`);
 	});
 
 }
