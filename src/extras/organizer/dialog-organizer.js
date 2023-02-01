@@ -57,7 +57,7 @@ export default class DialogOrganizer extends BM.Organizer
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "beforeStart", DialogOrganizer.onBeforeStart);
-		this._addOrganizerHandler(component, "afterStart", DialogOrganizer.onAfterStart);
+		this._addOrganizerHandler(component, "afterReady", DialogOrganizer.onAfterReady);
 
 	}
 
@@ -77,7 +77,7 @@ export default class DialogOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static onAfterStart(sender, e, ex)
+	static onAfterReady(sender, e, ex)
 	{
 
 		if (this.settings.get("settings.autoOpen"))
