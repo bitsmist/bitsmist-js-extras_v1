@@ -45,20 +45,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Fetch target.
-	 *
-	 * @type	{Object}
-	 */
-	get target()
-	{
-
-		return document.querySelector(this._options.get("rootNode"))["resources"][this._resourceName].target;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Raw data.
 	 *
 	 * @type	{Object}
@@ -66,7 +52,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get data()
 	{
 
-		return document.querySelector(this._options.get("rootNode"))["resources"][this._resourceName].data;
+		return this._ref.data;
 
 	}
 
@@ -84,7 +70,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	get items()
 	{
 
-		return document.querySelector(this._options.get("rootNode"))["resources"][this._resourceName].items;
+		return this._ref.items;
 
 	}
 
@@ -102,7 +88,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	getText(code)
 	{
 
-		return document.querySelector(this._options.get("rootNode"))["resources"][this._resourceName].getText(code);
+		return this._ref.getText(code);
 
 	}
 
@@ -118,7 +104,24 @@ export default class LinkedResourceHandler extends ResourceHandler
 	getItem(code)
 	{
 
-		return document.querySelector(this._options.get("rootNode"))["resources"][this._resourceName].getItem(code);
+		return this._ref.getItem(code);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
+	_get(id, parameters)
+	{
+
+		let rootNode = this._options.get("rootNode");
+		let resourceName = this._options.get("resourceName") || this._resourceName;
+
+		return this._component.waitFor([{"rootNode":rootNode}]).then(() => {
+			this._ref = document.querySelector(rootNode).resources[resourceName];
+			return this._ref;
+		});
 
 	}
 
