@@ -51,7 +51,7 @@ export default class ErrorOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, settings)
+	static init(component, settings)
 	{
 
 		let errors = settings["errors"];

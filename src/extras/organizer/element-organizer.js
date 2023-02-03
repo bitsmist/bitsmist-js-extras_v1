@@ -35,7 +35,7 @@ export default class ElementOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, options)
+	static init(component, options)
 	{
 
 		// Add event handlers to component

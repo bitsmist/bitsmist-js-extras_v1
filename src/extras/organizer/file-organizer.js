@@ -34,7 +34,7 @@ export default class FileOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, options)
+	static init(component, options)
 	{
 
 		// Add event handlers to component

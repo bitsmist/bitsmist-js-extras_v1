@@ -34,7 +34,7 @@ export default class PluginOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, options)
+	static init(component, options)
 	{
 
 		// Init component vars

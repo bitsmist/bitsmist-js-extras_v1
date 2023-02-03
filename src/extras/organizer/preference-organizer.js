@@ -51,7 +51,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, options)
+	static init(component, options)
 	{
 
 		// Register component as an observer

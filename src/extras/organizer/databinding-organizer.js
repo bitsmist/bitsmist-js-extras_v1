@@ -35,7 +35,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static attach(component, options)
+	static init(component, options)
 	{
 
 		// Add properties
