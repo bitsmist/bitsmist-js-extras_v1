@@ -19,6 +19,17 @@ export default class DatabindingOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "DatabindingOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -26,7 +37,6 @@ export default class DatabindingOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"DatabindingOrganizer",
 			"targetWords":	"binds",
 			"order":		320,
 		};

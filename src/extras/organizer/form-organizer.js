@@ -19,6 +19,17 @@ export default class FormOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "FormOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -26,7 +37,6 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"FormOrganizer",
 			"targetWords":	["forms", "validations"],
 			"order":		310,
 		};

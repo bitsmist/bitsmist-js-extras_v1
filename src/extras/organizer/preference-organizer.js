@@ -19,6 +19,17 @@ export default class PreferenceOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "PreferenceOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -26,7 +37,6 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"PreferenceOrganizer",
 			"targetWords":	"preferences",
 			"order":		900,
 		};

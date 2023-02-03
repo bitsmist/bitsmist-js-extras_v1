@@ -18,6 +18,17 @@ export default class FileOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "FileOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"FileOrganizer",
 			"targetWords":	"files",
 			"order":		110,
 		};

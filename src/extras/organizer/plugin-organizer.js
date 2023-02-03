@@ -18,6 +18,17 @@ export default class PluginOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "PluginOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class PluginOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"PluginOrganizer",
 			"targetWords":	"plugins",
 			"order":		800,
 		};

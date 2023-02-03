@@ -18,6 +18,17 @@ export default class ErrorOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ErrorOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class ErrorOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"ErrorOrganizer",
 			"targetWords":	"errors",
 			"order":		120,
 		};

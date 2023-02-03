@@ -18,6 +18,17 @@ export default class ChainOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ChainOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class ChainOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"ChainOrganizer",
 			"targetWords":	"chains",
 			"order":		800,
 		};

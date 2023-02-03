@@ -19,6 +19,17 @@ export default class ElementOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ElementOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -26,7 +37,6 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"ElementOrganizer",
 			"targetWords":	"elements",
 			"order":		220,
 		};

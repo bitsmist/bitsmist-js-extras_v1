@@ -18,6 +18,17 @@ export default class ResourceOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ResourceOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class ResourceOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"ResourceOrganizer",
 			"targetWords":	"resources",
 			"order":		300,
 		};

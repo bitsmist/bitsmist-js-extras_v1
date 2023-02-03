@@ -18,6 +18,17 @@ export default class DialogOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "DialogOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class DialogOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"DialogOrganizer",
 			"targetWords":	"dialog",
 			"order":		800,
 		};

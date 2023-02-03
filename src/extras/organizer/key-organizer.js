@@ -18,6 +18,17 @@ export default class KeyOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "KeyOrganizer";
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -25,7 +36,6 @@ export default class KeyOrganizer extends BM.Organizer
 	{
 
 		return {
-			"name":			"KeyOrganizer",
 			"targetWords":	"keys",
 			"order":		800,
 		};
