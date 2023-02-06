@@ -73,8 +73,8 @@ export default class KeyOrganizer extends BM.Organizer
 			//this.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, this, keys);});
 
 			// Init buttons
-			Object.keys(keys).forEach((key) => {
-				KeyOrganizer.__initButtons(this, key, keys[key]);
+			this._enumSettings(this.settings.get("keys"), (sectionName, sectionValue) => {
+				KeyOrganizer.__initButtons(this, sectionName, sectionValue);
 			});
 		}
 

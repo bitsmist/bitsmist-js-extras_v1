@@ -61,13 +61,9 @@ export default class FileOrganizer extends BM.Organizer
 
 		let promises = [];
 
-		let files = e.detail.settings["files"];
-		if (files)
-		{
-			Object.keys(files).forEach((fileName) => {
-				promises.push(BM.AjaxUtil.loadScript(files[fileName]["href"]));
-			});
-		}
+		this._enumSettings(e.detail.settings["files"], (sectionName, sectionValue) => {
+			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+		});
 
 		return Promise.all(promises);
 

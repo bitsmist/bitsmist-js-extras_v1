@@ -74,14 +74,10 @@ export default class ResourceOrganizer extends BM.Organizer
 	{
 
 		let promises = [];
-		let resources = e.detail.settings["resources"];
-		if (resources)
-		{
-			Object.keys(resources).forEach((resourceName) => {
-				// Add resource
-				promises.push(ResourceOrganizer._addResource(this, resourceName, resources[resourceName]));
-			});
-		}
+
+		this._enumSettings(e.detail.settings["resources"], (sectionName, sectionValue) => {
+			promises.push(ResourceOrganizer._addResource(this, sectionName, sectionValue));
+		});
 
 		return Promise.all(promises);
 

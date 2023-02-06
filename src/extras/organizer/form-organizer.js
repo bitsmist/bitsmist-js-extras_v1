@@ -83,13 +83,9 @@ export default class FormOrganizer extends BM.Organizer
 	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let validations = e.detail.settings["validations"]
-		if (validations)
-		{
-			Object.keys(validations).forEach((validatorName) => {
-				FormOrganizer._addValidator(this, validatorName, validations[validatorName]);
-			});
-		}
+		this._enumSettings(e.detail.settings["validations"], (sectionName, sectionValue) => {
+			FormOrganizer._addValidator(this, sectionName, sectionValue);
+		});
 
 	}
 

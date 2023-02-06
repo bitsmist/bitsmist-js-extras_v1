@@ -60,13 +60,9 @@ export default class ElementOrganizer extends BM.Organizer
 	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let elements = e.detail.settings["elements"];
-		if (elements)
-		{
-			Object.keys(elements).forEach((eventName) => {
-				this.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
-			});
-		}
+		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
+			this.addEventHandler(sectionName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":sectionValue}});
+		});
 
 	}
 

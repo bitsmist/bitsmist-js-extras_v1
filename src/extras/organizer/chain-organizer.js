@@ -54,7 +54,7 @@ export default class ChainOrganizer extends BM.Organizer
 
 	// -----------------------------------------------------------------------------
 
-	static detach(component, options)
+	static deinit(component, options)
 	{
 
 		let chains = e.details.setting["chains"];
@@ -74,13 +74,9 @@ export default class ChainOrganizer extends BM.Organizer
 	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let chains = e.detail.settings["chains"];
-		if (chains)
-		{
-			Object.keys(chains).forEach((eventName) => {
-				this.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-			});
-		}
+		this._enumSettings(e.detail.settings["chains"], (sectionName, sectionValue) => {
+			this.addEventHandler(sectionName, {"handler":ChainOrganizer.onDoOrganize, "options":sectionValue});
+		});
 
 	}
 

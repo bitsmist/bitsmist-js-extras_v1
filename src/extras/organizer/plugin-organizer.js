@@ -62,13 +62,9 @@ export default class PluginOrganizer extends BM.Organizer
 	static onAfterLoadSettings(sender, e, ex)
 	{
 
-		let plugins = e.detail.settings["plugins"];
-		if (plugins)
-		{
-			Object.keys(plugins).forEach((pluginName) => {
-				PluginOrganizer._addPlugin(this, pluginName, plugins[pluginName]);
-			});
-		}
+		this._enumSettings(e.detail.settings["plugins"], (sectionName, sectionValue) => {
+			PluginOrganizer._addPlugin(this, sectionName, sectionValue);
+		});
 
 	}
 
