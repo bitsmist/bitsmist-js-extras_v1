@@ -61,10 +61,10 @@ export default class ErrorOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static init(component, settings)
+	static init(component, options)
 	{
 
-		let errors = settings["errors"];
+		let errors = BM.Util.safeGet(options, "settings.errors");
 		if (errors)
 		{
 			ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
