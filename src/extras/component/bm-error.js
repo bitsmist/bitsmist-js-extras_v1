@@ -95,8 +95,6 @@ ErrorManager.prototype.onError = function(sender, e, ex)
 
 //	try
 	{
-		console.log("@@@error", e.detail.error.message);
-
 		if (document.querySelector("#msg"))
 		{
 			document.querySelector("#msg").innerText = e.detail.error.message;
