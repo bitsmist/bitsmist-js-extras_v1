@@ -81,13 +81,13 @@ export default class PreferenceOrganizer extends BM.Organizer
 
 		let chain = Promise.resolve();
 
-		// Set default preferences
+		// Set default preferences (Server side)
 		if (BM.Util.safeGet(e.detail.settings, "preferences.defaults"))
 		{
 			PreferenceOrganizer._defaults.items = this.settings.get("preferences.defaults");
 		}
 
-		// Load preferences
+		// Load preferences (Server side)
 		if (BM.Util.safeGet(e.detail.settings, "preferences.settings.autoLoad"))
 		{
 			chain = this.resources["preferences"].get().then((preferences) => {
@@ -96,7 +96,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 			});
 		}
 
-		// Wait for preference to be loaded
+		// Wait for preference to be loaded (Client side)
 		let timer;
 		return chain.then(() => {
 			let timeout = this.settings.get("system.preferenceTimeout", 10000);
