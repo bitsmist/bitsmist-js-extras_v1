@@ -65,7 +65,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		// Register component as an observer
-		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BM.Util.safeGet(options, "preferences.targets")});
+		PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BM.Util.safeGet(options, "settings.preferences.targets")});
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterLoadSettings", PreferenceOrganizer.onAfterLoadSettings);
