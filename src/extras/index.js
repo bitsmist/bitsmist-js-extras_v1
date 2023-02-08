@@ -109,5 +109,5 @@ import BmTabcontent from "./component/bm-tabcontent.js";
 window.BITSMIST.v1.BmTabcontent = BmTabcontent;
 
 import TagLoader from "./component/bm-tagloader.js";
-import SettingManager from "./component/bm-setting.js";
-import PreferenceManager from "./component/bm-preference.js";
+import SettingServer from "./component/bm-setting.js";
+import PreferenceServer from "./component/bm-preference.js";
