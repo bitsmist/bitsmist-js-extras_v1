@@ -47,7 +47,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		this._addOrganizerHandler(component, "afterLoadSettings", PreferenceOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", PreferenceOrganizer.onDoOrganize);
 
 	}
 
@@ -55,7 +55,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		// Wait for PreferenceManager to be ready
