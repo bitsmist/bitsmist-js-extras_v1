@@ -9,10 +9,10 @@
 // =============================================================================
 
 import BM from "../bm";
-import PreferenceOrganizer from "../organizer/preference-organizer.js";
+import ObservableStore from "../store/observable-store.js";
 
 // =============================================================================
-//	Preference manager class
+//	Preference Server Class
 // =============================================================================
 
 // -----------------------------------------------------------------------------
@@ -22,14 +22,14 @@ import PreferenceOrganizer from "../organizer/preference-organizer.js";
 /**
  * Constructor.
  */
-export default function PreferenceManager(settings)
+export default function PreferenceServer(settings)
 {
 
 	return Reflect.construct(BM.Component, [settings], this.constructor);
 
 }
 
-BM.ClassUtil.inherit(PreferenceManager, BM.Component);
+BM.ClassUtil.inherit(PreferenceServer, BM.Component);
 
 // -----------------------------------------------------------------------------
 
@@ -38,21 +38,31 @@ BM.ClassUtil.inherit(PreferenceManager, BM.Component);
  *
  * @return  {Object}		Options.
  */
-PreferenceManager.prototype._getSettings = function()
+PreferenceServer.prototype._getSettings = function()
 {
 
 	return {
 		// Settings
 		"settings": {
-			"autoRefresh":				false,
-			"autoSetup":				false,
+			"autoFill":					false,
 			"hasTemplate":				false,
-			"name":						"PreferenceManager",
+			"name":						"PreferenceServer",
 		},
 
 		// Organizers
 		"organizers": {
 			"FormOrganizer":			{"settings":{"attach":true}},
+		},
+
+		// Events
+		"events": {
+			"this": {
+				"handlers": {
+					"beforeStart":		this.onBeforeStart,
+					"doFetch":			this.onDoFetch,
+					"beforeSubmit":		this.onBeforeSubmit
+				}
+			}
 		}
 	}
 
@@ -67,12 +77,80 @@ PreferenceManager.prototype._getSettings = function()
  *
  * @type	{Object}
  */
-Object.defineProperty(PreferenceManager.prototype, "items", {
+Object.defineProperty(PreferenceServer.prototype, "items", {
 	get()
 	{
-		return PreferenceOrganizer._store.items;
+		return this._store.items;
+	},
+	set(value)
+	{
+		this._store.items = value;
 	},
 })
+
+// -----------------------------------------------------------------------------
+//  Event Handlers
+// -----------------------------------------------------------------------------
+
+PreferenceServer.prototype.onBeforeStart = function(sender, e, ex)
+{
+
+	this._defaults = new BM.ChainableStore();
+	this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
+
+}
+
+// -----------------------------------------------------------------------------
+
+PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
+{
+
+	let chain = Promise.resolve();
+
+	// Set default preferences
+	if (this.settings.get("defaults.preferences"))
+	{
+		this._defaults.items = this.settings.get("defaults.preferences");
+	}
+
+	// Load preferences
+	chain = this.resources["preferences"].get().then((preferences) => {
+		this._store.merge(preferences);
+	});
+
+}
+
+// -----------------------------------------------------------------------------
+
+PreferenceServer.prototype.onBeforeSubmit = function(sender, e, ex)
+{
+
+	let values = e.detail.values;
+	let options = e.detail.options;
+
+	this._store.set("", values, options);
+
+	// Pass items to the latter event handlers
+	e.detail.items = this._store.localItems;
+
+}
+
+// -----------------------------------------------------------------------------
+//  Methods
+// -----------------------------------------------------------------------------
+
+PreferenceServer.prototype.subscribe = function(component, options)
+{
+
+	this._store.subscribe(
+		component.name + "_" + component.uniqueId,
+		this._triggerEvent.bind(component),
+		{
+			"targets":BM.Util.safeGet(options, "targets")
+		}
+	);
+
+}
 
 // -----------------------------------------------------------------------------
 
@@ -84,10 +162,10 @@ Object.defineProperty(PreferenceManager.prototype, "items", {
  *
  * @return  {*}				Value.
  */
-PreferenceManager.prototype.get = function(key, defaultValue)
+PreferenceServer.prototype.get = function(key, defaultValue)
 {
 
-	return PreferenceOrganizer._store.get(key, defaultValue);
+	return this._store.get(key, defaultValue);
 
 }
 
@@ -99,32 +177,69 @@ PreferenceManager.prototype.get = function(key, defaultValue)
  * @param	{Object}		values				Values to store.
  * @param	{Object}		options				Options.
  */
-PreferenceManager.prototype.set = function(values, options)
+PreferenceServer.prototype.set = function(values, options)
 {
 
-	this._validationResult["result"] = true;
-
-	Promise.resolve().then(() => {
-		return this.trigger("doValidate", {"items":values, "options":options});
-	}).then(() => {
-		// Validation failed?
-		if (!this.validationResult["result"])
-		{
-			throw new Error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}, invalids=${JSON.stringify(this._validationResult["invalids"])}`);
-		}
-
-		// Store
-		PreferenceOrganizer._store.set("", values, options);
-
-		// Save preferences
-		if (BM.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
-		{
-			return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
-		}
-	});
+	return this.submit({"values":values, "options":options});
 
 }
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  Privates
+// -----------------------------------------------------------------------------
 
-customElements.define("bm-preference", PreferenceManager);
+/**
+ * Trigger preference changed events.
+ *
+ * @param	{Object}		item				Changed items.
+ *
+ * @return  {Promise}		Promise.
+ */
+PreferenceServer.prototype._triggerEvent = function(item)
+{
+
+	let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
+
+	return this.trigger(eventName, {"sender":this, "item":item});
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Check if it is a target.
+ *
+ * @param	{Object}		conditions			Conditions.
+ * @param	{Object}		options				Options.
+ */
+PreferenceServer.prototype._filter = function(conditions, options)
+{
+
+	let result = false;
+	let target = options["targets"];
+
+	if (target === "*")
+	{
+		result = true;
+	}
+	else
+	{
+		target = ( Array.isArray(target) ? target : [target] );
+
+		for (let i = 0; i < target.length; i++)
+		{
+			if (conditions[target[i]])
+			{
+				result = true;
+				break;
+			}
+		}
+	}
+
+	return result;
+
+}
+
+// ----------------------------------------------------------------------------
+
+customElements.define("bm-preference", PreferenceServer);
