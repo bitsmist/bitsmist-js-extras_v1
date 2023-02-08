@@ -70,7 +70,7 @@ export default class FormOrganizer extends BM.Organizer
 		component._cancelSubmit = false;
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", FormOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", FormOrganizer.onDoOrganize);
 		this._addOrganizerHandler(component, "doValidate", FormOrganizer.onDoValidate);
 		this._addOrganizerHandler(component, "doReportValidity", FormOrganizer.onDoReportValidity);
 
@@ -80,7 +80,7 @@ export default class FormOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		this._enumSettings(e.detail.settings["validations"], (sectionName, sectionValue) => {

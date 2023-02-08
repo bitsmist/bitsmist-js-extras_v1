@@ -48,7 +48,7 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", FileOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", FileOrganizer.onDoOrganize);
 
 	}
 
@@ -56,7 +56,7 @@ export default class FileOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		let promises = [];

@@ -60,7 +60,7 @@ export default class ResourceOrganizer extends BM.Organizer
 		component._resources = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", ResourceOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", ResourceOrganizer.onDoOrganize);
 		this._addOrganizerHandler(component, "doFetch", ResourceOrganizer.onDoFetch);
 		this._addOrganizerHandler(component, "doSubmit", ResourceOrganizer.onDoSubmit);
 
@@ -70,7 +70,7 @@ export default class ResourceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		let promises = [];

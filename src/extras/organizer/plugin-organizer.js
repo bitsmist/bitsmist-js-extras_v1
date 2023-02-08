@@ -51,7 +51,7 @@ export default class PluginOrganizer extends BM.Organizer
 		component._plugins = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", PluginOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", PluginOrganizer.onDoOrganize);
 
 	}
 
@@ -59,7 +59,7 @@ export default class PluginOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		this._enumSettings(e.detail.settings["plugins"], (sectionName, sectionValue) => {

@@ -49,7 +49,7 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", ElementOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.onDoOrganize);
 
 	}
 
@@ -57,18 +57,18 @@ export default class ElementOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":sectionValue}});
+			this.addEventHandler(sectionName, {"handler":ElementOrganizer.onDoProcess, "options":{"attrs":sectionValue}});
 		});
 
 	}
 
 	// -----------------------------------------------------------------------------
 
-	static onDoOrganize(sender, e, ex)
+	static onDoProcess(sender, e, ex)
 	{
 
 		let component = ex.component;

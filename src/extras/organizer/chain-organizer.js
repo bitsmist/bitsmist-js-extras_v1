@@ -48,7 +48,7 @@ export default class ChainOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterLoadSettings", ChainOrganizer.onAfterLoadSettings);
+		this._addOrganizerHandler(component, "doOrganize", ChainOrganizer.onDoOrganize);
 
 	}
 
@@ -71,18 +71,18 @@ export default class ChainOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static onAfterLoadSettings(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
 		this._enumSettings(e.detail.settings["chains"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {"handler":ChainOrganizer.onDoOrganize, "options":sectionValue});
+			this.addEventHandler(sectionName, {"handler":ChainOrganizer.onDoProcess, "options":sectionValue});
 		});
 
 	}
 
 	// -----------------------------------------------------------------------------
 
-	static onDoOrganize(sender, e, ex)
+	static onDoProcess(sender, e, ex)
 	{
 
 		let component = ex.component;
