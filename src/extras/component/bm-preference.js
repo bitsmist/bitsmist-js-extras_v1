@@ -191,16 +191,16 @@ PreferenceServer.prototype.set = function(values, options)
 /**
  * Trigger preference changed events.
  *
- * @param	{Object}		item				Changed items.
+ * @param	{Object}		items				Changed items.
  *
  * @return  {Promise}		Promise.
  */
-PreferenceServer.prototype._triggerEvent = function(item)
+PreferenceServer.prototype._triggerEvent = function(items)
 {
 
 	let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 
-	return this.trigger(eventName, {"sender":this, "item":item});
+	return this.trigger(eventName, {"sender":this, "items":items});
 
 }
 
