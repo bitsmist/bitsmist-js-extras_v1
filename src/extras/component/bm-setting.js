@@ -11,7 +11,7 @@
 import BM from "../bm";
 
 // =============================================================================
-//	SettingManager class
+//	Setting Server Class
 // =============================================================================
 
 // -----------------------------------------------------------------------------
@@ -21,7 +21,7 @@ import BM from "../bm";
 /**
  * Constructor.
  */
-export default function SettingManager()
+export default function SettingServer()
 {
 
 	// super()
@@ -29,7 +29,7 @@ export default function SettingManager()
 
 }
 
-BM.ClassUtil.inherit(SettingManager, BM.Component);
+BM.ClassUtil.inherit(SettingServer, BM.Component);
 
 // -----------------------------------------------------------------------------
 
@@ -38,12 +38,12 @@ BM.ClassUtil.inherit(SettingManager, BM.Component);
  *
  * @return  {Object}		Options.
  */
-SettingManager.prototype._getSettings = function()
+SettingServer.prototype._getSettings = function()
 {
 
 	return {
 		"settings": {
-			"name":					"SettingManager",
+			"name":					"SettingServer",
 			"autoSetup":			false,
 		}
 	};
@@ -52,4 +52,4 @@ SettingManager.prototype._getSettings = function()
 
 // -----------------------------------------------------------------------------
 
-customElements.define("bm-setting", SettingManager);
+customElements.define("bm-setting", SettingServer);
