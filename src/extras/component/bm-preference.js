@@ -125,10 +125,7 @@ PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
 PreferenceServer.prototype.onBeforeSubmit = function(sender, e, ex)
 {
 
-	let values = e.detail.values;
-	let options = e.detail.options;
-
-	this._store.set("", values, options);
+	this._store.set("", e.detail.values, e.detail.options, ...e.detail.args);
 
 	// Pass items to the latter event handlers
 	e.detail.items = this._store.localItems;
@@ -145,9 +142,7 @@ PreferenceServer.prototype.subscribe = function(component, options)
 	this._store.subscribe(
 		component.name + "_" + component.uniqueId,
 		this._triggerEvent.bind(component),
-		{
-			"targets":BM.Util.safeGet(options, "targets")
-		}
+		options,
 	);
 
 }
@@ -177,10 +172,10 @@ PreferenceServer.prototype.get = function(key, defaultValue)
  * @param	{Object}		values				Values to store.
  * @param	{Object}		options				Options.
  */
-PreferenceServer.prototype.set = function(values, options)
+PreferenceServer.prototype.set = function(values, options, ...args)
 {
 
-	return this.submit({"values":values, "options":options});
+	return this.submit({"values":values, "options":options, "args":args});
 
 }
 
@@ -195,12 +190,13 @@ PreferenceServer.prototype.set = function(values, options)
  *
  * @return  {Promise}		Promise.
  */
-PreferenceServer.prototype._triggerEvent = function(items)
+PreferenceServer.prototype._triggerEvent = function(items, options)
 {
 
 	let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
+	let sender = BM.Util.safeGet(options, "sender");
 
-	return this.trigger(eventName, {"sender":this, "items":items});
+	return this.trigger(eventName, {"sender":sender, "items":items});
 
 }
 
