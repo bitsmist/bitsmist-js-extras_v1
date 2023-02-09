@@ -29,7 +29,6 @@ export default class ObservableStore extends BM.ChainableStore
 	constructor(options)
 	{
 
-
 		let defaults = {"notifyOnChange":true, "async":false};
 		super(Object.assign(defaults, options));
 
