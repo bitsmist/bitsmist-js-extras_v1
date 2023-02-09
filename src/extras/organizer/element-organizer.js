@@ -71,11 +71,10 @@ export default class ElementOrganizer extends BM.Organizer
 	static onDoProcess(sender, e, ex)
 	{
 
-		let component = ex.component;
 		let settings = ex.options["attrs"];
 
 		Object.keys(settings).forEach((elementName) => {
-			ElementOrganizer.__initAttr(component, elementName, settings[elementName]);
+			ElementOrganizer.__initAttr(this, elementName, settings[elementName]);
 		});
 
 	}

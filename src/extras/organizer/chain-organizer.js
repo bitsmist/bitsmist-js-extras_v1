@@ -85,7 +85,6 @@ export default class ChainOrganizer extends BM.Organizer
 	static onDoProcess(sender, e, ex)
 	{
 
-		let component = ex.component;
 		let targets = ex.options;
 		let promises = [];
 		let chain = Promise.resolve();
@@ -98,17 +97,17 @@ export default class ChainOrganizer extends BM.Organizer
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			nodes = Array.prototype.slice.call(nodes, 0);
-			BM.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			BM.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${this.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
 			if (sync)
 			{
 				chain = chain.then(() => {
-					return ChainOrganizer.__execTarget(component, nodes, method, state);
+					return ChainOrganizer.__execTarget(this, nodes, method, state);
 				});
 			}
 			else
 			{
-				chain = ChainOrganizer.__execTarget(component, nodes, method, state);
+				chain = ChainOrganizer.__execTarget(this, nodes, method, state);
 			}
 			promises.push(chain);
 		}
@@ -124,7 +123,7 @@ export default class ChainOrganizer extends BM.Organizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Organize.
+	 * Execute target methods.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Array}			nodes				Nodes.
