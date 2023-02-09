@@ -75,7 +75,7 @@ export default class ObservableStore extends BM.ChainableStore
 	 * @param	{String}		key					Key to store.
 	 * @param	{Object}		value				Value to store.
 	 */
-	set(key, value, options)
+	set(key, value, options, ...args)
 	{
 
 		let changedItem = {};
@@ -97,7 +97,7 @@ export default class ObservableStore extends BM.ChainableStore
 		let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
 		if (notify && Object.keys(changedItem).length > 0)
 		{
-			return this.notify(changedItem);
+			return this.notify(changedItem, ...args);
 		}
 
 	}
@@ -110,7 +110,7 @@ export default class ObservableStore extends BM.ChainableStore
      * @param   {String}        key                 Key to store.
      * @param   {Object}        value               Value to store.
      */
-    replace(value, options)
+    replace(value, options, ...args)
     {
 
         this._items = {};
@@ -119,7 +119,7 @@ export default class ObservableStore extends BM.ChainableStore
         let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
         if (notify)
         {
-            return this.notify("*");
+            return this.notify("*", ...args);
         }
 
     }
