@@ -192,7 +192,7 @@ List.prototype.transformRow = function(templateName, options)
 
 	return Promise.resolve().then(() => {
 		console.debug(`List.switchRowTemplate(): Switching a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}, uniqueId=${this.uniqueId}`);
-		return this.addTemplate(templateName);
+		return this.loadTemplate(templateName);
 	}).then(() => {
 		this._activeRowTemplateName = templateName;
 	}).then(() => {
