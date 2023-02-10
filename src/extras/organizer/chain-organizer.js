@@ -112,9 +112,7 @@ export default class ChainOrganizer extends BM.Organizer
 			promises.push(chain);
 		}
 
-		return chain.then(() => {
-			return Promise.all(promises);
-		});
+		return Promise.all(promises);
 
 	}
 
