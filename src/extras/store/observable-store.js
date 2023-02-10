@@ -232,7 +232,7 @@ export default class ObservableStore extends BM.ChainableStore
 
 		for (let i = 0; i < this._observers.length; i++)
 		{
-			if (this._filter(conditions, this._observers[i]["options"], ...args))
+			if (this._filter(conditions, this._observers[i], ...args))
 			{
 				console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this._observers[i].id}`);
 				this._observers[i]["handler"](conditions, ...args);
