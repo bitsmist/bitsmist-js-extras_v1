@@ -206,13 +206,13 @@ PreferenceServer.prototype._triggerEvent = function(items, options)
  * Check if it is a target.
  *
  * @param	{Object}		conditions			Conditions.
- * @param	{Object}		options				Options.
+ * @param	{Object}		observerInfo		Observer info.
  */
-PreferenceServer.prototype._filter = function(conditions, options)
+PreferenceServer.prototype._filter = function(conditions, observerInfo, ...args)
 {
 
 	let result = false;
-	let target = options["targets"];
+	let target = observerInfo["targets"];
 
 	if (target === "*")
 	{
