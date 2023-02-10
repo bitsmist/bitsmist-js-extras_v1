@@ -80,18 +80,18 @@ export default class ErrorOrganizer extends BM.Organizer
 	 * Filter target components to notify.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{Object}		target				Target component to check.
-	 * @param	{Object}		e					Event object.
+ 	 * @param	{Object}		observerInfo		Observer info.
 	 */
-	static __filter(conditions, options, e)
+	static __filter(conditions, observerInfo, ...args)
 	{
 
 		let result = false;
-		let targets = options["component"].settings.get("errors.targets");
+		let targets = observerInfo["options"]["component"].settings.get("errors.targets");
+		let e = args[0]["error"];
 
 		for (let i = 0; i < targets.length; i++)
 		{
-			if (e.error.name === targets[i] || targets[i] === "*")
+			if (e.name === targets[i] || targets[i] === "*")
 			{
 				result = true;
 				break;
@@ -113,7 +113,7 @@ export default class ErrorOrganizer extends BM.Organizer
 		window.addEventListener("unhandledrejection", (error) => {
 			let e = {};
 
-			//try
+			try
 			{
 				if (error.reason)
 				{
@@ -141,14 +141,13 @@ export default class ErrorOrganizer extends BM.Organizer
 				e.colno = "";
 				// e.stack = error.reason.stack;
 				// e.object = error.reason;
+				//
+				ErrorOrganizer.__handleException(e);
 			}
-			/*
 			catch(e)
 			{
+				console.error("An error occurred in error handler", e);
 			}
-			*/
-
-			ErrorOrganizer.__handleException(e);
 
 			return false;
 			//return true;
@@ -157,19 +156,26 @@ export default class ErrorOrganizer extends BM.Organizer
 		window.addEventListener("error", (error, file, line, col) => {
 			let e = {};
 
-			e.type = "error";
-			e.name = ErrorOrganizer.__getErrorName(error);
-			e.message = error.message;
-			e.file = error.filename;
-			e.line = error.lineno;
-			e.col = error.colno;
-			if (error.error)
+			try
 			{
-				e.stack = error.error.stack;
-				e.object = error.error;
-			}
+				e.type = "error";
+				e.name = ErrorOrganizer.__getErrorName(error);
+				e.message = error.message;
+				e.file = error.filename;
+				e.line = error.lineno;
+				e.col = error.colno;
+				if (error.error)
+				{
+					e.stack = error.error.stack;
+					e.object = error.error;
+				}
 
-			ErrorOrganizer.__handleException(e);
+				ErrorOrganizer.__handleException(e);
+			}
+			catch(e)
+			{
+				console.error("An error occurred in error handler", e);
+			}
 
 			return false;
 			//return true;
