@@ -212,7 +212,7 @@ PreferenceServer.prototype._filter = function(conditions, observerInfo, ...args)
 {
 
 	let result = false;
-	let target = observerInfo["targets"];
+	let target = observerInfo["options"]["targets"];
 
 	if (target === "*")
 	{
