@@ -97,17 +97,18 @@ export default class ResourceOrganizer extends BM.Organizer
 				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
 				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
-				promises.push(resource.get(resource.target["id"], resource.target["parameters"]));
+				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
+					// Set a property automatically after resource is fetched
+					let autoSet = this.settings.get("resources." + resourceName + ".autoSetProperty");
+					if (autoSet)
+					{
+						this[autoSet] = resource.items;
+					}
+				}));
 			}
 		});
 
-		return Promise.all(promises).then(() => {
-			let resourceName = this.settings.get("settings.resourceName");
-			if (resourceName && this._resources[resourceName])
-			{
-				this.items = this._resources[resourceName].items;
-			}
-		});
+		return Promise.all(promises);
 
 	}
 
@@ -160,7 +161,14 @@ export default class ResourceOrganizer extends BM.Organizer
 			let id = resource.options.get("autoLoadOptions.id");
 			let parameters = resource.options.get("autoLoadOptions.parameters");
 
-			return resource.get(id, parameters);
+			return resource.get(id, parameters).then(() => {
+				// Set a property automatically after resource is fetched
+				let autoSet = component.settings.get("resources." + resourceName + ".autoSetProperty");
+				if (autoSet)
+				{
+					component[autoSet] = resource.items;
+				}
+			});
 		}
 
 	}
