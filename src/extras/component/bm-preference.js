@@ -45,8 +45,13 @@ PreferenceServer.prototype._getSettings = function()
 		// Settings
 		"settings": {
 			"autoFill":					false,
-			"hasTemplate":				false,
 			"name":						"PreferenceServer",
+		},
+
+		"templates": {
+			"settings": {
+				"hasTemplate":			false,
+			}
 		},
 
 		// Organizers

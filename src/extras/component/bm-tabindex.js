@@ -27,7 +27,11 @@ export default class TabIndex extends BM.Component
 		return {
 			"settings": {
 				"name":					"BmTabindex",
-				"hasTemplate":			false,
+			},
+			"templates": {
+				"settings": {
+					"hasTemplate":		false,
+				}
 			},
 			"events": {
 				"tab-indices": {

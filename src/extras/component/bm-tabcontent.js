@@ -27,7 +27,11 @@ export default class TabContent extends BM.Component
 		return {
 			"settings": {
 				"name":					"BmTabcontent",
-				"hasTemplate":			false,
+			},
+			"templates": {
+				"settings": {
+					"hasTemplate":		false,
+				}
 			},
 		}
 
