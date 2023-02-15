@@ -12,7 +12,7 @@ import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
-//	Form organizer class
+//	Form Organizer Class
 // =============================================================================
 
 export default class FormOrganizer extends BM.Organizer
@@ -37,8 +37,9 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	["forms", "validations"],
+			"sections":		"forms",
 			"order":		310,
+			"depends":		"ValidationOrganizer",
 		};
 
 	}
@@ -49,81 +50,62 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		// Add properties to component
-		Object.defineProperty(component, 'validators', {
-			get() { return this._validators; },
+		Object.defineProperty(component, 'items', {
+			get()		{ return this._items; },
+			set(value)	{ this._items = value; },
 		});
-		Object.defineProperty(component, 'validationResult', {
-			get() { return this._validationResult; },
-		})
 		Object.defineProperty(component, 'cancelSubmit', {
 			get() { return this._cancelSubmit; },
 		})
 
 		// Add methods to component
-		component.addValidator = function(validatorName, options) { return FormOrganizer._addValidator(this, validatorName, options); }
-		component.validate = function(options) { return FormOrganizer._validate(this, options); }
-		component.submit = function(options) { return FormOrganizer._submit(this, options); }
+		component.build = function(...args) { return FormOrganizer._build(this, ...args); }
+		component.submit = function(...args) { return FormOrganizer._submit(this, ...args); }
 
 		// Init component vars
-		component._validators = {};
-		component._validationResult = {};
+		component._items = {};
 		component._cancelSubmit = false;
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", FormOrganizer.onDoOrganize);
-		this._addOrganizerHandler(component, "doValidate", FormOrganizer.onDoValidate);
-		this._addOrganizerHandler(component, "doReportValidity", FormOrganizer.onDoReportValidity);
+		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.onAfterTransform);
+		this._addOrganizerHandler(component, "doClear", FormOrganizer.onDoClear);
+		this._addOrganizerHandler(component, "doFill", FormOrganizer.onDoFill);
+//		this._addOrganizerHandler(component, "doCollect", FormOrganizer.onDoCollect);
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 	//	Event handlers
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	static onDoOrganize(sender, e, ex)
+	static onAfterTransform(sender, e, ex)
 	{
 
-		this._enumSettings(e.detail.settings["validations"], (sectionName, sectionValue) => {
-			FormOrganizer._addValidator(this, sectionName, sectionValue);
-		});
+		FormUtil.hideConditionalElements(this);
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	static onDoValidate(sender, e, ex)
+	static onDoClear(sender, e, ex)
 	{
 
-		let validationName = this.settings.get("settings.validationName");
-		if (validationName)
-		{
-			BM.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+		let target = BM.Util.safeGet(e.detail, "target", "");
 
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get("validations." + validationName + ".rules");
-			let options = this.settings.get("validations." + validationName + ".handlerOptions");
-
-			this._validators[validationName].checkValidity(items, rules, options);
-		}
+		return FormUtil.clearFields(this, target);
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
-	static onDoReportValidity(sender, e, ex)
+	static onDoFill(sender, e, ex)
 	{
 
-		let validationName = this.settings.get("settings.validationName");
-		if (validationName)
-		{
-			BM.Util.assert(this._validators[validationName], `FormOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+		let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
+		let items = BM.Util.safeGet(e.detail, "items", this._items);
 
-			let items = BM.Util.safeGet(e.detail.settings, "items");
-			let rules = this.settings.get("validations." + validationName + ".rules");
-			let options = this.settings.get("validations." + validationName + ".handlerOptions");
-
-			this._validators[validationName].reportValidity(items, rules, options);
-		}
+		FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
+		FormUtil.showConditionalElements(this, items);
 
 	}
 
@@ -132,58 +114,18 @@ export default class FormOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-     * Add a validator.
-     *
-     * @param	{Component}		component			Component.
-     * @param	{string}		validatorName		Validator name.
-     * @param	{array}			options				Options.
-     */
-	static _addValidator(component, validatorName, options)
+	*
+	* Build a element.
+	*
+    * @param	{Component}		component			Component.
+	* @param	{HTMLElement}	element				HTMLElement to build.
+	* @param	{Object}		items				Items to fill elements.
+	* @param	{Object}		options				Options.
+	*/
+	static _build(component, element, items, options)
 	{
 
-		let validator;
-
-		if (options["handlerClassName"])
-		{
-			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
-			component._validators[validatorName] = validator;
-		}
-
-		return validator;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Validate the form.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _validate(component, options)
-	{
-
-		options = options || {};
-		options["validationName"] = component.settings.get("settings.validationName");
-		component._validationResult = {"result":true};
-
-		return Promise.resolve().then(() => {
-			return component.trigger("beforeValidate", options);
-		}).then(() => {
-			return component.trigger("doValidate", options);
-		}).then(() => {
-			return component.trigger("afterValidate", options);
-		}).then(() => {
-			if (!component._validationResult["result"])
-			{
-				component._cancelSubmit = true;
-
-				return component.trigger("doReportValidity", options);
-			}
-		});
+		FormUtil.build(element, items, options);
 
 	}
 
@@ -200,26 +142,28 @@ export default class FormOrganizer extends BM.Organizer
 	static _submit(component, options)
 	{
 
-		let submitItem = {};
 		options = options || {};
 		component._cancelSubmit = false;
-		let items = FormUtil.getFields(component);
-
-		// Get target keys to submit
-		let nodes = component.querySelectorAll("[bm-submit]");
-		nodes = Array.prototype.slice.call(nodes, 0);
-		nodes.forEach((elem) => {
-			let key = elem.getAttribute("bm-bind");
-			submitItem[key] = items[key];
-		});
-		options["items"] = submitItem;
 
 		return Promise.resolve().then(() => {
-			if (component.settings.get("settings.autoValidate", true))
+			// Collect values
+			if (component.settings.get("forms.settings.autoCollect", false))
 			{
-				return component.validate(options);
+				options["items"] = FormOrganizer.__collectData(component);
 			}
 		}).then(() => {
+			// Validate values
+			if (component.settings.get("forms.settings.autoValidate"))
+			{
+				return component.validate(options).then(() => {
+					if (!component.validationResult["result"])
+					{
+						component._cancelSubmit = true;
+					}
+				});
+			}
+		}).then(() => {
+			// Submit values
 			if (!component._cancelSubmit)
 			{
 				return Promise.resolve().then(() => {
@@ -227,11 +171,41 @@ export default class FormOrganizer extends BM.Organizer
 				}).then(() => {
 					return component.trigger("doSubmit", options);
 				}).then(() => {
-					component.items = items;
+					component.items = options["items"];
 					return component.trigger("afterSubmit", options);
 				});
 			}
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Colled data from form.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Object}		Collected data.
+	 */
+	static __collectData(component, options)
+	{
+
+		let submitItem = {};
+		let items = FormUtil.getFields(component);
+
+		// Collect values only from nodes that has [bm-submit] attribute.
+		let nodes = component.querySelectorAll("[bm-submit]");
+		nodes = Array.prototype.slice.call(nodes, 0);
+		nodes.forEach((elem) => {
+			let key = elem.getAttribute("bm-bind");
+			submitItem[key] = items[key];
+		});
+
+		return submitItem;
 
 	}
 
