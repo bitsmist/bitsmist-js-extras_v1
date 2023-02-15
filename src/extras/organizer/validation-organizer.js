@@ -61,10 +61,8 @@ export default class ValidationOrganizer extends BM.Organizer
 		component.validate = function(...args) { return ValidationOrganizer._validate(this, ...args); }
 
 		// Init component vars
-		component._items = {};
 		component._validators = {};
 		component._validationResult = {};
-		component._cancelSubmit = false;
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", ValidationOrganizer.onDoOrganize);
@@ -176,8 +174,6 @@ export default class ValidationOrganizer extends BM.Organizer
 		}).then(() => {
 			if (!component._validationResult["result"])
 			{
-				component._cancelSubmit = true;
-
 				return component.trigger("doReportValidity", options);
 			}
 		});
