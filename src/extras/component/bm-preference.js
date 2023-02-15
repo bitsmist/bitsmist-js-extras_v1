@@ -110,7 +110,7 @@ PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
 PreferenceServer.prototype.onBeforeSubmit = function(sender, e, ex)
 {
 
-	this._store.set("", e.detail.values, e.detail.options, ...e.detail.args);
+	this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);
 
 	// Pass items to the latter event handlers
 	e.detail.items = this._store.items;
@@ -160,7 +160,7 @@ PreferenceServer.prototype.get = function(key, defaultValue)
 PreferenceServer.prototype.set = function(values, options, ...args)
 {
 
-	return this.submit({"values":values, "options":options, "args":args});
+	return this.submit({"items":values, "options":options, "args":args});
 
 }
 
