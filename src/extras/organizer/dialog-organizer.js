@@ -36,7 +36,7 @@ export default class DialogOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"dialog",
+			"sections":		"dialog",
 			"order":		800,
 		};
 

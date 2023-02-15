@@ -36,7 +36,7 @@ export default class ChainOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"chains",
+			"sections":		"chains",
 			"order":		800,
 		};
 

@@ -36,7 +36,7 @@ export default class KeyOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"keys",
+			"sections":		"keys",
 			"order":		800,
 		};
 

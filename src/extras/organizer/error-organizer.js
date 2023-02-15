@@ -36,7 +36,7 @@ export default class ErrorOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"errors",
+			"sections":		"errors",
 			"order":		120,
 		};
 

@@ -36,7 +36,7 @@ export default class PluginOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"plugins",
+			"sections":		"plugins",
 			"order":		800,
 		};
 

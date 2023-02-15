@@ -36,7 +36,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"preferences",
+			"sections":		"preferences",
 			"order":		900,
 		};
 
@@ -47,6 +47,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
+		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", PreferenceOrganizer.onDoOrganize);
 
 	}

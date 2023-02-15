@@ -37,7 +37,7 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"elements",
+			"sections":		"elements",
 			"order":		220,
 		};
 

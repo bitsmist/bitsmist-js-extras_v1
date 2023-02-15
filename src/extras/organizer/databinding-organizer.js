@@ -37,7 +37,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"binds",
+			"sections":		"binds",
 			"order":		320,
 		};
 

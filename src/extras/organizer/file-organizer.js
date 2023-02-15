@@ -36,7 +36,7 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"files",
+			"sections":		"files",
 			"order":		110,
 		};
 

@@ -36,7 +36,7 @@ export default class ResourceOrganizer extends BM.Organizer
 	{
 
 		return {
-			"targetWords":	"resources",
+			"sections":		"resources",
 			"order":		300,
 		};
 
