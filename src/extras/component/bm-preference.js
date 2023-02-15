@@ -74,26 +74,6 @@ PreferenceServer.prototype._getSettings = function()
 }
 
 // -----------------------------------------------------------------------------
-//  Setter/Getter
-// -----------------------------------------------------------------------------
-
-/**
- * Preference items.
- *
- * @type	{Object}
- */
-Object.defineProperty(PreferenceServer.prototype, "items", {
-	get()
-	{
-		return this._store.items;
-	},
-	set(value)
-	{
-		this._store.items = value;
-	},
-})
-
-// -----------------------------------------------------------------------------
 //  Event Handlers
 // -----------------------------------------------------------------------------
 
@@ -133,7 +113,7 @@ PreferenceServer.prototype.onBeforeSubmit = function(sender, e, ex)
 	this._store.set("", e.detail.values, e.detail.options, ...e.detail.args);
 
 	// Pass items to the latter event handlers
-	e.detail.items = this._store.localItems;
+	e.detail.items = this._store.items;
 
 }
 
