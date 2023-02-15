@@ -32,8 +32,14 @@ BM.OrganizerOrganizer.register(ElementOrganizer);
 import ResourceOrganizer from "./organizer/resource-organizer.js";
 BM.OrganizerOrganizer.register(ResourceOrganizer);
 
+import ValidationOrganizer from "./organizer/validation-organizer.js";
+BM.OrganizerOrganizer.register(ValidationOrganizer);
+
 import FormOrganizer from "./organizer/form-organizer.js";
 BM.OrganizerOrganizer.register(FormOrganizer);
+
+import ListOrganizer from "./organizer/list-organizer.js";
+BM.OrganizerOrganizer.register(ListOrganizer);
 
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BM.OrganizerOrganizer.register(DatabindingOrganizer);
@@ -52,6 +58,9 @@ BM.OrganizerOrganizer.register(DialogOrganizer);
 
 import PreferenceOrganizer from "./organizer/preference-organizer.js";
 BM.OrganizerOrganizer.register(PreferenceOrganizer);
+
+import RouteOrganizer from "./organizer/route-organizer.js";
+BM.OrganizerOrganizer.register(RouteOrganizer);
 
 // Plugin
 
@@ -92,12 +101,6 @@ import FormatterUtil from "./util/formatter-util.js";
 window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
 // Component
-
-import Form from "./component/bm-form.js";
-window.BITSMIST.v1.Form = Form;
-
-import List from "./component/bm-list.js";
-window.BITSMIST.v1.List = List;
 
 import ChainedSelect from "./component/bm-chainedselect.js";
 window.BITSMIST.v1.ChainedSelect = ChainedSelect;
