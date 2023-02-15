@@ -89,7 +89,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	static onDoValidate(sender, e, ex)
 	{
 
-		let validationName = this.settings.get("settings.validationName");
+		let validationName = e.detail.validationName;
 		if (validationName)
 		{
 			BM.Util.assert(this._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
@@ -108,7 +108,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	static onDoReportValidity(sender, e, ex)
 	{
 
-		let validationName = this.settings.get("settings.validationName");
+		let validationName = e.detail.validationName;
 		if (validationName)
 		{
 			BM.Util.assert(this._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
@@ -162,7 +162,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	{
 
 		options = options || {};
-		options["validationName"] = component.settings.get("settings.validationName");
+		options["validationName"] = options["validationName"] || component.settings.get("validations.settings.validationName");
 		component._validationResult = {"result":true};
 
 		return Promise.resolve().then(() => {
