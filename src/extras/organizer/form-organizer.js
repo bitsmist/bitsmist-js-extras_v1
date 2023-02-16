@@ -70,7 +70,6 @@ export default class FormOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.onAfterTransform);
 		this._addOrganizerHandler(component, "doClear", FormOrganizer.onDoClear);
 		this._addOrganizerHandler(component, "doFill", FormOrganizer.onDoFill);
-//		this._addOrganizerHandler(component, "doCollect", FormOrganizer.onDoCollect);
 
 	}
 
@@ -155,6 +154,7 @@ export default class FormOrganizer extends BM.Organizer
 			// Validate values
 			if (component.settings.get("forms.settings.autoValidate"))
 			{
+				options["validatorName"] = component.settings.get("forms.settings.validatorName");
 				return component.validate(options).then(() => {
 					if (!component.validationResult["result"])
 					{
