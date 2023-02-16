@@ -37,7 +37,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		["validations"],
+			"sections":		["validators"],
 			"order":		310,
 		};
 
@@ -78,7 +78,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	static onDoOrganize(sender, e, ex)
 	{
 
-		this._enumSettings(e.detail.settings["validations"], (sectionName, sectionValue) => {
+		this._enumSettings(e.detail.settings["validators"], (sectionName, sectionValue) => {
 			ValidationOrganizer._addValidator(this, sectionName, sectionValue);
 		});
 
@@ -89,16 +89,16 @@ export default class ValidationOrganizer extends BM.Organizer
 	static onDoValidate(sender, e, ex)
 	{
 
-		let validationName = e.detail.validationName;
-		if (validationName)
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
 		{
-			BM.Util.assert(this._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get("validations." + validationName + ".rules");
-			let options = this.settings.get("validations." + validationName + ".handlerOptions");
+			let rules = this.settings.get("validations." + validatorName + ".rules");
+			let options = this.settings.get("validations." + validatorName + ".handlerOptions");
 
-			this._validators[validationName].checkValidity(items, rules, options);
+			this._validators[validatorName].checkValidity(items, rules, options);
 		}
 
 	}
@@ -108,16 +108,16 @@ export default class ValidationOrganizer extends BM.Organizer
 	static onDoReportValidity(sender, e, ex)
 	{
 
-		let validationName = e.detail.validationName;
-		if (validationName)
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
 		{
-			BM.Util.assert(this._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validationName=${validationName}`);
+			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail.settings, "items");
-			let rules = this.settings.get("validations." + validationName + ".rules");
-			let options = this.settings.get("validations." + validationName + ".handlerOptions");
+			let rules = this.settings.get("validations." + validatorName + ".rules");
+			let options = this.settings.get("validations." + validatorName + ".handlerOptions");
 
-			this._validators[validationName].reportValidity(items, rules, options);
+			this._validators[validatorName].reportValidity(items, rules, options);
 		}
 
 	}
@@ -162,8 +162,9 @@ export default class ValidationOrganizer extends BM.Organizer
 	{
 
 		options = options || {};
-		options["validationName"] = options["validationName"] || component.settings.get("validations.settings.validationName");
 		component._validationResult = {"result":true};
+
+		BM.Util.assert(options["validatorName"], `Validator not specified. name=${component.name}`);
 
 		return Promise.resolve().then(() => {
 			return component.trigger("beforeValidate", options);
