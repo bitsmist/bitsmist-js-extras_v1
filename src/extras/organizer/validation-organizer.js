@@ -95,8 +95,8 @@ export default class ValidationOrganizer extends BM.Organizer
 			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get("validations." + validatorName + ".rules");
-			let options = this.settings.get("validations." + validatorName + ".handlerOptions");
+			let rules = this.settings.get("validators." + validatorName + ".rules");
+			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
 
 			this._validators[validatorName].checkValidity(items, rules, options);
 		}
@@ -114,8 +114,8 @@ export default class ValidationOrganizer extends BM.Organizer
 			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail.settings, "items");
-			let rules = this.settings.get("validations." + validatorName + ".rules");
-			let options = this.settings.get("validations." + validatorName + ".handlerOptions");
+			let rules = this.settings.get("validators." + validatorName + ".rules");
+			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
 
 			this._validators[validatorName].reportValidity(items, rules, options);
 		}
