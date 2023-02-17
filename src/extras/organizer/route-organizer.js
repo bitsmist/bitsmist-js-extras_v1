@@ -37,10 +37,20 @@ export default class RouteOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"routes",
+			"sections":		["routings", "specs"],
 			"order":		900,
 			"depends":		"ValidationOrganizer",
 		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static globalInit()
+	{
+
+		// Set state on the first page
+		history.replaceState(RouteOrganizer.__getState("connect"), null, null);
 
 	}
 
@@ -62,7 +72,6 @@ export default class RouteOrganizer extends BM.Organizer
 		component.updateRoute = function(routeInfo, options) { return RouteOrganizer._updateRoute(this, routeInfo, options); }
 		component.refreshRoute = function(routeInfo, options) { return RouteOrganizer._refreshRoute(this, routeInfo, options); }
 		component.replaceRoute = function(routeInfo, options) { return RouteOrganizer._replaceRoute(this, routeInfo, options); }
-		component.validateRoute = function() { return RouteOrganizer._validateRoute(this); }
 		component.normalizeRoute = function() { return RouteOrganizer._normalizeRoute(this); }
 
 		// Init component vars
@@ -72,15 +81,17 @@ export default class RouteOrganizer extends BM.Organizer
 		Object.defineProperty(component, "settings", { get() { return this._spec; }, }); // Tweak to see settings through spec
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", RouteOrganizer.onBeforeStart);
+		this._addOrganizerHandler(component, "doOrganize", RouteOrganizer.onDoOrganize);
 		this._addOrganizerHandler(component, "doStart", RouteOrganizer.onDoStart);
 		this._addOrganizerHandler(component, "afterReady", RouteOrganizer.onAfterReady);
+		this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.onDoValidateFail);
+		this._addOrganizerHandler(component, "afterValidate", RouteOrganizer.onAfterValidate);
+
+		// Load settings from attributes
+		RouteOrganizer._loadAttrSettings(component);
 
 		// Init popstate handler
 		RouteOrganizer.__initPopState(component);
-
-		// Set state on the first page
-		history.replaceState(RouteOrganizer.__getState("connect"), null, null);
 
 	}
 
@@ -88,33 +99,21 @@ export default class RouteOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onBeforeStart(sender, e, ex)
+	static onDoOrganize(sender, e, ex)
 	{
 
-		// Load settings from attributes
-		RouteOrganizer._loadAttrSettings(this);
-
-		// Load route info
-		let routes = this.settings.get("routes");
-		if (routes)
-		{
-			for(let i = 0; i < routes.length; i++)
-			{
-				RouteOrganizer._addRoute(this, routes[i]);
-			}
-		}
+		// Routings
+		this._enumSettings(e.detail.settings["routings"], (sectionName, sectionValue) => {
+			RouteOrganizer._addRoute(this, sectionValue);
+		});
 
 		// Set current route info.
 		this._routeInfo = RouteOrganizer.__loadRouteInfo(this, window.location.href);
 
-		// Load spec info
-		let specs = this.settings.get("specs");
-		if (specs)
-		{
-			Object.keys(specs).forEach((key) => {
-				this._specs[key] = specs[key];
-			});
-		}
+		// Specs
+		this._enumSettings(e.detail.settings["specs"], (sectionName, sectionValue) => {
+			this._specs[sectionName] = sectionValue;
+		});
 
 	}
 
@@ -140,6 +139,33 @@ export default class RouteOrganizer extends BM.Organizer
 	{
 
 		return this.openRoute();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static onDoValidateFail(sender, e, ex)
+	{
+
+		// Try to fix URL when validation failed
+		if (this.settings.get("routings.settings.autoFix"))
+		{
+			RouteOrganizer.__fixRoute(this, e.detail.url);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static onAfterValidate(sender, e, ex)
+	{
+
+		// Dump errors when validation failed
+		if (!this.validationResult["result"])
+		{
+			RouteOrganizer.__dumpValidationErrors(this);
+			throw new URIError("URL validation failed.");
+		}
 
 	}
 
@@ -379,7 +405,15 @@ export default class RouteOrganizer extends BM.Organizer
 			}
 		}).then(() => {
 			// Validate URL
-			return RouteOrganizer._validateRoute(component, newUrl);
+			if (component.settings.get("routings.settings.autoValidate"))
+			{
+				let validateOptions = {
+					"validatorName":	component.settings.get("routings.settings.validatorName"),
+					"items":			RouteOrganizer._loadParameters(newUrl),
+					"url":				newUrl,
+				};
+				return component.validate(validateOptions);
+			}
 		}).then(() => {
 			// Refresh
 			return RouteOrganizer._refreshRoute(component, newRouteInfo, options);
@@ -421,14 +455,7 @@ export default class RouteOrganizer extends BM.Organizer
 	static _updateRoute(component, curRouteInfo, newRouteInfo, options)
 	{
 
-		return Promise.resolve().then(() => {
-			return component.changeState("routing");
-		}).then(() => {
-			return RouteOrganizer._switchSpec(component, newRouteInfo["specName"]);
-		}).then(() => {
-			// Started
-			return component._postStart();
-		});
+		return RouteOrganizer._switchSpec(component, newRouteInfo["specName"]);
 
 	}
 
@@ -470,48 +497,10 @@ export default class RouteOrganizer extends BM.Organizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Validate route.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		url					Url to validate.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _validateRoute(component, url)
-	{
-
-		component.validationResult["result"] = true;
-
-		return Promise.resolve().then(() => {
-			return component.trigger("beforeValidate");
-		}).then(() => {
-			return component.trigger("doValidate", {"items": RouteOrganizer._loadParameters(url)});
-		}).then(() => {
-			// Fix URL
-			if (!component.validationResult["result"] && component.settings.get("settings.autoFixURL"))
-			{
-				return RouteOrganizer.__fixRoute(component, url);
-			}
-		}).then(() => {
-			return component.trigger("afterValidate");
-		}).then(() => {
-			// Validation failed?
-			if (!component.validationResult["result"])
-			{
-				RouteOrganizer.__dumpValidationErrors(component);
-				throw new URIError("URL validation failed.");
-			}
-		});
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
 	 * Normalize route.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{String}		url					Url to validate.
+	 * @param	{String}		url					Url to normalize.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
