@@ -164,12 +164,19 @@ export default class ValidationOrganizer extends BM.Organizer
 		options = options || {};
 		component._validationResult = {"result":true};
 
-		BM.Util.assert(options["validatorName"], `Validator not specified. name=${component.name}`);
-
 		return Promise.resolve().then(() => {
 			return component.trigger("beforeValidate", options);
 		}).then(() => {
 			return component.trigger("doValidate", options);
+		}).then(() => {
+			if (component.validationResult["result"])
+			{
+				return component.trigger("doValidateSuccess", options);
+			}
+			else
+			{
+				return component.trigger("doValidateFail", options);
+			}
 		}).then(() => {
 			return component.trigger("afterValidate", options);
 		}).then(() => {
