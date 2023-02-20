@@ -29,6 +29,75 @@ export default class ResourceOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static ResourceOrganizer_onDoOrganize(sender, e, ex)
+	{
+
+		let promises = [];
+
+		this._enumSettings(e.detail.settings["resources"], (sectionName, sectionValue) => {
+			promises.push(ResourceOrganizer._addResource(this, sectionName, sectionValue));
+		});
+
+		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ResourceOrganizer_onDoFetch(sender, e, ex)
+	{
+
+		let promises = [];
+
+		Object.keys(this._resources).forEach((resourceName) => {
+			let resource = this._resources[resourceName];
+			if (resource.options.get("autoFetch", true))
+			{
+				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+
+				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
+					// Set a property automatically after resource is fetched
+					let autoSet = this.settings.get("resources." + resourceName + ".autoSetProperty");
+					if (autoSet)
+					{
+						this[autoSet] = resource.items;
+					}
+				}));
+			}
+		});
+
+		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ResourceOrganizer_onDoSubmit(sender, e, ex)
+	{
+
+		let promises = [];
+		let submitItem = BM.Util.safeGet(e.detail, "items");
+
+		Object.keys(this._resources).forEach((resourceName) => {
+			let resource = this._resources[resourceName];
+			if (resource.options.get("autoSubmit", true)) {
+				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
+				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+
+				promises.push(this._resources[resourceName][method](id, submitItem, parameters));
+			}
+		});
+
+		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -60,78 +129,9 @@ export default class ResourceOrganizer extends BM.Organizer
 		component._resources = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ResourceOrganizer.onDoOrganize);
-		this._addOrganizerHandler(component, "doFetch", ResourceOrganizer.onDoFetch);
-		this._addOrganizerHandler(component, "doSubmit", ResourceOrganizer.onDoSubmit);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
-
-	static onDoOrganize(sender, e, ex)
-	{
-
-		let promises = [];
-
-		this._enumSettings(e.detail.settings["resources"], (sectionName, sectionValue) => {
-			promises.push(ResourceOrganizer._addResource(this, sectionName, sectionValue));
-		});
-
-		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoFetch(sender, e, ex)
-	{
-
-		let promises = [];
-
-		Object.keys(this._resources).forEach((resourceName) => {
-			let resource = this._resources[resourceName];
-			if (resource.options.get("autoFetch", true))
-			{
-				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
-
-				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
-					// Set a property automatically after resource is fetched
-					let autoSet = this.settings.get("resources." + resourceName + ".autoSetProperty");
-					if (autoSet)
-					{
-						this[autoSet] = resource.items;
-					}
-				}));
-			}
-		});
-
-		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoSubmit(sender, e, ex)
-	{
-
-		let promises = [];
-		let submitItem = BM.Util.safeGet(e.detail, "items");
-
-		Object.keys(this._resources).forEach((resourceName) => {
-			let resource = this._resources[resourceName];
-			if (resource.options.get("autoSubmit", true)) {
-				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
-				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
-
-				promises.push(this._resources[resourceName][method](id, submitItem, parameters));
-			}
-		});
-
-		return Promise.all(promises);
+		this._addOrganizerHandler(component, "doOrganize", ResourceOrganizer.ResourceOrganizer_onDoOrganize);
+		this._addOrganizerHandler(component, "doFetch", ResourceOrganizer.ResourceOrganizer_onDoFetch);
+		this._addOrganizerHandler(component, "doSubmit", ResourceOrganizer.ResourceOrganizer_onDoSubmit);
 
 	}
 

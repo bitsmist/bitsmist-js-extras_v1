@@ -29,6 +29,32 @@ export default class ElementOrganizer extends BM.Organizer
 
 	}
 
+	// -----------------------------------------------------------------------------
+	//	Event handlers
+	// -----------------------------------------------------------------------------
+
+	static ElementOrganizer_onDoOrganize(sender, e, ex)
+	{
+
+		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
+			this.addEventHandler(sectionName, {"handler":ElementOrganizer.ElementOrganizer_onDoProcess, "options":{"attrs":sectionValue}});
+		});
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static ElementOrganizer_onDoProcess(sender, e, ex)
+	{
+
+		let settings = ex.options["attrs"];
+
+		Object.keys(settings).forEach((elementName) => {
+			ElementOrganizer.__initAttr(this, elementName, settings[elementName]);
+		});
+
+	}
+
 	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
@@ -49,33 +75,7 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.onDoOrganize);
-
-	}
-
-	// -----------------------------------------------------------------------------
-	//	Event handlers
-	// -----------------------------------------------------------------------------
-
-	static onDoOrganize(sender, e, ex)
-	{
-
-		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {"handler":ElementOrganizer.onDoProcess, "options":{"attrs":sectionValue}});
-		});
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static onDoProcess(sender, e, ex)
-	{
-
-		let settings = ex.options["attrs"];
-
-		Object.keys(settings).forEach((elementName) => {
-			ElementOrganizer.__initAttr(this, elementName, settings[elementName]);
-		});
+		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.ElementOrganizer_onDoOrganize);
 
 	}
 

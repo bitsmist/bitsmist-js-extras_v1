@@ -28,45 +28,6 @@ export default class ChainOrganizer extends BM.Organizer
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"chains",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ChainOrganizer.onDoOrganize);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static deinit(component, options)
-	{
-
-		let chains = e.details.setting["chains"];
-		if (chains)
-		{
-			Object.keys(chains).forEach((eventName) => {
-				component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-			});
-		}
-
-	}
-
 	// -----------------------------------------------------------------------------
 	//	Event handlers
 	// -----------------------------------------------------------------------------
@@ -113,6 +74,45 @@ export default class ChainOrganizer extends BM.Organizer
 		}
 
 		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static getInfo()
+	{
+
+		return {
+			"sections":		"chains",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "doOrganize", ChainOrganizer.onDoOrganize);
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static deinit(component, options)
+	{
+
+		let chains = e.details.setting["chains"];
+		if (chains)
+		{
+			Object.keys(chains).forEach((eventName) => {
+				component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
+			});
+		}
 
 	}
 

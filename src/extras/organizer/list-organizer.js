@@ -30,6 +30,48 @@ export default class ListOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static ListOrganizer_onAfterTransform(sender, e, ex)
+	{
+
+		this._listRootNode = this.querySelector(this.settings.get("lists.settings.listRootNode"));
+		BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
+
+		return this.transformRow(this.settings.get("lists.settings.rowTemplateName"));
+//		return this.transformRow(this.settings.get("templates.settings.rowTemplateName"));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ListOrganizer_onDoClear(sender, e, ex)
+	{
+
+		this._listRootNode.innerHTML = "";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ListOrganizer_onDoFill(sender, e, ex)
+	{
+
+		this._rowElements = [];
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
+		let fragment = document.createDocumentFragment();
+		let items = BM.Util.safeGet(e.detail, "items", this._rows);
+
+		return Promise.resolve().then(() => {
+			return builder(this, fragment, items);
+		}).then(() => {
+			this._listRootNode.appendChild(fragment);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -62,51 +104,9 @@ export default class ListOrganizer extends BM.Organizer
 		component._activeRowTemplateName = "";
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.onAfterTransform);
-		this._addOrganizerHandler(component, "doClear", ListOrganizer.onDoClear);
-		this._addOrganizerHandler(component, "doFill", ListOrganizer.onDoFill);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static onAfterTransform(sender, e, ex)
-	{
-
-		this._listRootNode = this.querySelector(this.settings.get("lists.settings.listRootNode"));
-		BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
-
-		return this.transformRow(this.settings.get("lists.settings.rowTemplateName"));
-//		return this.transformRow(this.settings.get("templates.settings.rowTemplateName"));
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoClear(sender, e, ex)
-	{
-
-		this._listRootNode.innerHTML = "";
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoFill(sender, e, ex)
-	{
-
-		this._rowElements = [];
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
-		let fragment = document.createDocumentFragment();
-		let items = BM.Util.safeGet(e.detail, "items", this._rows);
-
-		return Promise.resolve().then(() => {
-			return builder(this, fragment, items);
-		}).then(() => {
-			this._listRootNode.appendChild(fragment);
-		});
+		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
+		this._addOrganizerHandler(component, "doClear", ListOrganizer.ListOrganizer_onDoClear);
+		this._addOrganizerHandler(component, "doFill", ListOrganizer.ListOrganizer_onDoFill);
 
 	}
 

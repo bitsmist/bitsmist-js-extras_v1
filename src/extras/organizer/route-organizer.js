@@ -30,6 +30,80 @@ export default class RouteOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static RouteOrganizer_onDoOrganize(sender, e, ex)
+	{
+
+		// Routings
+		this._enumSettings(e.detail.settings["routings"], (sectionName, sectionValue) => {
+			RouteOrganizer._addRoute(this, sectionValue);
+		});
+
+		// Set current route info.
+		this._routeInfo = RouteOrganizer.__loadRouteInfo(this, window.location.href);
+
+		// Specs
+		this._enumSettings(e.detail.settings["specs"], (sectionName, sectionValue) => {
+			this._specs[sectionName] = sectionValue;
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RouteOrganizer_onDoStart(sender, e, ex)
+	{
+
+		if (this.routeInfo["specName"])
+		{
+			let options = {
+				"query": this.settings.get("settings.query")
+			};
+
+			return this.switchSpec(this.routeInfo["specName"], options);
+		}
+
+	};
+
+	// -------------------------------------------------------------------------
+
+	static RouteOrganizer_onAfterReady(sender, e, ex)
+	{
+
+		return this.openRoute();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RouteOrganizer_onDoValidateFail(sender, e, ex)
+	{
+
+		// Try to fix URL when validation failed
+		if (this.settings.get("routings.settings.autoFix"))
+		{
+			RouteOrganizer.__fixRoute(this, e.detail.url);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RouteOrganizer_onAfterValidate(sender, e, ex)
+	{
+
+		// Dump errors when validation failed
+		if (!this.validationResult["result"])
+		{
+			RouteOrganizer.__dumpValidationErrors(this);
+			throw new URIError("URL validation failed.");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -81,91 +155,17 @@ export default class RouteOrganizer extends BM.Organizer
 		Object.defineProperty(component, "settings", { get() { return this._spec; }, }); // Tweak to see settings through spec
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", RouteOrganizer.onDoOrganize);
-		this._addOrganizerHandler(component, "doStart", RouteOrganizer.onDoStart);
-		this._addOrganizerHandler(component, "afterReady", RouteOrganizer.onAfterReady);
-		this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.onDoValidateFail);
-		this._addOrganizerHandler(component, "afterValidate", RouteOrganizer.onAfterValidate);
+		this._addOrganizerHandler(component, "doOrganize", RouteOrganizer.RouteOrganizer_onDoOrganize);
+		this._addOrganizerHandler(component, "doStart", RouteOrganizer.RouteOrganizer_onDoStart);
+		this._addOrganizerHandler(component, "afterReady", RouteOrganizer.RouteOrganizer_onAfterReady);
+		this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.RouteOrganizer_onDoValidateFail);
+		this._addOrganizerHandler(component, "afterValidate", RouteOrganizer.RouteOrganizer_onAfterValidate);
 
 		// Load settings from attributes
 		RouteOrganizer._loadAttrSettings(component);
 
 		// Init popstate handler
 		RouteOrganizer.__initPopState(component);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
-
-	static onDoOrganize(sender, e, ex)
-	{
-
-		// Routings
-		this._enumSettings(e.detail.settings["routings"], (sectionName, sectionValue) => {
-			RouteOrganizer._addRoute(this, sectionValue);
-		});
-
-		// Set current route info.
-		this._routeInfo = RouteOrganizer.__loadRouteInfo(this, window.location.href);
-
-		// Specs
-		this._enumSettings(e.detail.settings["specs"], (sectionName, sectionValue) => {
-			this._specs[sectionName] = sectionValue;
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoStart(sender, e, ex)
-	{
-
-		if (this.routeInfo["specName"])
-		{
-			let options = {
-				"query": this.settings.get("settings.query")
-			};
-
-			return this.switchSpec(this.routeInfo["specName"], options);
-		}
-
-	};
-
-	// -------------------------------------------------------------------------
-
-	static onAfterReady(sender, e, ex)
-	{
-
-		return this.openRoute();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoValidateFail(sender, e, ex)
-	{
-
-		// Try to fix URL when validation failed
-		if (this.settings.get("routings.settings.autoFix"))
-		{
-			RouteOrganizer.__fixRoute(this, e.detail.url);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onAfterValidate(sender, e, ex)
-	{
-
-		// Dump errors when validation failed
-		if (!this.validationResult["result"])
-		{
-			RouteOrganizer.__dumpValidationErrors(this);
-			throw new URIError("URL validation failed.");
-		}
 
 	}
 

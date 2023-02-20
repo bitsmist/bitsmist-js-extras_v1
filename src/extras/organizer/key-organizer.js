@@ -29,37 +29,10 @@ export default class KeyOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"keys",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Init component vars
-		component.__isComposing = false;
-
-		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterTransform", KeyOrganizer.onAfterTransform);
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static onAfterTransform(sender, e, ex)
+	static KeyOrganizer_onAfterTransform(sender, e, ex)
 	{
 
 		let keys = this.settings.get("keys");
@@ -67,8 +40,8 @@ export default class KeyOrganizer extends BM.Organizer
 		{
 			// Init keys
 			let actions = KeyOrganizer.__getActions(keys);
-			this.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, this);});
-			this.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, this, keys, actions);});
+			this.addEventListener("keydown", function(e){KeyOrganizer.KeyOrganizer_onKeyDown.call(this, e, this);});
+			this.addEventListener("keyup", function(e){KeyOrganizer.KeyOrganizer_onKeyUp.call(this, e, this, keys, actions);});
 			//this.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, this, keys);});
 			//this.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, this, keys);});
 
@@ -88,7 +61,7 @@ export default class KeyOrganizer extends BM.Organizer
 	 * @param	{Object}		e					Event info.
 	 * @param	{Component}		component			Component.
 	 */
-	static onKeyDown(e, component)
+	static KeyOrganizer_onKeyDown(e, component)
 	{
 
 		component.__isComposing = ( e.keyCode === 229 ? true : false );
@@ -105,7 +78,7 @@ export default class KeyOrganizer extends BM.Organizer
 	 * @param	{Object}		options				Options.
 	 * @param	{Object}		actions				Action info.
 	 */
-	static onKeyUp(e, component, options, actions)
+	static KeyOrganizer_onKeyUp(e, component, options, actions)
 	{
 
 		// Ignore all key input when composing.
@@ -168,6 +141,33 @@ export default class KeyOrganizer extends BM.Organizer
 
 	}
 	*/
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static getInfo()
+	{
+
+		return {
+			"sections":		"keys",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Init component vars
+		component.__isComposing = false;
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "afterTransform", KeyOrganizer.KeyOrganizer_onAfterTransform);
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Protected

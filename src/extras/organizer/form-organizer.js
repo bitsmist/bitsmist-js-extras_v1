@@ -30,6 +30,41 @@ export default class FormOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onAfterTransform(sender, e, ex)
+	{
+
+		FormUtil.hideConditionalElements(this);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onDoClear(sender, e, ex)
+	{
+
+		let target = BM.Util.safeGet(e.detail, "target", "");
+
+		return FormUtil.clearFields(this, target);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onDoFill(sender, e, ex)
+	{
+
+		let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
+		let items = BM.Util.safeGet(e.detail, "items", this._items);
+
+		FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
+		FormUtil.showConditionalElements(this, items);
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -67,44 +102,9 @@ export default class FormOrganizer extends BM.Organizer
 		component._cancelSubmit = false;
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.onAfterTransform);
-		this._addOrganizerHandler(component, "doClear", FormOrganizer.onDoClear);
-		this._addOrganizerHandler(component, "doFill", FormOrganizer.onDoFill);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static onAfterTransform(sender, e, ex)
-	{
-
-		FormUtil.hideConditionalElements(this);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoClear(sender, e, ex)
-	{
-
-		let target = BM.Util.safeGet(e.detail, "target", "");
-
-		return FormUtil.clearFields(this, target);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoFill(sender, e, ex)
-	{
-
-		let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
-		let items = BM.Util.safeGet(e.detail, "items", this._items);
-
-		FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
-		FormUtil.showConditionalElements(this, items);
+		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.FormOrganizer_onAfterTransform);
+		this._addOrganizerHandler(component, "doClear", FormOrganizer.FormOrganizer_onDoClear);
+		this._addOrganizerHandler(component, "doFill", FormOrganizer.FormOrganizer_onDoFill);
 
 	}
 

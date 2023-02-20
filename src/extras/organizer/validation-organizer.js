@@ -30,6 +30,57 @@ export default class ValidationOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static ValidationOrganizer_onDoOrganize(sender, e, ex)
+	{
+
+		this._enumSettings(e.detail.settings["validators"], (sectionName, sectionValue) => {
+			ValidationOrganizer._addValidator(this, sectionName, sectionValue);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationOrganizer_onDoValidate(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail, "items");
+			let rules = this.settings.get("validators." + validatorName + ".rules");
+			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
+
+			this._validators[validatorName].checkValidity(items, rules, options);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationOrganizer_onDoReportValidity(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail.settings, "items");
+			let rules = this.settings.get("validators." + validatorName + ".rules");
+			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
+
+			this._validators[validatorName].reportValidity(items, rules, options);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -65,60 +116,9 @@ export default class ValidationOrganizer extends BM.Organizer
 		component._validationResult = {};
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ValidationOrganizer.onDoOrganize);
-		this._addOrganizerHandler(component, "doValidate", ValidationOrganizer.onDoValidate);
-		this._addOrganizerHandler(component, "doReportValidity", ValidationOrganizer.onDoReportValidity);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static onDoOrganize(sender, e, ex)
-	{
-
-		this._enumSettings(e.detail.settings["validators"], (sectionName, sectionValue) => {
-			ValidationOrganizer._addValidator(this, sectionName, sectionValue);
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoValidate(sender, e, ex)
-	{
-
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get("validators." + validatorName + ".rules");
-			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
-
-			this._validators[validatorName].checkValidity(items, rules, options);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static onDoReportValidity(sender, e, ex)
-	{
-
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail.settings, "items");
-			let rules = this.settings.get("validators." + validatorName + ".rules");
-			let options = this.settings.get("validators." + validatorName + ".handlerOptions");
-
-			this._validators[validatorName].reportValidity(items, rules, options);
-		}
+		this._addOrganizerHandler(component, "doOrganize", ValidationOrganizer.ValidationOrganizer_onDoOrganize);
+		this._addOrganizerHandler(component, "doValidate", ValidationOrganizer.ValidationOrganizer_onDoValidate);
+		this._addOrganizerHandler(component, "doReportValidity", ValidationOrganizer.ValidationOrganizer_onDoReportValidity);
 
 	}
 

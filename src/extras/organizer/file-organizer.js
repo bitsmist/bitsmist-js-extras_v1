@@ -28,6 +28,23 @@ export default class FileOrganizer extends BM.Organizer
 
 	}
 
+	// -----------------------------------------------------------------------------
+	//	Event handlers
+	// -----------------------------------------------------------------------------
+
+	static FileOrganizer_onDoOrganize(sender, e, ex)
+	{
+
+		let promises = [];
+
+		this._enumSettings(e.detail.settings["files"], (sectionName, sectionValue) => {
+			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+		});
+
+		return Promise.all(promises);
+
+	}
+
 	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
@@ -48,24 +65,7 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", FileOrganizer.onDoOrganize);
-
-	}
-
-	// -----------------------------------------------------------------------------
-	//	Event handlers
-	// -----------------------------------------------------------------------------
-
-	static onDoOrganize(sender, e, ex)
-	{
-
-		let promises = [];
-
-		this._enumSettings(e.detail.settings["files"], (sectionName, sectionValue) => {
-			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
-		});
-
-		return Promise.all(promises);
+		this._addOrganizerHandler(component, "doOrganize", FileOrganizer.FileOrganizer_onDoOrganize);
 
 	}
 

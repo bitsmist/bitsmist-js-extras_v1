@@ -9,7 +9,6 @@
 // =============================================================================
 
 import BM from "../bm";
-//import PreferenceOrganizer from "../organizer/preference-organizer.js";
 
 // =============================================================================
 //	Error manager class
@@ -71,7 +70,7 @@ ErrorManager.prototype._getSettings = function()
 		"events": {
 			"this": {
 				"handlers": {
-					"error": 			this.onError
+					"error": 			this.ErrorOrganizer_onError
 				}
 			}
 		},
@@ -84,13 +83,15 @@ ErrorManager.prototype._getSettings = function()
 
 }
 
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  Event Handlers
+// -----------------------------------------------------------------------------
 
 /**
  * Handle an exception.
  *
  */
-ErrorManager.prototype.onError = function(sender, e, ex)
+ErrorManager.prototype.ErrorOrganizer_onError = function(sender, e, ex)
 {
 
 //	try
