@@ -36,7 +36,7 @@ export default class DialogOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"dialog",
+			"sections":		"dialogs",
 			"order":		800,
 		};
 
@@ -66,25 +66,18 @@ export default class DialogOrganizer extends BM.Organizer
 		component._modalPromise;
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", DialogOrganizer.onBeforeStart);
 		this._addOrganizerHandler(component, "afterReady", DialogOrganizer.onAfterReady);
+
+		// Init component settings
+		component.settings.set("settings.autoRefresh", false);
+		component.settings.set("settings.autoRefreshOnOpen", true);
+		component.settings.set("settings.autoSetup", false);
+		component.settings.set("settings.autoSetupOnOpen", true);
 
 	}
 
 	// -------------------------------------------------------------------------
 	//  Event Handlers
-	// -------------------------------------------------------------------------
-
-	static onBeforeStart(sender, e, ex)
-	{
-
-		this.settings.set("settings.autoRefresh", false);
-		this.settings.set("settings.autoRefreshOnOpen", true);
-		this.settings.set("settings.autoSetup", false);
-		this.settings.set("settings.autoSetupOnOpen", true);
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	static onAfterReady(sender, e, ex)
