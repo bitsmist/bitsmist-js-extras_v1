@@ -56,34 +56,34 @@ ChainedSelect.prototype._getSettings = function()
 		"events": {
 			"this": {
 				"handlers": {
-					"beforeStart":		["onChainedSelect_BeforeStart"],
-					"afterTransform":	["onChainedSelect_AfterTransform"],
-					"doClear":			["onChainedSelect_DoClear"],
-					"doFill":			["onChainedSelect_DoFill"],
+					"beforeStart":		["ChainedSelect_onBeforeStart"],
+					"afterTransform":	["ChainedSelect_onAfterTransform"],
+					"doClear":			["ChainedSelect_onDoClear"],
+					"doFill":			["ChainedSelect_onDoFill"],
 				}
 			},
 			"cmb-item": {
 				"rootNode":				"select",
 				"handlers": {
-					"change": 			["onChainedSelect_CmbItemChange"],
+					"change": 			["ChainedSelect_onCmbItemChange"],
 				}
 			},
 			"btn-newitem": {
 				"rootNode":				".btn-newitem",
 				"handlers": {
-					"click":			["onChainedSelect_BtnNewItemClick"],
+					"click":			["ChainedSelect_onBtnNewItemClick"],
 				}
 			},
 			"btn-edititem": {
 				"rootNode":				".btn-edititem",
 				"handlers": {
-					"click":			["onChainedSelect_BtnEditItemClick"],
+					"click":			["ChainedSelect_onBtnEditItemClick"],
 				}
 			},
 			"btn-removeitem": {
 				"rootNode":				".btn-removeitem",
 				"handlers": {
-					"click": 			["onChainedSelect_BtnRemoveItemClick"],
+					"click": 			["ChainedSelect_onBtnRemoveItemClick"],
 				}
 			}
 		},
@@ -131,19 +131,19 @@ ChainedSelect.prototype.ChainedSelect_onBeforeStart = function(sender, e, ex)
 
 	if (this.settings.get("settings.useDefaultInput", true))
 	{
-		this.addEventHandler("beforeAdd", this.onChainedSelect_BeforeAdd);
-		this.addEventHandler("doAdd", this.onChainedSelect_DoAdd);
-		this.addEventHandler("beforeEdit", this.onChainedSelect_BeforeEdit);
-		this.addEventHandler("doEdit", this.onChainedSelect_DoEdit);
-		this.addEventHandler("beforeRemove", this.onChainedSelect_BeforeRemove);
-		this.addEventHandler("doRemove", this.onChainedSelect_DoRemove);
+		this.addEventHandler("beforeAdd", "ChainedSelect_onChainedSelect_BeforeAdd");
+		this.addEventHandler("doAdd", "ChainedSelect_onChainedSelect_DoAdd");
+		this.addEventHandler("beforeEdit", "ChainedSelect_onChainedSelect_BeforeEdit");
+		this.addEventHandler("doEdit", "ChainedSelect_onChainedSelect_DoEdit");
+		this.addEventHandler("beforeRemove", "ChainedSelect_onChainedSelect_BeforeRemove");
+		this.addEventHandler("doRemove", "ChainedSelect_onChainedSelect_DoRemove");
 	}
 
 }
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onAfterTransform = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onAfterTransform = function(sender, e, ex)
 {
 
 	// Init select elements (disable all)
@@ -174,7 +174,7 @@ ChainedSelect.prototype.onChainedSelect_onAfterTransform = function(sender, e, e
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onDoClear = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onDoClear = function(sender, e, ex)
 {
 
 	let fromLevel = BM.Util.safeGet(e.detail, "fromLevel", 1);
@@ -196,7 +196,7 @@ ChainedSelect.prototype.onChainedSelect_onDoClear = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onDoFill = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onDoFill = function(sender, e, ex)
 {
 
 	let level = BM.Util.safeGet(e.detail, "level", 1);
@@ -206,7 +206,7 @@ ChainedSelect.prototype.onChainedSelect_onDoFill = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onCmbItemChange = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onCmbItemChange = function(sender, e, ex)
 {
 
 return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
@@ -215,7 +215,7 @@ return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.valu
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onBtnNewItemClick = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBtnNewItemClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("disabled")) {
@@ -254,7 +254,7 @@ ChainedSelect.prototype.onChainedSelect_onBtnNewItemClick = function(sender, e, 
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onBtnEditItemClick = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBtnEditItemClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("disabled")) {
@@ -332,7 +332,7 @@ ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, 
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onBeforeAdd = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBeforeAdd = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -350,7 +350,7 @@ ChainedSelect.prototype.onChainedSelect_onBeforeAdd = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onDoAdd = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onDoAdd = function(sender, e, ex)
 {
 
 	return this.newItem(e.detail.level, this.modalResult.text, this.modalResult.value);
@@ -359,7 +359,7 @@ ChainedSelect.prototype.onChainedSelect_onDoAdd = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onBeforeEdit = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBeforeEdit = function(sender, e, ex)
 {
 
 	let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
@@ -386,7 +386,7 @@ ChainedSelect.prototype.onChainedSelect_onBeforeEdit = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onDoEdit = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onDoEdit = function(sender, e, ex)
 {
 
 	this.editItem(e.detail.level, this.modalResult.new.text, this.modalResult.new.value);
@@ -395,7 +395,7 @@ ChainedSelect.prototype.onChainedSelect_onDoEdit = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onBeforeRemove = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBeforeRemove = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -415,7 +415,7 @@ ChainedSelect.prototype.onChainedSelect_onBeforeRemove = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-ChainedSelect.prototype.onChainedSelect_onDoRemove = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onDoRemove = function(sender, e, ex)
 {
 
 	return this.removeItem(e.detail.level);

@@ -66,9 +66,9 @@ PreferenceServer.prototype._getSettings = function()
 		"events": {
 			"this": {
 				"handlers": {
-					"beforeStart":		this.onBeforeStart,
-					"doFetch":			this.onDoFetch,
-					"beforeSubmit":		this.onBeforeSubmit
+					"beforeStart":		["PreferenceServer_onBeforeStart"],
+					"doFetch":			["PreferenceServer_onDoFetch"],
+					"beforeSubmit":		["PreferenceServer_onBeforeSubmit"]
 				}
 			}
 		}
@@ -80,7 +80,7 @@ PreferenceServer.prototype._getSettings = function()
 //  Event Handlers
 // -----------------------------------------------------------------------------
 
-PreferenceServer.prototype.onBeforeStart = function(sender, e, ex)
+PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, ex)
 {
 
 	this._defaults = new BM.ChainableStore();
@@ -90,7 +90,7 @@ PreferenceServer.prototype.onBeforeStart = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
+PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
 {
 
 	// Set default preferences
@@ -109,7 +109,7 @@ PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-PreferenceServer.prototype.onBeforeSubmit = function(sender, e, ex)
+PreferenceServer.prototype.PreferenceServer_onBeforeSubmit = function(sender, e, ex)
 {
 
 	this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);

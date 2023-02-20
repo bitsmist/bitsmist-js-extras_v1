@@ -55,7 +55,7 @@ TabIndex.prototype._getSettings = function()
 			"tab-indices": {
 				"rootNode": 		"[data-tabindex]",
 				"handlers": {
-					"click": 		"onTabIndex_TabIndexClick"
+					"click": 		["TabIndex_onTabIndexClick"]
 				}
 			},
 		},
@@ -67,7 +67,7 @@ TabIndex.prototype._getSettings = function()
 //	Event Handlers
 // -----------------------------------------------------------------------------
 
-TabIndex.prototype.onTabIndex_TabIndexClick = function(sender, e, ex)
+TabIndex.prototype.TabIndex_onTabIndexClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("active")) {
