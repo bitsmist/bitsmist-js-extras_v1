@@ -14,66 +14,79 @@ import BM from "../bm";
 //	Tab Content Class
 // =============================================================================
 
-export default class TabContent extends BM.Component
+// -----------------------------------------------------------------------------
+//  Constructor
+// -----------------------------------------------------------------------------
+
+/**
+ * Constructor.
+ */
+export default function TabContent(settings)
 {
 
-	// -------------------------------------------------------------------------
-	//	Settings
-	// -------------------------------------------------------------------------
+	return Reflect.construct(BM.Component, [settings], this.constructor);
 
-	_getSettings()
-	{
+}
 
-		return {
+BM.ClassUtil.inherit(TabContent, BM.Component);
+
+// -----------------------------------------------------------------------------
+//	Settings
+// -----------------------------------------------------------------------------
+
+TabContent.prototype._getSettings = function()
+{
+
+	return {
+		"settings": {
+			"name":					"BmTabcontent",
+		},
+		"templates": {
 			"settings": {
-				"name":					"BmTabcontent",
-			},
-			"templates": {
-				"settings": {
-					"hasTemplate":		false,
-				}
-			},
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	* Switch to the specified content.
-	*
- 	* @param	{String}		index				Index.
-	*/
-	switchContent(index)
-	{
-
-		// Deactivate current active content
-		this.querySelector(":scope > .active").classList.remove("active");
-
-		// Activate specified content
-		this.querySelector(":scope > [data-tabindex='" + index + "']").classList.add("active");
-		this.querySelector(":scope > [data-tabindex='" + index + "']").focus();
-//		this.querySelector(":scope nth-child(" + index + ")").classList.add("active");
-//		this.querySelector(":scope > [data-index='" + index + "']").focus();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get a current active content.
-	 *
- 	 * @return  {HTMLElement}	Current active element.
-	 */
-	getActiveContent()
-	{
-
-		return this.querySelector(":scope .active");
-
+				"hasTemplate":		false,
+			}
+		},
 	}
 
 }
+
+// -----------------------------------------------------------------------------
+//	Methods
+// -----------------------------------------------------------------------------
+
+/**
+ * Switch to the specified content.
+ *
+ * @param	{String}		index				Index.
+ */
+TabContent.prototype.switchContent = function(index)
+{
+
+	// Deactivate current active content
+	this.querySelector(":scope > .active").classList.remove("active");
+
+	// Activate specified content
+	this.querySelector(":scope > [data-tabindex='" + index + "']").classList.add("active");
+	this.querySelector(":scope > [data-tabindex='" + index + "']").focus();
+//		this.querySelector(":scope nth-child(" + index + ")").classList.add("active");
+//		this.querySelector(":scope > [data-index='" + index + "']").focus();
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Get a current active content.
+ *
+ * @return  {HTMLElement}	Current active element.
+ */
+TabContent.prototype.getActiveContent = function()
+{
+
+	return this.querySelector(":scope .active");
+
+}
+
+// -----------------------------------------------------------------------------
 
 customElements.define("bm-tabcontent", TabContent);
