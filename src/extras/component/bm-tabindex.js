@@ -38,14 +38,19 @@ TabIndex.prototype._getSettings = function()
 {
 
 	return {
+		// Settings
 		"settings": {
 			"name":					"BmTabindex",
 		},
+
+		// Templates
 		"templates": {
 			"settings": {
 				"hasTemplate":		false,
 			}
 		},
+
+		// Events
 		"events": {
 			"tab-indices": {
 				"rootNode": 		"[data-tabindex]",

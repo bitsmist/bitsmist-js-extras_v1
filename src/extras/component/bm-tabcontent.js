@@ -38,9 +38,12 @@ TabContent.prototype._getSettings = function()
 {
 
 	return {
+		// Settings
 		"settings": {
 			"name":					"BmTabcontent",
 		},
+
+		// Templates
 		"templates": {
 			"settings": {
 				"hasTemplate":		false,
