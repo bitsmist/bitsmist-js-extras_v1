@@ -48,6 +48,7 @@ PreferenceServer.prototype._getSettings = function()
 			"name":						"PreferenceServer",
 		},
 
+		// Templates
 		"templates": {
 			"settings": {
 				"hasTemplate":			false,
@@ -90,8 +91,6 @@ PreferenceServer.prototype.onBeforeStart = function(sender, e, ex)
 PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
 {
 
-	let chain = Promise.resolve();
-
 	// Set default preferences
 	if (this.settings.get("defaults.preferences"))
 	{
@@ -99,8 +98,9 @@ PreferenceServer.prototype.onDoFetch = function(sender, e, ex)
 	}
 
 	// Load preferences
-	chain = this.resources["preferences"].get().then((preferences) => {
+	return this.resources["preferences"].get().then((preferences) => {
 		this._store.merge(preferences);
+		this.items = this._store.items;
 	});
 
 }
