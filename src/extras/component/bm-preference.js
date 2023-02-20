@@ -32,6 +32,8 @@ export default function PreferenceServer(settings)
 BM.ClassUtil.inherit(PreferenceServer, BM.Component);
 
 // -----------------------------------------------------------------------------
+//	Settings
+// -----------------------------------------------------------------------------
 
 /**
  * Get component settings.

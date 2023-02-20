@@ -59,16 +59,9 @@ TabIndex.prototype._getSettings = function()
 }
 
 // -----------------------------------------------------------------------------
-//	Methods
+//	Event Handlers
 // -----------------------------------------------------------------------------
 
-/**
- * Click event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
 TabIndex.prototype.onTabIndex_TabIndexClick = function(sender, e, ex)
 {
 

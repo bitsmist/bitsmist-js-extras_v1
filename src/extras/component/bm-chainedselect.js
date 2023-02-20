@@ -124,14 +124,7 @@ Object.defineProperty(ChainedSelect.prototype, "items", {
 //	Event Handlers
 // -----------------------------------------------------------------------------
 
-/**
- * Before start event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BeforeStart = function(sender, e, ex)
+ChainedSelect.prototype.ChainedSelect_onBeforeStart = function(sender, e, ex)
 {
 
 	this.rootNodes = this.settings.get("settings.rootNodes");
@@ -150,14 +143,7 @@ ChainedSelect.prototype.onChainedSelect_BeforeStart = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * After transform event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_AfterTransform = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onAfterTransform = function(sender, e, ex)
 {
 
 	// Init select elements (disable all)
@@ -188,14 +174,7 @@ ChainedSelect.prototype.onChainedSelect_AfterTransform = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Do clear event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_DoClear = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onDoClear = function(sender, e, ex)
 {
 
 	let fromLevel = BM.Util.safeGet(e.detail, "fromLevel", 1);
@@ -217,14 +196,7 @@ ChainedSelect.prototype.onChainedSelect_DoClear = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Do fill event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_DoFill = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onDoFill = function(sender, e, ex)
 {
 
 	let level = BM.Util.safeGet(e.detail, "level", 1);
@@ -234,14 +206,7 @@ ChainedSelect.prototype.onChainedSelect_DoFill = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Change event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_CmbItemChange = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onCmbItemChange = function(sender, e, ex)
 {
 
 return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
@@ -250,14 +215,7 @@ return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.valu
 
 // -----------------------------------------------------------------------------
 
-/**
- * Click event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BtnNewItemClick = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBtnNewItemClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("disabled")) {
@@ -296,14 +254,7 @@ ChainedSelect.prototype.onChainedSelect_BtnNewItemClick = function(sender, e, ex
 
 // -----------------------------------------------------------------------------
 
-/**
- * Click event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BtnEditItemClick = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBtnEditItemClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("disabled")) {
@@ -342,14 +293,7 @@ ChainedSelect.prototype.onChainedSelect_BtnEditItemClick = function(sender, e, e
 
 // -----------------------------------------------------------------------------
 
-/**
- * Click event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BtnRemoveItemClick = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, e, ex)
 {
 
 	if (sender.classList.contains("disabled")) {
@@ -388,14 +332,7 @@ ChainedSelect.prototype.onChainedSelect_BtnRemoveItemClick = function(sender, e,
 
 // -----------------------------------------------------------------------------
 
-/**
- * Before add event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BeforeAdd = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBeforeAdd = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -413,14 +350,7 @@ ChainedSelect.prototype.onChainedSelect_BeforeAdd = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Do add event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_DoAdd = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onDoAdd = function(sender, e, ex)
 {
 
 	return this.newItem(e.detail.level, this.modalResult.text, this.modalResult.value);
@@ -429,14 +359,7 @@ ChainedSelect.prototype.onChainedSelect_DoAdd = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Before edit event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BeforeEdit = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBeforeEdit = function(sender, e, ex)
 {
 
 	let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
@@ -463,14 +386,7 @@ ChainedSelect.prototype.onChainedSelect_BeforeEdit = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- *  Do edit event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_DoEdit = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onDoEdit = function(sender, e, ex)
 {
 
 	this.editItem(e.detail.level, this.modalResult.new.text, this.modalResult.new.value);
@@ -479,14 +395,7 @@ ChainedSelect.prototype.onChainedSelect_DoEdit = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- * Before remove event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_BeforeRemove = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onBeforeRemove = function(sender, e, ex)
 {
 
 	return new Promise((resolve, reject) => {
@@ -506,14 +415,7 @@ ChainedSelect.prototype.onChainedSelect_BeforeRemove = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-/**
- *  Do remove event handler.
- *
- * @param	{Object}		sender				Sender.
- * @param	{Object}		e					Event info.
- * @param	{Object}		ex					Extra event info.
- */
-ChainedSelect.prototype.onChainedSelect_DoRemove = function(sender, e, ex)
+ChainedSelect.prototype.onChainedSelect_onDoRemove = function(sender, e, ex)
 {
 
 	return this.removeItem(e.detail.level);
