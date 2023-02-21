@@ -47,14 +47,8 @@ PreferenceServer.prototype._getSettings = function()
 		// Settings
 		"settings": {
 			"autoFill":					false,
+			"autoTransform":			false,
 			"name":						"PreferenceServer",
-		},
-
-		// Templates
-		"templates": {
-			"settings": {
-				"hasTemplate":			false,
-			}
 		},
 
 		// Organizers

@@ -131,12 +131,12 @@ ChainedSelect.prototype.ChainedSelect_onBeforeStart = function(sender, e, ex)
 
 	if (this.settings.get("settings.useDefaultInput", true))
 	{
-		this.addEventHandler("beforeAdd", "ChainedSelect_onChainedSelect_BeforeAdd");
-		this.addEventHandler("doAdd", "ChainedSelect_onChainedSelect_DoAdd");
-		this.addEventHandler("beforeEdit", "ChainedSelect_onChainedSelect_BeforeEdit");
-		this.addEventHandler("doEdit", "ChainedSelect_onChainedSelect_DoEdit");
-		this.addEventHandler("beforeRemove", "ChainedSelect_onChainedSelect_BeforeRemove");
-		this.addEventHandler("doRemove", "ChainedSelect_onChainedSelect_DoRemove");
+		this.addEventHandler("beforeAdd", "ChainedSelect_onBeforeAdd");
+		this.addEventHandler("doAdd", "ChainedSelect_onDoAdd");
+		this.addEventHandler("beforeEdit", "ChainedSelect_onBeforeEdit");
+		this.addEventHandler("doEdit", "ChainedSelect_onDoEdit");
+		this.addEventHandler("beforeRemove", "ChainedSelect_onBeforeRemove");
+		this.addEventHandler("doRemove", "ChainedSelect_onDoRemove");
 	}
 
 }

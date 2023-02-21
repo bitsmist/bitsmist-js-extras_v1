@@ -40,14 +40,8 @@ TabIndex.prototype._getSettings = function()
 	return {
 		// Settings
 		"settings": {
+			"autoTransform":		false,
 			"name":					"BmTabindex",
-		},
-
-		// Templates
-		"templates": {
-			"settings": {
-				"hasTemplate":		false,
-			}
 		},
 
 		// Events
