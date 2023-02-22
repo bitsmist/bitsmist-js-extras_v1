@@ -211,7 +211,7 @@ export default class ListOrganizer extends BM.Organizer
 	static _createRow(template)
 	{
 
-		let ele = document.createElement("div");
+		let ele = document.createElement("tbody");
 		ele.innerHTML = template;
 		let element = ele.firstElementChild;
 		element.setAttribute("bm-powered", "");
