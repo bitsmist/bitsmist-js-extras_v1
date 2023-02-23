@@ -195,7 +195,7 @@ export default class KeyOrganizer extends BM.Organizer
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					component.close();
+					component.close({"reason":"submit"});
 				}
 			}
 		});
@@ -214,7 +214,7 @@ export default class KeyOrganizer extends BM.Organizer
 	static _defaultCancel(e, component, options)
 	{
 
-		return component.close();
+		return component.close({"reason":"cancel"});
 
 	}
 
