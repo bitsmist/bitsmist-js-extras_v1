@@ -22,13 +22,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		component			Component.
-     * @param	{String}		resourceName		Resource name.
-     * @param	{Object}		options				Options.
-     */
 	constructor(component, resourceName, options)
 	{
 
@@ -44,11 +37,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Raw data.
-	 *
-	 * @type	{Object}
-	 */
 	get data()
 	{
 
@@ -62,11 +50,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Items.
-	 *
-	 * @type	{Object}
-	 */
 	get items()
 	{
 
@@ -78,13 +61,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Get resource text for the code.
-	 *
-	 * @param	{String}		code				Code value.
-	 *
-	 * @return  {String}		Resource text.
-	 */
 	getText(code)
 	{
 
@@ -94,13 +70,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 
     // -------------------------------------------------------------------------
 
-	/**
-	 * Get resource item for the code.
-	 *
-	 * @param	{String}		code				Code value.
-	 *
-	 * @return  {Object}		Resource data.
-	 */
 	getItem(code)
 	{
 
@@ -122,6 +91,33 @@ export default class LinkedResourceHandler extends ResourceHandler
 			this._ref = document.querySelector(rootNode).resources[resourceName];
 			return this._ref;
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	_delete(id, parameters)
+	{
+
+		return this._ref.delete(id, parameters);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	_post(id, data, parameters)
+	{
+
+		return this._ref.post(id, data, parameters);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	_put(id, data, parameters)
+	{
+
+		return this._ref.put(id, data, parameters);
 
 	}
 
