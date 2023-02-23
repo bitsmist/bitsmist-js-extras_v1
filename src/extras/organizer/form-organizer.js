@@ -164,17 +164,19 @@ export default class FormOrganizer extends BM.Organizer
 			}
 		}).then(() => {
 			// Submit values
-			if (!component._cancelSubmit)
-			{
-				return Promise.resolve().then(() => {
-					return component.trigger("beforeSubmit", options);
-				}).then(() => {
-					return component.trigger("doSubmit", options);
-				}).then(() => {
-					component.items = options["items"];
-					return component.trigger("afterSubmit", options);
-				});
-			}
+			console.debug(`Submitting component. name=${component.name}, id=${component.id}`);
+			return component.trigger("beforeSubmit", options).then(() => {
+				if (!component._cancelSubmit)
+				{
+					return Promise.resolve().then(() => {
+						return component.trigger("doSubmit", options);
+					}).then(() => {
+						console.debug(`Submitted component. name=${component.name}, id=${component.id}`);
+						component.items = options["items"];
+						return component.trigger("afterSubmit", options);
+					});
+				}
+			});
 		});
 
 	}
