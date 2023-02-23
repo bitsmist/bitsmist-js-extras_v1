@@ -165,16 +165,19 @@ export default class ValidationOrganizer extends BM.Organizer
 		component._validationResult = {"result":true};
 
 		return Promise.resolve().then(() => {
+			console.debug(`ValidationOrganizer._validate(): Validating component. name=${component.name}, id=${component.id}`);
 			return component.trigger("beforeValidate", options);
 		}).then(() => {
 			return component.trigger("doValidate", options);
 		}).then(() => {
 			if (component.validationResult["result"])
 			{
+				console.debug(`ValidationOrganizer._validate(): Validation Success. name=${component.name}, id=${component.id}`);
 				return component.trigger("doValidateSuccess", options);
 			}
 			else
 			{
+				console.debug(`ValidationOrganizer._validate(): Validation Failed. name=${component.name}, id=${component.id}`);
 				return component.trigger("doValidateFail", options);
 			}
 		}).then(() => {
