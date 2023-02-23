@@ -22,13 +22,6 @@ export default class CookieResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		component			Component.
-     * @param	{String}		resourceName		Resource name.
-     * @param	{Object}		options				Options.
-     */
 	constructor(component, resourceName, options)
 	{
 
@@ -41,17 +34,9 @@ export default class CookieResourceHandler extends ResourceHandler
 	}
 
 	// -------------------------------------------------------------------------
-	//  Methods
+	//  Protected
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Get data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
 	_get(id, parameters)
 	{
 
@@ -61,15 +46,6 @@ export default class CookieResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Update data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
 	_put(id, data, parameters)
 	{
 

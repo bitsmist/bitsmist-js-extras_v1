@@ -22,13 +22,6 @@ export default class WebstorageResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		component			Component.
-     * @param	{String}		resourceName		Resource name.
-     * @param	{Object}		options				Options.
-     */
 	constructor(component, resourceName, options)
 	{
 
@@ -40,17 +33,9 @@ export default class WebstorageResourceHandler extends ResourceHandler
 	}
 
 	// -------------------------------------------------------------------------
-	//  Methods
+	//  Protected
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Get data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Data.
-	 */
 	_get(id, parameters)
 	{
 
@@ -67,12 +52,6 @@ export default class WebstorageResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Delete data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 */
 	_delete(id, parameters)
 	{
 
@@ -82,13 +61,6 @@ export default class WebstorageResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Insert data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 */
 	_post(id, data, parameters)
 	{
 
@@ -98,22 +70,11 @@ export default class WebstorageResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Update data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 */
 	_put(id, data, parameters)
 	{
 
 		localStorage.setItem(id, JSON.stringify(data));
 
 	}
-
-	// -----------------------------------------------------------------------------
-	//  Privates
-	// -----------------------------------------------------------------------------
 
 }
