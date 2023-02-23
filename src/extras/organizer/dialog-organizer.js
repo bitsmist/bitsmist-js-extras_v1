@@ -35,7 +35,7 @@ export default class DialogOrganizer extends BM.Organizer
 	static DialogOrganizer_onAfterReady(sender, e, ex)
 	{
 
-		if (this.settings.get("settings.autoOpen"))
+		if (this.settings.get("dialogs.settings.autoOpen"))
 		{
 			return this.open();
 		}
@@ -76,6 +76,7 @@ export default class DialogOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._isModal = false;
+		component._cancelClose;
 		component._modalResult;
 		component._modalPromise;
 
@@ -125,7 +126,7 @@ export default class DialogOrganizer extends BM.Organizer
 			return component.trigger("doOpen", options);
 		}).then(() => {
 			// Auto focus
-			let autoFocus = component.settings.get("settings.autoFocus");
+			let autoFocus = component.settings.get("dialogs.settings.autoFocus");
 			if (autoFocus)
 			{
 				let target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
@@ -178,21 +179,23 @@ export default class DialogOrganizer extends BM.Organizer
 	{
 
 		options = options || {};
+		component._cancelClose = false;
 
-		return Promise.resolve().then(() => {
-			console.debug(`Closing component. name=${component.name}, id=${component.id}`);
-			return component.trigger("beforeClose", options);
-		}).then(() => {
-			return component.trigger("doClose", options);
-		}).then(() => {
-			return component.trigger("afterClose", options);
-		}).then(() => {
-			if (component._isModal)
+		console.debug(`Closing component. name=${component.name}, id=${component.id}`);
+		return component.trigger("beforeClose", options).then(() => {
+			if (!component._cancelClose)
 			{
-				component._modalPromise.resolve(component._modalResult);
+				return Promise.resolve().then(() => {
+					return component.trigger("doClose", options);
+				}).then(() => {
+					if (component._isModal)
+					{
+						component._modalPromise.resolve(component._modalResult);
+					}
+					console.debug(`Closed component. name=${component.name}, id=${component.id}`);
+					return component.trigger("afterClose", options);
+				});
 			}
-		}).then(() => {
-			console.debug(`Closed component. name=${component.name}, id=${component.id}`);
 		});
 
 	}
