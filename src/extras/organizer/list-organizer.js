@@ -40,13 +40,12 @@ export default class ListOrganizer extends BM.Organizer
 		BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 		return this.transformRow(this.settings.get("lists.settings.rowTemplateName"));
-//		return this.transformRow(this.settings.get("templates.settings.rowTemplateName"));
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static ListOrganizer_onDoClear(sender, e, ex)
+	static ListOrganizer_onBeforeFill(sender, e, ex)
 	{
 
 		this._listRootNode.innerHTML = "";
@@ -105,7 +104,7 @@ export default class ListOrganizer extends BM.Organizer
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
-		this._addOrganizerHandler(component, "doClear", ListOrganizer.ListOrganizer_onDoClear);
+		this._addOrganizerHandler(component, "beforeFill", ListOrganizer.ListOrganizer_onBeforeFill);
 		this._addOrganizerHandler(component, "doFill", ListOrganizer.ListOrganizer_onDoFill);
 
 	}
@@ -134,14 +133,14 @@ export default class ListOrganizer extends BM.Organizer
 		}
 
 		return Promise.resolve().then(() => {
-			console.debug(`List.switchRowTemplate(): Switching a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListOrganizer._transformRow(): Switching a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 			return component.loadTemplate(templateName);
 		}).then(() => {
 			component._activeRowTemplateName = templateName;
 		}).then(() => {
-			return component.trigger("afterRowAppend", options);
+			return component.trigger("afterRowTransform", options);
 		}).then(() => {
-			console.debug(`List.switchRowTemplate(): Switched a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListOrganizer._transformRow(): Switched a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
 
 	}
