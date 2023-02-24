@@ -77,6 +77,7 @@ export default class DialogOrganizer extends BM.Organizer
 		// Init component vars
 		component._isModal = false;
 		component._cancelClose;
+		component._cancelOpen;
 		component._modalResult;
 		component._modalPromise;
 
@@ -107,38 +108,30 @@ export default class DialogOrganizer extends BM.Organizer
 
 		options = options || {};
 
-		return Promise.resolve().then(() => {
-			console.debug(`Opening component. name=${component.name}, id=${component.id}`);
-			return component.trigger("beforeOpen", options);
-		}).then(() => {
-			// Setup
-			if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+		console.debug(`Opening component. name=${component.name}, id=${component.id}`);
+		return component.trigger("beforeOpen", options).then(() => {
+			if (!component._cancelOpen)
 			{
-				return component.setup(options);
+				return Promise.resolve().then(() => {
+					// Setup
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+					{
+						return component.setup(options);
+					}
+				}).then(() => {
+					// Refresh
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
+					{
+						return component.refresh(options);
+					}
+				}).then(() => {
+					return component.trigger("doOpen", options);
+				}).then(() => {
+					return component.trigger("afterOpen", options);
+				}).then(() => {
+					console.debug(`Opened component. name=${component.name}, id=${component.id}`);
+				});
 			}
-		}).then(() => {
-			// Refresh
-			if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
-			{
-				return component.refresh(options);
-			}
-		}).then(() => {
-			return component.trigger("doOpen", options);
-		}).then(() => {
-			// Auto focus
-			let autoFocus = component.settings.get("dialogs.settings.autoFocus");
-			if (autoFocus)
-			{
-				let target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
-				if (target)
-				{
-					target.focus();
-				}
-			}
-		}).then(() => {
-			return component.trigger("afterOpen", options);
-		}).then(() => {
-			console.debug(`Opened component. name=${component.name}, id=${component.id}`);
 		});
 
 	}
