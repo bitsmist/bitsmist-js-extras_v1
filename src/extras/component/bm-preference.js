@@ -46,14 +46,10 @@ PreferenceServer.prototype._getSettings = function()
 	return {
 		// Settings
 		"settings": {
+			"autoClear":				false,
 			"autoFill":					false,
 			"autoTransform":			false,
 			"name":						"PreferenceServer",
-		},
-
-		// Organizers
-		"organizers": {
-			"FormOrganizer":			{"settings":{"attach":true}},
 		},
 
 		// Events
@@ -64,6 +60,14 @@ PreferenceServer.prototype._getSettings = function()
 					"doFetch":			["PreferenceServer_onDoFetch"],
 					"beforeSubmit":		["PreferenceServer_onBeforeSubmit"]
 				}
+			}
+		},
+
+		// Forms
+		"forms": {
+			"settings": {
+				"autoValidate":			false,
+				"autoCollect":			false,
 			}
 		}
 	}
