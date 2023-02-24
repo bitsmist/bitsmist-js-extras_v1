@@ -36,8 +36,14 @@ export default class ElementOrganizer extends BM.Organizer
 	static ElementOrganizer_onDoOrganize(sender, e, ex)
 	{
 
+		let order = ElementOrganizer.getInfo()["order"];
+
 		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {"handler":ElementOrganizer.ElementOrganizer_onDoProcess, "options":{"attrs":sectionValue}});
+			this.addEventHandler(sectionName, {
+				"handler":	ElementOrganizer.ElementOrganizer_onDoProcess,
+				"order":	order,
+				"options":	{"attrs":sectionValue}
+			});
 		});
 
 	}
