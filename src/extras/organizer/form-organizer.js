@@ -146,13 +146,13 @@ export default class FormOrganizer extends BM.Organizer
 
 		return Promise.resolve().then(() => {
 			// Collect values
-			if (component.settings.get("forms.settings.autoCollect", false))
+			if (component.settings.get("forms.settings.autoCollect", true))
 			{
 				options["items"] = FormOrganizer.__collectData(component);
 			}
 		}).then(() => {
 			// Validate values
-			if (component.settings.get("forms.settings.autoValidate"))
+			if (component.settings.get("forms.settings.autoValidate", true))
 			{
 				options["validatorName"] = component.settings.get("forms.settings.validatorName");
 				return component.validate(options).then(() => {
@@ -164,14 +164,14 @@ export default class FormOrganizer extends BM.Organizer
 			}
 		}).then(() => {
 			// Submit values
-			console.debug(`Submitting component. name=${component.name}, id=${component.id}`);
+			console.debug(`FormOrganizer._submit(): Submitting component. name=${component.name}, id=${component.id}`);
 			return component.trigger("beforeSubmit", options).then(() => {
 				if (!component._cancelSubmit)
 				{
 					return Promise.resolve().then(() => {
 						return component.trigger("doSubmit", options);
 					}).then(() => {
-						console.debug(`Submitted component. name=${component.name}, id=${component.id}`);
+						console.debug(`FormOrganizer._submit(): Submitted component. name=${component.name}, id=${component.id}`);
 						component.items = options["items"];
 						return component.trigger("afterSubmit", options);
 					});
