@@ -35,7 +35,7 @@ export default class ChainOrganizer extends BM.Organizer
 	static onDoOrganize(sender, e, ex)
 	{
 
-		let order = ElementOrganizer.getInfo()["order"];
+		let order = ChainOrganizer.getInfo()["order"];
 
 		this._enumSettings(e.detail.settings["chains"], (sectionName, sectionValue) => {
 			this.addEventHandler(sectionName, {
