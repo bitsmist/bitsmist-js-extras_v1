@@ -47,7 +47,8 @@ export default class FormOrganizer extends BM.Organizer
 
 		let target = BM.Util.safeGet(e.detail, "target", "");
 
-		return FormUtil.clearFields(this, target);
+		FormUtil.clearFields(this, target);
+		this._items = {};
 
 	}
 
