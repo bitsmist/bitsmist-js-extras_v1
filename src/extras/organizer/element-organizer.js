@@ -54,10 +54,13 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		let settings = ex.options["attrs"];
+		let promises = [];
 
 		Object.keys(settings).forEach((elementName) => {
-			ElementOrganizer.__initAttr(this, elementName, settings[elementName]);
+			promises = promises.concat(ElementOrganizer.__initAttr(this, elementName, settings[elementName], e));
 		});
+
+		return Promise.all(promises);
 
 	}
 
@@ -131,6 +134,8 @@ export default class ElementOrganizer extends BM.Organizer
 	static __initAttr(component, elementName, elementInfo)
 	{
 
+		let ret = [];
+
 		if (elementInfo)
 		{
 			let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
@@ -139,6 +144,12 @@ export default class ElementOrganizer extends BM.Organizer
 				Object.keys(elementInfo).forEach((key) => {
 					switch (key)
 					{
+						case "transition":
+							Object.keys(elementInfo[key]).forEach((styleName) => {
+								ret.push(new Promise(resolve => elements[i].addEventListener('transitionend', resolve, {"once":true})));
+								elements[i].style[styleName] = elementInfo[key][styleName];
+							});
+							break;
 						case "build":
 							let resourceName = elementInfo[key]["resourceName"];
 							FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
@@ -165,6 +176,8 @@ export default class ElementOrganizer extends BM.Organizer
 				});
 			}
 		}
+
+		return ret;
 
 	}
 
