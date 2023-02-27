@@ -249,7 +249,9 @@ export default class DialogOrganizer extends BM.Organizer
 
 		let promise = new Promise((resolve, reject) => {
 			setTimeout(()=>{
-				DialogOrganizer._backdrop.classList.add("show", component.tagName.toLowerCase());
+				let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
+				DialogOrganizer._backdrop.classList.add(...addClasses);
+				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
 
 				let effect = DialogOrganizer.__getEffect();
 				if (effect)
@@ -284,7 +286,9 @@ export default class DialogOrganizer extends BM.Organizer
 	static __hideBackdrop(component, options)
 	{
 
-		DialogOrganizer._backdrop.classList.remove("show", component.tagName.toLowerCase());
+		let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
+		DialogOrganizer._backdrop.classList.remove(...removeClasses);
+		DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
 
 		let promise = new Promise((resolve, reject) => {
 			let effect = DialogOrganizer.__getEffect();
