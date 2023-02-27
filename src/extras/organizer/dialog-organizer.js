@@ -113,6 +113,13 @@ export default class DialogOrganizer extends BM.Organizer
 			if (!component._cancelOpen)
 			{
 				return Promise.resolve().then(() => {
+					// Show backdrop
+					if (component.settings.get("dialogs.backdropOptions.show"))
+					{
+						DialogOrganizer.__createBackdrop(component);
+						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+					}
+
 					// Setup
 					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
 					{
@@ -127,9 +134,8 @@ export default class DialogOrganizer extends BM.Organizer
 				}).then(() => {
 					return component.trigger("doOpen", options);
 				}).then(() => {
-					return component.trigger("afterOpen", options);
-				}).then(() => {
 					console.debug(`Opened component. name=${component.name}, id=${component.id}`);
+					return component.trigger("afterOpen", options);
 				});
 			}
 		});
@@ -181,15 +187,171 @@ export default class DialogOrganizer extends BM.Organizer
 				return Promise.resolve().then(() => {
 					return component.trigger("doClose", options);
 				}).then(() => {
+					// Hide backdrop
+					if (component.settings.get("dialogs.backdropOptions.show"))
+					{
+						return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+					}
+				}).then(() => {
 					if (component._isModal)
 					{
 						component._modalPromise.resolve(component._modalResult);
 					}
-					console.debug(`Closed component. name=${component.name}, id=${component.id}`);
+
+						console.debug(`Closed component. name=${component.name}, id=${component.id}`);
 					return component.trigger("afterClose", options);
 				});
 			}
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	// 	Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Create a backdrop if not exists.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __createBackdrop(component, options)
+	{
+
+		if (!DialogOrganizer._backdrop)
+		{
+			// Create a backdrop
+			document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
+			DialogOrganizer._backdrop = document.body.firstElementChild;
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Show backdrop.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __showBackdrop(component, options)
+	{
+
+		// Add close on click event handler
+		if (BM.Util.safeGet(options, "closeOnClick", true))
+		{
+			DialogOrganizer.__closeOnClick(component);
+		}
+
+		DialogOrganizer._backdrop.style.display = "block";
+
+		let promise = new Promise((resolve, reject) => {
+			setTimeout(()=>{
+				DialogOrganizer._backdrop.classList.add("show", component.tagName.toLowerCase());
+
+				let effect = DialogOrganizer.__getEffect();
+				if (effect)
+				{
+					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+						resolve();
+					}, {"once":true});
+				}
+				else
+				{
+					resolve();
+				}
+			}, 0);
+		});
+
+		let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
+		if (sync)
+		{
+			return promise;
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Hide backdrop.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __hideBackdrop(component, options)
+	{
+
+		DialogOrganizer._backdrop.classList.remove("show", component.tagName.toLowerCase());
+
+		let promise = new Promise((resolve, reject) => {
+			let effect = DialogOrganizer.__getEffect();
+			if (effect)
+			{
+				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+					DialogOrganizer._backdrop.style.display = "none";
+					resolve();
+				}, {"once":true});
+			}
+			else
+			{
+				DialogOrganizer._backdrop.style.display = "none";
+				resolve();
+			}
+		});
+
+		let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
+		if (sync)
+		{
+			return promise;
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Install an event handler to close when clicked.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __closeOnClick(component, options)
+	{
+
+		DialogOrganizer._backdrop.addEventListener("click", (e) => {
+			if (e.target === e.currentTarget)
+			{
+				component.close({"reason":"cancel"});
+			}
+		}, {"once":true});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get which effect is applied to backdrop.
+	 *
+	 * @return 	{String}		Effect ("transition" or "animation").
+	 */
+	static __getEffect()
+	{
+
+		let effect = "";
+
+		if (window.getComputedStyle(DialogOrganizer._backdrop).transition !== "all 0s ease 0s")
+		{
+			effect = "transition";
+		}
+		else if (window.getComputedStyle(DialogOrganizer._backdrop).animationName !== "none")
+		{
+			effect = "animation";
+		}
+
+		return effect;
 
 	}
 
