@@ -119,7 +119,7 @@ export default class DialogOrganizer extends BM.Organizer
 						DialogOrganizer.__createBackdrop(component);
 						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialogs.backdropOptions"));
 					}
-
+				}).then(() => {
 					// Setup
 					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
 					{
@@ -145,7 +145,7 @@ export default class DialogOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Open component modally.
+	 * Open component modal.
 	 *
 	 * @param	{array}			options				Options.
 	 *
@@ -154,7 +154,7 @@ export default class DialogOrganizer extends BM.Organizer
 	static _openModal(component, options)
 	{
 
-		console.debug(`Opening component modally. name=${component.name}, id=${component.id}`);
+		console.debug(`Opening component modal. name=${component.name}, id=${component.id}`);
 
 		return new Promise((resolve, reject) => {
 			component._isModal = true;
