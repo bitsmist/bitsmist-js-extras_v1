@@ -37,6 +37,8 @@ export default class DialogOrganizer extends BM.Organizer
 
 		if (this.settings.get("dialogs.settings.autoOpen"))
 		{
+			console.debug(`DialogOrganizer.DialogOrganizer_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
+
 			return this.open();
 		}
 
@@ -108,7 +110,7 @@ export default class DialogOrganizer extends BM.Organizer
 
 		options = options || {};
 
-		console.debug(`Opening component. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogOrganizer._open(): Opening component. name=${component.name}, id=${component.id}`);
 		return component.trigger("beforeOpen", options).then(() => {
 			if (!component._cancelOpen)
 			{
@@ -134,7 +136,7 @@ export default class DialogOrganizer extends BM.Organizer
 				}).then(() => {
 					return component.trigger("doOpen", options);
 				}).then(() => {
-					console.debug(`Opened component. name=${component.name}, id=${component.id}`);
+					console.debug(`DialogOrganizer._open(): Opened component. name=${component.name}, id=${component.id}`);
 					return component.trigger("afterOpen", options);
 				});
 			}
@@ -154,7 +156,7 @@ export default class DialogOrganizer extends BM.Organizer
 	static _openModal(component, options)
 	{
 
-		console.debug(`Opening component modal. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogOrganizer._openModal(): Opening component modal. name=${component.name}, id=${component.id}`);
 
 		return new Promise((resolve, reject) => {
 			component._isModal = true;
@@ -180,7 +182,7 @@ export default class DialogOrganizer extends BM.Organizer
 		options = options || {};
 		component._cancelClose = false;
 
-		console.debug(`Closing component. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogOrganizer._close(): Closing component. name=${component.name}, id=${component.id}`);
 		return component.trigger("beforeClose", options).then(() => {
 			if (!component._cancelClose)
 			{
@@ -198,7 +200,7 @@ export default class DialogOrganizer extends BM.Organizer
 						component._modalPromise.resolve(component._modalResult);
 					}
 
-						console.debug(`Closed component. name=${component.name}, id=${component.id}`);
+						console.debug(`DialogOrganizer._close(): Closed component. name=${component.name}, id=${component.id}`);
 					return component.trigger("afterClose", options);
 				});
 			}
