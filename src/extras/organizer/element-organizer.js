@@ -144,25 +144,32 @@ export default class ElementOrganizer extends BM.Organizer
 				Object.keys(elementInfo).forEach((key) => {
 					switch (key)
 					{
+						case "animation":
 						case "transition":
-							Object.keys(elementInfo[key]).forEach((styleName) => {
-								ret.push(new Promise(resolve => elements[i].addEventListener('transitionend', resolve, {"once":true})));
-								elements[i].style[styleName] = elementInfo[key][styleName];
-							});
+							setTimeout(() => {
+								Object.keys(elementInfo[key]).forEach((styleName) => {
+									ret.push(new Promise(resolve => elements[i].addEventListener(key + 'end', resolve, {"once":true})));
+									elements[i].style[styleName] = elementInfo[key][styleName];
+								});
+							}, 0);
 							break;
 						case "build":
 							let resourceName = elementInfo[key]["resourceName"];
 							FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
 							break;
 						case "attribute":
-							Object.keys(elementInfo[key]).forEach((attrName) => {
-								elements[i].setAttribute(attrName, elementInfo[key][attrName]);
-							});
+							setTimeout(() => {
+								Object.keys(elementInfo[key]).forEach((attrName) => {
+									elements[i].setAttribute(attrName, elementInfo[key][attrName]);
+								});
+							}, 0);
 							break;
 						case "style":
-							Object.keys(elementInfo[key]).forEach((styleName) => {
-								elements[i].style[styleName] = elementInfo[key][styleName];
-							});
+							setTimeout(() => {
+								Object.keys(elementInfo[key]).forEach((styleName) => {
+									elements[i].style[styleName] = elementInfo[key][styleName];
+								});
+							}, 0);
 							break;
 						case "property":
 							Object.keys(elementInfo[key]).forEach((propertyName) => {
