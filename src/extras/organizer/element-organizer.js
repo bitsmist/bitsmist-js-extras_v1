@@ -146,9 +146,14 @@ export default class ElementOrganizer extends BM.Organizer
 					{
 						case "animation":
 						case "transition":
+							// Create promises first
+							Object.keys(elementInfo[key]).forEach((styleName) => {
+								ret.push(new Promise(resolve => elements[i].addEventListener(key + 'end', resolve, {"once":true})));
+							});
+
+							// Set styles
 							setTimeout(() => {
 								Object.keys(elementInfo[key]).forEach((styleName) => {
-									ret.push(new Promise(resolve => elements[i].addEventListener(key + 'end', resolve, {"once":true})));
 									elements[i].style[styleName] = elementInfo[key][styleName];
 								});
 							}, 0);
@@ -172,12 +177,17 @@ export default class ElementOrganizer extends BM.Organizer
 							}, 0);
 							break;
 						case "property":
-							Object.keys(elementInfo[key]).forEach((propertyName) => {
-								elements[i][propertyName] = elementInfo[key][propertyName];
-							});
+							setTimeout(() => {
+								Object.keys(elementInfo[key]).forEach((propertyName) => {
+									console.log("@@@property", component.name, elementName, elements[i], propertyName);
+									elements[i][propertyName] = elementInfo[key][propertyName];
+								});
+							}, 0);
 							break;
 						case "autoFocus":
-							elements[i].focus();
+							setTimeout(() => {
+								elements[i].focus();
+							}, 0);
 							break;
 					}
 				});
