@@ -57,7 +57,7 @@ export default class ElementOrganizer extends BM.Organizer
 		let promises = [];
 
 		Object.keys(settings).forEach((elementName) => {
-			promises = promises.concat(ElementOrganizer.__initAttr(this, elementName, settings[elementName]));
+			promises = promises.concat(ElementOrganizer.__initElements(this, e, elementName, settings[elementName]));
 		});
 
 		return Promise.all(promises);
@@ -92,6 +92,15 @@ export default class ElementOrganizer extends BM.Organizer
 	//  Private
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Get target elements.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		elementName			Element name.
+	 * @param	{Object}		elementInfo			Element info.
+	 *
+ 	 * @return  {Array}			HTML elements.
+	 */
 	static __getTargetElements(component, elementName, elementInfo)
 	{
 
@@ -123,98 +132,131 @@ export default class ElementOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-
 	/**
-	 * Init attributes.
+	 * Init elements.
 	 *
 	 * @param	{Component}		component			Component.
+	 * @param	{Object}		eventInfo			Event info.
 	 * @param	{String}		elementName			Element name.
 	 * @param	{Object}		elementInfo			Element info.
 	 */
-	static __initAttr(component, elementName, elementInfo)
+	static __initElements(component, eventInfo, elementName, elementInfo)
 	{
 
 		let ret = [];
+		let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
 
-		if (elementInfo)
+		for (let i = 0; i < elements.length; i++)
 		{
-			let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
-			for (let i = 0; i < elements.length; i++)
-			{
-				Object.keys(elementInfo).forEach((key) => {
-					switch (key)
-					{
-						case "animation":
-						case "transition":
-							// Create promises first
-							Object.keys(elementInfo[key]).forEach((styleName) => {
-								ret.push(new Promise(resolve => elements[i].addEventListener(key + 'end', resolve, {"once":true})));
-							});
+			Object.keys(elementInfo).forEach((key) => {
+				switch (key)
+				{
+				case "build":
+					let resourceName = elementInfo[key]["resourceName"];
+					FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
+					break;
+				case "attribute":
+					Object.keys(elementInfo[key]).forEach((attrName) => {
+						elements[i].setAttribute(attrName, elementInfo[key][attrName]);
+					});
+					break;
+				case "class":
+					Object.keys(elementInfo[key]).forEach((mode) => {
+						switch (mode)
+						{
+						case "add":
+							elements[i].classList.add(elementInfo[key][mode]);
+							break;
+						case "remove":
+							elements[i].classList.remove(elementInfo[key][mode]);
+							break;
+						case "replace":
+							elements[i].setAttribute("class", elementInfo[key][mode]);
+							break;
+						default:
+							console.warn(false, `ElementOrganizer.__initAttr(): Invalid command. name=${component.name}, eventName=${eventInfo.type}, type=${key}, command=${mode}`);
+							break;
+						}
+					});
+					break;
+				case "style":
+					Object.keys(elementInfo[key]).forEach((styleName) => {
+						elements[i].style[styleName] = elementInfo[key][styleName];
+					});
+					break;
+				case "property":
+					Object.keys(elementInfo[key]).forEach((propertyName) => {
+						elements[i][propertyName] = elementInfo[key][propertyName];
+					});
+					break;
+				case "autoFocus":
+					elements[i].focus();
+					break;
+				case "rootNode":
+				case "waitFor":
+					break;
+				default:
+					console.warn(`ElementOrganizer.__initAttr(): Invalid type. name=${component.name}, eventName=${eventInfo.type}, type=${key}`);
+					break;
+				}
+			});
 
-							// Set styles
-							setTimeout(() => {
-								Object.keys(elementInfo[key]).forEach((styleName) => {
-									elements[i].style[styleName] = elementInfo[key][styleName];
-								});
-							}, 0);
-							break;
-						case "build":
-							let resourceName = elementInfo[key]["resourceName"];
-							FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
-							break;
-						case "attribute":
-							setTimeout(() => {
-								Object.keys(elementInfo[key]).forEach((attrName) => {
-									elements[i].setAttribute(attrName, elementInfo[key][attrName]);
-								});
-							}, 0);
-							break;
-						case "class":
-							setTimeout(() => {
-								Object.keys(elementInfo[key]).forEach((mode) => {
-									switch (mode)
-									{
-									case "add":
-										elements[i].classList.add(elementInfo[key][mode]);
-										break;
-									case "remove":
-										elements[i].classList.remove(elementInfo[key][mode]);
-										break;
-									case "replace":
-										elements[i].setAttribute("class", elementInfo[key][mode]);
-										break;
-									default:
-										BM.Util.warn(`ElementOrganizer.__initAttr(): Invalid command. type = ${key}, command = ${mode}`);
-										break;
-									}
-								});
-							}, 0);
-							break;
-						case "style":
-							setTimeout(() => {
-								Object.keys(elementInfo[key]).forEach((styleName) => {
-									elements[i].style[styleName] = elementInfo[key][styleName];
-								});
-							}, 0);
-							break;
-						case "property":
-							setTimeout(() => {
-								Object.keys(elementInfo[key]).forEach((propertyName) => {
-									elements[i][propertyName] = elementInfo[key][propertyName];
-								});
-							}, 0);
-							break;
-						case "autoFocus":
-							setTimeout(() => {
-								elements[i].focus();
-							}, 0);
-							break;
-					}
-				});
+			// Wait for transition/animation to finish
+			if (elementInfo["waitFor"])
+			{
+				ret.push(ElementOrganizer.__waitFor(component, eventInfo, elementName, elementInfo, elements[i]));
 			}
 		}
 
 		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Wait for transition to finish.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		eventInfo			Event info.
+	 * @param	{String}		elementName			Element name.
+	 * @param	{Object}		elementInfo			Element info.
+	 * @param	{HTMLElement}	element				Element.
+	 *
+ 	 * @return  {Promise}		Promise.
+	 */
+	static __waitFor(component, eventInfo, elementName, elementInfo, element)
+	{
+
+		let inTransition = false;
+
+		switch (elementInfo["waitFor"])
+		{
+		case "transition":
+			inTransition = (window.getComputedStyle(element).getPropertyValue('transition-duration') !== "0s");
+			break;
+		case "animation":
+			inTransition = (window.getComputedStyle(element).getPropertyValue('animation') !== "none");
+			break;
+		default:
+			console.warn(`ElementOrganizer.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+			break;
+		}
+
+		BM.Util.warn(inTransition, `ElementOrganizer.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+
+		return new Promise((resolve, reject) => {
+			// Timeout timer
+			let timer = setTimeout(() => {
+				reject(`ElementOrganizer.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+			}, BM.settings.get("system.waitForTimeout", 10000));
+
+			// Resolve when finished
+			element.addEventListener(elementInfo["waitFor"] + "end", () => {
+				clearTimeout(timer);
+				resolve();
+			}, {"once":true});
+		});
 
 	}
 
