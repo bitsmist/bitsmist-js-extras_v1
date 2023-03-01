@@ -186,9 +186,7 @@ export default class DialogOrganizer extends BM.Organizer
 		return component.trigger("beforeClose", options).then(() => {
 			if (!component._cancelClose)
 			{
-				return Promise.resolve().then(() => {
-					return component.trigger("doClose", options);
-				}).then(() => {
+				return component.trigger("doClose", options).then(() => {
 					// Hide backdrop
 					if (component.settings.get("dialogs.backdropOptions.show"))
 					{
