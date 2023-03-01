@@ -57,7 +57,7 @@ export default class ElementOrganizer extends BM.Organizer
 		let promises = [];
 
 		Object.keys(settings).forEach((elementName) => {
-			promises = promises.concat(ElementOrganizer.__initAttr(this, elementName, settings[elementName], e));
+			promises = promises.concat(ElementOrganizer.__initAttr(this, elementName, settings[elementName]));
 		});
 
 		return Promise.all(promises);
@@ -169,6 +169,27 @@ export default class ElementOrganizer extends BM.Organizer
 								});
 							}, 0);
 							break;
+						case "class":
+							setTimeout(() => {
+								Object.keys(elementInfo[key]).forEach((mode) => {
+									switch (mode)
+									{
+									case "add":
+										elements[i].classList.add(elementInfo[key][mode]);
+										break;
+									case "remove":
+										elements[i].classList.remove(elementInfo[key][mode]);
+										break;
+									case "replace":
+										elements[i].setAttribute("class", elementInfo[key][mode]);
+										break;
+									default:
+										BM.Util.warn(`ElementOrganizer.__initAttr(): Invalid command. type = ${key}, command = ${mode}`);
+										break;
+									}
+								});
+							}, 0);
+							break;
 						case "style":
 							setTimeout(() => {
 								Object.keys(elementInfo[key]).forEach((styleName) => {
@@ -179,7 +200,6 @@ export default class ElementOrganizer extends BM.Organizer
 						case "property":
 							setTimeout(() => {
 								Object.keys(elementInfo[key]).forEach((propertyName) => {
-									console.log("@@@property", component.name, elementName, elements[i], propertyName);
 									elements[i][propertyName] = elementInfo[key][propertyName];
 								});
 							}, 0);
