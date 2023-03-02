@@ -83,6 +83,9 @@ export default class ElementOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
+		// Init component vars
+		component._overlay;
+
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.ElementOrganizer_onDoOrganize);
 
@@ -151,6 +154,12 @@ export default class ElementOrganizer extends BM.Organizer
 			Object.keys(elementInfo).forEach((key) => {
 				switch (key)
 				{
+				case "showLoader":
+					ret.push(ElementOrganizer.__showOverlay(component, elementInfo[key]));
+					break;
+				case "hideLoader":
+					ret.push(ElementOrganizer.__hideOverlay(component, elementInfo[key]));
+					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
 					FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
@@ -236,7 +245,7 @@ export default class ElementOrganizer extends BM.Organizer
 			inTransition = (window.getComputedStyle(element).getPropertyValue('transition-duration') !== "0s");
 			break;
 		case "animation":
-			inTransition = (window.getComputedStyle(element).getPropertyValue('animation') !== "none");
+			inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
 			break;
 		default:
 			console.warn(`ElementOrganizer.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
@@ -257,6 +266,156 @@ export default class ElementOrganizer extends BM.Organizer
 				resolve();
 			}, {"once":true});
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Create an overlay if not exists.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __createOverlay(component, options)
+	{
+
+		if (!component._overlay)
+		{
+			component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
+			component._overlay = component.firstElementChild;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Install an event handler to close when clicked.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __closeOnClick(component, options)
+	{
+
+		component._overlay.addEventListener("click", (e) => {
+			if (e.target === e.currentTarget && typeof component.close === "function")
+			{
+				component.close({"reason":"cancel"});
+			}
+		}, {"once":true});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get which effect is applied to overlay.
+	 *
+	 * @param	{HTMLElement}	overlay				Overlay element.
+	 *
+	 * @return 	{String}		Effect ("transition" or "animation").
+	 */
+	static __getEffect(overlay)
+	{
+
+		let effect = "";
+
+		if (window.getComputedStyle(overlay).getPropertyValue('transition-duration') !== "0s")
+		{
+			effect = "transition";
+		}
+		else if (window.getComputedStyle(overlay).getPropertyValue('animation-name') !== "none")
+		{
+			effect = "animation";
+		}
+
+		return effect;
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Show overlay.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __showOverlay(component, options)
+	{
+
+		ElementOrganizer.__createOverlay(component);
+
+		// Add close on click event handler
+		if (BM.Util.safeGet(options, "closeOnClick"))
+		{
+			ElementOrganizer.__closeOnClick(component);
+		}
+
+		let promise = new Promise((resolve, reject) => {
+			window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+
+			let addClasses = ["show"].concat(BM.Util.safeGet(options, "addClasses", []));
+			component._overlay.classList.add(...addClasses);
+			component._overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
+
+			let effect = ElementOrganizer.__getEffect(component._overlay);
+			if (effect)
+			{
+				component._overlay.addEventListener(effect + "end", () => {
+					resolve();
+				}, {"once":true});
+			}
+			else
+			{
+				resolve();
+			}
+		});
+
+		if (BM.Util.safeGet(options, "sync"))
+		{
+			return promise;
+		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Hide overlay.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __hideOverlay(component, options)
+	{
+
+		let promise = new Promise((resolve, reject) => {
+			window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+
+			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
+			component._overlay.classList.remove(...removeClasses);
+			component._overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+
+			let effect = ElementOrganizer.__getEffect(component._overlay);
+			if (effect)
+			{
+				component._overlay.addEventListener(effect + "end", () => {
+					resolve();
+				}, {"once":true});
+			}
+			else
+			{
+				resolve();
+			}
+		});
+
+		if (BM.Util.safeGet(options, "sync"))
+		{
+			return promise;
+		}
 
 	}
 
