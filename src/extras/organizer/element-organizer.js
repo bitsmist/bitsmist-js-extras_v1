@@ -170,23 +170,7 @@ export default class ElementOrganizer extends BM.Organizer
 					});
 					break;
 				case "class":
-					Object.keys(elementInfo[key]).forEach((mode) => {
-						switch (mode)
-						{
-						case "add":
-							elements[i].classList.add(elementInfo[key][mode]);
-							break;
-						case "remove":
-							elements[i].classList.remove(elementInfo[key][mode]);
-							break;
-						case "replace":
-							elements[i].setAttribute("class", elementInfo[key][mode]);
-							break;
-						default:
-							console.warn(false, `ElementOrganizer.__initAttr(): Invalid command. name=${component.name}, eventName=${eventInfo.type}, type=${key}, command=${mode}`);
-							break;
-						}
-					});
+					ElementOrganizer.__setClasses(elements[i], elementInfo[key]);
 					break;
 				case "style":
 					Object.keys(elementInfo[key]).forEach((styleName) => {
@@ -265,6 +249,38 @@ export default class ElementOrganizer extends BM.Organizer
 				clearTimeout(timer);
 				resolve();
 			}, {"once":true});
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Set classes to element.
+	 *
+	 * @param	{HTMLElement}	element				Element to set classes.
+	 * @param	{Object}		options				Options.
+	 */
+	static __setClasses(element, options)
+	{
+
+		Object.keys(options).forEach((mode) => {
+			switch (mode)
+			{
+			case "add":
+				element.classList.add(options[mode]);
+				break;
+			case "remove":
+				element.classList.remove(options[mode]);
+				break;
+			case "replace":
+				element.setAttribute("class", options[mode]);
+				break;
+			default:
+				//console.warn(`ElementOrganizer.__initAttr(): Invalid command. name=${component.name}, eventName=${eventInfo.type}, type=${key}, command=${mode}`);
+				console.warn(`ElementOrganizer.__initAttr(): Invalid command. command=${mode}`);
+				break;
+			}
 		});
 
 	}
