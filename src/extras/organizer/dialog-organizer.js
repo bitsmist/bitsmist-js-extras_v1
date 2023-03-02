@@ -118,7 +118,6 @@ export default class DialogOrganizer extends BM.Organizer
 					// Show backdrop
 					if (component.settings.get("dialogs.backdropOptions.show"))
 					{
-						DialogOrganizer.__createBackdrop(component);
 						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialogs.backdropOptions"));
 					}
 				}).then(() => {
@@ -239,32 +238,32 @@ export default class DialogOrganizer extends BM.Organizer
 	static __showBackdrop(component, options)
 	{
 
+		DialogOrganizer.__createBackdrop(component);
+
 		// Add close on click event handler
 		if (BM.Util.safeGet(options, "closeOnClick", true))
 		{
 			DialogOrganizer.__closeOnClick(component);
 		}
 
-		DialogOrganizer._backdrop.style.display = "block";
-
 		let promise = new Promise((resolve, reject) => {
-			setTimeout(()=>{
-				let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
-				DialogOrganizer._backdrop.classList.add(...addClasses);
-				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
+			window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let effect = DialogOrganizer.__getEffect();
-				if (effect)
-				{
-					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
-						resolve();
-					}, {"once":true});
-				}
-				else
-				{
+			let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
+			DialogOrganizer._backdrop.classList.add(...addClasses);
+			DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
+
+			let effect = DialogOrganizer.__getEffect();
+			if (effect)
+			{
+				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
 					resolve();
-				}
-			}, 0);
+				}, {"once":true});
+			}
+			else
+			{
+				resolve();
+			}
 		});
 
 		let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
@@ -286,22 +285,22 @@ export default class DialogOrganizer extends BM.Organizer
 	static __hideBackdrop(component, options)
 	{
 
-		let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
-		DialogOrganizer._backdrop.classList.remove(...removeClasses);
-		DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
-
 		let promise = new Promise((resolve, reject) => {
+			window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+
+			let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
+			DialogOrganizer._backdrop.classList.remove(...removeClasses);
+			DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
+
 			let effect = DialogOrganizer.__getEffect();
 			if (effect)
 			{
 				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
-					DialogOrganizer._backdrop.style.display = "none";
 					resolve();
 				}, {"once":true});
 			}
 			else
 			{
-				DialogOrganizer._backdrop.style.display = "none";
 				resolve();
 			}
 		});
@@ -346,11 +345,11 @@ export default class DialogOrganizer extends BM.Organizer
 
 		let effect = "";
 
-		if (window.getComputedStyle(DialogOrganizer._backdrop).transition !== "all 0s ease 0s")
+		if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('transition-duration') !== "0s")
 		{
 			effect = "transition";
 		}
-		else if (window.getComputedStyle(DialogOrganizer._backdrop).animationName !== "none")
+		else if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('animation-name') !== "none")
 		{
 			effect = "animation";
 		}
