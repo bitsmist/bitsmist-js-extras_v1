@@ -169,9 +169,7 @@ export default class ElementOrganizer extends BM.Organizer
 					FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
 					break;
 				case "attribute":
-					Object.keys(elementInfo[key]).forEach((attrName) => {
-						elements[i].setAttribute(attrName, elementInfo[key][attrName]);
-					});
+					ElementOrganizer.__setAttributes(elements[i], elementInfo[key]);
 					break;
 				case "class":
 					ElementOrganizer.__setClasses(elements[i], elementInfo[key]);
@@ -260,6 +258,40 @@ export default class ElementOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Set attributes to element.
+	 *
+	 * @param	{HTMLElement}	element				Element to set classes.
+	 * @param	{Object}		options				Options.
+	 */
+	static __setAttributes(element, options)
+	{
+
+		Object.keys(options).forEach((mode) => {
+			switch (mode)
+			{
+			case "add":
+				Object.keys(options[mode]).forEach((attrName) => {
+					element.setAttribute(attrName, options[mode][attrName]);
+				});
+				break;
+			case "remove":
+				for (let i = 0; i < options[mode].length; i++)
+				{
+					element.removeAttribute(options[mode][i]);
+				};
+				break;
+			default:
+				console.warn(`ElementOrganizer.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
+				break;
+			}
+		});
+
+	}
+
+
+	// -------------------------------------------------------------------------
+
+	/**
 	 * Set classes to element.
 	 *
 	 * @param	{HTMLElement}	element				Element to set classes.
@@ -281,8 +313,7 @@ export default class ElementOrganizer extends BM.Organizer
 				element.setAttribute("class", options[mode]);
 				break;
 			default:
-				//console.warn(`ElementOrganizer.__initAttr(): Invalid command. name=${component.name}, eventName=${eventInfo.type}, type=${key}, command=${mode}`);
-				console.warn(`ElementOrganizer.__initAttr(): Invalid command. command=${mode}`);
+				console.warn(`ElementOrganizer.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
 				break;
 			}
 		});
