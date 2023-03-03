@@ -85,6 +85,7 @@ export default class ElementOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._overlay;
+		component._overlayPromise = Promise.resolve();
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.ElementOrganizer_onDoOrganize);
@@ -411,6 +412,20 @@ export default class ElementOrganizer extends BM.Organizer
 		component._overlay.classList.add(...addClasses);
 		component._overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
 
+		let effect = ElementOrganizer.__getEffect(component._overlay);
+		if (effect)
+		{
+			component._overlayPromise = new Promise((resolve, reject) => {
+				component._overlay.addEventListener(effect + "end", () => {
+					resolve();
+				}, {"once":true});
+			});
+		}
+		else
+		{
+			effect = Promise.resolve();
+		}
+
 	}
 
 	// -----------------------------------------------------------------------------
@@ -424,12 +439,13 @@ export default class ElementOrganizer extends BM.Organizer
 	static __hideOverlay(component, options)
 	{
 
-		window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+		component._overlayPromise.then(() => {
+			window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
 
-		let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
-		component._overlay.classList.remove(...removeClasses);
-		component._overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
-
+			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
+			component._overlay.classList.remove(...removeClasses);
+			component._overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+		});
 	}
 
 }
