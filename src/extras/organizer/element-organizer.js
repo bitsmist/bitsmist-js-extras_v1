@@ -118,7 +118,7 @@ export default class ElementOrganizer extends BM.Organizer
 			}
 			else
 			{
-				elements = component.querySelectorAll(elementInfo["rootNode"]);
+				elements = component.rootElement.querySelectorAll(elementInfo["rootNode"]);
 			}
 		}
 		else if (elementName === "this" || elementName === component.tagName.toLowerCase())
@@ -127,7 +127,7 @@ export default class ElementOrganizer extends BM.Organizer
 		}
 		else
 		{
-			elements = component.querySelectorAll("#" + elementName);
+			elements = component.rootElement.querySelectorAll("#" + elementName);
 		}
 
 		return elements;
@@ -157,6 +157,9 @@ export default class ElementOrganizer extends BM.Organizer
 			Object.keys(elementInfo).forEach((key) => {
 				switch (key)
 				{
+				case "scroll":
+					elements[i].scrollTo(elementInfo[key]);
+					break;
 				case "showLoader":
 					ElementOrganizer.__showOverlay(component, elementInfo[key]);
 					waitForElement = component._overlay;
