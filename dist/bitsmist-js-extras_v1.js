@@ -1,21 +1,20 @@
 (function () {
 	'use strict';
 
-	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
+	if (!window.BITSMIST || !window.BITSMIST.v1 || !window.BITSMIST.v1.Component)
+	{
+		throw new ReferenceError("Bitsmist Core Library does not exist.");
+	}
+
+	var BM = window.BITSMIST.v1;
+
 	// =============================================================================
 
 	// =============================================================================
 	//	Observable store class
 	// =============================================================================
 
-	class ObservableStore extends BITSMIST.v1.ChainableStore
+	class ObservableStore extends BM.ChainableStore
 	{
 
 		// -------------------------------------------------------------------------
@@ -30,14 +29,13 @@
 		constructor(options)
 		{
 
-
 			let defaults = {"notifyOnChange":true, "async":false};
 			super(Object.assign(defaults, options));
 
 			this._filter;
 			this._observers = [];
 
-			this.filter = BITSMIST.v1.Util.safeGet(this._options, "filter", () => { return true; } );
+			this.filter = BM.Util.safeGet(this._options, "filter", () => { return true; } );
 
 		}
 
@@ -60,7 +58,7 @@
 		set filter(value)
 		{
 
-			BITSMIST.v1.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
+			BM.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
 			this._filter = value;
 
@@ -76,7 +74,7 @@
 		 * @param	{String}		key					Key to store.
 		 * @param	{Object}		value				Value to store.
 		 */
-		set(key, value, options)
+		set(key, value, options, ...args)
 		{
 
 			let changedItem = {};
@@ -90,15 +88,15 @@
 			{
 				if (this.get(key) !== value)
 				{
-					BITSMIST.v1.Util.safeSet(this._items, key, value);
+					BM.Util.safeSet(this._items, key, value);
 					changedItem[key] = value;
 				}
 			}
 
-			let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+			let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
 			if (notify && Object.keys(changedItem).length > 0)
 			{
-				return this.notify(changedItem);
+				return this.notify(changedItem, ...args);
 			}
 
 		}
@@ -111,16 +109,16 @@
 	     * @param   {String}        key                 Key to store.
 	     * @param   {Object}        value               Value to store.
 	     */
-	    replace(value, options)
+	    replace(value, options, ...args)
 	    {
 
 	        this._items = {};
 	        this.__deepMerge(this._items, value);
 
-	        let notify = BITSMIST.v1.Util.safeGet(options, "notifyOnChange", BITSMIST.v1.Util.safeGet(this._options, "notifyOnChange"));
+	        let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
 	        if (notify)
 	        {
-	            return this.notify("*");
+	            return this.notify("*", ...args);
 	        }
 
 	    }
@@ -137,7 +135,7 @@
 		subscribe(id, handler, options)
 		{
 
-			BITSMIST.v1.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
+			BM.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 			this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -177,7 +175,7 @@
 		notify(conditions, ...args)
 		{
 
-			if (BITSMIST.v1.Util.safeGet(this._options, "async", false))
+			if (BM.Util.safeGet(this._options, "async", false))
 			{
 				return this.notifyAsync(conditions, ...args);
 			}
@@ -234,7 +232,7 @@
 
 			for (let i = 0; i < this._observers.length; i++)
 			{
-				if (this._filter(conditions, this._observers[i]["options"], ...args))
+				if (this._filter(conditions, this._observers[i], ...args))
 				{
 					console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this._observers[i].id}`);
 					this._observers[i]["handler"](conditions, ...args);
@@ -284,7 +282,7 @@
 
 			changedItem = changedItem || {};
 
-			BITSMIST.v1.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+			BM.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
 
 			Object.keys(obj2).forEach((key) => {
 				if (Array.isArray(obj1[key]))
@@ -597,12 +595,12 @@
 	{
 
 		// Get elements with bm-visible attribute
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 		// Show elements
 		elements.forEach((element) => {
 			let condition = element.getAttribute("bm-visible");
-			if (BITSMIST.v1.Util.safeEval(condition, item, item))
+			if (BM.Util.safeEval(condition, item, item))
 			{
 				element.style.removeProperty("display");
 			}
@@ -625,7 +623,7 @@
 	{
 
 		// Get elements with bm-visible attribute
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 		// Hide elements
 		elements.forEach((element) => {
@@ -647,18 +645,18 @@
 	FormUtil.setFields = function(rootNode, item, options)
 	{
 
-		let masters = BITSMIST.v1.Util.safeGet(options, "masters");
-		let triggerEvent = BITSMIST.v1.Util.safeGet(options, "triggerEvent");
+		let masters = BM.Util.safeGet(options, "masters");
+		let triggerEvent = BM.Util.safeGet(options, "triggerEvent");
 
 		// Get elements with bm-bind attribute
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		elements.push(rootNode);
 
 		elements.forEach((element) => {
 			let fieldName = element.getAttribute("bm-bind");
 			if (fieldName in item)
 			{
-				let value = BITSMIST.v1.Util.safeGet(item, fieldName, "");
+				let value = BM.Util.safeGet(item, fieldName, "");
 
 				// Get master value
 				if (element.hasAttribute("bm-bindtext"))
@@ -705,7 +703,7 @@
 		let item = {};
 
 		// Get elements with bm-bind attribute
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		elements.push(rootNode);
 
 		elements.forEach((element) => {
@@ -716,7 +714,7 @@
 			// Deformat
 			if (element.hasAttribute("bm-format"))
 			{
-				value = BITSMIST.v1.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
+				value = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
 			}
 
 			if (Array.isArray(item[key]))
@@ -764,7 +762,7 @@
 		target = (target ? target : "");
 
 		// Get input elements
-		let elements = BITSMIST.v1.Util.scopedSelectorAll(rootNode, target + " input");
+		let elements = BM.Util.scopedSelectorAll(rootNode, target + " input");
 
 		elements.forEach((element) => {
 			switch (element.type.toLowerCase())
@@ -1176,7 +1174,7 @@
 	//		FormUtil.setValue(elem, this.get(key));
 
 			let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
-			if (!bound && BITSMIST.v1.Util.safeGet(this._options, "2way", true))
+			if (!bound && BM.Util.safeGet(this._options, "2way", true))
 			{
 				// Change element's value when store value changed
 				this.subscribe(key, () => {
@@ -1184,7 +1182,7 @@
 				});
 
 				// Set store value when element's value changed
-				let eventName = BITSMIST.v1.Util.safeGet(this._options, "eventName", "change");
+				let eventName = BM.Util.safeGet(this._options, "eventName", "change");
 				elem.addEventListener(eventName, (() => {
 					this.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
 				}).bind(this));
@@ -1197,86 +1195,112 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	File organizer class
 	// =============================================================================
 
-	class FileOrganizer extends BITSMIST.v1.Organizer
+	class FileOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "FileOrganizer";
+
+		}
+
+		// -----------------------------------------------------------------------------
+		//	Event handlers
+		// -----------------------------------------------------------------------------
+
+		static FileOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			let promises = [];
+
+			this._enumSettings(e.detail.settings["files"], (sectionName, sectionValue) => {
+				promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+			});
+
+			return Promise.all(promises);
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static getInfo()
 		{
 
-			let promises = [];
+			return {
+				"sections":		"files",
+				"order":		110,
+			};
 
-			let files = settings["files"];
-			if (files)
-			{
-				Object.keys(files).forEach((fileName) => {
-					promises.push(BITSMIST.v1.AjaxUtil.loadScript(files[fileName]["href"]));
-				});
-			}
+		}
 
-			return Promise.all(promises);
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", FileOrganizer.FileOrganizer_onDoOrganize);
 
 		}
 
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Error organizer class
 	// =============================================================================
 
-	class ErrorOrganizer extends BITSMIST.v1.Organizer
+	class ErrorOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "ErrorOrganizer";
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Global init.
-		 */
+		static getInfo()
+		{
+
+			return {
+				"sections":		"errors",
+				"order":		120,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
 		static globalInit()
 		{
 
-			ErrorOrganizer._observers = new BITSMIST.v1.ObservableStore({"filter":ErrorOrganizer.__filter});
+			ErrorOrganizer._observers = new BM.ObservableStore({"filter":ErrorOrganizer.__filter});
 
 			// Install error listner
 			document.addEventListener("DOMContentLoaded", () => {
-				if (BITSMIST.v1.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
+				if (BM.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
 				{
 					ErrorOrganizer.__initErrorListeners();
 				}
@@ -1286,19 +1310,10 @@
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static init(component, options)
 		{
 
-			let errors = settings["errors"];
+			let errors = BM.Util.safeGet(options, "settings.errors");
 			if (errors)
 			{
 				ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
@@ -1314,18 +1329,18 @@
 		 * Filter target components to notify.
 		 *
 		 * @param	{Component}		component			Component.
-		 * @param	{Object}		target				Target component to check.
-		 * @param	{Object}		e					Event object.
+	 	 * @param	{Object}		observerInfo		Observer info.
 		 */
-		static __filter(conditions, options, e)
+		static __filter(conditions, observerInfo, ...args)
 		{
 
 			let result = false;
-			let targets = options["component"].settings.get("errors.targets");
+			let targets = observerInfo["options"]["component"].settings.get("errors.targets");
+			let e = args[0]["error"];
 
 			for (let i = 0; i < targets.length; i++)
 			{
-				if (e.error.name === targets[i] || targets[i] === "*")
+				if (e.name === targets[i] || targets[i] === "*")
 				{
 					result = true;
 					break;
@@ -1347,7 +1362,7 @@
 			window.addEventListener("unhandledrejection", (error) => {
 				let e = {};
 
-				//try
+				try
 				{
 					if (error.reason)
 					{
@@ -1375,14 +1390,13 @@
 					e.colno = "";
 					// e.stack = error.reason.stack;
 					// e.object = error.reason;
+					//
+					ErrorOrganizer.__handleException(e);
 				}
-				/*
 				catch(e)
 				{
+					console.error("An error occurred in error handler", e);
 				}
-				*/
-
-				ErrorOrganizer.__handleException(e);
 
 				return false;
 				//return true;
@@ -1391,19 +1405,26 @@
 			window.addEventListener("error", (error, file, line, col) => {
 				let e = {};
 
-				e.type = "error";
-				e.name = ErrorOrganizer.__getErrorName(error);
-				e.message = error.message;
-				e.file = error.filename;
-				e.line = error.lineno;
-				e.col = error.colno;
-				if (error.error)
+				try
 				{
-					e.stack = error.error.stack;
-					e.object = error.error;
-				}
+					e.type = "error";
+					e.name = ErrorOrganizer.__getErrorName(error);
+					e.message = error.message;
+					e.file = error.filename;
+					e.line = error.lineno;
+					e.col = error.colno;
+					if (error.error)
+					{
+						e.stack = error.error.stack;
+						e.object = error.error;
+					}
 
-				ErrorOrganizer.__handleException(e);
+					ErrorOrganizer.__handleException(e);
+				}
+				catch(e)
+				{
+					console.error("An error occurred in error handler", e);
+				}
 
 				return false;
 				//return true;
@@ -1475,32 +1496,17 @@
 	//	Element organizer class
 	// =============================================================================
 
-	class ElementOrganizer extends BITSMIST.v1.Organizer
+	class ElementOrganizer extends BM.Organizer
 	{
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		//  Setter/Getter
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static get name()
 		{
 
-			let elements = settings["elements"];
-			if (elements)
-			{
-				Object.keys(elements).forEach((eventName) => {
-					component.addEventHandler(eventName, {"handler":ElementOrganizer.onDoOrganize, "options":{"attrs":elements[eventName]}});
-				});
-			}
+			return "ElementOrganizer";
 
 		}
 
@@ -1508,22 +1514,62 @@
 		//	Event handlers
 		// -----------------------------------------------------------------------------
 
-		/**
-		 * DoOrganize event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-		 * @param	{Object}		ex					Extra event info.
-		 */
-		static onDoOrganize(sender, e, ex)
+		static ElementOrganizer_onDoOrganize(sender, e, ex)
 		{
 
-			let component = ex.component;
+			let order = ElementOrganizer.getInfo()["order"];
+
+			this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
+				this.addEventHandler(sectionName, {
+					"handler":	ElementOrganizer.ElementOrganizer_onDoProcess,
+					"order":	order,
+					"options":	{"attrs":sectionValue}
+				});
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		static ElementOrganizer_onDoProcess(sender, e, ex)
+		{
+
 			let settings = ex.options["attrs"];
+			let promises = [];
 
 			Object.keys(settings).forEach((elementName) => {
-				ElementOrganizer.__initAttr(component, elementName, settings[elementName]);
+				promises = promises.concat(ElementOrganizer.__initElements(this, e, elementName, settings[elementName]));
 			});
+
+			return Promise.all(promises);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"elements",
+				"order":		220,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Init component vars
+			component._overlay;
+			component._overlayPromise = Promise.resolve();
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.ElementOrganizer_onDoOrganize);
 
 		}
 
@@ -1531,6 +1577,15 @@
 		//  Private
 		// -------------------------------------------------------------------------
 
+		/**
+		 * Get target elements.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		elementName			Element name.
+		 * @param	{Object}		elementInfo			Element info.
+		 *
+	 	 * @return  {Array}			HTML elements.
+		 */
 		static __getTargetElements(component, elementName, elementInfo)
 		{
 
@@ -1544,7 +1599,7 @@
 				}
 				else
 				{
-					elements = component.querySelectorAll(elementInfo["rootNode"]);
+					elements = component.rootElement.querySelectorAll(elementInfo["rootNode"]);
 				}
 			}
 			else if (elementName === "this" || elementName === component.tagName.toLowerCase())
@@ -1553,7 +1608,7 @@
 			}
 			else
 			{
-				elements = component.querySelectorAll("#" + elementName);
+				elements = component.rootElement.querySelectorAll("#" + elementName);
 			}
 
 			return elements;
@@ -1562,148 +1617,446 @@
 
 		// -------------------------------------------------------------------------
 
-
 		/**
-		 * Init attributes.
+		 * Init elements.
 		 *
 		 * @param	{Component}		component			Component.
+		 * @param	{Object}		eventInfo			Event info.
 		 * @param	{String}		elementName			Element name.
 		 * @param	{Object}		elementInfo			Element info.
 		 */
-		static __initAttr(component, elementName, elementInfo)
+		static __initElements(component, eventInfo, elementName, elementInfo)
 		{
 
-			if (elementInfo)
+			let ret = [];
+			let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
+
+			for (let i = 0; i < elements.length; i++)
 			{
-				let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
-				for (let i = 0; i < elements.length; i++)
+				let waitForElement = elements[i];
+
+				Object.keys(elementInfo).forEach((key) => {
+					switch (key)
+					{
+					case "scroll":
+						elements[i].scrollTo(elementInfo[key]);
+						break;
+					case "showLoader":
+						ElementOrganizer.__showOverlay(component, elementInfo[key]);
+						waitForElement = component._overlay;
+						break;
+					case "hideLoader":
+						ElementOrganizer.__hideOverlay(component, elementInfo[key]);
+						waitForElement = component._overlay;
+						break;
+					case "build":
+						let resourceName = elementInfo[key]["resourceName"];
+						FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
+						break;
+					case "attribute":
+						ElementOrganizer.__setAttributes(elements[i], elementInfo[key]);
+						break;
+					case "class":
+						ElementOrganizer.__setClasses(elements[i], elementInfo[key]);
+						break;
+					case "style":
+						Object.keys(elementInfo[key]).forEach((styleName) => {
+							elements[i].style[styleName] = elementInfo[key][styleName];
+						});
+						break;
+					case "property":
+						Object.keys(elementInfo[key]).forEach((propertyName) => {
+							elements[i][propertyName] = elementInfo[key][propertyName];
+						});
+						break;
+					case "autoFocus":
+						elements[i].focus();
+						break;
+					case "rootNode":
+					case "waitFor":
+						break;
+					default:
+						console.warn(`ElementOrganizer.__initAttr(): Invalid type. name=${component.name}, eventName=${eventInfo.type}, type=${key}`);
+						break;
+					}
+				});
+
+				// Wait for transition/animation to finish
+				if (elementInfo["waitFor"])
 				{
-					Object.keys(elementInfo).forEach((key) => {
-						switch (key)
-						{
-							case "build":
-								let resourceName = elementInfo[key]["resourceName"];
-								FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
-								break;
-							case "attribute":
-								Object.keys(elementInfo[key]).forEach((attrName) => {
-									elements[i].setAttribute(attrName, elementInfo[key][attrName]);
-								});
-								break;
-							case "style":
-								Object.keys(elementInfo[key]).forEach((styleName) => {
-									elements[i].style[styleName] = elementInfo[key][styleName];
-								});
-								break;
-							case "property":
-								Object.keys(elementInfo[key]).forEach((propertyName) => {
-									elements[i][propertyName] = elementInfo[key][propertyName];
-								});
-								break;
-							case "autoFocus":
-								elements[i].focus();
-								break;
-						}
-					});
+					ret.push(ElementOrganizer.__waitFor(component, eventInfo, elementName, elementInfo, waitForElement));
 				}
+			}
+
+			return ret;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Wait for transition to finish.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		eventInfo			Event info.
+		 * @param	{String}		elementName			Element name.
+		 * @param	{Object}		elementInfo			Element info.
+		 * @param	{HTMLElement}	element				Element.
+		 *
+	 	 * @return  {Promise}		Promise.
+		 */
+		static __waitFor(component, eventInfo, elementName, elementInfo, element)
+		{
+
+			let inTransition = false;
+
+			switch (elementInfo["waitFor"])
+			{
+			case "transition":
+				inTransition = (window.getComputedStyle(element).getPropertyValue('transition-duration') !== "0s");
+				break;
+			case "animation":
+				inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
+				break;
+			default:
+				console.warn(`ElementOrganizer.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+				break;
+			}
+
+			BM.Util.warn(inTransition, `ElementOrganizer.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+
+			return new Promise((resolve, reject) => {
+				// Timeout timer
+				let timer = setTimeout(() => {
+					reject(`ElementOrganizer.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+				}, BM.settings.get("system.waitForTimeout", 10000));
+
+				// Resolve when finished
+				element.addEventListener(elementInfo["waitFor"] + "end", () => {
+					clearTimeout(timer);
+					resolve();
+				}, {"once":true});
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Set attributes to element.
+		 *
+		 * @param	{HTMLElement}	element				Element to set classes.
+		 * @param	{Object}		options				Options.
+		 */
+		static __setAttributes(element, options)
+		{
+
+			Object.keys(options).forEach((mode) => {
+				switch (mode)
+				{
+				case "add":
+					Object.keys(options[mode]).forEach((attrName) => {
+						element.setAttribute(attrName, options[mode][attrName]);
+					});
+					break;
+				case "remove":
+					for (let i = 0; i < options[mode].length; i++)
+					{
+						element.removeAttribute(options[mode][i]);
+					}				break;
+				default:
+					console.warn(`ElementOrganizer.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
+					break;
+				}
+			});
+
+		}
+
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Set classes to element.
+		 *
+		 * @param	{HTMLElement}	element				Element to set classes.
+		 * @param	{Object}		options				Options.
+		 */
+		static __setClasses(element, options)
+		{
+
+			Object.keys(options).forEach((mode) => {
+				switch (mode)
+				{
+				case "add":
+					element.classList.add(options[mode]);
+					break;
+				case "remove":
+					element.classList.remove(options[mode]);
+					break;
+				case "replace":
+					element.setAttribute("class", options[mode]);
+					break;
+				default:
+					console.warn(`ElementOrganizer.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
+					break;
+				}
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Create an overlay if not exists.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __createOverlay(component, options)
+		{
+
+			if (!component._overlay)
+			{
+				component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
+				component._overlay = component.firstElementChild;
 			}
 
 		}
 
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Install an event handler to close when clicked.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __closeOnClick(component, options)
+		{
+
+			component._overlay.addEventListener("click", (e) => {
+				if (e.target === e.currentTarget && typeof component.close === "function")
+				{
+					component.close({"reason":"cancel"});
+				}
+			}, {"once":true});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get which effect is applied to overlay.
+		 *
+		 * @param	{HTMLElement}	overlay				Overlay element.
+		 *
+		 * @return 	{String}		Effect ("transition" or "animation").
+		 */
+		static __getEffect(overlay)
+		{
+
+			let effect = "";
+
+			if (window.getComputedStyle(overlay).getPropertyValue('transition-duration') !== "0s")
+			{
+				effect = "transition";
+			}
+			else if (window.getComputedStyle(overlay).getPropertyValue('animation-name') !== "none")
+			{
+				effect = "animation";
+			}
+
+			return effect;
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Show overlay.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __showOverlay(component, options)
+		{
+
+			ElementOrganizer.__createOverlay(component);
+
+			// Add close on click event handler
+			if (BM.Util.safeGet(options, "closeOnClick"))
+			{
+				ElementOrganizer.__closeOnClick(component);
+			}
+
+			window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+
+			let addClasses = ["show"].concat(BM.Util.safeGet(options, "addClasses", []));
+			component._overlay.classList.add(...addClasses);
+			component._overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
+
+			let effect = ElementOrganizer.__getEffect(component._overlay);
+			if (effect)
+			{
+				component._overlayPromise = new Promise((resolve, reject) => {
+					component._overlay.addEventListener(effect + "end", () => {
+						resolve();
+					}, {"once":true});
+				});
+			}
+			else
+			{
+				effect = Promise.resolve();
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Hide overlay.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __hideOverlay(component, options)
+		{
+
+			component._overlayPromise.then(() => {
+				window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+
+				let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
+				component._overlay.classList.remove(...removeClasses);
+				component._overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+			});
+		}
+
 	}
 
-	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
 	// =============================================================================
 
 	// =============================================================================
 	//	Resource organizer class
 	// =============================================================================
 
-	class ResourceOrganizer extends BITSMIST.v1.Organizer
+	class ResourceOrganizer extends BM.Organizer
 	{
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		//  Setter/Getter
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		static init(component, settings)
+		static get name()
 		{
 
-			// Add properties
-			Object.defineProperty(component, 'resources', {
-				get() { return this._resources; },
+			return "ResourceOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		static ResourceOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			let promises = [];
+
+			this._enumSettings(e.detail.settings["resources"], (sectionName, sectionValue) => {
+				promises.push(ResourceOrganizer._addResource(this, sectionName, sectionValue));
 			});
 
-			// Add methods
-			component.addResource = function(resourceName, options) { return ResourceOrganizer._addResource(this, resourceName, options); };
-			component.switchResource = function(resourceName) { return ResourceOrganizer._switchResource(this, resourceName); };
-
-			// Init vars
-			component._resources = {};
+			return Promise.all(promises);
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static ResourceOrganizer_onDoFetch(sender, e, ex)
 		{
 
 			let promises = [];
 
-			switch (conditions)
-			{
-				case "beforeStart":
-				case "afterSpecLoad":
-					let resources = settings["resources"];
-					if (resources)
-					{
-						Object.keys(resources).forEach((resourceName) => {
-							// Add resource
-							let apiResourceName = BITSMIST.v1.Util.safeGet(resources[resourceName], "handlerOptions.resourceName", resourceName);
-							let resource = ResourceOrganizer._addResource(component, apiResourceName, resources[resourceName]);
+			Object.keys(this._resources).forEach((resourceName) => {
+				let resource = this._resources[resourceName];
+				if (resource.options.get("autoFetch", true))
+				{
+					resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+					resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
-							// Load data
-							if (resource.options.get("autoLoad"))
-							{
-								let id = resource.options.get("autoLoadOptions.id");
-								let paramters = resource.options.get("autoLoadOptions.parameters");
-
-								promises.push(component._resources[resourceName].get(id, paramters));
-							}
-						});
-					}
-					break;
-				case "doFetch":
-					promises.push(ResourceOrganizer.doFetch(component, settings));
-					break;
-				case "doSubmit":
-					promises.push(ResourceOrganizer.doSubmit(component, settings));
-					break;
-			}
+					promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
+						// Set a property automatically after resource is fetched
+						let autoSet = this.settings.get("resources." + resourceName + ".autoSetProperty");
+						if (autoSet)
+						{
+							this[autoSet] = resource.items;
+						}
+					}));
+				}
+			});
 
 			return Promise.all(promises);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static ResourceOrganizer_onDoSubmit(sender, e, ex)
+		{
+
+			let promises = [];
+			let submitItem = BM.Util.safeGet(e.detail, "items");
+
+			Object.keys(this._resources).forEach((resourceName) => {
+				let resource = this._resources[resourceName];
+				if (resource.options.get("autoSubmit", true)) {
+					let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
+					let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
+					let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+
+					promises.push(this._resources[resourceName][method](id, submitItem, parameters));
+				}
+			});
+
+			return Promise.all(promises);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"resources",
+				"order":		300,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add properties to component
+			Object.defineProperty(component, 'resources', {
+				get() { return this._resources; },
+			});
+
+			// Add methods to component
+			component.addResource = function(resourceName, options) { return ResourceOrganizer._addResource(this, resourceName, options); };
+			component.switchResource = function(resourceName) { return ResourceOrganizer._switchResource(this, resourceName); };
+
+			// Init compnoent vars
+			component._resources = {};
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", ResourceOrganizer.ResourceOrganizer_onDoOrganize);
+			this._addOrganizerHandler(component, "doFetch", ResourceOrganizer.ResourceOrganizer_onDoFetch);
+			this._addOrganizerHandler(component, "doSubmit", ResourceOrganizer.ResourceOrganizer_onDoSubmit);
 
 		}
 
@@ -1712,24 +2065,36 @@
 		// -------------------------------------------------------------------------
 
 		/**
-	     * Add a resource.
+	     * Add resource. Load data if "autoLoad" option is true using added resource.
 	     *
 	     * @param	{Component}		component			Component.
 	     * @param	{string}		resourceName		Resource name.
 	     * @param	{array}			options				Options.
+		 *
+		 * @return 	{Promise}		Promise.
 	     */
 		static _addResource(component, resourceName, options)
 		{
 
-			let resource;
+			BM.Util.assert(options["handlerClassName"], `ResourceOrganizer._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
 
-			if (options["handlerClassName"])
+			let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
+			component._resources[resourceName] = resource;
+
+			if (resource.options.get("autoLoad"))
 			{
-				resource = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
-				component._resources[resourceName] = resource;
-			}
+				let id = resource.options.get("autoLoadOptions.id");
+				let parameters = resource.options.get("autoLoadOptions.parameters");
 
-			return resource;
+				return resource.get(id, parameters).then(() => {
+					// Set a property automatically after resource is fetched
+					let autoSet = component.settings.get("resources." + resourceName + ".autoSetProperty");
+					if (autoSet)
+					{
+						component[autoSet] = resource.items;
+					}
+				});
+			}
 
 		}
 
@@ -1747,150 +2112,99 @@
 
 		}
 
-		// -------------------------------------------------------------------------
-		//  Protected
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Do fetch event handler.
-		 *
-		 * @param	{Component}		component				Component.
-		 * @param	{Object}		options					Options
-		 */
-		static doFetch(component, options)
-		{
-
-			let promises = [];
-			let resources = ResourceOrganizer.__getTargetResources(component, options, "autoFetch");
-
-			for (let i = 0; i < resources.length; i++)
-			{
-				let resourceName = resources[i];
-				let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
-				component._resources[resourceName].target["id"] = id;
-				component._resources[resourceName].target["parameters"] = parameters;
-
-				promises.push(component._resources[resourceName].get(id, parameters));
-			}
-
-			return Promise.all(promises).then(() => {
-				let resourceName = component.settings.get("settings.resourceName");
-				if (resourceName && component._resources[resourceName])
-				{
-					component.items = component._resources[resourceName].items;
-					component.item = component._resources[resourceName].item;
-				}
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Do submit event handler.
-		 *
-		 * @param	{Component}		component				Component.
-		 * @param	{Object}		options					Options
-		 */
-		static doSubmit(component, options)
-		{
-
-			let promises = [];
-			let submitItem = {};
-			let resources = ResourceOrganizer.__getTargetResources(component, options, "autoSubmit");
-
-			// Get target keys to submit
-			let nodes = component.querySelectorAll("[bm-submit]");
-			nodes = Array.prototype.slice.call(nodes, 0);
-			nodes.forEach((elem) => {
-				let key = elem.getAttribute("bm-bind");
-				submitItem[key] = component.item[key];
-			});
-
-			for (let i = 0; i < resources.length; i++)
-			{
-				let resourceName = resources[i];
-				let method = BITSMIST.v1.Util.safeGet(options, "method", component._resources[resourceName].target["method"] || "put"); // Default is "put"
-				let id = BITSMIST.v1.Util.safeGet(options, "id", component._resources[resourceName].target["id"]);
-				let parameters = BITSMIST.v1.Util.safeGet(options, "parameters", component._resources[resourceName].target["parameters"]);
-
-				promises.push(component._resources[resourceName][method](id, submitItem, parameters));
-			}
-
-			return Promise.all(promises);
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Privates
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Get target resource names.
-		 *
-		 * @param	{Component}		component				Component.
-		 * @param	{Object}		options					Options
-		 * @param	{String}		target					Target event
-	 	 *
-		 * @return  {Array}			Array of target resource names.
-		 */
-		static __getTargetResources(component, options, target)
-		{
-
-			let resources = BITSMIST.v1.Util.safeGet(options, target, component.settings.get("settings." + target, []));
-
-			if (Array.isArray(resources))
-			;
-			else if (typeof resources === "string")
-			{
-				resources = [component.settings.get("settings." + target)];
-			}
-			else if (resources === true)
-			{
-				if (component.settings.get("settings.resourceName"))
-				{
-					resources = [component.settings.get("settings.resourceName")];
-				}
-			}
-
-			return resources;
-
-		}
-
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
-	//	Validation organizer class
+	//	Validation Organizer Class
 	// =============================================================================
 
-	class ValidationOrganizer extends BITSMIST.v1.Organizer
+	class ValidationOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "ValidationOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//	Event handlers
+		// -------------------------------------------------------------------------
+
+		static ValidationOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			this._enumSettings(e.detail.settings["validators"], (sectionName, sectionValue) => {
+				ValidationOrganizer._addValidator(this, sectionName, sectionValue);
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static ValidationOrganizer_onDoValidate(sender, e, ex)
+		{
+
+			let validatorName = e.detail.validatorName;
+			if (validatorName)
+			{
+				BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+				let items = BM.Util.safeGet(e.detail, "items");
+				let rules = this.settings.get("validators." + validatorName + ".rules");
+				let options = this.settings.get("validators." + validatorName + ".handlerOptions");
+
+				this._validators[validatorName].checkValidity(items, rules, options);
+			}
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static ValidationOrganizer_onDoReportValidity(sender, e, ex)
+		{
+
+			let validatorName = e.detail.validatorName;
+			if (validatorName)
+			{
+				BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+				let items = BM.Util.safeGet(e.detail.settings, "items");
+				let rules = this.settings.get("validators." + validatorName + ".rules");
+				let options = this.settings.get("validators." + validatorName + ".handlerOptions");
+
+				this._validators[validatorName].reportValidity(items, rules, options);
+			}
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		static init(component, settings)
+		static getInfo()
 		{
 
-			// Add properties
+			return {
+				"sections":		["validators"],
+				"order":		310,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add properties to component
 			Object.defineProperty(component, 'validators', {
 				get() { return this._validators; },
 			});
@@ -1898,57 +2212,18 @@
 				get() { return this._validationResult; },
 			});
 
-			// Add methods
-			component.addValidator = function(validatorName, options) { return ValidationOrganizer._addValidator(this, validatorName, options); };
+			// Add methods to component
+			component.addValidator = function(...args) { return ValidationOrganizer._addValidator(this, ...args); };
+			component.validate = function(...args) { return ValidationOrganizer._validate(this, ...args); };
 
-			// Init vars
+			// Init component vars
 			component._validators = {};
 			component._validationResult = {};
 
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
-		{
-
-			switch (conditions)
-			{
-			case "doCheckValidity":
-			case "doReportValidity":
-				let validationName = settings["validationName"];
-	//			BITSMIST.v1.Util.warn(validationName, `ValidationOrganizer.organize(): Validator not specified. name=${component.name}`);
-
-				if (validationName)
-				{
-					let item = BITSMIST.v1.Util.safeGet(settings, "item");
-					let rules = component.settings.get("validations." + validationName + ".rules");
-					let options = component.settings.get("validations." + validationName + ".handlerOptions");
-					let method = (conditions === "doCheckValidity" ? "checkValidity" : "reportValidity" );
-
-					BITSMIST.v1.Util.assert(component._validators[validationName], `ValidationOrganizer.organize(): Validator not found. name=${component.name}, validationName=${validationName}`);
-					component._validators[validationName][method](item, rules, options);
-				}
-				break;
-			default:
-				let validations = settings["validations"];
-				if (validations)
-				{
-					Object.keys(validations).forEach((validatorName) => {
-						ValidationOrganizer._addValidator(component, validatorName, validations[validatorName]);
-					});
-				}
-				break;
-			}
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", ValidationOrganizer.ValidationOrganizer_onDoOrganize);
+			this._addOrganizerHandler(component, "doValidate", ValidationOrganizer.ValidationOrganizer_onDoValidate);
+			this._addOrganizerHandler(component, "doReportValidity", ValidationOrganizer.ValidationOrganizer_onDoReportValidity);
 
 		}
 
@@ -1970,11 +2245,557 @@
 
 			if (options["handlerClassName"])
 			{
-				validator = BITSMIST.v1.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
+				validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
 				component._validators[validatorName] = validator;
 			}
 
 			return validator;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Validate the form.
+		 *
+	     * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _validate(component, options)
+		{
+
+			options = options || {};
+			component._validationResult = {"result":true};
+
+			return Promise.resolve().then(() => {
+				console.debug(`ValidationOrganizer._validate(): Validating component. name=${component.name}, id=${component.id}`);
+				return component.trigger("beforeValidate", options);
+			}).then(() => {
+				return component.trigger("doValidate", options);
+			}).then(() => {
+				if (component.validationResult["result"])
+				{
+					console.debug(`ValidationOrganizer._validate(): Validation Success. name=${component.name}, id=${component.id}`);
+					return component.trigger("doValidateSuccess", options);
+				}
+				else
+				{
+					console.debug(`ValidationOrganizer._validate(): Validation Failed. name=${component.name}, id=${component.id}`);
+					return component.trigger("doValidateFail", options);
+				}
+			}).then(() => {
+				return component.trigger("afterValidate", options);
+			}).then(() => {
+				if (!component._validationResult["result"])
+				{
+					return component.trigger("doReportValidity", options);
+				}
+			});
+
+		}
+
+	}
+
+	// =============================================================================
+
+	// =============================================================================
+	//	Form Organizer Class
+	// =============================================================================
+
+	class FormOrganizer extends BM.Organizer
+	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "FormOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//	Event handlers
+		// -------------------------------------------------------------------------
+
+		static FormOrganizer_onAfterTransform(sender, e, ex)
+		{
+
+			FormUtil.hideConditionalElements(this);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static FormOrganizer_onDoClear(sender, e, ex)
+		{
+
+			let target = BM.Util.safeGet(e.detail, "target", "");
+
+			FormUtil.clearFields(this, target);
+			this._items = {};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static FormOrganizer_onDoFill(sender, e, ex)
+		{
+
+			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
+			let items = BM.Util.safeGet(e.detail, "items", this._items);
+
+			FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
+			FormUtil.showConditionalElements(this, items);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"forms",
+				"order":		310,
+				"depends":		"ValidationOrganizer",
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add properties to component
+			Object.defineProperty(component, 'items', {
+				get()		{ return this._items; },
+				set(value)	{ this._items = value; },
+			});
+			Object.defineProperty(component, 'cancelSubmit', {
+				get() { return this._cancelSubmit; },
+			});
+
+			// Add methods to component
+			component.build = function(...args) { return FormOrganizer._build(this, ...args); };
+			component.submit = function(...args) { return FormOrganizer._submit(this, ...args); };
+
+			// Init component vars
+			component._items = {};
+			component._cancelSubmit = false;
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "afterTransform", FormOrganizer.FormOrganizer_onAfterTransform);
+			this._addOrganizerHandler(component, "doClear", FormOrganizer.FormOrganizer_onDoClear);
+			this._addOrganizerHandler(component, "doFill", FormOrganizer.FormOrganizer_onDoFill);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		*
+		* Build a element.
+		*
+	    * @param	{Component}		component			Component.
+		* @param	{HTMLElement}	element				HTMLElement to build.
+		* @param	{Object}		items				Items to fill elements.
+		* @param	{Object}		options				Options.
+		*/
+		static _build(component, element, items, options)
+		{
+
+			FormUtil.build(element, items, options);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Submit the form.
+		 *
+	     * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _submit(component, options)
+		{
+
+			options = options || {};
+			component._cancelSubmit = false;
+
+			return Promise.resolve().then(() => {
+				// Collect values
+				if (component.settings.get("forms.settings.autoCollect", true))
+				{
+					options["items"] = FormOrganizer.__collectData(component);
+				}
+			}).then(() => {
+				// Validate values
+				if (component.settings.get("forms.settings.autoValidate", true))
+				{
+					options["validatorName"] = component.settings.get("forms.settings.validatorName");
+					return component.validate(options).then(() => {
+						if (!component.validationResult["result"])
+						{
+							component._cancelSubmit = true;
+						}
+					});
+				}
+			}).then(() => {
+				// Submit values
+				console.debug(`FormOrganizer._submit(): Submitting component. name=${component.name}, id=${component.id}`);
+				return component.trigger("beforeSubmit", options).then(() => {
+					if (!component._cancelSubmit)
+					{
+						return Promise.resolve().then(() => {
+							return component.trigger("doSubmit", options);
+						}).then(() => {
+							console.debug(`FormOrganizer._submit(): Submitted component. name=${component.name}, id=${component.id}`);
+							component.items = options["items"];
+							return component.trigger("afterSubmit", options);
+						});
+					}
+				});
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Privates
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Colled data from form.
+		 *
+	     * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Object}		Collected data.
+		 */
+		static __collectData(component, options)
+		{
+
+			let submitItem = {};
+			let items = FormUtil.getFields(component);
+
+			// Collect values only from nodes that has [bm-submit] attribute.
+			let nodes = component.querySelectorAll("[bm-submit]");
+			nodes = Array.prototype.slice.call(nodes, 0);
+			nodes.forEach((elem) => {
+				let key = elem.getAttribute("bm-bind");
+				submitItem[key] = items[key];
+			});
+
+			return submitItem;
+
+		}
+
+	}
+
+	// =============================================================================
+
+	// =============================================================================
+	//	List Organizer Class
+	// =============================================================================
+
+	class ListOrganizer extends BM.Organizer
+	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "ListOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//	Event handlers
+		// -------------------------------------------------------------------------
+
+		static ListOrganizer_onAfterTransform(sender, e, ex)
+		{
+
+			this._listRootNode = this.querySelector(this.settings.get("lists.settings.listRootNode"));
+			BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
+
+			return this.transformRow(this.settings.get("lists.settings.rowTemplateName"));
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static ListOrganizer_onBeforeFill(sender, e, ex)
+		{
+
+			this._listRootNode.innerHTML = "";
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static ListOrganizer_onDoFill(sender, e, ex)
+		{
+
+			this._rowElements = [];
+			let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
+			let fragment = document.createDocumentFragment();
+			let items = BM.Util.safeGet(e.detail, "items", this._rows);
+
+			return Promise.resolve().then(() => {
+				return builder(this, fragment, items);
+			}).then(() => {
+				this._listRootNode.appendChild(fragment);
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"lists",
+				"order":		310,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add properties to component
+			Object.defineProperty(component, 'rows', {
+				get()		{ return this._rows; },
+				set(value)	{ this._rows = value; },
+			});
+
+			// Add methods to component
+			component.transformRow = function(...args) { return ListOrganizer._transformRow(this, ...args); };
+
+			// Init component vars
+			component._rows = [];
+			component._activeRowTemplateName = "";
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
+			this._addOrganizerHandler(component, "beforeFill", ListOrganizer.ListOrganizer_onBeforeFill);
+			this._addOrganizerHandler(component, "doFill", ListOrganizer.ListOrganizer_onDoFill);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Change a row template html.
+		 *
+	     * @param	{Component}		component			Component.
+		 * @param	{String}		templateName		Template name.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _transformRow(component, templateName, options)
+		{
+
+			options = options || {};
+
+			if (component._activeRowTemplateName === templateName)
+			{
+				return Promise.resolve();
+			}
+
+			return Promise.resolve().then(() => {
+				console.debug(`ListOrganizer._transformRow(): Switching a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+				return component.loadTemplate(templateName);
+			}).then(() => {
+				component._activeRowTemplateName = templateName;
+			}).then(() => {
+				return component.trigger("afterRowTransform", options);
+			}).then(() => {
+				console.debug(`ListOrganizer._transformRow(): Switched a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Build rows synchronously.
+		 *
+		 * @param	{DocumentFragment}	fragment		Document fragment.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _buildSync(component, fragment, items)
+		{
+
+			BM.Util.assert(component._templates[component._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
+
+			let chain = Promise.resolve();
+			//let rowEvents = component.settings.get("lists.rowevents");
+			let rowEvents = component.settings.get("rowevents");
+			let template = component.templates[component._activeRowTemplateName].html;
+
+			for (let i = 0; i < items.length; i++)
+			{
+				chain = chain.then(() => {
+					return ListOrganizer._appendRowSync(component, fragment, i, items[i], template, rowEvents);
+				});
+			}
+
+			return chain;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Build rows asynchronously.
+		 *
+		 * @param	{DocumentFragment}	fragment		Document fragment.
+		 */
+		static _buildAsync(component, fragment, items)
+		{
+
+			BM.Util.assert(component.templates[component._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
+
+			//let rowEvents = component.settings.get("lists.rowevents");
+			let rowEvents = component.settings.get("rowevents");
+			let template = component.templates[component._activeRowTemplateName].html;
+
+			for (let i = 0; i < items.length; i++)
+			{
+				ListOrganizer._appendRowAsync(component, fragment, i, items[i], template, rowEvents);
+			}
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Privates
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Create a row element.
+		 *
+		 * @param	{String}		template				Template html.
+		 *
+		 * @return  {HTMLElement}	Row element.
+		 */
+		static _createRow(template)
+		{
+
+			let ele = document.createElement("tbody");
+			ele.innerHTML = template;
+			let element = ele.firstElementChild;
+			element.setAttribute("bm-powered", "");
+
+			return element;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Append a new row synchronously.
+		 *
+		 * @param	{HTMLElement}	rootNode				Root node to append a row.
+		 * @param	{integer}		no						Line no.
+		 * @param	{Object}		item					Row data.
+		 * @param	{String}		template				Template html.
+		 * @param	{Object}		rowEvents				Row's event info.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _appendRowSync(component, rootNode, no, item, template, rowEvents)
+		{
+
+			component.triggerAsync("beforeBuildRow", {"item":item});
+
+			let chain = Promise.resolve();
+			chain = chain.then(() => {
+				// Append a row
+				let element = ListOrganizer._createRow(template);
+				rootNode.appendChild(element);
+				component._rowElements.push(element);
+
+				// set row elements click event handler
+				if (rowEvents)
+				{
+					Object.keys(rowEvents).forEach((elementName) => {
+						component.initEvents(elementName, rowEvents[elementName], element);
+					});
+				}
+
+				// Call event handlers
+				return Promise.resolve().then(() => {
+					return component.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
+				}).then(() => {
+					// Fill fields
+					FormUtil.showConditionalElements(element, item);
+					FormUtil.setFields(element, item, {"masters":component.resources});
+				}).then(() => {
+					return component.trigger("afterFillRow", {"item":item, "no":no, "element":element});
+				});
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Append a new row asynchronously.
+		 *
+		 * @param	{HTMLElement}	rootNode				Root node to append a row.
+		 * @param	{integer}		no						Line no.
+		 * @param	{Object}		item					Row data.
+		 * @param	{String}		template				Template html.
+		 * @param	{Object}		rowEvents				Row's event info.
+		 */
+		static _appendRowAsync(component, rootNode, no, item, template, rowEvents)
+		{
+
+			component.triggerAsync("beforeBuildRow", {"item":item});
+
+			// Append a row
+			let element = ListOrganizer._createRow(template);
+			rootNode.appendChild(element);
+			component._rowElements.push(element);
+
+			// set row elements click event handler
+			if (rowEvents)
+			{
+				Object.keys(rowEvents).forEach((elementName) => {
+					component.initEvents(elementName, rowEvents[elementName], element);
+				});
+			}
+
+			// Call event handlers
+			component.triggerAsync("beforeFillRow", {"item":item, "no":no, "element":element});
+			FormUtil.showConditionalElements(element, item);
+			FormUtil.setFields(element, item, {"masters":component.resources});
+			component.triggerAsync("afterFillRow", {"item":item, "no":no, "element":element});
 
 		}
 
@@ -1986,22 +2807,37 @@
 	//	Databinding organizer class
 	// =============================================================================
 
-	class DatabindingOrganizer extends BITSMIST.v1.Organizer
+	class DatabindingOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "DatabindingOrganizer";
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static init(component, settings)
+		static getInfo()
+		{
+
+			return {
+				"sections":		"binds",
+				"order":		320,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
 		{
 
 			// Add properties
@@ -2037,7 +2873,7 @@
 
 			switch (conditions)
 			{
-				case "afterAppend":
+				case "afterTransform":
 					DatabindingOrganizer._bindData(component);
 					break;
 				case "afterFetch":
@@ -2116,61 +2952,62 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Plugin organizer class
 	// =============================================================================
 
-	class PluginOrganizer extends BITSMIST.v1.Organizer
+	class PluginOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "PluginOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		static PluginOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			this._enumSettings(e.detail.settings["plugins"], (sectionName, sectionValue) => {
+				PluginOrganizer._addPlugin(this, sectionName, sectionValue);
+			});
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		static init(component, settings)
+		static getInfo()
 		{
 
-			// Init vars
-			component._plugins = {};
+			return {
+				"sections":		"plugins",
+				"order":		800,
+			};
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static init(component, options)
 		{
 
-			let plugins = settings["plugins"];
-			if (plugins)
-			{
-				Object.keys(plugins).forEach((pluginName) => {
-					PluginOrganizer._addPlugin(component, pluginName, plugins[pluginName]);
-				});
-			}
+			// Init component vars
+			component._plugins = {};
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", PluginOrganizer.PluginOrganizer_onDoOrganize);
 
 		}
 
@@ -2184,19 +3021,19 @@
 		 * @param	{String}		pluginName			Plugin name.
 		 * @param	{Object}		options				Options for the plugin.
 		 *
-		 * @return  {Promise}		Promise.
+		 * @return  {Object}		Added plugin.
 		 */
 		static _addPlugin(component, pluginName, options)
 		{
 
 			console.debug(`PluginOrganizer._addPlugin(): Adding a plugin. name=${component.name}, pluginName=${pluginName}`);
 
-			options = Object.assign({}, options);
+			options = options || {};
 			let className = ( "className" in options ? options["className"] : pluginName );
 			let plugin = null;
 
 			// CreatePlugin
-			plugin = BITSMIST.v1.ClassUtil.createObject(className, component, options);
+			plugin = BM.ClassUtil.createObject(className, component, options);
 			component._plugins[pluginName] = plugin;
 
 			return plugin;
@@ -2206,74 +3043,50 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Key organizer class
 	// =============================================================================
 
-	class KeyOrganizer extends BITSMIST.v1.Organizer
+	class KeyOrganizer extends BM.Organizer
 	{
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		//  Setter/Getter
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		static init(component, settings)
+		static get name()
 		{
 
-			// Init vars
-			component.__isComposing = false;
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
-		{
-
-			let keys = settings["keys"];
-			if (keys)
-			{
-				// Init keys
-				let actions = KeyOrganizer.__getActions(keys);
-				component.addEventListener("keydown", function(e){KeyOrganizer.onKeyDown.call(this, e, component);});
-				component.addEventListener("keyup", function(e){KeyOrganizer.onKeyUp.call(this, e, component, keys, actions);});
-				// component.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, component, keys);});
-				// component.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, component, keys);});
-
-				// Init buttons
-				Object.keys(keys).forEach((key) => {
-					KeyOrganizer.__initButtons(component, key, keys[key]);
-				});
-			}
+			return "KeyOrganizer";
 
 		}
 
 		// -------------------------------------------------------------------------
 		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		static KeyOrganizer_onAfterTransform(sender, e, ex)
+		{
+
+			let keys = this.settings.get("keys");
+			if (keys)
+			{
+				// Init keys
+				let actions = KeyOrganizer.__getActions(keys);
+				this.addEventListener("keydown", function(e){KeyOrganizer.KeyOrganizer_onKeyDown.call(this, e, this);});
+				this.addEventListener("keyup", function(e){KeyOrganizer.KeyOrganizer_onKeyUp.call(this, e, this, keys, actions);});
+				//this.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, this, keys);});
+				//this.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, this, keys);});
+
+				// Init buttons
+				this._enumSettings(this.settings.get("keys"), (sectionName, sectionValue) => {
+					KeyOrganizer.__initButtons(this, sectionName, sectionValue);
+				});
+			}
+
+		}
+
 		// -------------------------------------------------------------------------
 
 		/**
@@ -2282,7 +3095,7 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Component}		component			Component.
 		 */
-		static onKeyDown(e, component)
+		static KeyOrganizer_onKeyDown(e, component)
 		{
 
 			component.__isComposing = ( e.keyCode === 229 ? true : false );
@@ -2299,7 +3112,7 @@
 		 * @param	{Object}		options				Options.
 		 * @param	{Object}		actions				Action info.
 		 */
-		static onKeyUp(e, component, options, actions)
+		static KeyOrganizer_onKeyUp(e, component, options, actions)
 		{
 
 			// Ignore all key input when composing.
@@ -2364,6 +3177,33 @@
 		*/
 
 		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"keys",
+				"order":		800,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Init component vars
+			component.__isComposing = false;
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "afterTransform", KeyOrganizer.KeyOrganizer_onAfterTransform);
+
+		}
+
+		// -------------------------------------------------------------------------
 		//  Protected
 		// -------------------------------------------------------------------------
 
@@ -2377,11 +3217,11 @@
 		static _defaultSubmit(e, component, options)
 		{
 
-			component.submit().then(() => {
+			return component.submit().then(() => {
 				if (!component.cancelSubmit)
 				{
 					// Modal result
-					if (component._isModal)
+					if (component.isModal)
 					{
 						component.modalResult["result"] = true;
 					}
@@ -2389,7 +3229,7 @@
 					// Auto close
 					if (options && options["autoClose"])
 					{
-						component.close();
+						component.close({"reason":"submit"});
 					}
 				}
 			});
@@ -2408,7 +3248,7 @@
 		static _defaultCancel(e, component, options)
 		{
 
-			component.close();
+			return component.close({"reason":"cancel"});
 
 		}
 
@@ -2431,7 +3271,7 @@
 				target = this.getAttribute("bm-cleartarget");
 			}
 
-			component.clear(target);
+			return component.clear({"target":target});
 
 		}
 
@@ -2552,60 +3392,22 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Chain organizer class
 	// =============================================================================
 
-	class ChainOrganizer extends BITSMIST.v1.Organizer
+	class ChainOrganizer extends BM.Organizer
 	{
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		//  Setter/Getter
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
+		static get name()
 		{
 
-			let chains = settings["chains"];
-			if (chains)
-			{
-				Object.keys(chains).forEach((eventName) => {
-					component.addEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-				});
-			}
-
-		}
-
-		// -----------------------------------------------------------------------------
-
-		static unorganize(conditions, component, settings)
-		{
-
-			let chains = settings["chains"];
-			if (chains)
-			{
-				Object.keys(chains).forEach((eventName) => {
-					component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
-				});
-			}
+			return "ChainOrganizer";
 
 		}
 
@@ -2613,17 +3415,26 @@
 		//	Event handlers
 		// -----------------------------------------------------------------------------
 
-		/**
-		 * DoOrganize event handler.
-		 *
-		 * @param	{Object}		sender				Sender.
-		 * @param	{Object}		e					Event info.
-		 * @param	{Object}		ex					Extra event info.
-		 */
 		static onDoOrganize(sender, e, ex)
 		{
 
-			let component = ex.component;
+			let order = ChainOrganizer.getInfo()["order"];
+
+			this._enumSettings(e.detail.settings["chains"], (sectionName, sectionValue) => {
+				this.addEventHandler(sectionName, {
+					"handler":ChainOrganizer.onDoProcess,
+					"order":	order,
+					"options":sectionValue
+				});
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		static onDoProcess(sender, e, ex)
+		{
+
 			let targets = ex.options;
 			let promises = [];
 			let chain = Promise.resolve();
@@ -2636,24 +3447,61 @@
 
 				let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 				nodes = Array.prototype.slice.call(nodes, 0);
-				BITSMIST.v1.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${component.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`);
+				BM.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${this.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`);
 
 				if (sync)
 				{
 					chain = chain.then(() => {
-						return ChainOrganizer.__execTarget(component, nodes, method, state);
+						return ChainOrganizer.__execTarget(this, nodes, method, state);
 					});
 				}
 				else
 				{
-					chain = ChainOrganizer.__execTarget(component, nodes, method, state);
+					chain = ChainOrganizer.__execTarget(this, nodes, method, state);
 				}
 				promises.push(chain);
 			}
 
-			return chain.then(() => {
-				return Promise.all(promises);
-			});
+			return Promise.all(promises);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		"chains",
+				"order":		800,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", ChainOrganizer.onDoOrganize);
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		static deinit(component, options)
+		{
+
+			let chains = e.details.setting["chains"];
+			if (chains)
+			{
+				Object.keys(chains).forEach((eventName) => {
+					component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
+				});
+			}
 
 		}
 
@@ -2662,7 +3510,7 @@
 		// -----------------------------------------------------------------------------
 
 		/**
-		 * Organize.
+		 * Execute target methods.
 		 *
 		 * @param	{Component}		component			Component.
 		 * @param	{Array}			nodes				Nodes.
@@ -2689,38 +3537,61 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Dialog organizer class
 	// =============================================================================
 
-	class DialogOrganizer extends BITSMIST.v1.Organizer
+	class DialogOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "DialogOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Event Handlers
+		// -------------------------------------------------------------------------
+
+		static DialogOrganizer_onAfterReady(sender, e, ex)
+		{
+
+			if (this.settings.get("dialogs.settings.autoOpen"))
+			{
+				console.debug(`DialogOrganizer.DialogOrganizer_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
+
+				return this.open();
+			}
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static init(component, settings)
+		static getInfo()
 		{
 
-			// Add properties
+			return {
+				"sections":		"dialogs",
+				"order":		800,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add properties to component
 			Object.defineProperty(component, 'modalResult', {
 				get() { return this._modalResult; },
 			});
@@ -2728,52 +3599,26 @@
 				get() { return this._isModal; },
 			});
 
-			// Add methods
+			// Add methods to component
 			component.open = function(options) { return DialogOrganizer._open(this, options); };
 			component.openModal = function(options) { return DialogOrganizer._openModal(this, options); };
 			component.close = function(options) { return DialogOrganizer._close(this, options); };
 
-			// Init vars
+			// Init component vars
 			component._isModal = false;
+			component._cancelClose;
+			component._cancelOpen;
 			component._modalResult;
 			component._modalPromise;
 
-		}
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "afterReady", DialogOrganizer.DialogOrganizer_onAfterReady);
 
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
-		{
-
-			settings["dialog"];
-
-			switch (conditions)
-			{
-				case "beforeStart":
-			//		if (dialog["overrideSettings"])
-					{
-						component.settings.set("settings.autoRefresh", false);
-						component.settings.set("settings.autoRefreshOnOpen", true);
-						component.settings.set("settings.autoSetup", false);
-						component.settings.set("settings.autoSetupOnOpen", true);
-					}
-					break;
-				case "afterStart":
-					if (component.settings.get("settings.autoOpen"))
-					{
-						component.open();
-					}
-					break;
-			}
+			// Init component settings
+			component.settings.set("settings.autoRefresh", false);
+			component.settings.set("settings.autoRefreshOnOpen", true);
+			component.settings.set("settings.autoSetup", false);
+			component.settings.set("settings.autoSetupOnOpen", true);
 
 		}
 
@@ -2791,40 +3636,37 @@
 		static _open(component, options)
 		{
 
-			options = Object.assign({}, options);
+			options = options || {};
 
-			return Promise.resolve().then(() => {
-				console.debug(`Opening component. name=${component.name}, id=${component.id}`);
-				return component.trigger("beforeOpen", options);
-			}).then(() => {
-				// Setup
-				if (BITSMIST.v1.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+			console.debug(`DialogOrganizer._open(): Opening component. name=${component.name}, id=${component.id}`);
+			return component.trigger("beforeOpen", options).then(() => {
+				if (!component._cancelOpen)
 				{
-					return component.setup(options);
+					return Promise.resolve().then(() => {
+						// Show backdrop
+						if (component.settings.get("dialogs.backdropOptions.show"))
+						{
+							return DialogOrganizer.__showBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+						}
+					}).then(() => {
+						// Setup
+						if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+						{
+							return component.setup(options);
+						}
+					}).then(() => {
+						// Refresh
+						if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
+						{
+							return component.refresh(options);
+						}
+					}).then(() => {
+						return component.trigger("doOpen", options);
+					}).then(() => {
+						console.debug(`DialogOrganizer._open(): Opened component. name=${component.name}, id=${component.id}`);
+						return component.trigger("afterOpen", options);
+					});
 				}
-			}).then(() => {
-				// Refresh
-				if (BITSMIST.v1.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
-				{
-					return component.refresh(options);
-				}
-			}).then(() => {
-				return component.trigger("doOpen", options);
-			}).then(() => {
-				// Auto focus
-				let autoFocus = component.settings.get("settings.autoFocus");
-				if (autoFocus)
-				{
-					let target = ( autoFocus === true ? component : component.querySelector(autoFocus) );
-					if (target)
-					{
-						target.focus();
-					}
-				}
-			}).then(() => {
-				return component.trigger("afterOpen", options);
-			}).then(() => {
-				console.debug(`Opened component. name=${component.name}, id=${component.id}`);
 			});
 
 		}
@@ -2832,7 +3674,7 @@
 		// -------------------------------------------------------------------------
 
 		/**
-		 * Open component modally.
+		 * Open component modal.
 		 *
 		 * @param	{array}			options				Options.
 		 *
@@ -2841,13 +3683,13 @@
 		static _openModal(component, options)
 		{
 
-			console.debug(`Opening component modally. name=${component.name}, id=${component.id}`);
+			console.debug(`DialogOrganizer._openModal(): Opening component modal. name=${component.name}, id=${component.id}`);
 
 			return new Promise((resolve, reject) => {
 				component._isModal = true;
 				component._modalResult = {"result":false};
 				component._modalPromise = { "resolve": resolve, "reject": reject };
-				DialogOrganizer._open(component, options);
+				return DialogOrganizer._open(component, options);
 			});
 
 		}
@@ -2864,23 +3706,188 @@
 		static _close(component, options)
 		{
 
-			options = Object.assign({}, options);
+			options = options || {};
+			component._cancelClose = false;
 
-			return Promise.resolve().then(() => {
-				console.debug(`Closing component. name=${component.name}, id=${component.id}`);
-				return component.trigger("beforeClose", options);
-			}).then(() => {
-				return component.trigger("doClose", options);
-			}).then(() => {
-				return component.trigger("afterClose", options);
-			}).then(() => {
-				if (component._isModal)
+			console.debug(`DialogOrganizer._close(): Closing component. name=${component.name}, id=${component.id}`);
+			return component.trigger("beforeClose", options).then(() => {
+				if (!component._cancelClose)
 				{
-					component._modalPromise.resolve(component._modalResult);
+					return component.trigger("doClose", options).then(() => {
+						// Hide backdrop
+						if (component.settings.get("dialogs.backdropOptions.show"))
+						{
+							return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+						}
+					}).then(() => {
+						if (component._isModal)
+						{
+							component._modalPromise.resolve(component._modalResult);
+						}
+
+							console.debug(`DialogOrganizer._close(): Closed component. name=${component.name}, id=${component.id}`);
+						return component.trigger("afterClose", options);
+					});
 				}
-			}).then(() => {
-				console.debug(`Closed component. name=${component.name}, id=${component.id}`);
 			});
+
+		}
+
+		// -------------------------------------------------------------------------
+		// 	Privates
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Create a backdrop if not exists.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __createBackdrop(component, options)
+		{
+
+			if (!DialogOrganizer._backdrop)
+			{
+				// Create a backdrop
+				document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
+				DialogOrganizer._backdrop = document.body.firstElementChild;
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Show backdrop.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __showBackdrop(component, options)
+		{
+
+			DialogOrganizer.__createBackdrop(component);
+
+			let promise = new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+
+				let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
+				DialogOrganizer._backdrop.classList.add(...addClasses);
+				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
+
+				let effect = DialogOrganizer.__getEffect();
+				if (effect)
+				{
+					// Transition/Animation
+					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+						if (BM.Util.safeGet(options, "closeOnClick", true))
+						{
+							DialogOrganizer.__closeOnClick(component);
+						}
+						resolve();
+					}, {"once":true});
+				}
+				else
+				{
+					// No Transition/Animation
+					if (BM.Util.safeGet(options, "closeOnClick", true))
+					{
+						DialogOrganizer.__closeOnClick(component);
+					}
+
+					resolve();
+				}
+			});
+
+			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
+			if (sync)
+			{
+				return promise;
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Hide backdrop.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __hideBackdrop(component, options)
+		{
+
+			let promise = new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+
+				let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
+				DialogOrganizer._backdrop.classList.remove(...removeClasses);
+				DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
+
+				let effect = DialogOrganizer.__getEffect();
+				if (effect)
+				{
+					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+						resolve();
+					}, {"once":true});
+				}
+				else
+				{
+					resolve();
+				}
+			});
+
+			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
+			if (sync)
+			{
+				return promise;
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Install an event handler to close when clicked.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		options				Options.
+		 */
+		static __closeOnClick(component, options)
+		{
+
+			DialogOrganizer._backdrop.addEventListener("click", (e) => {
+				if (e.target === e.currentTarget)
+				{
+					component.close({"reason":"cancel"});
+				}
+			}, {"once":true});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get which effect is applied to backdrop.
+		 *
+		 * @return 	{String}		Effect ("transition" or "animation").
+		 */
+		static __getEffect()
+		{
+
+			let effect = "";
+
+			if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('transition-duration') !== "0s")
+			{
+				effect = "transition";
+			}
+			else if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('animation-name') !== "none")
+			{
+				effect = "animation";
+			}
+
+			return effect;
 
 		}
 
@@ -2892,88 +3899,514 @@
 	//	Preference organizer class
 	// =============================================================================
 
-	class PreferenceOrganizer extends BITSMIST.v1.Organizer
+	class PreferenceOrganizer extends BM.Organizer
 	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "PreferenceOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		static PreferenceOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			// Wait for PreferenceManager to be ready
+			return this.waitFor([{"rootNode":"bm-preference"}]).then(() => {
+				document.querySelector("bm-preference").subscribe(this, this.settings.get("preferences"));
+			});
+
+		}
 
 		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Global init.
-		 */
+		static getInfo()
+		{
+
+			return {
+				"sections":		"preferences",
+				"order":		900,
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static init(component, options)
+		{
+
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", PreferenceOrganizer.PreferenceOrganizer_onDoOrganize);
+
+		}
+
+	}
+
+	/**
+	 * Tokenize input string.
+	 */
+	function lexer(str) {
+	    var tokens = [];
+	    var i = 0;
+	    while (i < str.length) {
+	        var char = str[i];
+	        if (char === "*" || char === "+" || char === "?") {
+	            tokens.push({ type: "MODIFIER", index: i, value: str[i++] });
+	            continue;
+	        }
+	        if (char === "\\") {
+	            tokens.push({ type: "ESCAPED_CHAR", index: i++, value: str[i++] });
+	            continue;
+	        }
+	        if (char === "{") {
+	            tokens.push({ type: "OPEN", index: i, value: str[i++] });
+	            continue;
+	        }
+	        if (char === "}") {
+	            tokens.push({ type: "CLOSE", index: i, value: str[i++] });
+	            continue;
+	        }
+	        if (char === ":") {
+	            var name = "";
+	            var j = i + 1;
+	            while (j < str.length) {
+	                var code = str.charCodeAt(j);
+	                if (
+	                // `0-9`
+	                (code >= 48 && code <= 57) ||
+	                    // `A-Z`
+	                    (code >= 65 && code <= 90) ||
+	                    // `a-z`
+	                    (code >= 97 && code <= 122) ||
+	                    // `_`
+	                    code === 95) {
+	                    name += str[j++];
+	                    continue;
+	                }
+	                break;
+	            }
+	            if (!name)
+	                throw new TypeError("Missing parameter name at ".concat(i));
+	            tokens.push({ type: "NAME", index: i, value: name });
+	            i = j;
+	            continue;
+	        }
+	        if (char === "(") {
+	            var count = 1;
+	            var pattern = "";
+	            var j = i + 1;
+	            if (str[j] === "?") {
+	                throw new TypeError("Pattern cannot start with \"?\" at ".concat(j));
+	            }
+	            while (j < str.length) {
+	                if (str[j] === "\\") {
+	                    pattern += str[j++] + str[j++];
+	                    continue;
+	                }
+	                if (str[j] === ")") {
+	                    count--;
+	                    if (count === 0) {
+	                        j++;
+	                        break;
+	                    }
+	                }
+	                else if (str[j] === "(") {
+	                    count++;
+	                    if (str[j + 1] !== "?") {
+	                        throw new TypeError("Capturing groups are not allowed at ".concat(j));
+	                    }
+	                }
+	                pattern += str[j++];
+	            }
+	            if (count)
+	                throw new TypeError("Unbalanced pattern at ".concat(i));
+	            if (!pattern)
+	                throw new TypeError("Missing pattern at ".concat(i));
+	            tokens.push({ type: "PATTERN", index: i, value: pattern });
+	            i = j;
+	            continue;
+	        }
+	        tokens.push({ type: "CHAR", index: i, value: str[i++] });
+	    }
+	    tokens.push({ type: "END", index: i, value: "" });
+	    return tokens;
+	}
+	/**
+	 * Parse a string for the raw tokens.
+	 */
+	function parse(str, options) {
+	    if (options === void 0) { options = {}; }
+	    var tokens = lexer(str);
+	    var _a = options.prefixes, prefixes = _a === void 0 ? "./" : _a;
+	    var defaultPattern = "[^".concat(escapeString(options.delimiter || "/#?"), "]+?");
+	    var result = [];
+	    var key = 0;
+	    var i = 0;
+	    var path = "";
+	    var tryConsume = function (type) {
+	        if (i < tokens.length && tokens[i].type === type)
+	            return tokens[i++].value;
+	    };
+	    var mustConsume = function (type) {
+	        var value = tryConsume(type);
+	        if (value !== undefined)
+	            return value;
+	        var _a = tokens[i], nextType = _a.type, index = _a.index;
+	        throw new TypeError("Unexpected ".concat(nextType, " at ").concat(index, ", expected ").concat(type));
+	    };
+	    var consumeText = function () {
+	        var result = "";
+	        var value;
+	        while ((value = tryConsume("CHAR") || tryConsume("ESCAPED_CHAR"))) {
+	            result += value;
+	        }
+	        return result;
+	    };
+	    while (i < tokens.length) {
+	        var char = tryConsume("CHAR");
+	        var name = tryConsume("NAME");
+	        var pattern = tryConsume("PATTERN");
+	        if (name || pattern) {
+	            var prefix = char || "";
+	            if (prefixes.indexOf(prefix) === -1) {
+	                path += prefix;
+	                prefix = "";
+	            }
+	            if (path) {
+	                result.push(path);
+	                path = "";
+	            }
+	            result.push({
+	                name: name || key++,
+	                prefix: prefix,
+	                suffix: "",
+	                pattern: pattern || defaultPattern,
+	                modifier: tryConsume("MODIFIER") || "",
+	            });
+	            continue;
+	        }
+	        var value = char || tryConsume("ESCAPED_CHAR");
+	        if (value) {
+	            path += value;
+	            continue;
+	        }
+	        if (path) {
+	            result.push(path);
+	            path = "";
+	        }
+	        var open = tryConsume("OPEN");
+	        if (open) {
+	            var prefix = consumeText();
+	            var name_1 = tryConsume("NAME") || "";
+	            var pattern_1 = tryConsume("PATTERN") || "";
+	            var suffix = consumeText();
+	            mustConsume("CLOSE");
+	            result.push({
+	                name: name_1 || (pattern_1 ? key++ : ""),
+	                pattern: name_1 && !pattern_1 ? defaultPattern : pattern_1,
+	                prefix: prefix,
+	                suffix: suffix,
+	                modifier: tryConsume("MODIFIER") || "",
+	            });
+	            continue;
+	        }
+	        mustConsume("END");
+	    }
+	    return result;
+	}
+	/**
+	 * Escape a regular expression string.
+	 */
+	function escapeString(str) {
+	    return str.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+	}
+	/**
+	 * Get the flags for a regexp from the options.
+	 */
+	function flags(options) {
+	    return options && options.sensitive ? "" : "i";
+	}
+	/**
+	 * Pull out keys from a regexp.
+	 */
+	function regexpToRegexp(path, keys) {
+	    if (!keys)
+	        return path;
+	    var groupsRegex = /\((?:\?<(.*?)>)?(?!\?)/g;
+	    var index = 0;
+	    var execResult = groupsRegex.exec(path.source);
+	    while (execResult) {
+	        keys.push({
+	            // Use parenthesized substring match if available, index otherwise
+	            name: execResult[1] || index++,
+	            prefix: "",
+	            suffix: "",
+	            modifier: "",
+	            pattern: "",
+	        });
+	        execResult = groupsRegex.exec(path.source);
+	    }
+	    return path;
+	}
+	/**
+	 * Transform an array into a regexp.
+	 */
+	function arrayToRegexp(paths, keys, options) {
+	    var parts = paths.map(function (path) { return pathToRegexp(path, keys, options).source; });
+	    return new RegExp("(?:".concat(parts.join("|"), ")"), flags(options));
+	}
+	/**
+	 * Create a path regexp from string input.
+	 */
+	function stringToRegexp(path, keys, options) {
+	    return tokensToRegexp(parse(path, options), keys, options);
+	}
+	/**
+	 * Expose a function for taking tokens and returning a RegExp.
+	 */
+	function tokensToRegexp(tokens, keys, options) {
+	    if (options === void 0) { options = {}; }
+	    var _a = options.strict, strict = _a === void 0 ? false : _a, _b = options.start, start = _b === void 0 ? true : _b, _c = options.end, end = _c === void 0 ? true : _c, _d = options.encode, encode = _d === void 0 ? function (x) { return x; } : _d, _e = options.delimiter, delimiter = _e === void 0 ? "/#?" : _e, _f = options.endsWith, endsWith = _f === void 0 ? "" : _f;
+	    var endsWithRe = "[".concat(escapeString(endsWith), "]|$");
+	    var delimiterRe = "[".concat(escapeString(delimiter), "]");
+	    var route = start ? "^" : "";
+	    // Iterate over the tokens and create our regexp string.
+	    for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
+	        var token = tokens_1[_i];
+	        if (typeof token === "string") {
+	            route += escapeString(encode(token));
+	        }
+	        else {
+	            var prefix = escapeString(encode(token.prefix));
+	            var suffix = escapeString(encode(token.suffix));
+	            if (token.pattern) {
+	                if (keys)
+	                    keys.push(token);
+	                if (prefix || suffix) {
+	                    if (token.modifier === "+" || token.modifier === "*") {
+	                        var mod = token.modifier === "*" ? "?" : "";
+	                        route += "(?:".concat(prefix, "((?:").concat(token.pattern, ")(?:").concat(suffix).concat(prefix, "(?:").concat(token.pattern, "))*)").concat(suffix, ")").concat(mod);
+	                    }
+	                    else {
+	                        route += "(?:".concat(prefix, "(").concat(token.pattern, ")").concat(suffix, ")").concat(token.modifier);
+	                    }
+	                }
+	                else {
+	                    if (token.modifier === "+" || token.modifier === "*") {
+	                        route += "((?:".concat(token.pattern, ")").concat(token.modifier, ")");
+	                    }
+	                    else {
+	                        route += "(".concat(token.pattern, ")").concat(token.modifier);
+	                    }
+	                }
+	            }
+	            else {
+	                route += "(?:".concat(prefix).concat(suffix, ")").concat(token.modifier);
+	            }
+	        }
+	    }
+	    if (end) {
+	        if (!strict)
+	            route += "".concat(delimiterRe, "?");
+	        route += !options.endsWith ? "$" : "(?=".concat(endsWithRe, ")");
+	    }
+	    else {
+	        var endToken = tokens[tokens.length - 1];
+	        var isEndDelimited = typeof endToken === "string"
+	            ? delimiterRe.indexOf(endToken[endToken.length - 1]) > -1
+	            : endToken === undefined;
+	        if (!strict) {
+	            route += "(?:".concat(delimiterRe, "(?=").concat(endsWithRe, "))?");
+	        }
+	        if (!isEndDelimited) {
+	            route += "(?=".concat(delimiterRe, "|").concat(endsWithRe, ")");
+	        }
+	    }
+	    return new RegExp(route, flags(options));
+	}
+	/**
+	 * Normalize the given path string, returning a regular expression.
+	 *
+	 * An empty array can be passed in for the keys, which will hold the
+	 * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+	 * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+	 */
+	function pathToRegexp(path, keys, options) {
+	    if (path instanceof RegExp)
+	        return regexpToRegexp(path, keys);
+	    if (Array.isArray(path))
+	        return arrayToRegexp(path, keys, options);
+	    return stringToRegexp(path, keys, options);
+	}
+
+	// =============================================================================
+
+	// =============================================================================
+	//	Route organizer class
+	// =============================================================================
+
+	class RouteOrganizer extends BM.Organizer
+	{
+
+		// -------------------------------------------------------------------------
+		//  Setter/Getter
+		// -------------------------------------------------------------------------
+
+		static get name()
+		{
+
+			return "RouteOrganizer";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Event handlers
+		// -------------------------------------------------------------------------
+
+		static RouteOrganizer_onDoOrganize(sender, e, ex)
+		{
+
+			// Routings
+			this._enumSettings(e.detail.settings["routings"], (sectionName, sectionValue) => {
+				RouteOrganizer._addRoute(this, sectionValue);
+			});
+
+			// Set current route info.
+			this._routeInfo = RouteOrganizer.__loadRouteInfo(this, window.location.href);
+
+			// Specs
+			this._enumSettings(e.detail.settings["specs"], (sectionName, sectionValue) => {
+				this._specs[sectionName] = sectionValue;
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static RouteOrganizer_onDoStart(sender, e, ex)
+		{
+
+			if (this.routeInfo["specName"])
+			{
+				let options = {
+					"query": this.settings.get("settings.query")
+				};
+
+				return this.switchSpec(this.routeInfo["specName"], options);
+			}
+
+		};
+
+		// -------------------------------------------------------------------------
+
+		static RouteOrganizer_onAfterReady(sender, e, ex)
+		{
+
+			return this.openRoute();
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static RouteOrganizer_onDoValidateFail(sender, e, ex)
+		{
+
+			// Try to fix URL when validation failed
+			if (this.settings.get("routings.settings.autoFix"))
+			{
+				RouteOrganizer.__fixRoute(this, e.detail.url);
+			}
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static RouteOrganizer_onAfterValidate(sender, e, ex)
+		{
+
+			// Dump errors when validation failed
+			if (!this.validationResult["result"])
+			{
+				RouteOrganizer.__dumpValidationErrors(this);
+				throw new URIError("URL validation failed.");
+			}
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static getInfo()
+		{
+
+			return {
+				"sections":		["routings", "specs"],
+				"order":		900,
+				"depends":		"ValidationOrganizer",
+			};
+
+		}
+
+		// -------------------------------------------------------------------------
+
 		static globalInit()
 		{
 
-			// Init vars
-			PreferenceOrganizer._defaults = new BITSMIST.v1.ChainableStore();
-			PreferenceOrganizer._store = new ObservableStore({"chain":PreferenceOrganizer._defaults, "filter":PreferenceOrganizer._filter, "async":true});
-			PreferenceOrganizer.__loaded =  {};
-			PreferenceOrganizer.__loaded["promise"] = new Promise((resolve, reject) => {
-				PreferenceOrganizer.__loaded["resolve"] = resolve;
-				PreferenceOrganizer.__loaded["reject"] = reject;
-			});
+			// Set state on the first page
+			history.replaceState(RouteOrganizer.__getState("connect"), null, null);
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Init.
-		 *
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 */
-		static init(component, settings)
+		static init(component, options)
 		{
 
-			// Register a component as an observer
-			PreferenceOrganizer._store.subscribe(component.name + "_" + component.uniqueId, PreferenceOrganizer._triggerEvent.bind(component), {"targets":BITSMIST.v1.Util.safeGet(settings, "preferences.targets")});
+			// Add properties to component
+			Object.defineProperty(component, 'routeInfo', { get() { return this._routeInfo; }, });
+			Object.defineProperty(component, 'specs', { get() { return this._specs; }, });
+			Object.defineProperty(component, 'spec', { get() { return this._spec; }, });
 
-		}
+			// Add methods to component
+			component.loadParameters = function(url) { return RouteOrganizer._loadParameters(url); };
+			component.switchSpec = function(specName, options) { return RouteOrganizer._switchSpec(this, specName, options); };
+			component.openRoute = function(routeInfo, options) { return RouteOrganizer._open(this, routeInfo, options); };
+			component.jumpRoute = function(routeInfo, options) { return RouteOrganizer._jumpRoute(this, routeInfo, options); };
+			component.updateRoute = function(routeInfo, options) { return RouteOrganizer._updateRoute(this, routeInfo, options); };
+			component.refreshRoute = function(routeInfo, options) { return RouteOrganizer._refreshRoute(this, routeInfo, options); };
+			component.replaceRoute = function(routeInfo, options) { return RouteOrganizer._replaceRoute(this, routeInfo, options); };
+			component.normalizeRoute = function() { return RouteOrganizer._normalizeRoute(this); };
 
-		// -------------------------------------------------------------------------
+			// Init component vars
+			component._routes = [];
+			component._specs = {};
+			component._spec = new BM.ChainableStore({"chain":component.settings, "writeThrough":true});
+			Object.defineProperty(component, "settings", { get() { return this._spec; }, }); // Tweak to see settings through spec
 
-		/**
-		 * Organize.
-		 *
-		 * @param	{Object}		conditions			Conditions.
-		 * @param	{Component}		component			Component.
-		 * @param	{Object}		settings			Settings.
-		 *
-		 * @return 	{Promise}		Promise.
-		 */
-		static organize(conditions, component, settings)
-		{
+			// Add event handlers to component
+			this._addOrganizerHandler(component, "doOrganize", RouteOrganizer.RouteOrganizer_onDoOrganize);
+			this._addOrganizerHandler(component, "doStart", RouteOrganizer.RouteOrganizer_onDoStart);
+			this._addOrganizerHandler(component, "afterReady", RouteOrganizer.RouteOrganizer_onAfterReady);
+			this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.RouteOrganizer_onDoValidateFail);
+			this._addOrganizerHandler(component, "afterValidate", RouteOrganizer.RouteOrganizer_onAfterValidate);
 
-			let chain = Promise.resolve();
+			// Load settings from attributes
+			RouteOrganizer._loadAttrSettings(component);
 
-			// Set default preferences
-			if (BITSMIST.v1.Util.safeGet(settings, "preferences.defaults"))
-			{
-				PreferenceOrganizer._defaults.items = component.settings.get("preferences.defaults");
-			}
-
-			// Load preferences
-			if (BITSMIST.v1.Util.safeGet(settings, "preferences.settings.load"))
-			{
-				chain = component.resources["preferences"].get().then((preferences) => {
-					PreferenceOrganizer._store.merge(preferences);
-					PreferenceOrganizer.__loaded.resolve();
-				});
-			}
-
-			// Wait for preference to be loaded
-			let timer;
-			return chain.then(() => {
-				let timeout = component.settings.get("system.preferenceTimeout", 10000);
-				timer = setTimeout(() => {
-					throw new ReferenceError(`Time out waiting for loading preferences. name=${component.name}`);
-				}, timeout);
-				return PreferenceOrganizer.__loaded.promise;
-			}).then(() => {
-				clearTimeout(timer);
-			});
+			// Init popstate handler
+			RouteOrganizer.__initPopState(component);
 
 		}
 
@@ -2982,67 +4415,624 @@
 		// -------------------------------------------------------------------------
 
 		/**
-	 	 * Trigger preference changed events.
+		 * Add a route.
 		 *
-		 * @param	{Object}		item				Changed items.
-		 *
-		 * @return  {Promise}		Promise.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route info.
+		 * @param	{Boolean}		first				Add to top when true.
 		 */
-		static _triggerEvent(item)
+		static _addRoute(component, routeInfo, first)
 		{
 
-			let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
+			let keys = [];
+			let route = {
+				"origin": routeInfo["origin"],
+				"name": routeInfo["name"],
+				"path": routeInfo["path"],
+				"keys": keys,
+				"specName": routeInfo["specName"],
+				"componentName": routeInfo["componentName"],
+				"re": pathToRegexp(routeInfo["path"], keys)
+			};
 
-			return this.trigger(eventName, {"sender":PreferenceOrganizer, "item":item});
+			if (first)
+			{
+				component._routes.unshift(route);
+			}
+			else
+			{
+				component._routes.push(route);
+			}
 
 		}
 
 		// -------------------------------------------------------------------------
 
 		/**
-		 * Check if it is a target.
+		 * Build url from route info.
 		 *
-		 * @param	{Object}		conditions			Conditions.
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
 		 * @param	{Object}		options				Options.
+		 *
+		 * @return  {String}		Url.
 		 */
-		static _filter(conditions, options)
+		static _buildUrl(component, routeInfo, options)
 		{
 
-			let result = false;
-			let target = options["targets"];
+			let url = "";
 
-			if (target === "*")
-			{
-				result = true;
-			}
-			else
-			{
-				target = ( Array.isArray(target) ? target : [target] );
+			url += ( routeInfo["url"] ? routeInfo["url"] : "" );
+			url += ( routeInfo["path"] ? routeInfo["path"] : "" );
+			url += ( routeInfo["query"] ? "?" + routeInfo["query"] : "" );
 
-				for (let i = 0; i < target.length; i++)
+			if (routeInfo["queryParameters"])
+			{
+				let params = {};
+				if (options && options["mergeParameters"])
 				{
-					if (conditions[target[i]])
+					params = Object.assign(params, component.routeInfo["queryParameters"]);
+				}
+				params = Object.assign(params, routeInfo["queryParameters"]);
+				url += RouteOrganizer._buildUrlQuery(params);
+			}
+
+			return ( url ? url : "/" );
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Build query string from the options object.
+		 *
+		 * @param	{Object}		options				Query options.
+		 *
+		 * @return	{String}		Query string.
+		 */
+		static _buildUrlQuery(options)
+		{
+
+			let query = "";
+
+			if (options)
+			{
+				query = Object.keys(options).reduce((result, current) => {
+					if (Array.isArray(options[current]))
 					{
-						result = true;
-						break;
+						result += encodeURIComponent(current) + "=" + encodeURIComponent(options[current].join()) + "&";
 					}
+					else if (options[current])
+					{
+						result += encodeURIComponent(current) + "=" + encodeURIComponent(options[current]) + "&";
+					}
+
+					return result;
+				}, "");
+			}
+
+			return ( query ? "?" + query.slice(0, -1) : "");
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Create options array from the current url.
+		 *
+		 * @return  {Array}			Options array.
+		 */
+		static _loadParameters(url)
+		{
+
+			url = url || window.location.href;
+			let vars = {};
+			let hash;
+			let value;
+
+			if (window.location.href.indexOf("?") > -1)
+			{
+				let hashes = url.slice(url.indexOf('?') + 1).split('&');
+
+				for(let i = 0; i < hashes.length; i++) {
+					hash = hashes[i].split('=');
+					if (hash[1]){
+						value = hash[1].split('#')[0];
+					} else {
+						value = hash[1];
+					}
+					vars[hash[0]] = decodeURIComponent(value);
 				}
 			}
 
-			return result;
+			return vars;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Load a spec and init.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		specName			Spec name.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static _switchSpec(component, specName, options)
+		{
+
+			BM.Util.assert(specName, "RouteOrganizer._switchSpec(): A spec name not specified.", TypeError);
+
+			return Promise.resolve().then(() => {
+				if (!component._specs[specName])
+				{
+					return RouteOrganizer._loadSpec(component, specName, options).then((spec) => {
+						component._specs[specName] = spec;
+					});
+				}
+			}).then(() => {
+				component._spec.items = component._specs[specName];
+			}).then(() => {
+				if (component.settings.get("settings.hasExtender"))
+				{
+					return RouteOrganizer._loadExtender(component, specName, options);
+				}
+			}).then(() => {
+				return component.attachOrganizers({"settings":component._specs[component._routeInfo["specName"]]});
+			}).then(() => {
+				return component.trigger("doOrganize", {"settings":component._specs[component._routeInfo["specName"]]});
+			}).then(() => {
+				return component.trigger("afterLoadSettings", {"settings":component._specs[component._routeInfo["specName"]]});
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Open route.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static _open(component, routeInfo, options)
+		{
+
+			options = Object.assign({}, options);
+			let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
+
+			// Current route info
+			let curRouteInfo = component._routeInfo;
+
+			let newUrl;
+			let newRouteInfo;
+			if (routeInfo)
+			{
+				newUrl = RouteOrganizer._buildUrl(component, routeInfo, options);
+				newRouteInfo = RouteOrganizer.__loadRouteInfo(component, newUrl);
+			}
+			else
+			{
+				newUrl = window.location.href;
+				newRouteInfo = curRouteInfo;
+			}
+
+			// Jump to another page
+			if (options["jump"] || !newRouteInfo["name"]
+					|| ( curRouteInfo["specName"] != newRouteInfo["specName"]) // <--- remove this when _update() is ready.
+			)
+			{
+				RouteOrganizer._jumpRoute(component, {"url":newUrl});
+				return;
+			}
+
+			return Promise.resolve().then(() => {
+				// Replace URL
+				if (pushState)
+				{
+					history.pushState(RouteOrganizer.__getState("_open.pushState"), null, newUrl);
+				}
+				component._routeInfo = newRouteInfo;
+			}).then(() => {
+				// Load other component when new spec is different from the current spec
+				if (curRouteInfo["specName"] != newRouteInfo["specName"])
+				{
+					return RouteOrganizer._updateRoute(component, curRouteInfo, newRouteInfo, options);
+				}
+			}).then(() => {
+				// Validate URL
+				if (component.settings.get("routings.settings.autoValidate"))
+				{
+					let validateOptions = {
+						"validatorName":	component.settings.get("routings.settings.validatorName"),
+						"items":			RouteOrganizer._loadParameters(newUrl),
+						"url":				newUrl,
+					};
+					return component.validate(validateOptions);
+				}
+			}).then(() => {
+				// Refresh
+				return RouteOrganizer._refreshRoute(component, newRouteInfo, options);
+			}).then(() => {
+				// Normalize URL
+				return RouteOrganizer._normalizeRoute(component, window.location.href);
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Jump to url.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
+		 * @param	{Object}		options				Options.
+		 */
+		static _jumpRoute(component, routeInfo, options)
+		{
+
+			let url = RouteOrganizer._buildUrl(component, routeInfo, options);
+			window.location.href = url;
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Update route.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static _updateRoute(component, curRouteInfo, newRouteInfo, options)
+		{
+
+			return RouteOrganizer._switchSpec(component, newRouteInfo["specName"]);
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Refresh route.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
+		 * @param	{Object}		options				Options.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static _refreshRoute(component, routeInfo, options)
+		{
+
+			return component.refresh(options);
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Replace current url.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{Object}		routeInfo			Route information.
+		 * @param	{Object}		options				Options.
+		 */
+		static _replaceRoute(component, routeInfo, options)
+		{
+
+			history.replaceState(RouteOrganizer.__getState("replaceRoute", window.history.state), null, RouteOrganizer._buildUrl(component, routeInfo, options));
+			component._routeInfo = RouteOrganizer.__loadRouteInfo(component, window.location.href);
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Normalize route.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		url					Url to normalize.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static _normalizeRoute(component, url)
+		{
+
+			return Promise.resolve().then(() => {
+				return component.trigger("beforeNormalizeURL");
+			}).then(() => {
+				return component.trigger("doNormalizeURL");
+			}).then(() => {
+				return component.trigger("afterNormalizeURL");
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get settings from element's attribute.
+		 *
+		 * @param	{Component}		component			Component.
+		 */
+		static _loadAttrSettings(component)
+		{
+
+			// Get spec path from  bm-specpath
+			let path = component.getAttribute("bm-specpath");
+			if (path)
+			{
+				component.settings.set("system.specPath", path);
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Load the spec file for this page.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		specName			Spec name.
+		 * @param	{Object}		loadOptions			Load options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _loadSpec(component, specName, loadOptions)
+		{
+
+			let spec;
+	//		let specCommon;
+			let promises = [];
+
+			console.debug(`RouteOrganizer._loadSpec(): Loading spec file. name=${component.name}, specName=${specName}`);
+
+			// Path
+			let path = BM.Util.safeGet(loadOptions, "path",
+				BM.Util.concatPath([
+					component.settings.get("system.appBaseUrl", ""),
+					component.settings.get("system.specPath", "")
+				])
+			);
+
+			// Load specs
+			let options = BM.Util.deepMerge({"type": "js", "bindTo": this}, loadOptions);
+			promises.push(BM.SettingOrganizer.loadFile(specName, path, options));
+
+			return Promise.all(promises).then((result) => {
+				spec = result[0];
+	//			specCommon = result[0];
+	//			spec = BM.Util.deepMerge(specCommon, result[1]);
+
+				return spec;
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Load the extender file for this page.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		specName			Spec name.
+		 * @param	{Object}		loadOptions			Load options.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static _loadExtender(component, extenderName, loadOptions)
+		{
+
+			console.debug(`RouteOrganizer._loadExtender(): Loading extender file. name=${component.name}, extenderName=${extenderName}`);
+
+			let query = BM.Util.safeGet(loadOptions, "query");
+			let path = BM.Util.safeGet(loadOptions, "path",
+				BM.Util.concatPath([
+					component.settings.get("system.appBaseUrl", ""),
+					component.settings.get("system.specPath", "")
+				])
+			);
+			let url = path + extenderName + ".extender.js" + (query ? "?" + query : "");
+
+			return BM.AjaxUtil.loadScript(url);
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Privates
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get route info from the url.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		url					Url.
+		 *
+		 * @return  {Object}		Route info.
+		 */
+		static __loadRouteInfo(component, url)
+		{
+
+			let routeInfo = {};
+			let routeName;
+			let parsedUrl = new URL(url, window.location.href);
+			let specName;
+			let params = {};
+
+			// Find a matching route
+			for (let i = component._routes.length - 1; i >= 0; i--)
+			{
+				// Check origin
+				if (component._routes[i]["origin"] && parsedUrl.origin != component._routes[i]["origin"])
+				{
+					continue;
+				}
+
+				// Check path
+				let result = ( !component._routes[i]["path"] ? [] : component._routes[i].re.exec(parsedUrl.pathname) );
+				if (result)
+				{
+					routeName = component._routes[i].name;
+					specName = ( component._routes[i].specName ? component._routes[i].specName : "" );
+					for (let j = 0; j < result.length - 1; j++)
+					{
+						params[component._routes[i].keys[j].name] = result[j + 1];
+						let keyName = component._routes[i].keys[j].name;
+						let value = result[j + 1];
+						specName = specName.replace("{{:" + keyName + "}}", value);
+					}
+
+					break;
+				}
+			}
+
+			routeInfo["name"] = routeName;
+			routeInfo["specName"] = specName;
+			routeInfo["url"] = parsedUrl["href"];
+			routeInfo["path"] = parsedUrl.pathname;
+			routeInfo["query"] = parsedUrl.search;
+			routeInfo["parsedUrl"] = parsedUrl;
+			routeInfo["routeParameters"] = params;
+			routeInfo["queryParameters"] = RouteOrganizer._loadParameters(url);
+
+			return routeInfo;
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Init pop state handling.
+		 *
+		 * @param	{Component}		component			Component.
+		 */
+		static __initPopState(component)
+		{
+
+			window.addEventListener("popstate", (e) => {
+				return Promise.resolve().then(() => {
+					return component.trigger("beforePopState");
+				}).then(() => {
+					return RouteOrganizer._open(component, {"url":window.location.href}, {"pushState":false});
+				}).then(() => {
+					return component.trigger("afterPopState");
+				});
+			});
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Return history state.
+		 *
+		 * @param	{String}		msg					Message to store in state.
+		 * @param	{Object}		options				Optional values to store in state.
+		 *
+		 * @return	{String}		State.
+		 */
+		static __getState(msg, options)
+		{
+
+			let newState = {
+				"msg": msg,
+			};
+
+			if (options)
+			{
+				newState = BM.Util.deepMerge(BM.Util.deepClone(options), newState);
+			}
+
+			return newState;
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Fix route.
+		 *
+		 * @param	{Component}		component			Component.
+		 * @param	{String}		url					Url to validate.
+		 *
+		 * @return 	{Promise}		Promise.
+		 */
+		static __fixRoute(component, url)
+		{
+
+			let isOk = true;
+			let newParams = RouteOrganizer._loadParameters(url);
+
+			// Fix invalid paramters
+			Object.keys(component.validationResult["invalids"]).forEach((key) => {
+				let item = component.validationResult["invalids"][key];
+
+				if (item["fix"] !== undefined)
+				{
+					newParams[item["key"]] = item["fix"];
+				}
+				else if (item["failed"][0]["validity"] === "notAllowed")
+				{
+					delete newParams[item["key"]];
+				}
+				else
+				{
+					isOk = false;
+				}
+			});
+
+			if (isOk)
+			{
+				// Replace URL
+				RouteOrganizer._replaceRoute(component, {"queryParameters":newParams});
+
+				// Fixed
+				component.validationResult["result"] = true;
+			}
+
+		}
+
+		// -----------------------------------------------------------------------------
+
+		/**
+		 * Dump validation errors.
+		 *
+		 * @param	{Component}		component			Component.
+		 */
+		static __dumpValidationErrors(component)
+		{
+
+			Object.keys(component.validationResult["invalids"]).forEach((key) => {
+				let item = component.validationResult["invalids"][key];
+
+				if (item.failed)
+				{
+					for (let i = 0; i < item.failed.length; i++)
+					{
+						console.warn("URL validation failed.",
+							"key=" + item.key +
+							", value=" + item.value +
+							", rule=" + item.failed[i].rule +
+							", validity=" + item.failed[i].validity
+						);
+					}
+				}
+			});
 
 		}
 
 	}
 
-	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
 	// =============================================================================
 
 	// =============================================================================
@@ -3066,7 +5056,7 @@
 		{
 
 			this._component = component;
-			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+			this._options = new BM.Store({"items":Object.assign({}, options)});
 			this._options.merge(this._getOptions());
 			this._options.set("name", this._options.get("name", this.constructor.name));
 
@@ -3146,14 +5136,6 @@
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
 	//	Resource Handler class
@@ -3175,13 +5157,14 @@
 		constructor(component, resourceName, options)
 		{
 
+			options = options || {};
+
 			this._resourceName = resourceName;
 			this._component = component;
-			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
-			this._data;
-			this._name = "ResourceHandler";
+			this._options = new BM.Store({"items":options});
+			this._data = {};
 			this._items = [];
-			this._item = {};
+			this._name = "ResourceHandler";
 			this._target = {};
 			this._currentIndex = 0;
 
@@ -3264,7 +5247,6 @@
 
 			this._data = value;
 			this._items = this.__reshapeItems(value);
-			this._item = ( Array.isArray(this._items) ? this._items[this._currentIndex] : this._items );
 
 		}
 
@@ -3279,20 +5261,6 @@
 		{
 
 			return this._items;
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Item.
-		 *
-		 * @type	{Object}
-		 */
-		get item()
-		{
-
-			return this._item;
 
 		}
 
@@ -3328,12 +5296,9 @@
 			return Promise.resolve().then(() => {
 				return this._get(id, parameters);
 			}).then((data) => {
-	//			BITSMIST.v1.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+	//			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
-				if (data)
-				{
-					this.data = data;
-				}
+				this.data = data;
 
 				return this._data;
 			});
@@ -3526,7 +5491,7 @@
 
 			// Get items
 			let itemsField = this._options.get("fieldOptions.items");
-			let items = ( itemsField ? BITSMIST.v1.Util.safeGet(data, itemsField) : data );
+			let items = ( itemsField ? BM.Util.safeGet(data, itemsField) : data );
 
 			// Reshape
 			if (this._options.get("reshapeOptions.get.reshape"))
@@ -3573,14 +5538,18 @@
 		__reshaper_get(target)
 		{
 
-			let idField = this._options.get("fieldOptions.id");
+			let items;
 
-			let items = target.reduce((result, current) => {
-				let id = current[idField];
-				result[id] = current;
+			if (target)
+			{
+				let idField = this._options.get("fieldOptions.id");
+				items = target.reduce((result, current) => {
+					let id = current[idField];
+					result[id] = current;
 
-				return result;
-			}, {});
+					return result;
+				}, {});
+			}
 
 			return items;
 
@@ -3601,13 +5570,6 @@
 		//  Constructor
 		// -------------------------------------------------------------------------
 
-		/**
-	     * Constructor.
-	     *
-		 * @param	{Object}		component			Component.
-	     * @param	{String}		resourceName		Resource name.
-	     * @param	{Object}		options				Options.
-	     */
 		constructor(component, resourceName, options)
 		{
 
@@ -3615,22 +5577,14 @@
 			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "CookieResourceHandler";
-			this._cookieName = BITSMIST.v1.Util.safeGet(options, "cookieOptions.name", "preferences");
+			this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		//  Protected
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Get data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_get(id, parameters)
 		{
 
@@ -3640,15 +5594,6 @@
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Update data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		data				Data to update.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_put(id, data, parameters)
 		{
 
@@ -3721,12 +5666,6 @@
 		//  Constructor
 		// -------------------------------------------------------------------------
 
-		/**
-	     * Constructor.
-	     *
-	     * @param	{String}		resourceName		Resource name.
-	     * @param	{Object}		options				Options.
-	     */
 		constructor(component, resourceName, options)
 		{
 
@@ -3737,17 +5676,9 @@
 		}
 
 		// -------------------------------------------------------------------------
-		//  Methods
+		// 	Protected
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Get data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_get(id, parameters)
 		{
 
@@ -3759,7 +5690,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+			return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
 				return this._convertResponseData(xhr.responseText, dataType);
 			});
 
@@ -3767,14 +5698,6 @@
 
 	    // -------------------------------------------------------------------------
 
-		/**
-		 * Delete data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_delete(id, parameters)
 		{
 
@@ -3786,21 +5709,12 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
+			return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
 
 		}
 
 	    // -------------------------------------------------------------------------
 
-		/**
-		 * Insert data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		data				Data to insert.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_post(id, data, parameters)
 		{
 
@@ -3812,21 +5726,12 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+			return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 		}
 
 	    // -------------------------------------------------------------------------
 
-		/**
-		 * Update data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		data				Data to insert.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
 		_put(id, data, parameters)
 		{
 
@@ -3838,7 +5743,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BITSMIST.v1.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+			return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 		}
 
@@ -4017,7 +5922,7 @@
 		constructor(component, resourceName, options)
 		{
 
-			let defaults = {"autoLoad":true};
+			let defaults = {"autoLoad":true, "autoFetch":false, "autoSubmit":false};
 			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "ObjectResourceHandler";
@@ -4080,18 +5985,10 @@
 		//  Constructor
 		// -------------------------------------------------------------------------
 
-		/**
-	     * Constructor.
-	     *
-		 * @param	{Object}		component			Component.
-	     * @param	{String}		resourceName		Resource name.
-	     * @param	{Object}		options				Options.
-	     */
 		constructor(component, resourceName, options)
 		{
 
-			let defaults = {"autoLoad":true};
-
+			let defaults = {"autoLoad":true, "autoFetch":false, "autoSubmit":false};
 			super(component, resourceName, Object.assign(defaults, options));
 
 			this._name = "LinkedResourceHandler";
@@ -4103,25 +6000,6 @@
 		//  Setter/Getter
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Fetch target.
-		 *
-		 * @type	{Object}
-		 */
-		get target()
-		{
-
-			return this._ref.target;
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Raw data.
-		 *
-		 * @type	{Object}
-		 */
 		get data()
 		{
 
@@ -4131,18 +6009,10 @@
 
 		set data(value)
 		{
-
-			this._ref.data = value;
-
 		}
 
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Items.
-		 *
-		 * @type	{Object}
-		 */
 		get items()
 		{
 
@@ -4151,52 +6021,9 @@
 		}
 
 		// -------------------------------------------------------------------------
-
-		/**
-		 * Item.
-		 *
-		 * @type	{Object}
-		 */
-		get item()
-		{
-
-			return this._ref.item;
-
-		}
-
-		// -------------------------------------------------------------------------
 		//  Methods
 		// -------------------------------------------------------------------------
 
-		/**
-		 * Get data.
-		 *
-		 * @param	{String}		id					Target id.
-		 * @param	{Object}		parameters			Query parameters.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
-		_get(id, parameters)
-		{
-
-			let handlerOptions = this._options.items;
-			let rootNode = handlerOptions["rootNode"];
-			let resourceName = handlerOptions["resourceName"];
-			handlerOptions["state"];
-
-			this._ref = document.querySelector(rootNode).resources[resourceName];
-
-		}
-
-	    // -------------------------------------------------------------------------
-
-		/**
-		 * Get resource text for the code.
-		 *
-		 * @param	{String}		code				Code value.
-		 *
-		 * @return  {String}		Resource text.
-		 */
 		getText(code)
 		{
 
@@ -4206,13 +6033,6 @@
 
 	    // -------------------------------------------------------------------------
 
-		/**
-		 * Get resource item for the code.
-		 *
-		 * @param	{String}		code				Code value.
-		 *
-		 * @return  {Object}		Resource data.
-		 */
 		getItem(code)
 		{
 
@@ -4220,16 +6040,122 @@
 
 		}
 
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		_get(id, parameters)
+		{
+
+			let rootNode = this._options.get("rootNode");
+			let resourceName = this._options.get("resourceName") || this._resourceName;
+
+			return this._component.waitFor([{"rootNode":rootNode}]).then(() => {
+				this._ref = document.querySelector(rootNode).resources[resourceName];
+				return this._ref;
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_delete(id, parameters)
+		{
+
+			return this._ref.delete(id, parameters);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_post(id, data, parameters)
+		{
+
+			return this._ref.post(id, data, parameters);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_put(id, data, parameters)
+		{
+
+			return this._ref.put(id, data, parameters);
+
+		}
+
 	}
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
+
+	// =============================================================================
+	//	Web Storage handler class
+	// =============================================================================
+
+	class WebstorageResourceHandler extends ResourceHandler
+	{
+
+		// -------------------------------------------------------------------------
+		//  Constructor
+		// -------------------------------------------------------------------------
+
+		constructor(component, resourceName, options)
+		{
+
+			let defaults = {};
+			super(component, resourceName, Object.assign(defaults, options));
+
+			this._name = "WebstorageResourceHandler";
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Protected
+		// -------------------------------------------------------------------------
+
+		_get(id, parameters)
+		{
+
+			let data;
+			let rawData = localStorage.getItem(id);
+			if (rawData)
+			{
+				data = JSON.parse(rawData);
+			}
+
+			return data;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_delete(id, parameters)
+		{
+
+			localStorage.removeItem(id);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_post(id, data, parameters)
+		{
+
+			localStorage.setItem(id, JSON.stringify(data));
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		_put(id, data, parameters)
+		{
+
+			localStorage.setItem(id, JSON.stringify(data));
+
+		}
+
+	}
+
 	// =============================================================================
 
 	// =============================================================================
@@ -4252,9 +6178,11 @@
 		constructor(component, validatorName, options)
 		{
 
+			options = options || {};
+
 			this._name = validatorName;
 			this._component = component;
-			this._options = new BITSMIST.v1.Store({"items":Object.assign({}, options)});
+			this._options = new BM.Store({"items":options});
 
 		}
 
@@ -4498,10 +6426,10 @@
 
 			let invalids = {};
 
-			BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-			BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+			BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+			BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
-			let elements = BITSMIST.v1.Util.scopedSelectorAll(form, "input:not([novalidate])");
+			let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])");
 			elements.forEach((element) => {
 				let key = element.getAttribute("bm-bind");
 				let value = FormUtil.getValue(element);
@@ -4525,8 +6453,8 @@
 
 			let invalids = [];
 
-			BITSMIST.v1.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-			BITSMIST.v1.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+			BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+			BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
 			if (!form.checkValidity())
 			{
@@ -4561,7 +6489,7 @@
 				invalids1 = ValidationHandler.validate(values, rules, options);
 			}
 			invalids2 = HTML5FormValidationHandler.validate(form, rules);
-			let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+			let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 			this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 			this._component.validationResult["invalids"] = invalids;
@@ -4581,8 +6509,8 @@
 
 			let form = this._component.querySelector("form");
 
-			BITSMIST.v1.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
-			BITSMIST.v1.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
+			BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+			BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
 
 			form.reportValidity();
 
@@ -4683,7 +6611,7 @@
 
 			let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
 			let invalids2 = ObjectValidationHandler.validate(values, rules);
-			let invalids = BITSMIST.v1.Util.deepMerge(invalids1, invalids2);
+			let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 			this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
 			this._component.validationResult["invalids"] = invalids;
@@ -4876,7 +6804,7 @@
 	// =============================================================================
 
 	// =============================================================================
-	//	Form class
+	//	Chained Select Class
 	// =============================================================================
 
 	// -----------------------------------------------------------------------------
@@ -4886,202 +6814,231 @@
 	/**
 	 * Constructor.
 	 */
-	function Form(settings)
+	function ChainedSelect(settings)
 	{
 
-		return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
+		return Reflect.construct(BM.Component, [settings], this.constructor);
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(Form, BITSMIST.v1.Component);
+	BM.ClassUtil.inherit(ChainedSelect, BM.Component);
 
 	// -----------------------------------------------------------------------------
-	//  Setter/Getter
+	//	Settings
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Data item.
-	 *
-	 * @type	{Object}
-	 */
-	Object.defineProperty(Form.prototype, 'item', {
-		get()
-		{
-			return this._item;
-		},
-		set(value)
-		{
-			this._item = value;
-		}
-	});
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Flag wheter to cancel submit.
-	 *
-	 * @type	{Object}
-	 */
-	Object.defineProperty(Form.prototype, 'cancelSubmit', {
-		get()
-		{
-			return this._cancelSubmit;
-		},
-		set(value)
-		{
-			this._cancelSubmit = value;
-		}
-	});
-
-	// -----------------------------------------------------------------------------
-	//  Methods
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Start component.
-	 *
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.start = function(settings)
+	ChainedSelect.prototype._getSettings = function()
 	{
 
-		// Init vars
-		this._item = {};
-		this._cancelSubmit = false;
-
-		// Init component settings
-		settings = Object.assign({}, settings, {
+		return {
+			// Settings
 			"settings": {
+				"name":						"ChainedSelect",
 				"autoClear":				true,
+				"autoSubmit":				true,
+				"useDefaultInput":			true,
+				"rootNodes": {
+					"newitem": 				".btn-newitem",
+					"removeitem":			".btn-removeitem",
+					"edititem":				".btn-edititem",
+					"select":				"select"
+				},
 			},
-			"organizers": {
-				"ValidationOrganizer":		{"settings":{"attach":true}},
+
+			// Events
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["ChainedSelect_onBeforeStart"],
+						"afterTransform":	["ChainedSelect_onAfterTransform"],
+						"doClear":			["ChainedSelect_onDoClear"],
+						"doFill":			["ChainedSelect_onDoFill"],
+					}
+				},
+				"cmb-item": {
+					"rootNode":				"select",
+					"handlers": {
+						"change": 			["ChainedSelect_onCmbItemChange"],
+					}
+				},
+				"btn-newitem": {
+					"rootNode":				".btn-newitem",
+					"handlers": {
+						"click":			["ChainedSelect_onBtnNewItemClick"],
+					}
+				},
+				"btn-edititem": {
+					"rootNode":				".btn-edititem",
+					"handlers": {
+						"click":			["ChainedSelect_onBtnEditItemClick"],
+					}
+				},
+				"btn-removeitem": {
+					"rootNode":				".btn-removeitem",
+					"handlers": {
+						"click": 			["ChainedSelect_onBtnRemoveItemClick"],
+					}
+				}
+			},
+
+			// Validators
+			"validators": {
 			}
-		});
-
-		// super()
-		return BITSMIST.v1.Component.prototype.start.call(this, settings);
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Change a template html.
-	 *
-	 * @param	{String}		templateName		Template name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.switchTemplate = function(templateName, options)
-	{
-
-		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
-			FormUtil.hideConditionalElements(this);
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Build a element.
-	 *
-	 * @param	{HTMLElement}	element				HTMLElement to build.
-	 * @param	{Object}		items				Items to fill elements.
-	 * @param	{Object}		options				Options.
-	 */
-	Form.prototype.build = function(element, items, options)
-	{
-
-		FormUtil.build(element, items, options);
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Clear the form.
-	 *
-	 * @param	{String}		target				Target selector.
-	 */
-	Form.prototype.clear = function(target)
-	{
-
-		return FormUtil.clearFields(this, target);
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fill the form.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.fill = function(options)
-	{
-
-		options = Object.assign({}, options);
-		let rootNode = ( "rootNode" in options ? this.querySelector(options["rootNode"]) : this );
-
-		// Clear fields
-		let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
-		if (autoClear)
-		{
-			this.clear();
 		}
 
-		let item = ("item" in options ? options["item"] : this._item);
+	};
 
-		return Promise.resolve().then(() => {
-			FormUtil.showConditionalElements(this, item);
-			return this.trigger("beforeFill", options);
-		}).then(() => {
-			FormUtil.setFields(rootNode, item, {"masters":this.resources, "triggerEvent":"change"});
+	// -----------------------------------------------------------------------------
+	//  Setter/Getter
+	// -----------------------------------------------------------------------------
 
-			return this.trigger("afterFill", options);
-		});
+	/**
+	 * Length.
+	 *
+	 * @type	{Number}
+	 */
+	Object.defineProperty(ChainedSelect.prototype, "items", {
+		get()
+		{
+			let length = 0;
+			let level = 1;
+
+			while (this.querySelector(":scope .item[data-level='" + level + "'] select"))
+			{
+				level++;
+				length++;
+			}
+
+			return length;
+		},
+	});
+
+	// -----------------------------------------------------------------------------
+	//	Event Handlers
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onBeforeStart = function(sender, e, ex)
+	{
+
+		this.rootNodes = this.settings.get("settings.rootNodes");
+
+		if (this.settings.get("settings.useDefaultInput", true))
+		{
+			this.addEventHandler("beforeAdd", "ChainedSelect_onBeforeAdd");
+			this.addEventHandler("doAdd", "ChainedSelect_onDoAdd");
+			this.addEventHandler("beforeEdit", "ChainedSelect_onBeforeEdit");
+			this.addEventHandler("doEdit", "ChainedSelect_onDoEdit");
+			this.addEventHandler("beforeRemove", "ChainedSelect_onBeforeRemove");
+			this.addEventHandler("doRemove", "ChainedSelect_onDoRemove");
+		}
 
 	};
 
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Validate.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.validate = function(options)
+	ChainedSelect.prototype.ChainedSelect_onAfterTransform = function(sender, e, ex)
 	{
 
-		options = Object.assign({}, options);
-		this.validationResult["result"] = true;
+		// Init select elements (disable all)
+		this.clear({"fromLevel":1, "toLevel":this.length});
 
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeValidate");
-		}).then(() => {
-			return this.callOrganizers("doCheckValidity", {"item":this._item, "validationName":this.settings.get("settings.validationName")});
-		}).then(() => {
-			return this.trigger("doValidate");
-		}).then(() => {
-			return this.trigger("afterValidate");
-		}).then(() => {
-			if (!this.validationResult["result"])
+		if (!this.settings.get("settings.isAddable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["newitem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+		if (!this.settings.get("settings.isEditable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["edititem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+		if (!this.settings.get("settings.isRemovable", true))
+		{
+			this.querySelectorAll(":scope " + this.rootNodes["removeitem"]).forEach((element) => {
+				element.style.display = "none";
+			});
+		}
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onDoClear = function(sender, e, ex)
+	{
+
+		let fromLevel = BM.Util.safeGet(e.detail, "fromLevel", 1);
+		let toLevel = BM.Util.safeGet(e.detail, "toLevel", this.length);
+
+		for (let i = fromLevel; i <= toLevel; i++)
+		{
+			if (this.settings.get("settings.autoClear")) {
+				this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).options.length = 0;
+			}
+			this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).selectedIndex = -1;
+			this._initElement("select", i);
+			this._initElement("newitem", i);
+			this._initElement("edititem", i);
+			this._initElement("removeitem", i);
+		}
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onDoFill = function(sender, e, ex)
+	{
+
+		let level = BM.Util.safeGet(e.detail, "level", 1);
+		this.assignItems(level, this.items);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onCmbItemChange = function(sender, e, ex)
+	{
+
+	return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onBtnNewItemClick = function(sender, e, ex)
+	{
+
+		if (sender.classList.contains("disabled")) {
+			return;
+		}
+
+		let level = sender.parentNode.getAttribute("data-level");
+		this.modalResult = {"result":false};
+		let options = {
+			"level":level,
+			"validatorName": "",
+		};
+
+		return this.trigger("beforeAdd", options).then(() => {
+			if (this.modalResult["result"])
 			{
-				this._cancelSubmit = true;
-
-				return Promise.resolve().then(() => {
-					return this.callOrganizers("doReportValidity", {"validationName":this.settings.get("settings.validationName")});
-				}).then(() => {
-					return this.trigger("doReportValidatidy");
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doAdd", options);
+						}).then(() => {
+							return this.trigger("afterAdd", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
 				});
 			}
 		});
@@ -5090,43 +7047,400 @@
 
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Submit the form.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	Form.prototype.submit = function(options)
+	ChainedSelect.prototype.ChainedSelect_onBtnEditItemClick = function(sender, e, ex)
 	{
 
-		options = Object.assign({}, options);
-		this._cancelSubmit = false;
+		if (sender.classList.contains("disabled")) {
+			return;
+		}
 
-		// Get values from the form
-		this._item = FormUtil.getFields(this);
+		let level = sender.parentNode.getAttribute("data-level");
+		this.modalResult = {"result":false};
+		let options = {
+			"level":level,
+			"validatorName": "",
+		};
 
-		return Promise.resolve().then(() => {
-			return this.validate(options);
-		}).then(() => {
-			if (!this._cancelSubmit)
+		return this.trigger("beforeEdit", options).then(() => {
+			if (this.modalResult["result"])
 			{
-				return Promise.resolve().then(() => {
-					return this.trigger("beforeSubmit", {"item":this._item});
-				}).then(() => {
-					return this.callOrganizers("doSubmit", options);
-				}).then(() => {
-					return this.trigger("doSubmit", {"item":this._item});
-				}).then(() => {
-					return this.trigger("afterSubmit", {"item":this._item});
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doEdit", options);
+						}).then(() => {
+							return this.trigger("afterEdit", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
 				});
 			}
 		});
 
 	};
 
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, e, ex)
+	{
+
+		if (sender.classList.contains("disabled")) {
+			return;
+		}
+
+		let level = sender.parentNode.getAttribute("data-level");
+		this.modalResult = {"result":false};
+		let options = {
+			"level":level,
+			"validatorName": "",
+		};
+
+		return this.trigger("beforeRemove", options).then(() => {
+			if (this.modalResult["result"])
+			{
+				return this.validate(options).then(() => {
+					if(this.validationResult["result"])
+					{
+						return Promise.resolve().then(() => {
+							return this.trigger("doRemove", options);
+						}).then(() => {
+							return this.trigger("afterRemove", options);
+						}).then(() => {
+							if (this.settings.get("settings.autoSubmit", true))
+							{
+								return this.submit(options);
+							}
+						});
+					}
+				});
+			}
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onBeforeAdd = function(sender, e, ex)
+	{
+
+		return new Promise((resolve, reject) => {
+			let text = window.prompt("アイテム名を入力してください", "");
+			if (text)
+			{
+				this.modalResult["text"] = text;
+				this.modalResult["value"] = text;
+				this.modalResult["result"] = true;
+			}
+			resolve();
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onDoAdd = function(sender, e, ex)
+	{
+
+		return this.newItem(e.detail.level, this.modalResult.text, this.modalResult.value);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onBeforeEdit = function(sender, e, ex)
+	{
+
+		let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
+		let selectBox = this.getSelect(level);
+
+		return new Promise((resolve, reject) => {
+			let text = window.prompt("アイテム名を入力してください", "");
+			if (text)
+			{
+				this.modalResult["old"] = {
+					"text": selectBox.options[selectBox.selectedIndex].text,
+					"value": selectBox.value
+				};
+				this.modalResult["new"] = {
+					"text": text,
+					"value": text
+				};
+				this.modalResult["result"] = true;
+			}
+			resolve();
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onDoEdit = function(sender, e, ex)
+	{
+
+		this.editItem(e.detail.level, this.modalResult.new.text, this.modalResult.new.value);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onBeforeRemove = function(sender, e, ex)
+	{
+
+		return new Promise((resolve, reject) => {
+			if (window.confirm("削除しますか？"))
+			{
+				let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
+				let selectBox = this.getSelect(level);
+
+				this.modalResult["text"] = selectBox.options[selectBox.selectedIndex].text;
+				this.modalResult["value"] = selectBox.value;
+				this.modalResult["result"] = true;
+			}
+			resolve();
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	ChainedSelect.prototype.ChainedSelect_onDoRemove = function(sender, e, ex)
+	{
+
+		return this.removeItem(e.detail.level);
+
+	};
+
+	// -----------------------------------------------------------------------------
+	//	Methods
+	// -----------------------------------------------------------------------------
+
+	/**
+	 *  Get the specified level select element.
+	 *
+	 * @param	{Number}		level				Level to retrieve.
+	 */
+	ChainedSelect.prototype.getSelect = function(level)
+	{
+
+		return this.querySelector(":scope [data-level='" + level + "'] " + this.rootNodes["select"]);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Assign objects to a select element.
+	 *
+	 * @param	{Number}		level				Level.
+	 * @param	{Object}		parentObject		Parent object.
+	 */
+	ChainedSelect.prototype.assignItems = function(level, items)
+	{
+
+		// Prerequisite check
+		let selectBox = this.querySelector(":scope [data-level='" + level + "'] > select");
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+
+		items = items || {};
+
+		if (Array.isArray(items))
+		{
+			// items is an array
+			for (let i = 0; i < items.length; i++)
+			{
+				let item = document.createElement("option");
+				if (typeof(items[i] === "object"))
+				{
+					item.value = BM.Util.safeGet(items[i], "value", items[i]);
+					item.text = BM.Util.safeGet(items[i], "text", items[i]);
+					let css = BM.Util.safeGet(items[i], "css");
+					if (css) {
+						Object.keys(css).forEach((style) => {
+							item.css[style] = css[style];
+						});
+					}
+				}
+				else
+				{
+					item.value = items[i];
+					item.text = items[i];
+				}
+				selectBox.add(item);
+			}
+		}
+		else
+		{
+			// items is an object
+			Object.keys(items).forEach((key) => {
+				let item = document.createElement("option");
+				item.value = BM.Util.safeGet(items[key], "value", key);
+				item.text = BM.Util.safeGet(items[key], "text", key);
+				let css = BM.Util.safeGet(items[key], "css");
+				if (css) {
+					Object.keys(css).forEach((style) => {
+						item.css[style] = css[style];
+					});
+				}
+				selectBox.add(item);
+			});
+		}
+
+		selectBox.value = "";
+
+		this._initElement("select", level, true);
+		this._initElement("newitem", level, true);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Select an item.
+	 *
+	 * @param	{Number}		level				Level.
+	 * @param	{String}		itemId				Item id.
+	 */
+	ChainedSelect.prototype.selectItem = function(level, itemId)
+	{
+
+		// Prerequisite check
+		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+
+		selectBox.value = itemId;
+
+		this._initElement("edititem", level, true);
+		this._initElement("removeitem", level, true);
+
+		// Clear children
+		this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+
+		// Refresh the child select element
+		return Promise.resolve().then(() => {
+			level++;
+			let nextSelectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+			if (nextSelectBox) {
+				this._initElement("newitem", level);
+				return this.refresh({"level":level, "value":itemId});
+			}
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Create a new item.
+	 *
+	 * @param	{Number}		level				Level.
+	 * @param	{String}		itemName			Item name set as select's text.
+	 * @param	{String}		itemId				Item id set as select's value.
+	 */
+	ChainedSelect.prototype.newItem = function(level, itemName, itemId)
+	{
+
+		// Prerequisite check
+		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+
+		// Backup current index since it changes after an option is added when select has no option.
+		let curIndex = selectBox.selectedIndex;
+
+		let item = document.createElement("option");
+		item.value = (itemId ? itemId : itemName);
+		item.text = itemName;
+		selectBox.add(item);
+
+		// Restore index
+		selectBox.selectedIndex = curIndex;
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Edit an item.
+	 *
+	 * @param	{Number}		level				Level.
+	 * @param	{String}		itemName			Item name set as select's text.
+	 * @param	{String}		itemId				Item id set as select's value.
+	 */
+	ChainedSelect.prototype.editItem = function(level, itemName, itemId)
+	{
+
+		// Prerequisite check
+		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+		BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
+
+		// Edit the selectbox
+		selectBox.options[selectBox.selectedIndex].text = itemName;
+		selectBox.options[selectBox.selectedIndex].value = (itemId ? itemId : itemName);
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Remove an item.
+	 *
+	 * @param	{Number}		level				Level.
+	 */
+	ChainedSelect.prototype.removeItem = function(level)
+	{
+
+		// Prerequisite check
+		let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+		BM.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.name}, level=${level}`);
+
+		// Remove from the select element
+		selectBox.remove(selectBox.selectedIndex);
+		selectBox.value = "";
+		this._initElement("edititem", level);
+		this._initElement("removeitem", level);
+
+		// Reset children select elements
+		this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+
+	};
+
+	// -----------------------------------------------------------------------------
+	//	Protected
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Init an element.
+	 *
+	 * @param	{String}		type				CSS Selector of the element to init.
+	 * @param	{Number}		level				Level.
+	 * @param	{Boolean}		enable				Enable an element when true. Disable otherwise.
+	 */
+	ChainedSelect.prototype._initElement = function(type, level, enable)
+	{
+
+		type = this.rootNodes[type];
+
+		if (enable)
+		{
+			this.querySelector(":scope .item[data-level='" + level + "'] " + type).disabled = false;
+			this.querySelector(":scope .item[data-level='" + level + "'] " + type).classList.remove("disabled");
+		}
+		else
+		{
+			this.querySelector(":scope .item[data-level='" + level + "'] " + type).disabled = true;
+			this.querySelector(":scope .item[data-level='" + level + "'] " + type).classList.add("disabled");
+		}
+
+	};
+
 	// =============================================================================
 
 	// =============================================================================
-	//	List class
+	//	Tab Index Class
 	// =============================================================================
 
 	// -----------------------------------------------------------------------------
@@ -5136,380 +7450,180 @@
 	/**
 	 * Constructor.
 	 */
-	function List()
+	function TabIndex(settings)
 	{
 
-		return Reflect.construct(BITSMIST.v1.Component, [], this.constructor);
+		return Reflect.construct(BM.Component, [settings], this.constructor);
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(List, BITSMIST.v1.Component);
+	BM.ClassUtil.inherit(TabIndex, BM.Component);
 
 	// -----------------------------------------------------------------------------
-	//  Setter/Getter
+	//	Settings
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Row object.
-	 *
-	 * @type	{Object}
-	 */
-	Object.defineProperty(List.prototype, 'rows', {
-		get()
-		{
-			return this._rows;
-		},
-	});
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Data items.
-	 *
-	 * @type	{Object}
-	 */
-	Object.defineProperty(List.prototype, 'items', {
-		get()
-		{
-			return this._items;
-		},
-		set(value)
-		{
-			this._items = value;
-		}
-	});
-
-	// -----------------------------------------------------------------------------
-	//  Methods
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Start component.
-	 *
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.start = function(settings)
+	TabIndex.prototype._getSettings = function()
 	{
 
-		// Init vars
-		this._items = [];
-		this._activeRowTemplateName = "";
-		this._listRootNode;
-		this._rows;
-
-		// Init component settings
-		settings = Object.assign({}, settings, {
+		return {
+			// Settings
 			"settings": {
-				"autoClear": true,
+				"autoTransform":		false,
+				"name":					"BmTabindex",
 			},
-		});
 
-		// super()
-		return BITSMIST.v1.Component.prototype.start.call(this, settings);
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Change template html.
-	 *
-	 * @param	{String}		templateName		Template name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.switchTemplate = function(templateName, options)
-	{
-
-		return BITSMIST.v1.Component.prototype.switchTemplate.call(this, templateName, options).then(() => {
-			FormUtil.hideConditionalElements(this);
-
-			return this.switchRowTemplate(this.settings.get("settings.rowTemplateName"));
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Change a template html.
-	 *
-	 * @param	{String}		templateName		Template name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.switchRowTemplate = function(templateName, options)
-	{
-
-		options = Object.assign({}, options);
-
-		if (this._activeRowTemplateName === templateName)
-		{
-			return Promise.resolve();
-		}
-
-		return Promise.resolve().then(() => {
-			console.debug(`List.switchRowTemplate(): Switching a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
-			return this.addTemplate(templateName);
-		}).then(() => {
-			this._activeRowTemplateName = templateName;
-		}).then(() => {
-			return this.callOrganizers("afterRowAppend", this.settings.items);
-		}).then(() => {
-			return this.trigger("afterRowAppend", options);
-		}).then(() => {
-			console.debug(`List.switchRowTemplate(): Switched a row template. name=${this.name}, rowTemplateName=${templateName}, id=${this.id}`);
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Clear list.
-	 */
-	List.prototype.clear = function()
-	{
-
-		this._listRootNode.innerHTML = "";
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fill list with data.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype.fill = function(options)
-	{
-
-		console.debug(`List.fill(): Filling list. name=${this.name}`);
-
-		options = Object.assign({}, options);
-
-		let builder = this._getBuilder(options);
-		let fragment = document.createDocumentFragment();
-		this._rows = [];
-
-		// Get list root node
-		this._listRootNode = this.querySelector(this.settings.get("settings.listRootNode"));
-		BITSMIST.v1.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
-
-		return Promise.resolve().then(() => {
-			let autoClear = BITSMIST.v1.Util.safeGet(options, "autoClear", this.settings.get("settings.autoClear"));
-			if (autoClear)
-			{
-				this.clear();
-			}
-			FormUtil.showConditionalElements(this, this.item);
-			return this.trigger("beforeFill", options);
-		}).then(() => {
-			return builder.call(this, fragment, this._items);
-		}).then(() => {
-			this._listRootNode.appendChild(fragment);
-		}).then(() => {
-			return this.trigger("afterFill", options);
-		}).then(() => {
-			console.debug(`List.fill(): Filled list. name=${this.name}`);
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-	//  Protected
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Fetch data.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Function}		List builder function.
-	 */
-	List.prototype._getBuilder = function(options)
-	{
-
-		let rowAsync = BITSMIST.v1.Util.safeGet(options, "async", this.settings.get("settings.async", true));
-		let builder = ( rowAsync ? this._buildAsync : this._buildSync );
-
-		return builder;
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Build rows synchronously.
-	 *
-	 * @param	{DocumentFragment}	fragment		Document fragment.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype._buildSync = function(fragment, items)
-	{
-
-		BITSMIST.v1.Util.assert(this._templates[this._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
-
-		let chain = Promise.resolve();
-		let rowEvents = this.settings.get("rowevents");
-		let template = this.templates[this._activeRowTemplateName].html;
-
-		for (let i = 0; i < items.length; i++)
-		{
-			chain = chain.then(() => {
-				return this._appendRowSync(fragment, i, items[i], template, rowEvents);
-			});
-		}
-
-		return chain;
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Build rows asynchronously.
-	 *
-	 * @param	{DocumentFragment}	fragment		Document fragment.
-	 */
-	List.prototype._buildAsync = function(fragment, items)
-	{
-
-		BITSMIST.v1.Util.assert(this.templates[this._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${this.name}, rowTemplateName=${this._activeRowTemplateName}`);
-
-		let rowEvents = this.settings.get("rowevents");
-		let template = this.templates[this._activeRowTemplateName].html;
-
-		for (let i = 0; i < items.length; i++)
-		{
-			this._appendRowAsync(fragment, i, items[i], template, rowEvents);
+			// Events
+			"events": {
+				"tab-indices": {
+					"rootNode": 		"[data-tabindex]",
+					"handlers": {
+						"click": 		["TabIndex_onTabIndexClick"]
+					}
+				},
+			},
 		}
 
 	};
 
 	// -----------------------------------------------------------------------------
-	//  Privates
+	//	Event Handlers
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Create a row element.
-	 *
-	 * @param	{String}		template				Template html.
-	 *
-	 * @return  {HTMLElement}	Row element.
-	 */
-	List.prototype._createRow = function(template)
+	TabIndex.prototype.TabIndex_onTabIndexClick = function(sender, e, ex)
 	{
 
-		let ele = document.createElement("div");
-		ele.innerHTML = template;
-		let element = ele.firstElementChild;
-		element.setAttribute("bm-powered", "");
-
-		return element;
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Append a new row synchronously.
-	 *
-	 * @param	{HTMLElement}	rootNode				Root node to append a row.
-	 * @param	{integer}		no						Line no.
-	 * @param	{Object}		item					Row data.
-	 * @param	{String}		template				Template html.
-	 * @param	{Object}		rowEvents				Row's event info.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	List.prototype._appendRowSync = function(rootNode, no, item, template, rowEvents)
-	{
-
-		this.triggerAsync("beforeBuildRow", {"item":item});
-
-		let chain = Promise.resolve();
-		chain = chain.then(() => {
-			// Append a row
-			let element = this._createRow(template);
-			rootNode.appendChild(element);
-			this._rows.push(element);
-
-			// set row elements click event handler
-			if (rowEvents)
-			{
-				Object.keys(rowEvents).forEach((elementName) => {
-					this.initEvents(elementName, rowEvents[elementName], element);
-				});
-			}
-
-			// Call event handlers
-			return Promise.resolve().then(() => {
-				return this.trigger("beforeFillRow", {"item":item, "no":no, "element":element});
-			}).then(() => {
-				// Fill fields
-				FormUtil.showConditionalElements(element, item);
-				FormUtil.setFields(element, item, {"masters":this.resources});
-			}).then(() => {
-				return this.trigger("afterFillRow", {"item":item, "no":no, "element":element});
-			});
-		});
-
-	};
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Append a new row asynchronously.
-	 *
-	 * @param	{HTMLElement}	rootNode				Root node to append a row.
-	 * @param	{integer}		no						Line no.
-	 * @param	{Object}		item					Row data.
-	 * @param	{String}		template				Template html.
-	 * @param	{Object}		rowEvents				Row's event info.
-	 */
-	List.prototype._appendRowAsync = function(rootNode, no, item, template, rowEvents)
-	{
-
-		this.triggerAsync("beforeBuildRow", {"item":item});
-
-		// Append a row
-		let element = this._createRow(template);
-		rootNode.appendChild(element);
-		this._rows.push(element);
-
-		// set row elements click event handler
-		if (rowEvents)
-		{
-			Object.keys(rowEvents).forEach((elementName) => {
-				this.initEvents(elementName, rowEvents[elementName], element);
-			});
+		if (sender.classList.contains("active")) {
+			return;
 		}
 
-		// Call event handlers
-		this.triggerAsync("beforeFillRow", {"item":item, "no":no, "element":element});
-		FormUtil.showConditionalElements(element, item);
-		FormUtil.setFields(element, item, {"masters":this.resources});
-		this.triggerAsync("afterFillRow", {"item":item, "no":no, "element":element});
+		this.switchIndex(sender.getAttribute("data-tabindex"));
 
 	};
+
+	// -----------------------------------------------------------------------------
+	//	Methods
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Switch to the specified index.
+	 *
+	 * @param	{String}		index				Index.
+	 */
+	TabIndex.prototype.switchIndex = function(index)
+	{
+
+		this.querySelector(":scope [data-tabindex].active").classList.remove("active");
+		let tabIndex = this.querySelector(":scope [data-tabindex='" + index + "']");
+		tabIndex.classList.add("active");
+
+		let container = document.querySelector(this.getAttribute("data-pair"));
+		if (container) {
+			container.switchContent(index);
+		} else {
+			console.log("@@@no pair");
+		}
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get a current active index.
+	 *
+	 * @return  {HTMLElement}	Current active element.
+	 */
+	TabIndex.prototype.getActiveIndex = function()
+	{
+
+		return this.querySelector(":scope .active");
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	customElements.define("bm-tabindex", TabIndex);
 
 	// =============================================================================
+
+	// =============================================================================
+	//	Tab Content Class
+	// =============================================================================
+
+	// -----------------------------------------------------------------------------
+	//  Constructor
+	// -----------------------------------------------------------------------------
+
 	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 * Constructor.
 	 */
+	function TabContent(settings)
+	{
+
+		return Reflect.construct(BM.Component, [settings], this.constructor);
+
+	}
+
+	BM.ClassUtil.inherit(TabContent, BM.Component);
+
+	// -----------------------------------------------------------------------------
+	//	Settings
+	// -----------------------------------------------------------------------------
+
+	TabContent.prototype._getSettings = function()
+	{
+
+		return {
+			// Settings
+			"settings": {
+				"autoTransform":		false,
+				"name":					"BmTabcontent",
+			},
+		}
+
+	};
+
+	// -----------------------------------------------------------------------------
+	//	Methods
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Switch to the specified content.
+	 *
+	 * @param	{String}		index				Index.
+	 */
+	TabContent.prototype.switchContent = function(index)
+	{
+
+		// Deactivate current active content
+		this.querySelector(":scope > .active").classList.remove("active");
+
+		// Activate specified content
+		this.querySelector(":scope > [data-tabindex='" + index + "']").classList.add("active");
+		this.querySelector(":scope > [data-tabindex='" + index + "']").focus();
+	//		this.querySelector(":scope nth-child(" + index + ")").classList.add("active");
+	//		this.querySelector(":scope > [data-index='" + index + "']").focus();
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Get a current active content.
+	 *
+	 * @return  {HTMLElement}	Current active element.
+	 */
+	TabContent.prototype.getActiveContent = function()
+	{
+
+		return this.querySelector(":scope .active");
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	customElements.define("bm-tabcontent", TabContent);
+
 	// =============================================================================
 
 	// =============================================================================
@@ -5531,7 +7645,7 @@
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(TagLoader, BITSMIST.v1.Component);
+	BM.ClassUtil.inherit(TagLoader, BM.Component);
 
 	// -----------------------------------------------------------------------------
 	//  Methods
@@ -5553,18 +7667,18 @@
 				"name": "TagLoader",
 			},
 		};
-		settings = ( settings ? BITSMIST.v1.Util.deepMerge(defaults, settings) : defaults );
+		settings = ( settings ? BM.Util.deepMerge(defaults, settings) : defaults );
 
 		// super()
-		return BITSMIST.v1.Component.prototype.start.call(this, settings).then(() => {
+		return BM.Component.prototype.start.call(this, settings).then(() => {
 			if (document.readyState !== "loading")
 			{
-				BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
+				BM.LoaderOrganizer.load(document.body, this.settings);
 			}
 			else
 			{
 				document.addEventListener("DOMContentLoaded", () => {
-					BITSMIST.v1.LoaderOrganizer.load(document.body, this.settings);
+					BM.LoaderOrganizer.load(document.body, this.settings);
 				});
 			}
 		});
@@ -5576,17 +7690,9 @@
 	customElements.define("bm-tagloader", TagLoader);
 
 	// =============================================================================
-	/**
-	 * BitsmistJS - Javascript Web Client Framework
-	 *
-	 * @copyright		Masaki Yasutake
-	 * @link			https://bitsmist.com/
-	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
-	 */
-	// =============================================================================
 
 	// =============================================================================
-	//	SettingManager class
+	//	Setting Server Class
 	// =============================================================================
 
 	// -----------------------------------------------------------------------------
@@ -5596,7 +7702,7 @@
 	/**
 	 * Constructor.
 	 */
-	function SettingManager()
+	function SettingServer()
 	{
 
 		// super()
@@ -5604,7 +7710,7 @@
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(SettingManager, BITSMIST.v1.Component);
+	BM.ClassUtil.inherit(SettingServer, BM.Component);
 
 	// -----------------------------------------------------------------------------
 
@@ -5613,12 +7719,12 @@
 	 *
 	 * @return  {Object}		Options.
 	 */
-	SettingManager.prototype._getSettings = function()
+	SettingServer.prototype._getSettings = function()
 	{
 
 		return {
 			"settings": {
-				"name":					"SettingManager",
+				"name":					"SettingServer",
 				"autoSetup":			false,
 			}
 		};
@@ -5627,12 +7733,12 @@
 
 	// -----------------------------------------------------------------------------
 
-	customElements.define("bm-setting", SettingManager);
+	customElements.define("bm-setting", SettingServer);
 
 	// =============================================================================
 
 	// =============================================================================
-	//	Preference manager class
+	//	Preference Server Class
 	// =============================================================================
 
 	// -----------------------------------------------------------------------------
@@ -5642,15 +7748,17 @@
 	/**
 	 * Constructor.
 	 */
-	function PreferenceManager(settings)
+	function PreferenceServer(settings)
 	{
 
-		return Reflect.construct(BITSMIST.v1.Component, [settings], this.constructor);
+		return Reflect.construct(BM.Component, [settings], this.constructor);
 
 	}
 
-	BITSMIST.v1.ClassUtil.inherit(PreferenceManager, BITSMIST.v1.Component);
+	BM.ClassUtil.inherit(PreferenceServer, BM.Component);
 
+	// -----------------------------------------------------------------------------
+	//	Settings
 	// -----------------------------------------------------------------------------
 
 	/**
@@ -5658,41 +7766,97 @@
 	 *
 	 * @return  {Object}		Options.
 	 */
-	PreferenceManager.prototype._getSettings = function()
+	PreferenceServer.prototype._getSettings = function()
 	{
 
 		return {
 			// Settings
 			"settings": {
-				"autoRefresh":				false,
-				"autoSetup":				false,
-				"hasTemplate":				false,
-				"name":						"PreferenceManager",
+				"autoClear":				false,
+				"autoFill":					false,
+				"autoTransform":			false,
+				"name":						"PreferenceServer",
 			},
 
-			// Organizers
-			"organizers": {
-				"ValidationOrganizer":		{"settings":{"attach":true}},
+			// Events
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["PreferenceServer_onBeforeStart"],
+						"doFetch":			["PreferenceServer_onDoFetch"],
+						"beforeSubmit":		["PreferenceServer_onBeforeSubmit"]
+					}
+				}
+			},
+
+			// Forms
+			"forms": {
+				"settings": {
+					"autoValidate":			false,
+					"autoCollect":			false,
+				}
 			}
 		}
 
 	};
 
 	// -----------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Event Handlers
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Preference items.
-	 *
-	 * @type	{Object}
-	 */
-	Object.defineProperty(PreferenceManager.prototype, "items", {
-		get()
+	PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, ex)
+	{
+
+		this._defaults = new BM.ChainableStore();
+		this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
+	{
+
+		// Set default preferences
+		if (this.settings.get("defaults.preferences"))
 		{
-			return PreferenceOrganizer._store.items;
-		},
-	});
+			this._defaults.items = this.settings.get("defaults.preferences");
+		}
+
+		// Load preferences
+		return this.resources["preferences"].get().then((preferences) => {
+			this._store.merge(preferences);
+			this.items = this._store.items;
+		});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	PreferenceServer.prototype.PreferenceServer_onBeforeSubmit = function(sender, e, ex)
+	{
+
+		this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);
+
+		// Pass items to the latter event handlers
+		e.detail.items = this._store.items;
+
+	};
+
+	// -----------------------------------------------------------------------------
+	//  Methods
+	// -----------------------------------------------------------------------------
+
+	PreferenceServer.prototype.subscribe = function(component, options)
+	{
+
+		this._store.subscribe(
+			component.name + "_" + component.uniqueId,
+			this._triggerEvent.bind(component),
+			options,
+		);
+
+	};
 
 	// -----------------------------------------------------------------------------
 
@@ -5704,10 +7868,10 @@
 	 *
 	 * @return  {*}				Value.
 	 */
-	PreferenceManager.prototype.get = function(key, defaultValue)
+	PreferenceServer.prototype.get = function(key, defaultValue)
 	{
 
-		return PreferenceOrganizer._store.get(key, defaultValue);
+		return this._store.get(key, defaultValue);
 
 	};
 
@@ -5719,65 +7883,104 @@
 	 * @param	{Object}		values				Values to store.
 	 * @param	{Object}		options				Options.
 	 */
-	PreferenceManager.prototype.set = function(values, options)
+	PreferenceServer.prototype.set = function(values, options, ...args)
 	{
 
-		this._validationResult["result"] = true;
-
-		Promise.resolve().then(() => {
-			// Validate
-			return this.callOrganizers("doCheckValidity", {"item":values, "validationName":this._settings.get("settings.validationName")});
-		}).then(() => {
-			return this.trigger("doValidate");
-		}).then(() => {
-			// Validation failed?
-			if (!this._validationResult["result"])
-			{
-				throw new Error(`PreferenceManager.set(): Validation failed. values=${JSON.stringify(values)}, invalids=${JSON.stringify(this._validationResult["invalids"])}`);
-			}
-
-			// Store
-			PreferenceOrganizer._store.set("", values, options);
-
-			// Save preferences
-			if (BITSMIST.v1.Util.safeGet(options, "autoSave", this.settings.get("preferences.settings.autoSave")))
-			{
-				return this.resources["preferences"].put("", PreferenceOrganizer._store.localItems);
-			}
-		});
+		return this.submit({"items":values, "options":options, "args":args});
 
 	};
 
-	// -------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	//  Privates
+	// -----------------------------------------------------------------------------
 
-	customElements.define("bm-preference", PreferenceManager);
+	/**
+	 * Trigger preference changed events.
+	 *
+	 * @param	{Object}		items				Changed items.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	PreferenceServer.prototype._triggerEvent = function(items, options)
+	{
 
-	window.BITSMIST = window.BITSMIST || {};
-	window.BITSMIST.v1 = window.BITSMIST.v1 || {};
+		let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
+		let sender = BM.Util.safeGet(options, "sender");
+
+		return this.trigger(eventName, {"sender":sender, "items":items});
+
+	};
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Check if it is a target.
+	 *
+	 * @param	{Object}		conditions			Conditions.
+	 * @param	{Object}		observerInfo		Observer info.
+	 */
+	PreferenceServer.prototype._filter = function(conditions, observerInfo, ...args)
+	{
+
+		let result = false;
+		let target = observerInfo["options"]["targets"];
+
+		if (target === "*")
+		{
+			result = true;
+		}
+		else
+		{
+			target = ( Array.isArray(target) ? target : [target] );
+
+			for (let i = 0; i < target.length; i++)
+			{
+				if (conditions[target[i]])
+				{
+					result = true;
+					break;
+				}
+			}
+		}
+
+		return result;
+
+	};
+
+	// ----------------------------------------------------------------------------
+
+	customElements.define("bm-preference", PreferenceServer);
+
+	// =============================================================================
 	window.BITSMIST.v1.ObservableStore = ObservableStore;
 	window.BITSMIST.v1.BindableStore = BindableStore;
-	BITSMIST.v1.OrganizerOrganizer.register("FileOrganizer", {"object":FileOrganizer, "targetWords":"files", "targetEvents":["beforeStart", "afterSpecLoad"], "order":110});
-	BITSMIST.v1.OrganizerOrganizer.register("ErrorOrganizer", {"object":ErrorOrganizer, "targetWords":"errors", "targetEvents":["beforeStart", "afterSpecLoad"], "order":120});
-	BITSMIST.v1.OrganizerOrganizer.register("ElementOrganizer", {"object":ElementOrganizer, "targetWords":"elements", "targetEvents":["beforeStart"], "order":220});
-	BITSMIST.v1.OrganizerOrganizer.register("ResourceOrganizer", {"object":ResourceOrganizer, "targetWords":"resources", "targetEvents":["beforeStart", "afterSpecLoad", "doFetch", "doSubmit"], "order":300});
-	BITSMIST.v1.OrganizerOrganizer.register("ValidationOrganizer", {"object":ValidationOrganizer, "targetWords":"validations", "targetEvents":["beforeStart", "afterSpecLoad", "doCheckValidity", "doReportValidity"], "order":310});
-	BITSMIST.v1.OrganizerOrganizer.register("DatabindingOrganizer", {"object":DatabindingOrganizer, "targetWords":"data", "targetEvents":["afterAppend"], "order":320});
-	BITSMIST.v1.OrganizerOrganizer.register("PluginOrganizer", {"object":PluginOrganizer, "targetWords":"plugins", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.register("KeyOrganizer", {"object":KeyOrganizer, "targetWords":"keys", "targetEvents":["afterAppend"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.register("ChainOrganizer", {"object":ChainOrganizer, "targetWords":"chains", "targetEvents":["beforeStart", "afterSpecLoad"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.register("DialogOrganizer", {"object":DialogOrganizer, "targetWords":"dialog", "targetEvents":["beforeStart", "afterStart"], "order":800});
-	BITSMIST.v1.OrganizerOrganizer.register("PreferenceOrganizer", {"object":PreferenceOrganizer, "targetWords":"preferences", "targetEvents":["beforeStart", "afterSpecLoad"], "order":900});
+	BM.OrganizerOrganizer.register(FileOrganizer);
+	BM.OrganizerOrganizer.register(ErrorOrganizer);
+	BM.OrganizerOrganizer.register(ElementOrganizer);
+	BM.OrganizerOrganizer.register(ResourceOrganizer);
+	BM.OrganizerOrganizer.register(ValidationOrganizer);
+	BM.OrganizerOrganizer.register(FormOrganizer);
+	BM.OrganizerOrganizer.register(ListOrganizer);
+	BM.OrganizerOrganizer.register(DatabindingOrganizer);
+	BM.OrganizerOrganizer.register(PluginOrganizer);
+	BM.OrganizerOrganizer.register(KeyOrganizer);
+	BM.OrganizerOrganizer.register(ChainOrganizer);
+	BM.OrganizerOrganizer.register(DialogOrganizer);
+	BM.OrganizerOrganizer.register(PreferenceOrganizer);
+	BM.OrganizerOrganizer.register(RouteOrganizer);
 	window.BITSMIST.v1.Plugin = Plugin;
 	window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
 	window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
 	window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 	window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
+	window.BITSMIST.v1.WebstorageResourceHandler = WebstorageResourceHandler;
 	window.BITSMIST.v1.ValidationHandler = ValidationHandler;
 	window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
 	window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
 	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
-	window.BITSMIST.v1.Form = Form;
-	window.BITSMIST.v1.List = List;
+	window.BITSMIST.v1.ChainedSelect = ChainedSelect;
+	window.BITSMIST.v1.BmTabindex  = TabIndex;
+	window.BITSMIST.v1.BmTabcontent = TabContent;
 
 })();
 //# sourceMappingURL=bitsmist-js-extras_v1.js.map
