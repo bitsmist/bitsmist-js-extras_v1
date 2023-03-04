@@ -240,12 +240,6 @@ export default class DialogOrganizer extends BM.Organizer
 
 		DialogOrganizer.__createBackdrop(component);
 
-		// Add close on click event handler
-		if (BM.Util.safeGet(options, "closeOnClick", true))
-		{
-			DialogOrganizer.__closeOnClick(component);
-		}
-
 		let promise = new Promise((resolve, reject) => {
 			window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
@@ -256,12 +250,23 @@ export default class DialogOrganizer extends BM.Organizer
 			let effect = DialogOrganizer.__getEffect();
 			if (effect)
 			{
+				// Transition/Animation
 				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+					if (BM.Util.safeGet(options, "closeOnClick", true))
+					{
+						DialogOrganizer.__closeOnClick(component);
+					}
 					resolve();
 				}, {"once":true});
 			}
 			else
 			{
+				// No Transition/Animation
+				if (BM.Util.safeGet(options, "closeOnClick", true))
+				{
+					DialogOrganizer.__closeOnClick(component);
+				}
+
 				resolve();
 			}
 		});
