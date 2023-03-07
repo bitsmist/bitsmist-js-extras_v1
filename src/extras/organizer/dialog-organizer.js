@@ -35,7 +35,7 @@ export default class DialogOrganizer extends BM.Organizer
 	static DialogOrganizer_onAfterReady(sender, e, ex)
 	{
 
-		if (this.settings.get("dialogs.settings.autoOpen"))
+		if (this.settings.get("dialog.settings.autoOpen"))
 		{
 			console.debug(`DialogOrganizer.DialogOrganizer_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
 
@@ -52,7 +52,7 @@ export default class DialogOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"dialogs",
+			"sections":		"dialog",
 			"order":		800,
 		};
 
@@ -117,9 +117,9 @@ export default class DialogOrganizer extends BM.Organizer
 			{
 				return Promise.resolve().then(() => {
 					// Show backdrop
-					if (component.settings.get("dialogs.backdropOptions.show"))
+					if (component.settings.get("dialog.backdropOptions.show"))
 					{
-						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialog.backdropOptions"));
 					}
 				}).then(() => {
 					// Setup
@@ -188,9 +188,9 @@ export default class DialogOrganizer extends BM.Organizer
 			{
 				return component.trigger("doClose", options).then(() => {
 					// Hide backdrop
-					if (component.settings.get("dialogs.backdropOptions.show"))
+					if (component.settings.get("dialog.backdropOptions.show"))
 					{
-						return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialogs.backdropOptions"));
+						return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialog.backdropOptions"));
 					}
 				}).then(() => {
 					if (component._isModal)
@@ -245,9 +245,9 @@ export default class DialogOrganizer extends BM.Organizer
 			component._backdropPromise = new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
+				let addClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.showOptions.addClasses", []));
 				DialogOrganizer._backdrop.classList.add(...addClasses);
-				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
+				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialog.backdropOptions.showOptions.removeClasses", []));
 
 				let effect = DialogOrganizer.__getEffect();
 				if (effect)
@@ -297,9 +297,9 @@ export default class DialogOrganizer extends BM.Organizer
 			component._backdropPromise = new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
+				let removeClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.hideOptions.removeClasses", []));
 				DialogOrganizer._backdrop.classList.remove(...removeClasses);
-				DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
+				DialogOrganizer._backdrop.classList.add(...component.settings.get("dialog.backdropOptions.hideOptions.addClasses", []));
 
 				let effect = DialogOrganizer.__getEffect();
 				if (effect)
