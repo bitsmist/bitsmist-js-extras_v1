@@ -18,9 +18,6 @@ import BM from "../bm";
 //  Constructor
 // -----------------------------------------------------------------------------
 
-/**
- * Constructor.
- */
 export default function TagLoader()
 {
 

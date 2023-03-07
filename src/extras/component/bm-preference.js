@@ -19,9 +19,6 @@ import ObservableStore from "../store/observable-store.js";
 //  Constructor
 // -----------------------------------------------------------------------------
 
-/**
- * Constructor.
- */
 export default function PreferenceServer(settings)
 {
 
@@ -35,11 +32,6 @@ BM.ClassUtil.inherit(PreferenceServer, BM.Component);
 //	Settings
 // -----------------------------------------------------------------------------
 
-/**
- * Get component settings.
- *
- * @return  {Object}		Options.
- */
 PreferenceServer.prototype._getSettings = function()
 {
 
