@@ -73,7 +73,7 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"forms",
+			"sections":		"form",
 			"order":		310,
 			"depends":		"ValidationOrganizer",
 		};
@@ -147,15 +147,15 @@ export default class FormOrganizer extends BM.Organizer
 
 		return Promise.resolve().then(() => {
 			// Collect values
-			if (component.settings.get("forms.settings.autoCollect", true))
+			if (component.settings.get("form.settings.autoCollect", true))
 			{
 				options["items"] = FormOrganizer.__collectData(component);
 			}
 		}).then(() => {
 			// Validate values
-			if (component.settings.get("forms.settings.autoValidate", true))
+			if (component.settings.get("form.settings.autoValidate", true))
 			{
-				options["validatorName"] = component.settings.get("forms.settings.validatorName");
+				options["validatorName"] = component.settings.get("form.settings.validatorName");
 				return component.validate(options).then(() => {
 					if (!component.validationResult["result"])
 					{

@@ -63,8 +63,8 @@ PreferenceServer.prototype._getSettings = function()
 			}
 		},
 
-		// Forms
-		"forms": {
+		// Form
+		"form": {
 			"settings": {
 				"autoValidate":			false,
 				"autoCollect":			false,
