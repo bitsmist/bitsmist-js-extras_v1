@@ -418,10 +418,12 @@ export default class ElementOrganizer extends BM.Organizer
 		let effect = ElementOrganizer.__getEffect(component._overlay);
 		if (effect)
 		{
-			component._overlayPromise = new Promise((resolve, reject) => {
-				component._overlay.addEventListener(effect + "end", () => {
-					resolve();
-				}, {"once":true});
+			component._overlayPromise.then(() => {
+				component._overlayPromise = new Promise((resolve, reject) => {
+					component._overlay.addEventListener(effect + "end", () => {
+						resolve();
+					}, {"once":true});
+				});
 			});
 		}
 		else

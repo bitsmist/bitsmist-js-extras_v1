@@ -82,6 +82,7 @@ export default class DialogOrganizer extends BM.Organizer
 		component._cancelOpen;
 		component._modalResult;
 		component._modalPromise;
+		component._backdropPromise = Promise.resolve();
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterReady", DialogOrganizer.DialogOrganizer_onAfterReady);
@@ -240,42 +241,44 @@ export default class DialogOrganizer extends BM.Organizer
 
 		DialogOrganizer.__createBackdrop(component);
 
-		let promise = new Promise((resolve, reject) => {
-			window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+		return component._backdropPromise.then(() => {
+			component._backdropPromise = new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-			let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
-			DialogOrganizer._backdrop.classList.add(...addClasses);
-			DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
+				let addClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.showOptions.addClasses", []));
+				DialogOrganizer._backdrop.classList.add(...addClasses);
+				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialogs.backdropOptions.showOptions.removeClasses", []));
 
-			let effect = DialogOrganizer.__getEffect();
-			if (effect)
-			{
-				// Transition/Animation
-				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+				let effect = DialogOrganizer.__getEffect();
+				if (effect)
+				{
+					// Transition/Animation
+					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+						if (BM.Util.safeGet(options, "closeOnClick", true))
+						{
+							DialogOrganizer.__closeOnClick(component);
+						}
+						resolve();
+					}, {"once":true});
+				}
+				else
+				{
+					// No Transition/Animation
 					if (BM.Util.safeGet(options, "closeOnClick", true))
 					{
 						DialogOrganizer.__closeOnClick(component);
 					}
-					resolve();
-				}, {"once":true});
-			}
-			else
-			{
-				// No Transition/Animation
-				if (BM.Util.safeGet(options, "closeOnClick", true))
-				{
-					DialogOrganizer.__closeOnClick(component);
-				}
 
-				resolve();
+					resolve();
+				}
+			});
+
+			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
+			if (sync)
+			{
+				return component._backdropPromise;
 			}
 		});
-
-		let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
-		if (sync)
-		{
-			return promise;
-		}
 
 	}
 
@@ -290,31 +293,33 @@ export default class DialogOrganizer extends BM.Organizer
 	static __hideBackdrop(component, options)
 	{
 
-		let promise = new Promise((resolve, reject) => {
-			window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+		return component._backdropPromise.then(() => {
+			component._backdropPromise = new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-			let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
-			DialogOrganizer._backdrop.classList.remove(...removeClasses);
-			DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
+				let removeClasses = ["show"].concat(component.settings.get("dialogs.backdropOptions.hideOptions.removeClasses", []));
+				DialogOrganizer._backdrop.classList.remove(...removeClasses);
+				DialogOrganizer._backdrop.classList.add(...component.settings.get("dialogs.backdropOptions.hideOptions.addClasses", []));
 
-			let effect = DialogOrganizer.__getEffect();
-			if (effect)
-			{
-				DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+				let effect = DialogOrganizer.__getEffect();
+				if (effect)
+				{
+					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+						resolve();
+					}, {"once":true});
+				}
+				else
+				{
 					resolve();
-				}, {"once":true});
-			}
-			else
+				}
+			});
+
+			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
+			if (sync)
 			{
-				resolve();
+				return component._backdropPromise;
 			}
 		});
-
-		let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
-		if (sync)
-		{
-			return promise;
-		}
 
 	}
 
