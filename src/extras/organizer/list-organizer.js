@@ -36,10 +36,10 @@ export default class ListOrganizer extends BM.Organizer
 	static ListOrganizer_onAfterTransform(sender, e, ex)
 	{
 
-		this._listRootNode = this.querySelector(this.settings.get("lists.settings.listRootNode"));
+		this._listRootNode = this.querySelector(this.settings.get("list.settings.listRootNode"));
 		BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
-		return this.transformRow(this.settings.get("lists.settings.rowTemplateName"));
+		return this.transformRow(this.settings.get("list.settings.rowTemplateName"));
 
 	}
 
@@ -78,7 +78,7 @@ export default class ListOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"lists",
+			"sections":		"list",
 			"order":		310,
 		};
 
@@ -160,7 +160,7 @@ export default class ListOrganizer extends BM.Organizer
 		BM.Util.assert(component._templates[component._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
 
 		let chain = Promise.resolve();
-		let rowEvents = component.settings.get("rowevents");
+		let rowEvents = component.settings.get("list.rowevents");
 		let template = component.templates[component._activeRowTemplateName].html;
 
 		for (let i = 0; i < items.length; i++)
@@ -186,7 +186,7 @@ export default class ListOrganizer extends BM.Organizer
 
 		BM.Util.assert(component.templates[component._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
 
-		let rowEvents = component.settings.get("rowevents");
+		let rowEvents = component.settings.get("list.rowevents");
 		let template = component.templates[component._activeRowTemplateName].html;
 
 		for (let i = 0; i < items.length; i++)
