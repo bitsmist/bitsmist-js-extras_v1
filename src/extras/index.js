@@ -44,9 +44,6 @@ BM.OrganizerOrganizer.register(ListOrganizer);
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BM.OrganizerOrganizer.register(DatabindingOrganizer);
 
-import PluginOrganizer from "./organizer/plugin-organizer.js";
-BM.OrganizerOrganizer.register(PluginOrganizer);
-
 import KeyOrganizer from "./organizer/key-organizer.js";
 BM.OrganizerOrganizer.register(KeyOrganizer);
 
@@ -61,11 +58,6 @@ BM.OrganizerOrganizer.register(PreferenceOrganizer);
 
 import RouteOrganizer from "./organizer/route-organizer.js";
 BM.OrganizerOrganizer.register(RouteOrganizer);
-
-// Plugin
-
-import Plugin from "./plugin/plugin.js";
-window.BITSMIST.v1.Plugin = Plugin;
 
 // Resource handler
 
