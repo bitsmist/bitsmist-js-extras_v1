@@ -219,9 +219,8 @@ export default class ObservableStore extends BM.ChainableStore
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Notify observers synchronously.
+	 * Notify observers asynchronously.
 	 *
-	 * @param	{String}		type				Notification type(=methodname).
 	 * @param	{Object}		conditions			Current conditions.
 	 * @param	{Object}		...args				Arguments to callback function.
 	 *
