@@ -50,6 +50,19 @@ export default class BindableStore extends BM.Store
 
 		this._items = value;
 
+		Object.keys(this._items).forEach((key) => {
+			if (this._elems[key] && this._elems[key]["callback"])
+			{
+				let value = this._items[key];
+				this._items[key] = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
+			}
+		});
+
+		if (this._callback)
+		{
+			value = this._callback({"changedItem": value});
+		}
+
 		return this._notify(value);
 
 	}
