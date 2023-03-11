@@ -21,15 +21,10 @@ export default class ObservableStore extends BM.ChainableStore
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		options				Options.
-     */
 	constructor(options)
 	{
 
-		let defaults = {"notifyOnChange":true, "async":false};
+		let defaults = {"notifyOnChange":true, "async":true};
 		super(Object.assign(defaults, options));
 
 		this._filter;
@@ -118,7 +113,7 @@ export default class ObservableStore extends BM.ChainableStore
         let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
         if (notify)
         {
-            return this.notify("*", ...args);
+            return this.notify(value, ...args);
         }
 
     }
