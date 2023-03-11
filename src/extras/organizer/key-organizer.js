@@ -230,7 +230,7 @@ export default class KeyOrganizer extends BM.Organizer
 	static _defaultClear(e, component, options)
 	{
 
-		let target;
+		let target = "";
 
 		if (this.hasAttribute("bm-cleartarget"))
 		{
