@@ -37,7 +37,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"binds",
+			"sections":		"bindings",
 			"order":		320,
 		};
 
@@ -49,88 +49,58 @@ export default class DatabindingOrganizer extends BM.Organizer
 	{
 
 		// Add properties
-		Object.defineProperty(component, 'binds', {
-			get() { return this._binds; },
-			set(newValue) {
-				DatabindingOrganizer.update(this, newValue);
-			},
+		Object.defineProperty(component, 'bindings', {
+			get() { return this._bindings; },
 		});
 
 		// Add methods
 		component.bindData = function(data) { return DatabindingOrganizer._bindData(this, data); }
-		component.update = function(data) { return DatabindingOrganizer._update(this, data); }
 
 		// Init vars
-		component._binds = new BindableStore();
+		component._bindings = new BindableStore({
+			"callback": component.settings.get("bindings.settings.callback"),
+			"type":		component.settings.get("bindings.settings.type", "two-way"),
+		});
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "afterTransform", DatabindingOrganizer.DatabindingOrganizer_onAfterTransform);
+		this._addOrganizerHandler(component, "afterFetch", DatabindingOrganizer.DatabindingOrganizer_onAfterFetch);
+		this._addOrganizerHandler(component, "doCollect", DatabindingOrganizer.DatabindingOrganizer_onDoCollect);
 
 	}
 
 	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
 
-	/**
-	 * Organize.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static organize(conditions, component, settings)
+	static DatabindingOrganizer_onDoCollect(sender, e, ex)
 	{
 
-		switch (conditions)
+		if (this.settings.get("bindings.settings.autoCollect", true))
 		{
-			case "afterTransform":
-				DatabindingOrganizer._bindData(component);
-				break;
-			case "afterFetch":
-				let bindings = settings["bindings"];
-				if (bindings)
-				{
-
-					DatabindingOrganizer.setResource(component, bindings);
-				}
-				break;
+			e.detail["items"] = this._bindings.items;
 		}
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Set resource to the component.
-	 *
-	 * @param	{Object}		conditions			Conditions.
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		settings			Settings.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static setResource(component, settings)
+	static DatabindingOrganizer_onAfterTransform(sender, e, ex)
 	{
 
-		let resourceName = settings["resourceName"];
-
-		component._binds.replace(component.resources[resourceName].item);
+		DatabindingOrganizer._bindData(this);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Update bindings.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{HTMLElement}	rootNode			Root node.
-	 */
-	static update(component, data)
+	static DatabindingOrganizer_onAfterFetch(sender, e, ex)
 	{
 
-		component._binds.items = data;
-
-		// Bind data to elements
-		DatabindingOrganizer._bindData(component);
+		if (e.detail.items)
+		{
+			this._bindings.items = e.detail.items;
+		}
 
 	}
 
@@ -139,7 +109,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Bind data and elemnets.
+	 * Bind data and elements.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{HTMLElement}	rootNode			Root node.
@@ -152,7 +122,23 @@ export default class DatabindingOrganizer extends BM.Organizer
 		let nodes = rootNode.querySelectorAll("[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		nodes.forEach(elem => {
-			component._binds.bindTo(elem);
+			// Get a callback function from settings
+			let key = elem.getAttribute("bm-bind");
+			let callback;
+			component._enumSettings(component.settings.get("bindings"), (sectionName, sectionValue) => {
+				if (sectionValue["callback"])
+				{
+					const pattern = sectionValue["key"] || sectionName;
+					const r = new RegExp(pattern);
+					if (r.test(key))
+					{
+						callback = sectionValue["callback"];
+					}
+				}
+			});
+
+			// Bind
+			component._bindings.bindTo(key, elem, callback);
 		});
 
 	}
