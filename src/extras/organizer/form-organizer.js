@@ -53,27 +53,6 @@ export default class FormOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingOrganizer_onAfterFetch(sender, e, ex)
-	{
-
-		this._items = e.detail.items;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static FormOrganizer_onDoCollect(sender, e, ex)
-	{
-
-		if (this.settings.get("form.settings.autoCollect"))
-		{
-			e.detail["items"] = FormOrganizer.__collectData(this);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static FormOrganizer_onDoFill(sender, e, ex)
 	{
 
@@ -84,6 +63,28 @@ export default class FormOrganizer extends BM.Organizer
 			FormUtil.setFields(rootNode, e.detail.items, {"masters":this.resources, "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onDoCollect(sender, e, ex)
+	{
+
+		if (this.settings.get("form.settings.autoCollect"))
+		{
+			e.detail.items = FormUtil.getFields(this);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onAfterCollect(sender, e, ex)
+	{
+
+		// Collect only submittable data
+		e.detail.items = FormOrganizer.__collectData(this, e.detail.items);
 
 	}
 
@@ -124,6 +125,7 @@ export default class FormOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "doClear", FormOrganizer.FormOrganizer_onDoClear);
 		this._addOrganizerHandler(component, "doFill", FormOrganizer.FormOrganizer_onDoFill);
 		this._addOrganizerHandler(component, "doCollect", FormOrganizer.FormOrganizer_onDoCollect);
+		this._addOrganizerHandler(component, "afterCollect", FormOrganizer.FormOrganizer_onAfterCollect);
 
 	}
 
@@ -222,18 +224,17 @@ export default class FormOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Colled data from form.
+	 * Collect submittable data.
 	 *
      * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
+	 * @param	{Object}		items				Data to submit.
 	 *
 	 * @return  {Object}		Collected data.
 	 */
-	static __collectData(component, options)
+	static __collectData(component, items)
 	{
 
 		let submitItem = {};
-		let items = FormUtil.getFields(component);
 
 		// Collect values only from nodes that has [bm-submit] attribute.
 		let nodes = component.querySelectorAll("[bm-submit]");
