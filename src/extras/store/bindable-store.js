@@ -10,37 +10,47 @@
 
 import BM from "../bm";
 import FormUtil from "../util/form-util.js";
-import ObservableStore from "./observable-store.js";
 
 // =============================================================================
 //	Bindable store class
 // =============================================================================
 
-export default class BindableStore extends ObservableStore
+export default class BindableStore extends BM.Store
 {
 
 	// -------------------------------------------------------------------------
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		options				Options.
-     */
 	constructor(options)
 	{
 
-		super(options);
+		let defaults = {};
+		super(Object.assign(defaults, options));
 
-		this.filter = (conditions, observerInfo, ...args) => {
-			let ret = false;
-			if (conditions === "*" || conditions.indexOf(observerInfo.id) > -1)
-			{
-				ret = true;
-			}
-			return ret;
-		};
+		this._elems = {};
+		this._callback = BM.Util.safeGet(options, "callback");
+		this._notify = ( BM.Util.safeGet(options, "type") === "one-way-reverse" ? ()=>{} : this._notifyAsync );
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	get items()
+	{
+
+		return this.clone();
+
+	}
+
+	set items(value)
+	{
+
+		this._items = value;
+
+		return this._notify(value);
 
 	}
 
@@ -48,36 +58,88 @@ export default class BindableStore extends ObservableStore
 	//  Method
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Bind the store to a element.
-	 *
-	 * @param	{Element}		elem				HTML Element.
-	 * @param	{String}		key					Key to store.
-	 */
-	bindTo(elem)
+	set(key, value, options, ...args)
 	{
 
-		let key = elem.getAttribute("bm-bind");
+		if (this._elems[key] && this._elems[key]["callback"])
+		{
+			value = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
+		}
 
-		// Init element's value
-//		FormUtil.setValue(elem, this.get(key));
+		if (this._callback)
+		{
+			value = this._callback({"changedItem": {[key]: value}});
+		}
+
+		super.set(key, value);
+
+		return this._notify({[key]:value}, ...args);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Bind the store to an element.
+	 *
+	 * @param	{String}		key					Key to bind.
+	 * @param	{Element}		elem				HTML Element to bind.
+	 * @param	{Function}		callback			Callback function that is called when value is changed.
+	 */
+	bindTo(key, elem, callback)
+	{
 
 		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
-		if (!bound && BM.Util.safeGet(this._options, "2way", true))
+		if (!bound)
 		{
-			// Change element's value when store value changed
-			this.subscribe(key, () => {
-				FormUtil.setValue(elem, this.get(key));
-			});
+			this._elems[key] = this._elems[key] || {"elements":[]};
+			this._elems[key]["elements"].push(elem);
+			this._elems[key]["callback"] = callback;
 
-			// Set store value when element's value changed
-			let eventName = BM.Util.safeGet(this._options, "eventName", "change");
-			elem.addEventListener(eventName, (() => {
-				this.set(key, FormUtil.getValue(elem), {"notifyOnChange":false});
-			}).bind(this));
+			let type = BM.Util.safeGet(this._options, "type")
+			if (type === "two-way" || type === "one-way-reverse")
+			{
+				// Update store value when element's value changed
+				let eventName = BM.Util.safeGet(this._options, "eventName", "change");
+				elem.addEventListener(eventName, (() => {
+					let value = FormUtil.getValue(elem);
+
+					this.set(key, value, null, elem);
+				}).bind(this));
+			}
 
 			elem.__bm_bindinfo = { "bound": true };
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Notify observers asynchronously.
+	 *
+	 * @param	{Object}		conditions			Current conditions.
+	 * @param	{Object}		...args				Arguments to callback function.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_notifyAsync(conditions, ...args)
+	{
+
+		Object.keys(conditions).forEach((key) => {
+			if (this._elems[key])
+			{
+				let value = this.get(key);
+				for (let i = 0; i < this._elems[key]["elements"].length; i++)
+				{
+					FormUtil.setValue(this._elems[key]["elements"][i], value);
+				}
+			}
+		});
+
+		return Promise.resolve();
 
 	}
 
