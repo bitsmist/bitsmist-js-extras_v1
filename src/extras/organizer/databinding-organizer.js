@@ -64,7 +64,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", DatabindingOrganizer.DatabindingOrganizer_onAfterTransform);
-		this._addOrganizerHandler(component, "afterFetch", DatabindingOrganizer.DatabindingOrganizer_onAfterFetch);
+		this._addOrganizerHandler(component, "doFill", DatabindingOrganizer.DatabindingOrganizer_onDoFill);
 		this._addOrganizerHandler(component, "doCollect", DatabindingOrganizer.DatabindingOrganizer_onDoCollect);
 
 	}
@@ -94,7 +94,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingOrganizer_onAfterFetch(sender, e, ex)
+	static DatabindingOrganizer_onDoFill(sender, e, ex)
 	{
 
 		if (e.detail.items)
