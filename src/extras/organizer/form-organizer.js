@@ -47,8 +47,28 @@ export default class FormOrganizer extends BM.Organizer
 
 		let target = BM.Util.safeGet(e.detail, "target", "");
 
-		FormUtil.clearFields(this, target);
-		this._items = {};
+		FormUtil.clearFields(this, {"target":target, "triggerEvent":"change"});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingOrganizer_onAfterFetch(sender, e, ex)
+	{
+
+		this._items = e.detail.items;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static FormOrganizer_onDoCollect(sender, e, ex)
+	{
+
+		if (this.settings.get("form.settings.autoCollect"))
+		{
+			e.detail["items"] = FormOrganizer.__collectData(this);
+		}
 
 	}
 
@@ -57,11 +77,13 @@ export default class FormOrganizer extends BM.Organizer
 	static FormOrganizer_onDoFill(sender, e, ex)
 	{
 
-		let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
-		let items = BM.Util.safeGet(e.detail, "items", this._items);
+		if (this.settings.get("form.settings.autoFill"))
+		{
+			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
 
-		FormUtil.setFields(rootNode, items, {"masters":this.resources, "triggerEvent":"change"});
-		FormUtil.showConditionalElements(this, items);
+			FormUtil.setFields(rootNode, e.detail.items, {"masters":this.resources, "triggerEvent":true});
+			FormUtil.showConditionalElements(this, e.detail.items);
+		}
 
 	}
 
@@ -86,10 +108,6 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		// Add properties to component
-		Object.defineProperty(component, 'items', {
-			get()		{ return this._items; },
-			set(value)	{ this._items = value; },
-		});
 		Object.defineProperty(component, 'cancelSubmit', {
 			get() { return this._cancelSubmit; },
 		})
@@ -99,13 +117,13 @@ export default class FormOrganizer extends BM.Organizer
 		component.submit = function(...args) { return FormOrganizer._submit(this, ...args); }
 
 		// Init component vars
-		component._items = {};
 		component._cancelSubmit = false;
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.FormOrganizer_onAfterTransform);
 		this._addOrganizerHandler(component, "doClear", FormOrganizer.FormOrganizer_onDoClear);
 		this._addOrganizerHandler(component, "doFill", FormOrganizer.FormOrganizer_onDoFill);
+		this._addOrganizerHandler(component, "doCollect", FormOrganizer.FormOrganizer_onDoCollect);
 
 	}
 
@@ -114,18 +132,41 @@ export default class FormOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	*
-	* Build a element.
-	*
-    * @param	{Component}		component			Component.
-	* @param	{HTMLElement}	element				HTMLElement to build.
-	* @param	{Object}		items				Items to fill elements.
-	* @param	{Object}		options				Options.
-	*/
+	 *
+	 * Build a element.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{HTMLElement}	element				HTMLElement to build.
+	 * @param	{Object}		items				Items to fill elements.
+	 * @param	{Object}		options				Options.
+	 */
 	static _build(component, element, items, options)
 	{
 
 		FormUtil.build(element, items, options);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Collect data from the form.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _collect(component, options)
+	{
+
+		return Promise.resolve().then(() => {
+			return component.trigger("beforeCollect", options);
+		}).then(() => {
+			return component.trigger("doCollect", options);
+		}).then(() => {
+			return component.trigger("afterCollect", options);
+		});
 
 	}
 
@@ -145,13 +186,7 @@ export default class FormOrganizer extends BM.Organizer
 		options = options || {};
 		component._cancelSubmit = false;
 
-		return Promise.resolve().then(() => {
-			// Collect values
-			if (component.settings.get("form.settings.autoCollect", true))
-			{
-				options["items"] = FormOrganizer.__collectData(component);
-			}
-		}).then(() => {
+		return FormOrganizer._collect(component, options).then(() => {
 			// Validate values
 			if (component.settings.get("form.settings.autoValidate", true))
 			{
