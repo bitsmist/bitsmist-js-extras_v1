@@ -116,7 +116,7 @@ FormUtil.setFields = function(rootNode, item, options)
 			if (triggerEvent)
 			{
 				let e = document.createEvent("HTMLEvents");
-				e.initEvent(triggerEvent, true, true);
+				e.initEvent("change", true, true);
 				element.dispatchEvent(e);
 			}
 		}
@@ -190,12 +190,13 @@ FormUtil.getFields = function(rootNode)
  * Clear the form.
  *
  * @param	{HTMLElement}	rootNode			Form node.
- * @param	{String}		target				Target.
+ * @param	{Object}		options				Options.
  */
-FormUtil.clearFields = function(rootNode, target)
+FormUtil.clearFields = function(rootNode, options)
 {
 
-	target = (target ? target : "");
+	let target = BM.Util.safeGet(options, "target", "");
+	let triggerEvent = BM.Util.safeGet(options, "triggerEvent");
 
 	// Get input elements
 	let elements = BM.Util.scopedSelectorAll(rootNode, target + " input");
@@ -213,12 +214,28 @@ FormUtil.clearFields = function(rootNode, target)
 			element.checked = false;
 			break;
 		}
+
+		// Trigger change event
+		if (triggerEvent)
+		{
+			let e = document.createEvent("HTMLEvents");
+			e.initEvent("change", true, true);
+			element.dispatchEvent(e);
+		}
 	});
 
 	elements = rootNode.querySelectorAll(target + " select");
 	elements = Array.prototype.slice.call(elements, 0);
 	elements.forEach((element) => {
 		element.selectedIndex = -1;
+
+		// Trigger change event
+		if (triggerEvent)
+		{
+			let e = document.createEvent("HTMLEvents");
+			e.initEvent("change", true, true);
+			element.dispatchEvent(e);
+		}
 	});
 
 }
