@@ -103,12 +103,6 @@ FormUtil.setFields = function(rootNode, item, options)
 				value = FormUtil._getMasterValue(masters, type, item[fieldName], field);
 			}
 
-			// Format
-			if (element.hasAttribute("bm-format"))
-			{
-				value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
-			}
-
 			// Set
 			FormUtil.setValue(element, value);
 
@@ -254,6 +248,12 @@ FormUtil.setValue = function(element, value)
 	if (value === undefined || value === null)
 	{
 		value = "";
+	}
+
+	// Format
+	if (element.hasAttribute("bm-format"))
+	{
+		value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
 	}
 
 	// Sanitize
