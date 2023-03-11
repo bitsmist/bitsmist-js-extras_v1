@@ -60,6 +60,8 @@ export default class ResourceOrganizer extends BM.Organizer
 				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
+					e.detail["items"] = resource.items;
+
 					// Set a property automatically after resource is fetched
 					let autoSet = this.settings.get("resources." + resourceName + ".autoSetProperty");
 					if (autoSet)
