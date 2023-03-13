@@ -91,15 +91,12 @@ export default class RouteOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onAfterValidate(sender, e, ex)
+	static RouteOrganizer_onDoReportValidity(sender, e, ex)
 	{
 
 		// Dump errors when validation failed
-		if (!this.validationResult["result"])
-		{
-			RouteOrganizer.__dumpValidationErrors(this);
-			throw new URIError("URL validation failed.");
-		}
+		RouteOrganizer.__dumpValidationErrors(this);
+		throw new URIError("URL validation failed.");
 
 	}
 
@@ -159,7 +156,7 @@ export default class RouteOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "doStart", RouteOrganizer.RouteOrganizer_onDoStart);
 		this._addOrganizerHandler(component, "afterReady", RouteOrganizer.RouteOrganizer_onAfterReady);
 		this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.RouteOrganizer_onDoValidateFail);
-		this._addOrganizerHandler(component, "afterValidate", RouteOrganizer.RouteOrganizer_onAfterValidate);
+		this._addOrganizerHandler(component, "doReportValidity", RouteOrganizer.RouteOrganizer_onDoReportValidity);
 
 		// Load settings from attributes
 		RouteOrganizer._loadAttrSettings(component);
