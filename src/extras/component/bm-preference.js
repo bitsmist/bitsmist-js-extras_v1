@@ -50,7 +50,8 @@ PreferenceServer.prototype._getSettings = function()
 				"handlers": {
 					"beforeStart":		["PreferenceServer_onBeforeStart"],
 					"doFetch":			["PreferenceServer_onDoFetch"],
-					"beforeSubmit":		["PreferenceServer_onBeforeSubmit"]
+					"doSubmit":			["PreferenceServer_onDoSubmit"],
+					"doReportValidity":	["PreferenceServer_onDoReportValidity"]
 				}
 			}
 		},
@@ -58,13 +59,29 @@ PreferenceServer.prototype._getSettings = function()
 		// Form
 		"form": {
 			"settings": {
-				"autoValidate":			false,
 				"autoCollect":			false,
+				"autoFilter":			false,
 			}
 		}
 	}
 
 }
+
+// -----------------------------------------------------------------------------
+//  Setter/Getter
+// -----------------------------------------------------------------------------
+
+/**
+ * Preferences.
+ *
+ * @type	{Object}
+ */
+Object.defineProperty(PreferenceServer.prototype, 'items', {
+	get()
+	{
+		return this._store.items;
+	}
+})
 
 // -----------------------------------------------------------------------------
 //  Event Handlers
@@ -92,20 +109,32 @@ PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
 	// Load preferences
 	return this.resources["preferences"].get().then((preferences) => {
 		this._store.merge(preferences);
-		this.items = this._store.items;
 	});
 
 }
 
 // -----------------------------------------------------------------------------
 
-PreferenceServer.prototype.PreferenceServer_onBeforeSubmit = function(sender, e, ex)
+PreferenceServer.prototype.PreferenceServer_onDoSubmit = function(sender, e, ex)
 {
 
 	this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);
 
 	// Pass items to the latter event handlers
 	e.detail.items = this._store.items;
+
+}
+
+// -----------------------------------------------------------------------------
+
+PreferenceServer.prototype.PreferenceServer_onDoReportValidity = function(sender, e, ex)
+{
+
+	let msg = `Invalid preference value. name=${this.name}`;
+	Object.keys(this.validationResult["invalids"]).forEach((key) => {
+		msg += "\n\tkey=" + this.validationResult["invalids"][key]["key"] + ", value=" + this.validationResult["invalids"][key]["value"];
+	});
+	console.error(msg);
 
 }
 
@@ -190,22 +219,14 @@ PreferenceServer.prototype._filter = function(conditions, observerInfo, ...args)
 
 	let result = false;
 	let target = observerInfo["options"]["targets"];
+	target = ( Array.isArray(target) ? target : [target] );
 
-	if (target === "*")
+	for (let i = 0; i < target.length; i++)
 	{
-		result = true;
-	}
-	else
-	{
-		target = ( Array.isArray(target) ? target : [target] );
-
-		for (let i = 0; i < target.length; i++)
+		if (conditions[target[i]])
 		{
-			if (conditions[target[i]])
-			{
-				result = true;
-				break;
-			}
+			result = true;
+			break;
 		}
 	}
 
