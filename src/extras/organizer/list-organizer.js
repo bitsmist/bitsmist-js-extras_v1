@@ -37,7 +37,7 @@ export default class ListOrganizer extends BM.Organizer
 	{
 
 		this._listRootNode = this.querySelector(this.settings.get("list.settings.listRootNode"));
-		BM.Util.assert(this._listRootNode, `List.fill(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
+		BM.Util.assert(this._listRootNode, `List.ListOrganizer_onAfterTransform(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
 
 		return this.transformRow(this.settings.get("list.settings.rowTemplateName"));
 
@@ -138,7 +138,7 @@ export default class ListOrganizer extends BM.Organizer
 		}).then(() => {
 			component._activeRowTemplateName = templateName;
 		}).then(() => {
-			return component.trigger("afterRowTransform", options);
+			return component.trigger("afterTransformRow", options);
 		}).then(() => {
 			console.debug(`ListOrganizer._transformRow(): Switched a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
@@ -235,10 +235,9 @@ export default class ListOrganizer extends BM.Organizer
 	static _appendRowSync(component, rootNode, no, item, template, rowEvents)
 	{
 
-		component.triggerAsync("beforeBuildRow", {"item":item});
+		let chain = component.trigger("beforeBuildRow", {"item":item});
 
-		let chain = Promise.resolve();
-		chain = chain.then(() => {
+		return chain = chain.then(() => {
 			// Append a row
 			let element = ListOrganizer._createRow(template);
 			rootNode.appendChild(element);
