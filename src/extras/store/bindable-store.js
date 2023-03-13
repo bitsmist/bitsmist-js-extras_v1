@@ -35,17 +35,10 @@ export default class BindableStore extends BM.Store
 	}
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Method
 	// -------------------------------------------------------------------------
 
-	get items()
-	{
-
-		return this.clone();
-
-	}
-
-	set items(value)
+	replace(value)
 	{
 
 		this._items = value;
@@ -67,8 +60,6 @@ export default class BindableStore extends BM.Store
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Method
 	// -------------------------------------------------------------------------
 
 	set(key, value, options, ...args)
