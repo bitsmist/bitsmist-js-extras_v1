@@ -181,12 +181,12 @@ export default class ValidationOrganizer extends BM.Organizer
 				return component.trigger("doValidateFail", options);
 			}
 		}).then(() => {
-			return component.trigger("afterValidate", options);
-		}).then(() => {
 			if (!component._validationResult["result"])
 			{
 				return component.trigger("doReportValidity", options);
 			}
+		}).then(() => {
+			return component.trigger("afterValidate", options);
 		});
 
 	}
