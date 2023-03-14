@@ -60,7 +60,7 @@ PreferenceServer.prototype._getSettings = function()
 		"form": {
 			"settings": {
 				"autoCollect":			false,
-				"autoFilter":			false,
+				"autoCrop":				false,
 			}
 		}
 	}
