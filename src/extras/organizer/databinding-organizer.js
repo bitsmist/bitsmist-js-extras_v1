@@ -78,7 +78,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 		if (this.settings.get("bindings.settings.autoCollect", true))
 		{
-			e.detail["items"] = this._bindings.items;
+			e.detail.items = this._bindings.items;
 		}
 
 	}
