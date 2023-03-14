@@ -56,9 +56,9 @@ export default class FormOrganizer extends BM.Organizer
 	static FormOrganizer_onDoFill(sender, e, ex)
 	{
 
-		if (this.settings.get("form.settings.autoFill"))
+		if (this.settings.get("form.settings.autoFill", true))
 		{
-			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail["rootNode"]) : this );
+			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
 
 			FormUtil.setFields(rootNode, e.detail.items, {"masters":this.resources, "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
@@ -71,7 +71,7 @@ export default class FormOrganizer extends BM.Organizer
 	static FormOrganizer_onDoCollect(sender, e, ex)
 	{
 
-		if (this.settings.get("form.settings.autoCollect"))
+		if (this.settings.get("form.settings.autoCollect", true))
 		{
 			e.detail.items = FormUtil.getFields(this);
 		}
@@ -84,7 +84,10 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		// Collect only submittable data
-		e.detail.items = FormOrganizer.__collectData(this, e.detail.items);
+		if (this.settings.get("form.settings.autoCrop", true))
+		{
+			e.detail.items = FormOrganizer.__collectData(this, e.detail.items);
+		}
 
 	}
 
@@ -210,7 +213,6 @@ export default class FormOrganizer extends BM.Organizer
 						return component.trigger("doSubmit", options);
 					}).then(() => {
 						console.debug(`FormOrganizer._submit(): Submitted component. name=${component.name}, id=${component.id}`);
-						component.items = options["items"];
 						return component.trigger("afterSubmit", options);
 					});
 				}
