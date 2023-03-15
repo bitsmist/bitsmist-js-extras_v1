@@ -49,12 +49,6 @@ export default class BindableStore extends BM.Store
 			}
 		});
 
-		if (typeof(this._options["callback"]) === "function")
-		{
-			value = this._options["callback"](value, {"changedItem": value});
-			this._items = value;
-		}
-
 		return this._notify(value);
 
 	}
@@ -67,11 +61,6 @@ export default class BindableStore extends BM.Store
 		if (this._elems[key] && this._elems[key]["callback"])
 		{
 			value = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
-		}
-
-		if (typeof(this._options["callback"]) === "function")
-		{
-			value = this._options["callback"](value, {"changedItem": value});
 		}
 
 		super.set(key, value);
@@ -99,8 +88,8 @@ export default class BindableStore extends BM.Store
 			this._elems[key]["elements"].push(elem);
 			this._elems[key]["callback"] = callback;
 
-			let type = this._options["type"];
-			if (type === "two-way" || type === "one-way-reverse")
+			let direction = this._options["direction"];
+			if (direction === "two-way" || direction === "one-way-reverse")
 			{
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
@@ -131,7 +120,7 @@ export default class BindableStore extends BM.Store
 	_notify(conditions, ...args)
 	{
 
-		if (this._options["type"] !== "one-way-reverse" )
+		if (this._options["direction"] !== "one-way-reverse" )
 		{
 			return this._notifyAsync(conditions, ...args);
 		}
