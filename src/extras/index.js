@@ -12,11 +12,17 @@ import BM from "./bm";
 
 // Store
 
+import ArrayStore from "./store/array-store.js";
+window.BITSMIST.v1.ArrayStore = ArrayStore;
+
 import ObservableStore from "./store/observable-store.js";
 window.BITSMIST.v1.ObservableStore = ObservableStore;
 
 import BindableStore from "./store/bindable-store.js";
 window.BITSMIST.v1.BindableStore = BindableStore;
+
+import BindableArrayStore from "./store/bindable-array-store.js";
+window.BITSMIST.v1.BindableArrayStore = BindableArrayStore;
 
 // Organizer
 
@@ -106,3 +112,4 @@ window.BITSMIST.v1.BmTabcontent = BmTabcontent;
 import TagLoader from "./component/bm-tagloader.js";
 import SettingServer from "./component/bm-setting.js";
 import PreferenceServer from "./component/bm-preference.js";
+import ErrorServer from "./component/bm-error.js";
