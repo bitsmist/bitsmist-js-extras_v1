@@ -29,8 +29,6 @@ export default class BindableStore extends BM.Store
 		super(Object.assign(defaults, options));
 
 		this._elems = {};
-		this._callback = BM.Util.safeGet(options, "callback");
-		this._notify = ( BM.Util.safeGet(options, "type") === "one-way-reverse" ? ()=>{} : this._notifyAsync );
 
 	}
 
@@ -51,9 +49,10 @@ export default class BindableStore extends BM.Store
 			}
 		});
 
-		if (this._callback)
+		if (typeof(this._options["callback"]) === "function")
 		{
-			value = this._callback({"changedItem": value});
+			value = this._options["callback"](value, {"changedItem": value});
+			this._items = value;
 		}
 
 		return this._notify(value);
@@ -70,9 +69,9 @@ export default class BindableStore extends BM.Store
 			value = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
 		}
 
-		if (this._callback)
+		if (typeof(this._options["callback"]) === "function")
 		{
-			value = this._callback({"changedItem": {[key]: value}});
+			value = this._options["callback"](value, {"changedItem": value});
 		}
 
 		super.set(key, value);
@@ -100,11 +99,11 @@ export default class BindableStore extends BM.Store
 			this._elems[key]["elements"].push(elem);
 			this._elems[key]["callback"] = callback;
 
-			let type = BM.Util.safeGet(this._options, "type")
+			let type = this._options["type"];
 			if (type === "two-way" || type === "one-way-reverse")
 			{
 				// Update store value when element's value changed
-				let eventName = BM.Util.safeGet(this._options, "eventName", "change");
+				let eventName = this._options["eventName"] || "change";
 				elem.addEventListener(eventName, (() => {
 					let value = FormUtil.getValue(elem);
 
@@ -119,6 +118,26 @@ export default class BindableStore extends BM.Store
 
 	// -------------------------------------------------------------------------
 	//  Protected
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Notify observers.
+	 *
+	 * @param	{Object}		conditions			Current conditions.
+	 * @param	{Object}		...args				Arguments to callback function.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	_notify(conditions, ...args)
+	{
+
+		if (this._options["type"] !== "one-way-reverse" )
+		{
+			return this._notifyAsync(conditions, ...args);
+		}
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
