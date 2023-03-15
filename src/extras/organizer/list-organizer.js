@@ -168,7 +168,7 @@ export default class ListOrganizer extends BM.Organizer
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
-						FormUtil.setFields(element, options["item"], {"masters":component.resources});
+						FormUtil.setFields(element, options["item"], {"resources":component.resources});
 					}
 					return component.triggerAsync("doFillRow", options);
 				}).then(() => {
@@ -219,7 +219,7 @@ export default class ListOrganizer extends BM.Organizer
 			FormUtil.showConditionalElements(element, options["item"]);
 			if (component.settings.get("list.settings.autoFill", true))
 			{
-				FormUtil.setFields(element, options["item"], {"masters":component.resources});
+				FormUtil.setFields(element, options["item"], {"resources":component.resources});
 			}
 			component.triggerAsync("doFillRow", options);
 			component.triggerAsync("afterFillRow", options);

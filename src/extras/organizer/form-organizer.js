@@ -60,7 +60,7 @@ export default class FormOrganizer extends BM.Organizer
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
 
-			FormUtil.setFields(rootNode, e.detail.items, {"masters":this.resources, "triggerEvent":true});
+			FormUtil.setFields(rootNode, e.detail.items, {"resources":this.resources, "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
