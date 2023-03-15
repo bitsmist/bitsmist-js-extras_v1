@@ -54,7 +54,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 			get() { return this._bindings; },
 		});
 
-		if (component.settings.get("bindings.settings.type", "single") === "single")
+		if (component.settings.get("bindings.settings.dataType", "single") === "single")
 		{
 			// Add methods
 			component.bindData = function(...args) { return DatabindingOrganizer._bindData(this, ...args); }
