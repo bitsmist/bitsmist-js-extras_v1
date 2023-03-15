@@ -146,7 +146,7 @@ export default class BindableStore extends BM.Store
 				let value = this.get(key);
 				for (let i = 0; i < this._elems[key]["elements"].length; i++)
 				{
-					FormUtil.setValue(this._elems[key]["elements"][i], value);
+					FormUtil.setValue(this._elems[index][key]["elements"][i], value, {"resources":this._options["resources"]});
 				}
 			}
 		});

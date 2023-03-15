@@ -155,7 +155,7 @@ export default class BindableArrayStore extends ArrayStore
 				let value = this.get(index, key);
 				for (let i = 0; i < this._elems[index][key]["elements"].length; i++)
 				{
-					FormUtil.setValue(this._elems[index][key]["elements"][i], value);
+					FormUtil.setValue(this._elems[index][key]["elements"][i], value, {"resources":this._options["resources"]});
 				}
 			}
 		});
