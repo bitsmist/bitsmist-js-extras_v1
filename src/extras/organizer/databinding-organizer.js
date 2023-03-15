@@ -54,7 +54,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 		});
 
 		// Add methods
-		component.bindData = function(data) { return DatabindingOrganizer._bindData(this, data); }
+		component.bindData = function(...args) { return DatabindingOrganizer._bindData(this, ...args); }
 
 		// Init vars
 		component._bindings = new BindableStore({
@@ -71,18 +71,6 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onDoCollect(sender, e, ex)
-	{
-
-		if (this.settings.get("bindings.settings.autoCollect", true))
-		{
-			e.detail.items = this._bindings.items;
-		}
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	static DatabindingOrganizer_onAfterTransform(sender, e, ex)
@@ -105,6 +93,18 @@ export default class DatabindingOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//
+	static DatabindingOrganizer_onDoCollect(sender, e, ex)
+	{
+
+		if (this.settings.get("bindings.settings.autoCollect", true))
+		{
+			e.detail.items = this._bindings.items;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Protected
 	// -------------------------------------------------------------------------
 
@@ -121,6 +121,10 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 		let nodes = rootNode.querySelectorAll("[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
+		if (rootNode.matches("[bm-bind]"))
+		{
+			nodes.push(rootNode);
+		}
 		nodes.forEach(elem => {
 			// Get a callback function from settings
 			let key = elem.getAttribute("bm-bind");
