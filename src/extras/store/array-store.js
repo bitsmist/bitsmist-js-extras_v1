@@ -32,7 +32,7 @@ export default class ArrayStore extends BM.Store
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this.items = BM.Util.safeGet(options, "items", []);
+		this.items = BM.Util.safeGet(this._options, "items", []);
 
 	}
 
