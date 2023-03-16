@@ -195,7 +195,7 @@ export default class FormOrganizer extends BM.Organizer
 			// Validate values
 			if (component.settings.get("form.settings.autoValidate", true))
 			{
-				options["validatorName"] = component.settings.get("form.settings.validatorName");
+				options["validatorName"] = options["validatorName"] || component.settings.get("form.settings.validatorName");
 				return component.validate(options).then(() => {
 					if (!component.validationResult["result"])
 					{
