@@ -61,6 +61,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 			// Init vars
 			component._bindings = new BindableStore({
+				"resources":	component.resources,
 				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
 			});
 
@@ -75,6 +76,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 			// Init vars
 			component._bindings = new BindableArrayStore({
+				"resources":	component.resources,
 				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
 			});
 
