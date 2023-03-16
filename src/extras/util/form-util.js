@@ -36,7 +36,7 @@ FormUtil.showConditionalElements = function(rootNode, item)
 	// Show elements
 	elements.forEach((element) => {
 		let condition = element.getAttribute("bm-visible");
-		if (BM.Util.safeEval(condition, item, item))
+		if (BM.Util.safeEval(condition, item))
 		{
 			element.style.removeProperty("display");
 		}
@@ -81,12 +81,12 @@ FormUtil.hideConditionalElements = function(rootNode)
 FormUtil.setFields = function(rootNode, item, options)
 {
 
-	let masters = BM.Util.safeGet(options, "masters");
-	let triggerEvent = BM.Util.safeGet(options, "triggerEvent");
-
 	// Get elements with bm-bind attribute
 	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
-	elements.push(rootNode);
+	if (rootNode.matches("[bm-bind]"))
+	{
+		elements.push(rootNode);
+	}
 
 	elements.forEach((element) => {
 		let fieldName = element.getAttribute("bm-bind");
@@ -94,25 +94,8 @@ FormUtil.setFields = function(rootNode, item, options)
 		{
 			let value = BM.Util.safeGet(item, fieldName, "");
 
-			// Get master value
-			if (element.hasAttribute("bm-bindtext"))
-			{
-				let arr = element.getAttribute("bm-bindtext").split(".");
-				let type = arr[0];
-				let field = arr[1] || "";
-				value = FormUtil._getMasterValue(masters, type, item[fieldName], field);
-			}
-
 			// Set
-			FormUtil.setValue(element, value);
-
-			// Trigger change event
-			if (triggerEvent)
-			{
-				let e = document.createEvent("HTMLEvents");
-				e.initEvent("change", true, true);
-				element.dispatchEvent(e);
-			}
+			FormUtil.setValue(element, value, options);
 		}
 	});
 
@@ -140,12 +123,6 @@ FormUtil.getFields = function(rootNode)
 		// Get a value from the element
 		let key = element.getAttribute("bm-bind");
 		let value = FormUtil.getValue(element);
-
-		// Deformat
-		if (element.hasAttribute("bm-format"))
-		{
-			value = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
-		}
 
 		if (Array.isArray(item[key]))
 		{
@@ -190,46 +167,17 @@ FormUtil.clearFields = function(rootNode, options)
 {
 
 	let target = BM.Util.safeGet(options, "target", "");
-	let triggerEvent = BM.Util.safeGet(options, "triggerEvent");
 
 	// Get input elements
 	let elements = BM.Util.scopedSelectorAll(rootNode, target + " input");
-
 	elements.forEach((element) => {
-		switch (element.type.toLowerCase())
-		{
-		case "search":
-		case "text":
-		case "number":
-			element.value = "";
-			break;
-		case "checkbox":
-		case "radio":
-			element.checked = false;
-			break;
-		}
-
-		// Trigger change event
-		if (triggerEvent)
-		{
-			let e = document.createEvent("HTMLEvents");
-			e.initEvent("change", true, true);
-			element.dispatchEvent(e);
-		}
+		FormUtil.clearValue(element, options);
 	});
 
 	elements = rootNode.querySelectorAll(target + " select");
 	elements = Array.prototype.slice.call(elements, 0);
 	elements.forEach((element) => {
-		element.selectedIndex = -1;
-
-		// Trigger change event
-		if (triggerEvent)
-		{
-			let e = document.createEvent("HTMLEvents");
-			e.initEvent("change", true, true);
-			element.dispatchEvent(e);
-		}
+		FormUtil.clearValue(element, options);
 	});
 
 }
@@ -242,12 +190,23 @@ FormUtil.clearFields = function(rootNode, options)
  * @param	{HTMLElement}	element				Html element.
  * @param	{String}		value				Value.
  */
-FormUtil.setValue = function(element, value)
+FormUtil.setValue = function(element, value, options)
 {
+
+	let eventName = "change";
 
 	if (value === undefined || value === null)
 	{
 		value = "";
+	}
+
+	// Get master value
+	if (element.hasAttribute("bm-bindtext") && options && options["resources"])
+	{
+		let arr = element.getAttribute("bm-bindtext").split(".");
+		let resourceName = arr[0];
+		let key = arr[1];
+		value = FormUtil._getResourceValue(options["resources"], resourceName, value, key);
 	}
 
 	// Format
@@ -274,26 +233,12 @@ FormUtil.setValue = function(element, value)
 		FormUtil._setValue_element(element, value);
 	}
 
-}
-
-
-// -----------------------------------------------------------------------------
-
-/**
- * Build a form element.
- *
- * @param	{HTMLElement}	element				Element to build.
- * @param	{Object}		items				Items.
- * @param	{Object}		options				Options.
- */
-FormUtil.build = function(element, items, options)
-{
-
-	switch (element.tagName.toLowerCase())
+	// Trigger change event
+	if (options && options["triggerEvent"])
 	{
-	case "select":
-		FormUtil._build_select(element, items, options);
-		break;
+		let e = document.createEvent("HTMLEvents");
+		e.initEvent(eventName, true, true);
+		element.dispatchEvent(e);
 	}
 
 }
@@ -341,7 +286,66 @@ FormUtil.getValue = function(element)
 		break;
 	}
 
+	// Deformat
+	if (element.hasAttribute("bm-format"))
+	{
+		ret = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
+	}
+
 	return ret;
+
+}
+
+// -----------------------------------------------------------------------------
+
+FormUtil.clearValue = function(element, options)
+{
+
+	let eventName = "change";
+
+	switch (element.type.toLowerCase())
+	{
+	case "select-one":
+	case "select-multiple":
+		element.selectedIndex = -1;
+		break;
+	case "checkbox":
+	case "radio":
+		element.checked = false;
+		break;
+	default:
+		element.value = "";
+		break;
+	}
+
+	// Trigger change event
+	if (options && options["triggerEvent"])
+	{
+		let e = document.createEvent("HTMLEvents");
+		e.initEvent(eventName, true, true);
+		element.dispatchEvent(e);
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Build a form element.
+ *
+ * @param	{HTMLElement}	element				Element to build.
+ * @param	{Object}		items				Items.
+ * @param	{Object}		options				Options.
+ */
+FormUtil.build = function(element, items, options)
+{
+
+	switch (element.tagName.toLowerCase())
+	{
+	case "select":
+		FormUtil._build_select(element, items, options);
+		break;
+	}
 
 }
 
@@ -442,23 +446,10 @@ FormUtil._setValue_target = function(element, targets, value)
 			element.innerHTML = value;
 			break;
 		case "outerhtml":
-			if (value)
-			{
-				element.outerHTML = value;
-			}
-			break;
-		case "href":
-		case "src":
-		case "rel":
-			if (value.substring(0, 4) === "http" || value.substring(0, 1) === "/")
-			{
-				element.setAttribute(item, value);
-			}
+			element.outerHTML = value;
 			break;
 		default:
-			let attr = element.getAttribute(item);
-			attr = ( attr ? attr + " " + value : value );
-			element.setAttribute(item, attr);
+			element.setAttribute(item, value);
 			break;
 		}
 	}
@@ -550,30 +541,29 @@ FormUtil._setValue_element = function(element, value)
 // -----------------------------------------------------------------------------
 
 /**
- * Get master value.
+ * Get a resource value that matches given value.
  *
- * @param	{array}			masters				Master values.
- * @param	{String}		type				Master type.
- * @param	{String}		code				Code value.
+ * @param	{array}			resources			Resources.
+ * @param	{String}		resourceName		Resource name.
+ * @param	{String}		value				Code value.
+ * @param	{String}		key					Key.
  *
- * @return  {String}		Master value.
+ * @return  {String}		Resource value.
  */
-FormUtil._getMasterValue = function(masters, type, code, fieldName)
+FormUtil._getResourceValue = function(resources, resourceName, value, key)
 {
 
-	let ret = code;
+	let ret = value;
 
-	if (masters && (type in masters))
+	if (resources && (resourceName in resources))
 	{
-		let item = masters[type].getItem(code);
+		let item = resources[resourceName].getItem(value);
 		if (item)
 		{
-			ret = item[fieldName];
+			ret = item[key];
 		}
 	}
 
 	return ret;
 
 }
-
-
