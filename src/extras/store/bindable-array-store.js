@@ -37,6 +37,16 @@ export default class BindableArrayStore extends ArrayStore
 	//  Method
 	// -------------------------------------------------------------------------
 
+	clear()
+	{
+
+		super.clear();
+		this._elems = {};
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	replace(index, value)
 	{
 
