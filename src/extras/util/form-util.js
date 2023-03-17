@@ -81,15 +81,17 @@ FormUtil.hideConditionalElements = function(rootNode)
 FormUtil.setFields = function(rootNode, item, options)
 {
 
-	// Get elements with bm-bind attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
-	if (rootNode.matches("[bm-bind]"))
+	let attrName = (options && options["attribute"] ) || "bm-bind";
+
+	// Get elements with the attribute
+	let elements = BM.Util.scopedSelectorAll(rootNode, `[${attrName}]`);
+	if (rootNode.matches(attrName))
 	{
 		elements.push(rootNode);
 	}
 
 	elements.forEach((element) => {
-		let fieldName = element.getAttribute("bm-bind");
+		let fieldName = element.getAttribute(attrName);
 		if (fieldName in item)
 		{
 			let value = BM.Util.safeGet(item, fieldName, "");
@@ -113,15 +115,19 @@ FormUtil.setFields = function(rootNode, item, options)
 FormUtil.getFields = function(rootNode)
 {
 
+	let attrName = (options && options["attribute"] ) || "bm-bind";
 	let item = {};
 
-	// Get elements with bm-bind attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
-	elements.push(rootNode);
+	// Get elements with the attribute
+	let elements = BM.Util.scopedSelectorAll(rootNode, `[${attrName}]`);
+	if (rootNode.matches(attrName))
+	{
+		elements.push(rootNode);
+	}
 
 	elements.forEach((element) => {
 		// Get a value from the element
-		let key = element.getAttribute("bm-bind");
+		let key = element.getAttribute(attrName);
 		let value = FormUtil.getValue(element);
 
 		if (Array.isArray(item[key]))
@@ -193,6 +199,7 @@ FormUtil.clearFields = function(rootNode, options)
 FormUtil.setValue = function(element, value, options)
 {
 
+	let attrName = (options && options["attribute"]) || "bm-bind";
 	let eventName = "change";
 
 	if (value === undefined || value === null)
@@ -201,9 +208,9 @@ FormUtil.setValue = function(element, value, options)
 	}
 
 	// Get master value
-	if (element.hasAttribute("bm-bindtext") && options && options["resources"])
+	if (element.hasAttribute(`${attrName}text`) && options && options["resources"])
 	{
-		let arr = element.getAttribute("bm-bindtext").split(".");
+		let arr = element.getAttribute(`${attrName}text`).split(".");
 		let resourceName = arr[0];
 		let key = arr[1];
 		value = FormUtil._getResourceValue(options["resources"], resourceName, value, key);
@@ -219,7 +226,7 @@ FormUtil.setValue = function(element, value, options)
 	//value = FormatterUtil.sanitize(value);
 
 	// Set value
-	let targets = element.getAttribute("bm-bindtarget");
+	let targets = element.getAttribute(`${attrName}target`);
 	if (targets)
 	{
 		FormUtil._setValue_target(element, targets, value);
