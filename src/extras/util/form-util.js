@@ -85,7 +85,7 @@ FormUtil.setFields = function(rootNode, item, options)
 
 	// Get elements with the attribute
 	let elements = BM.Util.scopedSelectorAll(rootNode, `[${attrName}]`);
-	if (rootNode.matches(attrName))
+	if (rootNode.matches(`[${attrName}]`))
 	{
 		elements.push(rootNode);
 	}
@@ -112,7 +112,7 @@ FormUtil.setFields = function(rootNode, item, options)
  *
  * @return  {Object}		Values.
  */
-FormUtil.getFields = function(rootNode)
+FormUtil.getFields = function(rootNode, options)
 {
 
 	let attrName = (options && options["attribute"] ) || "bm-bind";
@@ -120,7 +120,7 @@ FormUtil.getFields = function(rootNode)
 
 	// Get elements with the attribute
 	let elements = BM.Util.scopedSelectorAll(rootNode, `[${attrName}]`);
-	if (rootNode.matches(attrName))
+	if (rootNode.matches(`[${attrName}]`))
 	{
 		elements.push(rootNode);
 	}
@@ -226,7 +226,7 @@ FormUtil.setValue = function(element, value, options)
 	//value = FormatterUtil.sanitize(value);
 
 	// Set value
-	let targets = element.getAttribute(`${attrName}target`);
+	let targets = element.getAttribute(`${attrName}-target`);
 	if (targets)
 	{
 		FormUtil._setValue_target(element, targets, value);
@@ -296,7 +296,7 @@ FormUtil.getValue = function(element)
 	// Deformat
 	if (element.hasAttribute("bm-format"))
 	{
-		ret = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), value);
+		ret = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
 	}
 
 	return ret;
