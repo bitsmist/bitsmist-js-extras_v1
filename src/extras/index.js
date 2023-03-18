@@ -90,6 +90,9 @@ window.BITSMIST.v1.WebstorageResourceHandler = WebstorageResourceHandler;
 import LocaleHandler from "./locale-handler/locale-handler.js";
 window.BITSMIST.v1.LocaleHandler = LocaleHandler;
 
+import LocaleServerHandler from "./locale-handler/localeserver-handler.js";
+window.BITSMIST.v1.LocaleServerHandler = LocaleServerHandler;
+
 // Validation handler
 
 import ValidationHandler from "./validation-handler/validation-handler.js";
