@@ -68,6 +68,8 @@ export default class LocaleOrganizer extends BM.Organizer
 		};
 		component._localeHandler = BM.ClassUtil.createObject(component.settings.get("locales.settings.handlerClassName"), component, handlerOptions);
 
+		return component._localeHandler.init();
+
 	}
 
 	// -------------------------------------------------------------------------
@@ -82,14 +84,13 @@ export default class LocaleOrganizer extends BM.Organizer
 		});
 
 		return LocaleOrganizer._loadExternalMessages(this).then(() => {
-//			if ()
+			// If Locale Server exists, subscribe to it.
+			if (document.querySelector("bm-locale"))
 			{
 				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
 					document.querySelector("bm-locale").subscribe(this);
 				});
 			}
-		}).then(() => {
-			console.log("@@@messages", this._localeHandler.messages.items);
 		});
 
 	}
@@ -99,9 +100,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterTransform(sender, e, ex)
 	{
 
-		let messages = this._localeHandler.messages.get(this._localeHandler.locale, this._localeHandler.messages.get(this._localeHandler.fallbackLocale, {}));
-
-		FormUtil.setFields(this, messages, {"attribute":"bm-locale"});
+		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
 
 	}
 
@@ -110,9 +109,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterBuildRows(sender, e, ex)
 	{
 
-		let messages = this._localeHandler.messages.get(this._localeHandler.locale, this._localeHandler.messages.get(this._localeHandler.fallbackLocale, {}));
-
-		FormUtil.setFields(this, messages, {"attribute":"bm-locale"});
+		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
 
 	}
 
@@ -121,9 +118,9 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onDoLocale(sender, e, ex)
 	{
 
-		let messages = this._localeHandler.messages.get(e.detail.locale, this._localeHandler.messages.get(this._localeHandler.fallbackLocale, {}));
+		this._localeHandler.locale = e.detail.locale;
 
-		FormUtil.setFields(this, messages, {"attribute":"bm-locale"});
+		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
 
 	}
 
