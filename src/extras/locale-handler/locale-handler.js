@@ -131,16 +131,48 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get translated message.
+	 * Initialize the handler.
+	 */
+	init()
+	{
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get messages which belong to a locale.
+	 *
+	 * @param	{String}		key					Key.
+	 * @param	{String}		locale				Locale.
+	 *
+ 	 * @return  {String}		Messages.
+	 */
+	get(key, locale)
+	{
+
+		let key1 = (locale || this._locale) + ( key ? "." + $key : "" );
+		let key2 = (this._fallbackLocale) + ( key ? "." + $key : "" );
+
+		return this._messages.get(key1, this._messages.get(key2));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get a translated message.
+	 *
+	 * @param	{String}		locale				Locale.
 	 *
 	 * @param	{String}		key					Key.
 	 *
  	 * @return  {String}		Translated message.
 	 */
-	get(key, locale)
+	t(key, locale)
 	{
 
 		locale = locale || this._locale;
+
 		return this._messages.get(`${locale}.${key}`, this._messages.get(`${this._fallbackLocale}.${key}`));
 
 	}
