@@ -50,6 +50,9 @@ BM.OrganizerOrganizer.register(ListOrganizer);
 import DatabindingOrganizer from "./organizer/databinding-organizer.js";
 BM.OrganizerOrganizer.register(DatabindingOrganizer);
 
+import LocaleOrganizer from "./organizer/locale-organizer.js";
+BM.OrganizerOrganizer.register(LocaleOrganizer);
+
 import KeyOrganizer from "./organizer/key-organizer.js";
 BM.OrganizerOrganizer.register(KeyOrganizer);
 
@@ -82,6 +85,11 @@ window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
 import WebstorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
 window.BITSMIST.v1.WebstorageResourceHandler = WebstorageResourceHandler;
 
+// Locale Handler
+
+import LocaleHandler from "./locale-handler/locale-handler.js";
+window.BITSMIST.v1.LocaleHandler = LocaleHandler;
+
 // Validation handler
 
 import ValidationHandler from "./validation-handler/validation-handler.js";
@@ -113,3 +121,4 @@ import TagLoader from "./component/bm-tagloader.js";
 import SettingServer from "./component/bm-setting.js";
 import PreferenceServer from "./component/bm-preference.js";
 import ErrorServer from "./component/bm-error.js";
+import LocaleServer from "./component/bm-locale.js";
