@@ -52,9 +52,12 @@ export default class ListOrganizer extends BM.Organizer
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
+			return this.trigger("beforeBuildRows");
+		}).then(() => {
 			return builder(this, fragment, e.detail);
 		}).then(() => {
 			this._listRootNode.replaceChildren(fragment);
+			return this.trigger("afterBuildRows");
 		});
 
 	}
@@ -140,10 +143,10 @@ export default class ListOrganizer extends BM.Organizer
 
 		BM.Util.assert(component._templates[component._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
 
-		let chain = Promise.resolve();
 		let rowEvents = component.settings.get("list.rowevents");
 		let template = component.templates[component._activeRowTemplateName].html;
 
+		let chain = Promise.resolve();
 		for (let i = 0; i < options["items"].length; i++)
 		{
 			chain = chain.then(() => {
@@ -177,7 +180,11 @@ export default class ListOrganizer extends BM.Organizer
 			});
 		}
 
-		return chain;
+		return chain.then(() => {
+			delete options["no"];
+			delete options["item"];
+			delete options["element"];
+		});
 
 	}
 
@@ -224,6 +231,10 @@ export default class ListOrganizer extends BM.Organizer
 			component.triggerAsync("doFillRow", options);
 			component.triggerAsync("afterFillRow", options);
 		}
+
+		delete options["no"];
+		delete options["item"];
+		delete options["element"];
 
 	}
 
