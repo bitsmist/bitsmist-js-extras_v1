@@ -55,10 +55,14 @@ export default class LocaleOrganizer extends BM.Organizer
 			get() { return this._localeHandler; },
 		});
 
+		// Add methods to component
+		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
+
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
 		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
 		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
+		this._addOrganizerHandler(component, "beforeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeLocale);
 		this._addOrganizerHandler(component, "doLocale", LocaleOrganizer.LocaleOrganizer_onDoLocale);
 
 		// Init vars
@@ -67,8 +71,6 @@ export default class LocaleOrganizer extends BM.Organizer
 			"fallbackLocale": component.settings.get("locales.settings.fallbackLocale", component.settings.get("system.fallbackLocale", "en")),
 		};
 		component._localeHandler = BM.ClassUtil.createObject(component.settings.get("locales.settings.handlerClassName"), component, handlerOptions);
-
-		return component._localeHandler.init();
 
 	}
 
@@ -85,7 +87,8 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		return LocaleOrganizer._loadExternalMessages(this).then(() => {
 			// If Locale Server exists, subscribe to it.
-			if (document.querySelector("bm-locale"))
+			let server = document.querySelector("bm-locale");
+			if (server && this !==  server)
 			{
 				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
 					document.querySelector("bm-locale").subscribe(this);
@@ -110,6 +113,24 @@ export default class LocaleOrganizer extends BM.Organizer
 	{
 
 		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static LocaleOrganizer_onBeforeLocale(sender, e, ex)
+	{
+
+		let splitLocale = this.settings.get("locales.settings.splitLocale", this.settings.get("system.splitLocale", false));
+		if (splitLocale && !this._localeHandler.messages.has(e.detail.locale))
+		{
+			let loadOptions = {
+				"splitLocale":	splitLocale,
+				"locale":		e.detail.locale,
+			};
+
+			return this.loadMessages("messages", loadOptions);
+		}
 
 	}
 
@@ -146,7 +167,8 @@ export default class LocaleOrganizer extends BM.Organizer
 		fileName = fileName || "messages";
 		if (loadOptions["splitLocale"])
 		{
-			fileName = `${fileName}.${component._localeHandler.locale}`;
+			let locale = BM.Util.safeGet(loadOptions, "locale");
+			fileName = `${fileName}.${loadOptions["locale"]}`;
 		}
 
 		// Path
