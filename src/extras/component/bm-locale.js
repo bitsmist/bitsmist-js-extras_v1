@@ -53,6 +53,13 @@ LocaleServer.prototype._getSettings = function()
 				}
 			}
 		},
+
+		// Locales
+		"locales": {
+			"settings": {
+				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+			}
+		}
 	}
 
 }
@@ -73,8 +80,11 @@ Object.defineProperty(LocaleServer.prototype, 'locale', {
 	},
 	set(value)
 	{
-		this._locale = value;
-		this._store.notify("*", {"locale":value});
+		return this._triggerEvent("*", {"locale":value}).then(() => {
+			return this._store.notify("*", {"locale":value});
+		}).then(() => {
+			this._locale = value;
+		});
 	}
 })
 
@@ -90,48 +100,14 @@ LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
 
 }
 
+// -----------------------------------------------------------------------------
+
 LocaleServer.prototype.LocaleServer_onDoFetch = function(sender, e, ex)
 {
 
-	this._store.items = e.detail.items;
+	this._localeHandler.messages.items = e.detail.items;
 
 }
-
-// -----------------------------------------------------------------------------
-
-/**
- * Load a messages file.
- *
- * @param	{Component}		component			Component.
- * @param	{Object}		loadOptions			Load options.
- *
- * @return  {Promise}		Promise.
- */
-/*
-LocaleServer.prototype._loadMessages = function(component, loadOptions)
-{
-
-	console.debug(`LocaleServer._loadSpec(): Loading spec file. name=${component.name}`);
-
-	// Path
-	let path = BM.Util.safeGet(loadOptions, "path",
-		BM.Util.concatPath([
-			component.settings.get("system.appBaseUrl", ""),
-		])
-	);
-
-	console.log("@@@", component.name, path, loadOptions);
-
-	// Load messages
-	return BM.SettingOrganizer.loadFile("messages", path, loadOptions).then((result) => {
-		console.log("@@@", result);
-		let messages = result[0];
-
-		return messages;
-	});
-
-}
-*/
 
 // -----------------------------------------------------------------------------
 //  Methods
@@ -154,17 +130,21 @@ LocaleServer.prototype.subscribe = function(component, options)
 /**
  * Trigger preference changed events.
  *
- * @param	{Object}		items				Changed items.
+ * @param	{String}		conditions			Notify conditions.
+ * @param	{Object}		options				Options.
  *
  * @return  {Promise}		Promise.
  */
-LocaleServer.prototype._triggerEvent = function(items, options)
+LocaleServer.prototype._triggerEvent = function(conditions, options)
 {
 
-	let sender = BM.Util.safeGet(options, "sender");
-	let locale = options["locale"];
-
-	return this.trigger("doLocale", {"sender":sender, "locale":locale});
+	return Promise.resolve().then(() => {
+		return this.trigger("beforeLocale", options);
+	}).then(() => {
+		return this.trigger("doLocale", options);
+	}).then(() => {
+		return this.trigger("afterLocale", options);
+	});
 
 }
 
