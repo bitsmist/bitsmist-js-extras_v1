@@ -42,7 +42,6 @@ export default class LocaleServerHandler extends LocaleHandler
 	{
 
 		return this._component.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-			console.log("@@@connected", this._component.name);
 			this._messages = document.querySelector("bm-locale")._store;
 		});
 
