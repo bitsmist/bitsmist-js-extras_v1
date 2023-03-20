@@ -35,10 +35,13 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static PreferenceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
-		// Wait for PreferenceManager to be ready
-		return this.waitFor([{"rootNode":"bm-preference"}]).then(() => {
-			document.querySelector("bm-preference").subscribe(this, this.settings.get("preferences"));
-		});
+		if (document.querySelector("bm-preference") !==  this)
+		{
+			// Wait for PreferenceManager to be ready
+			return this.waitFor([{"rootNode":"bm-preference"}]).then(() => {
+				document.querySelector("bm-preference").subscribe(this, this.settings.get("preferences"));
+			});
+		}
 
 	}
 
