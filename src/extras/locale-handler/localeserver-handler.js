@@ -34,16 +34,28 @@ export default class LocaleServerHandler extends LocaleHandler
 
 	}
 
+	get messages()
+	{
+
+		return document.querySelector("bm-locale").localeHandler.messages;
+
+	}
+
 	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	init()
+	get(key, locale)
 	{
 
-		return this._component.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-			this._messages = document.querySelector("bm-locale")._store;
-		});
+		return document.querySelector("bm-locale").localeHandler.get(key, locale);
+
+	}
+
+	t(key, locale)
+	{
+
+		return document.querySelector("bm-locale").localeHandler.t(key, locale);
 
 	}
 
