@@ -131,15 +131,6 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Initialize the handler.
-	 */
-	init()
-	{
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Get messages which belong to a locale.
 	 *
 	 * @param	{String}		key					Key.
@@ -150,8 +141,8 @@ export default class LocaleHandler
 	get(key, locale)
 	{
 
-		let key1 = (locale || this._locale) + ( key ? "." + $key : "" );
-		let key2 = (this._fallbackLocale) + ( key ? "." + $key : "" );
+		let key1 = (locale || this._locale) + ( key ? "." + key : "" );
+		let key2 = (this._fallbackLocale) + ( key ? "." + key : "" );
 
 		return this._messages.get(key1, this._messages.get(key2));
 
