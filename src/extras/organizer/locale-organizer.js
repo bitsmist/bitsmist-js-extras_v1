@@ -86,7 +86,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		});
 
 		return LocaleOrganizer._loadExternalMessages(this).then(() => {
-			// If Locale Server exists, subscribe to it.
+			// Subscribe to the Locale Server if exists
 			if (this !==  document.querySelector("bm-locale"))
 			{
 				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
