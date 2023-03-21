@@ -73,17 +73,17 @@ LocaleServer.prototype._getSettings = function()
  *
  * @type	{Object}
  */
-Object.defineProperty(LocaleServer.prototype, 'locale', {
+Object.defineProperty(LocaleServer.prototype, 'localeName', {
 	get()
 	{
-		return this._locale;
+		return this._localeName;
 	},
 	set(value)
 	{
-		return this._triggerEvent("*", {"locale":value}).then(() => {
-			return this._store.notify("*", {"locale":value});
+		return this._triggerEvent("*", {"localeName":value}).then(() => {
+			return this._store.notify("*", {"localeName":value});
 		}).then(() => {
-			this._locale = value;
+			this._localeName = value;
 		});
 	}
 })
@@ -95,7 +95,7 @@ Object.defineProperty(LocaleServer.prototype, 'locale', {
 LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
 {
 
-	this._locale;
+	this._localeName;
 	this._store = new ObservableStore({"async":true});
 
 }

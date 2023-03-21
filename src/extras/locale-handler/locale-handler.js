@@ -34,8 +34,8 @@ export default class LocaleHandler
 
 		this._component = component;
 		this._options = new BM.Store({"items":options});
-		this._fallbackLocale = options["fallbackLocale"] || "en";
-		this._locale = options["locale"];
+		this._fallbackLocaleName = options["fallbackLocaleName"] || "en";
+		this._localeName = options["localeName"];
 		this._messages = new BM.Store();
 
 	}
@@ -73,42 +73,42 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Fallback Locale.
+	 * Fallback Locale Name.
 	 *
 	 * @type	{String}
 	 */
-	get fallbackLocale()
+	get fallbackLocaleName()
 	{
 
-		return this._fallbackLocale;
+		return this._fallbackLocaleName;
 
 	}
 
-	set fallbackLocale(value)
+	set fallbackLocaleName(value)
 	{
 
-		this._fallbackLocale = value;
+		this._fallbackLocaleName = value;
 
 	}
 
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Locale.
+	 * Locale Name.
 	 *
 	 * @type	{String}
 	 */
-	get locale()
+	get localeName()
 	{
 
-		return this._locale;
+		return this._localeName;
 
 	}
 
-	set locale(value)
+	set localeName(value)
 	{
 
-		this._locale = value;
+		this._localeName = value;
 
 	}
 
@@ -131,18 +131,18 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get messages which belong to a locale.
+	 * Get messages which belong to the locale name.
 	 *
 	 * @param	{String}		key					Key.
-	 * @param	{String}		locale				Locale.
+	 * @param	{String}		localeName			Locale name.
 	 *
  	 * @return  {String}		Messages.
 	 */
-	get(key, locale)
+	get(key, localeName)
 	{
 
-		let key1 = (locale || this._locale) + ( key ? "." + key : "" );
-		let key2 = (this._fallbackLocale) + ( key ? "." + key : "" );
+		let key1 = (localeName || this._localeName) + ( key ? "." + key : "" );
+		let key2 = (this._fallbackLocaleName) + ( key ? "." + key : "" );
 
 		return this._messages.get(key1, this._messages.get(key2));
 
@@ -153,18 +153,17 @@ export default class LocaleHandler
 	/**
 	 * Get a translated message.
 	 *
-	 * @param	{String}		locale				Locale.
-	 *
 	 * @param	{String}		key					Key.
+	 * @param	{String}		localeName			Locale name.
 	 *
  	 * @return  {String}		Translated message.
 	 */
-	t(key, locale)
+	t(key, localeName)
 	{
 
-		locale = locale || this._locale;
+		localeName = localeName || this._localeName;
 
-		return this._messages.get(`${locale}.${key}`, this._messages.get(`${this._fallbackLocale}.${key}`));
+		return this._messages.get(`${localeName}.${key}`, this._messages.get(`${this._fallbackLocaleName}.${key}`));
 
 	}
 

@@ -45,17 +45,19 @@ export default class LocaleServerHandler extends LocaleHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	get(key, locale)
+	get(key, localeName)
 	{
 
-		return document.querySelector("bm-locale").localeHandler.get(key, locale);
+		return document.querySelector("bm-locale").localeHandler.get(key, localeName);
 
 	}
 
-	t(key, locale)
+	// -------------------------------------------------------------------------
+
+	t(key, localeName)
 	{
 
-		return document.querySelector("bm-locale").localeHandler.t(key, locale);
+		return document.querySelector("bm-locale").localeHandler.t(key, localeName);
 
 	}
 

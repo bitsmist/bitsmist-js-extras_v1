@@ -62,13 +62,14 @@ export default class LocaleOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
 		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
 		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
+		this._addOrganizerHandler(component, "doStart", LocaleOrganizer.LocaleOrganizer_onDoStart);
 		this._addOrganizerHandler(component, "beforeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeLocale);
 		this._addOrganizerHandler(component, "doLocale", LocaleOrganizer.LocaleOrganizer_onDoLocale);
 
 		// Init vars
 		let handlerOptions = {
-			"locale": component.settings.get("locales.settings.locale", component.settings.get("system.locale", "en")),
-			"fallbackLocale": component.settings.get("locales.settings.fallbackLocale", component.settings.get("system.fallbackLocale", "en")),
+			"localeName": component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en")),
+			"fallbackLocaleName": component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
 		};
 		component._localeHandler = BM.ClassUtil.createObject(component.settings.get("locales.settings.handlerClassName"), component, handlerOptions);
 
@@ -85,9 +86,21 @@ export default class LocaleOrganizer extends BM.Organizer
 			this._localeHandler.messages.set(sectionName, sectionValue);
 		});
 
-		return LocaleOrganizer._loadExternalMessages(this).then(() => {
+	}
+
+	// -------------------------------------------------------------------------
+
+	static LocaleOrganizer_onDoStart(sender, e, ex)
+	{
+
+		return Promise.resolve().then(() => {
+			if (LocaleOrganizer._hasExternalMessages(this))
+			{
+				return LocaleOrganizer._loadExternalMessages(this);
+			}
+		}).then(() => {
 			// Subscribe to the Locale Server if exists
-			if (this !==  document.querySelector("bm-locale"))
+			if (document.querySelector("bm-locale") && this !==  document.querySelector("bm-locale"))
 			{
 				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
 					document.querySelector("bm-locale").subscribe(this);
@@ -120,15 +133,13 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onBeforeLocale(sender, e, ex)
 	{
 
-		let splitLocale = this.settings.get("locales.settings.splitLocale", this.settings.get("system.splitLocale", false));
-		if (splitLocale && !this._localeHandler.messages.has(e.detail.locale))
+		if (!this._localeHandler.messages.has(e.detail.localeName) && this.settings.get("locales.settings.autoLoad"))
 		{
 			let loadOptions = {
-				"splitLocale":	splitLocale,
-				"locale":		e.detail.locale,
+				"localeName":		e.detail.localeName,
 			};
 
-			return this.loadMessages("messages", loadOptions);
+			return LocaleOrganizer._loadExternalMessages(this, e.detail.localeName);
 		}
 
 	}
@@ -138,7 +149,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onDoLocale(sender, e, ex)
 	{
 
-		this._localeHandler.locale = e.detail.locale;
+		this._localeHandler.localeName = e.detail.localeName;
 
 		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
 
@@ -152,7 +163,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	 * Load the messages file.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{String}		fileName			File name.
+	 * @param	{String}		fileName			File name. Use "" to use default name.
 	 * @param	{Object}		loadOptions			Load options.
 	 *
 	 * @return  {Promise}		Promise.
@@ -163,19 +174,26 @@ export default class LocaleOrganizer extends BM.Organizer
 		console.debug(`LocaleOrganizer._loadMessages(): Loading messages file. name=${component.name}, fileName=${fileName}`);
 
 		// Filename
-		fileName = fileName || "messages";
-		if (loadOptions["splitLocale"])
+		fileName = fileName ||
+			component.settings.get("locales.settings.fileName",
+				component.settings.get("settings.fileName",
+					component.tagName.toLowerCase())) + ".messages";
+
+		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
+			component.settings.get("locales.settings.splitLocale",
+				component.settings.get("system.settings.splitLocale", false)));
+		if (splitLocale)
 		{
-			let locale = BM.Util.safeGet(loadOptions, "locale");
-			fileName = `${fileName}.${loadOptions["locale"]}`;
+			let localeName = BM.Util.safeGet(loadOptions, "localeName");
+			fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
 		}
 
 		// Path
 		let path = BM.Util.safeGet(loadOptions, "path",
 			BM.Util.concatPath([
 				component.settings.get("system.appBaseUrl", ""),
-				component.settings.get("system.localePath", ""),
-				component.settings.get("locales.settings.path", "")
+				component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
+				component.settings.get("locales.settings.path", component.settings.get("settings.path", "")),
 			])
 		);
 
@@ -189,50 +207,55 @@ export default class LocaleOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Load an external messages file.
+	 * Check if the component has an external messages file.
 	 *
 	 * @param	{Component}		component			Component.
 	 *
-	 * @return  {Promise}		Promise.
+	 * @return  {Boolean}		True if the component has an external messages file.
 	 */
-	static _loadExternalMessages(component)
+	static _hasExternalMessages(component)
 	{
 
-		let localeRef;
-		let promise = Promise.resolve();
+		let ret = false;
 
-		if (component.hasAttribute("bm-localeref"))
+		if (component.hasAttribute("bm-localeref") || component.settings.get("locales.settings.localeRef"))
 		{
-			localeRef = component.getAttribute("bm-localeref") || true;
-		}
-		else
-		{
-			localeRef = component.settings.get("locales.settings.localeRef");
+			ret = true;
 		}
 
-		if (localeRef)
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load an external messages file.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		localeName			Locale name to load.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _loadExternalMessages(component, localeName)
+	{
+
+		let fileName;
+		let loadOptions = {"localeName":localeName};
+		let localeRef = ( component.hasAttribute("bm-localeref") ?
+			component.getAttribute("bm-localeref") || true :
+			component.settings.get("locales.settings.localeRef")
+		);
+
+		if (localeRef !== true)
 		{
-			let fileName;
-			let loadOptions = {};
-
-			if (localeRef === true)
-			{
-				fileName = component.settings.get("locales.settings.fileName", "messages");
-			}
-			else
-			{
-				let url = BM.Util.parseURL(component.getAttribute("bm-localeref"));
-				fileName = url.filenameWithoutExtension;
-				loadOptions["path"] = url.path;
-				loadOptions["query"] = url.query;
-			}
-
-			loadOptions["splitLocale"] = component.settings.get("locales.settings.splitLocale", component.settings.get("system.settings.splitLocale", false));
-
-			promise = LocaleOrganizer._loadMessages(component, fileName, loadOptions);
+			let url = BM.Util.parseURL(localeRef);
+			fileName = url.filenameWithoutExtension;
+			loadOptions["path"] = url.path;
+			loadOptions["query"] = url.query;
 		}
 
-		return promise
+		return LocaleOrganizer._loadMessages(component, fileName, loadOptions);
 
 	}
 
