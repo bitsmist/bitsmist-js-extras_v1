@@ -90,7 +90,7 @@ Object.defineProperty(PreferenceServer.prototype, 'items', {
 PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, ex)
 {
 
-	this._defaults = new BM.ChainableStore();
+	this._defaults = new BM.ChainableStore({"items":this.settings.get("preferences.defaults")});
 	this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
 
 }
@@ -100,16 +100,7 @@ PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, 
 PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
 {
 
-	// Set default preferences
-	if (this.settings.get("defaults.preferences"))
-	{
-		this._defaults.items = this.settings.get("defaults.preferences");
-	}
-
-	// Load preferences
-	return this.resources["preferences"].get().then((preferences) => {
-		this._store.merge(preferences);
-	});
+	this._store.items = e.detail.items;
 
 }
 
@@ -181,7 +172,9 @@ PreferenceServer.prototype.get = function(key, defaultValue)
 PreferenceServer.prototype.set = function(values, options, ...args)
 {
 
-	return this.submit({"items":values, "options":options, "args":args});
+	let validatorName = this.settings.get("preferences.settings.validatorName");
+
+	return this.submit({"items":values, "options":options, "args":args, "validatorName":validatorName});
 
 }
 
@@ -196,13 +189,13 @@ PreferenceServer.prototype.set = function(values, options, ...args)
  *
  * @return  {Promise}		Promise.
  */
-PreferenceServer.prototype._triggerEvent = function(items, options)
+PreferenceServer.prototype._triggerEvent = function(changedItems, options)
 {
 
 	let eventName = this.settings.get("preferences.settings.eventName", "doSetup");
 	let sender = BM.Util.safeGet(options, "sender");
 
-	return this.trigger(eventName, {"sender":sender, "items":items});
+	return this.trigger(eventName, {"sender":sender, "items":changedItems});
 
 }
 
