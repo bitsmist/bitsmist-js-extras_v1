@@ -62,7 +62,6 @@ export default class LocaleOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
 		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
 		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
-		this._addOrganizerHandler(component, "doStart", LocaleOrganizer.LocaleOrganizer_onDoStart);
 		this._addOrganizerHandler(component, "beforeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeLocale);
 		this._addOrganizerHandler(component, "doLocale", LocaleOrganizer.LocaleOrganizer_onDoLocale);
 
@@ -86,11 +85,26 @@ export default class LocaleOrganizer extends BM.Organizer
 			this._localeHandler.messages.set(sectionName, sectionValue);
 		});
 
+		return Promise.resolve().then(() => {
+			if (LocaleOrganizer._hasExternalMessages(this))
+			{
+				return LocaleOrganizer._loadExternalMessages(this);
+			}
+		}).then(() => {
+			// Subscribe to the Locale Server if exists
+			if (document.querySelector("bm-locale") && this !==  document.querySelector("bm-locale"))
+			{
+				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
+					document.querySelector("bm-locale").subscribe(this);
+				});
+			}
+		});
+
 	}
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onDoStart(sender, e, ex)
+	static LocaleOrganizer_onDoOrganize(sender, e, ex)
 	{
 
 		return Promise.resolve().then(() => {
