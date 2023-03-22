@@ -179,6 +179,7 @@ export default class LocaleOrganizer extends BM.Organizer
 				component.settings.get("settings.fileName",
 					component.tagName.toLowerCase())) + ".messages";
 
+		// Split Locale
 		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
 			component.settings.get("locales.settings.splitLocale",
 				component.settings.get("system.settings.splitLocale", false)));
