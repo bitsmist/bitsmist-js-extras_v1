@@ -32,7 +32,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static PreferenceOrganizer_onBeforeStart(sender, e, ex)
+	static PreferenceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
 		if (this !==  document.querySelector("bm-preference"))
@@ -65,7 +65,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "beforeStart", PreferenceOrganizer.PreferenceOrganizer_onBeforeStart);
+		this._addOrganizerHandler(component, "doOrganize", PreferenceOrganizer.PreferenceOrganizer_onDoOrganize);
 
 	}
 
