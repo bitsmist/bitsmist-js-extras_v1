@@ -32,10 +32,10 @@ export default class PreferenceOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static PreferenceOrganizer_onDoStart(sender, e, ex)
+	static PreferenceOrganizer_onBeforeStart(sender, e, ex)
 	{
 
-		if (document.querySelector("bm-preference") && this !==  document.querySelector("bm-preference"))
+		if (this !==  document.querySelector("bm-preference"))
 		{
 			// Wait for PreferenceManager to be ready
 			return this.waitFor([{"rootNode":"bm-preference"}]).then(() => {
@@ -65,7 +65,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doStart", PreferenceOrganizer.PreferenceOrganizer_onDoStart);
+		this._addOrganizerHandler(component, "beforeStart", PreferenceOrganizer.PreferenceOrganizer_onBeforeStart);
 
 	}
 
