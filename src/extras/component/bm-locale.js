@@ -139,11 +139,11 @@ LocaleServer.prototype._triggerEvent = function(conditions, options)
 {
 
 	return Promise.resolve().then(() => {
-		return this.trigger("beforeLocale", options);
+		return this.trigger("beforeChangeLocale", options);
 	}).then(() => {
-		return this.trigger("doLocale", options);
+		return this.trigger("doChangeLocale", options);
 	}).then(() => {
-		return this.trigger("afterLocale", options);
+		return this.trigger("afterChangeLocale", options);
 	});
 
 }

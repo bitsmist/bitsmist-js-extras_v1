@@ -32,49 +32,6 @@ export default class LocaleOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"locales",
-			"order":		320,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Add properties
-		Object.defineProperty(component, 'localeHandler', {
-			get() { return this._localeHandler; },
-		});
-
-		// Add methods to component
-		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
-
-		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
-		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
-		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
-		this._addOrganizerHandler(component, "beforeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeLocale);
-		this._addOrganizerHandler(component, "doLocale", LocaleOrganizer.LocaleOrganizer_onDoLocale);
-
-		// Init vars
-		let handlerOptions = {
-			"localeName": component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en")),
-			"fallbackLocaleName": component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
-		};
-		component._localeHandler = BM.ClassUtil.createObject(component.settings.get("locales.settings.handlerClassName"), component, handlerOptions);
-
-	}
-
-	// -------------------------------------------------------------------------
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
@@ -84,28 +41,6 @@ export default class LocaleOrganizer extends BM.Organizer
 		this._enumSettings(e.detail.settings["locales"], (sectionName, sectionValue) => {
 			this._localeHandler.messages.set(sectionName, sectionValue);
 		});
-
-		return Promise.resolve().then(() => {
-			if (LocaleOrganizer._hasExternalMessages(this))
-			{
-				return LocaleOrganizer._loadExternalMessages(this);
-			}
-		}).then(() => {
-			// Subscribe to the Locale Server if exists
-			if (document.querySelector("bm-locale") && this !==  document.querySelector("bm-locale"))
-			{
-				return this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-					document.querySelector("bm-locale").subscribe(this);
-				});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static LocaleOrganizer_onDoOrganize(sender, e, ex)
-	{
 
 		return Promise.resolve().then(() => {
 			if (LocaleOrganizer._hasExternalMessages(this))
@@ -144,7 +79,7 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onBeforeLocale(sender, e, ex)
+	static LocaleOrganizer_onBeforeChangeLocale(sender, e, ex)
 	{
 
 		if (!this._localeHandler.messages.has(e.detail.localeName) && this.settings.get("locales.settings.autoLoad"))
@@ -160,12 +95,56 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onDoLocale(sender, e, ex)
+	static LocaleOrganizer_onDoChangeLocale(sender, e, ex)
 	{
 
 		this._localeHandler.localeName = e.detail.localeName;
 
 		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
+
+	}
+
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static getInfo()
+	{
+
+		return {
+			"sections":		"locales",
+			"order":		320,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Add properties
+		Object.defineProperty(component, 'localeHandler', {
+			get() { return this._localeHandler; },
+		});
+
+		// Add methods to component
+		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
+
+		// Add event handlers to component
+		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
+		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
+		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
+		this._addOrganizerHandler(component, "beforeChangeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeChangeLocale);
+		this._addOrganizerHandler(component, "doChangeLocale", LocaleOrganizer.LocaleOrganizer_onDoChangeLocale);
+
+		// Init vars
+		let handlerOptions = {
+			"localeName": component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en")),
+			"fallbackLocaleName": component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
+		};
+		component._localeHandler = BM.ClassUtil.createObject(component.settings.get("locales.settings.handlerClassName"), component, handlerOptions);
 
 	}
 
