@@ -59,13 +59,6 @@ export default class ResourceHandler
 
 	}
 
-	set name(value)
-	{
-
-		this._name = value;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**

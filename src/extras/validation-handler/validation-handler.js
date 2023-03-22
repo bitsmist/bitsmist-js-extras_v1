@@ -54,13 +54,6 @@ export default class ValidationHandler
 
 	}
 
-	set name(value)
-	{
-
-		this._name = value;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
