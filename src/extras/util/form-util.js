@@ -508,35 +508,35 @@ FormUtil._setValue_value = function(element, value)
 FormUtil._setValue_element = function(element, value)
 {
 
-	if (element.tagName.toLowerCase() === "select")
+	switch (element.tagName.toLowerCase())
 	{
-		element.value = value;
-	}
-	else if (element.tagName.toLowerCase() === "input")
-	{
-		switch (element.type.toLowerCase())
-		{
-		case "number":
-		case "search":
-		case "text":
+		case "select":
 			element.value = value;
 			break;
-		case "checkbox":
-			element.checked = ( value ? true : false );
-			break;
-		case "radio":
-			if (element.value === value)
+		case "input":
+			switch (element.type.toLowerCase())
 			{
-				element.checked = true;
+			case "number":
+			case "search":
+			case "text":
+				element.value = value;
+				break;
+			case "checkbox":
+				element.checked = ( value ? true : false );
+				break;
+			case "radio":
+				if (element.value === value)
+				{
+					element.checked = true;
+				}
+				break;
+			default:
+				break;
 			}
 			break;
 		default:
+			element.innerText = value;
 			break;
-		}
-	}
-	else
-	{
-		element.innerText = value;
 	}
 
 }
