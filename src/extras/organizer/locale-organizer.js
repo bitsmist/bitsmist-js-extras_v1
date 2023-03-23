@@ -45,7 +45,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		return Promise.resolve().then(() => {
 			if (LocaleOrganizer._hasExternalMessages(this))
 			{
-				return LocaleOrganizer._loadExternalMessages(this);
+				return LocaleOrganizer._loadExternalMessages(this, this._localeHandler.localeName);
 			}
 		}).then(() => {
 			// Subscribe to the Locale Server if exists
@@ -64,7 +64,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterStart(sender, e, ex)
 	{
 
-		LocaleOrganizer._changeLocale(this, this._localeHandler.localeName);
+		return LocaleOrganizer._changeLocale(this, this._localeHandler.localeName);
 
 	}
 
