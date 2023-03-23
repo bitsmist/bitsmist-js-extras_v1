@@ -50,6 +50,7 @@ LocaleServer.prototype._getSettings = function()
 				"handlers": {
 					"doFetch":			["LocaleServer_onDoFetch"],
 					"beforeStart":		["LocaleServer_onBeforeStart"],
+					"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
 				}
 			}
 		},
@@ -63,30 +64,6 @@ LocaleServer.prototype._getSettings = function()
 	}
 
 }
-
-// -----------------------------------------------------------------------------
-//  Setter/Getter
-// -----------------------------------------------------------------------------
-
-/**
- * Locale.
- *
- * @type	{Object}
- */
-Object.defineProperty(LocaleServer.prototype, 'localeName', {
-	get()
-	{
-		return this._localeName;
-	},
-	set(value)
-	{
-		return this._triggerEvent("*", {"localeName":value}).then(() => {
-			return this._store.notify("*", {"localeName":value});
-		}).then(() => {
-			this._localeName = value;
-		});
-	}
-})
 
 // -----------------------------------------------------------------------------
 //  Event Handlers
@@ -105,7 +82,19 @@ LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
 LocaleServer.prototype.LocaleServer_onDoFetch = function(sender, e, ex)
 {
 
-	this._localeHandler.messages.items = e.detail.items;
+	if ("items" in e.detail)
+	{
+		this._localeHandler.messages.items = e.detail.items;
+	}
+
+}
+
+// -----------------------------------------------------------------------------
+
+LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
+{
+
+	return this._store.notify("*", e.detail);
 
 }
 
@@ -138,13 +127,7 @@ LocaleServer.prototype.subscribe = function(component, options)
 LocaleServer.prototype._triggerEvent = function(conditions, options)
 {
 
-	return Promise.resolve().then(() => {
-		return this.trigger("beforeChangeLocale", options);
-	}).then(() => {
-		return this.trigger("doChangeLocale", options);
-	}).then(() => {
-		return this.trigger("afterChangeLocale", options);
-	});
+	return this.trigger("doChangeLocale", options);
 
 }
 

@@ -61,19 +61,10 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onAfterTransform(sender, e, ex)
+	static LocaleOrganizer_onAfterStart(sender, e, ex)
 	{
 
-		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static LocaleOrganizer_onAfterBuildRows(sender, e, ex)
-	{
-
-		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
+		LocaleOrganizer._changeLocale(this, this._localeHandler.localeName);
 
 	}
 
@@ -98,12 +89,9 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onDoChangeLocale(sender, e, ex)
 	{
 
-		this._localeHandler.localeName = e.detail.localeName;
-
-		FormUtil.setFields(this, this._localeHandler.get(), {"attribute":"bm-locale"});
+		FormUtil.setFields(this, this._localeHandler.get("", e.detail.localeName), {"attribute":"bm-locale"});
 
 	}
-
 
 	// -------------------------------------------------------------------------
 	//  Methods
@@ -131,11 +119,11 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		// Add methods to component
 		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
+		component.changeLocale = function(...args) { return LocaleOrganizer._changeLocale(this, ...args); }
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
-		this._addOrganizerHandler(component, "afterTransform", LocaleOrganizer.LocaleOrganizer_onAfterTransform);
-		this._addOrganizerHandler(component, "afterBuildRows", LocaleOrganizer.LocaleOrganizer_onAfterBuildRows);
+		this._addOrganizerHandler(component, "afterStart", LocaleOrganizer.LocaleOrganizer_onAfterStart);
 		this._addOrganizerHandler(component, "beforeChangeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeChangeLocale);
 		this._addOrganizerHandler(component, "doChangeLocale", LocaleOrganizer.LocaleOrganizer_onDoChangeLocale);
 
@@ -150,6 +138,24 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 	//  Protected
+	// -------------------------------------------------------------------------
+
+	static _changeLocale(component, localeName)
+	{
+
+		let options = {"localeName":localeName};
+
+		return Promise.resolve().then(() => {
+			return component.trigger("beforeChangeLocale", options);
+		}).then(() => {
+			return component.trigger("doChangeLocale", options);
+		}).then(() => {
+			component.localeHandler.localeName = localeName;
+			return component.trigger("afterChangeLocale", options);
+		});
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
@@ -241,7 +247,7 @@ export default class LocaleOrganizer extends BM.Organizer
 			component.settings.get("locales.settings.localeRef")
 		);
 
-		if (localeRef !== true)
+		if (localeRef && localeRef !== true)
 		{
 			let url = BM.Util.parseURL(localeRef);
 			fileName = url.filenameWithoutExtension;
