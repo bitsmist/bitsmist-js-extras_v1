@@ -100,7 +100,10 @@ PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, 
 PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
 {
 
-	this._store.items = e.detail.items;
+	if ("items" in e.detail)
+	{
+		this._store.items = e.detail.items;
+	}
 
 }
 
