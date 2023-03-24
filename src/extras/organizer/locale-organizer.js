@@ -43,9 +43,9 @@ export default class LocaleOrganizer extends BM.Organizer
 		});
 
 		return Promise.resolve().then(() => {
-			if (LocaleOrganizer._hasExternalMessages(this))
+			if (LocaleOrganizer.__hasExternalMessages(this))
 			{
-				return LocaleOrganizer._loadExternalMessages(this, this._localeHandler.localeName);
+				return LocaleOrganizer.__loadExternalMessages(this, this._localeHandler.localeName);
 			}
 		}).then(() => {
 			// Subscribe to the Locale Server if exists
@@ -205,15 +205,17 @@ export default class LocaleOrganizer extends BM.Organizer
 	}
 
 	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
 
 	/**
-	 * Check if the component has an external messages file.
+	 * Check if the component has the external messages file.
 	 *
 	 * @param	{Component}		component			Component.
 	 *
-	 * @return  {Boolean}		True if the component has an external messages file.
+	 * @return  {Boolean}		True if the component has the external messages file.
 	 */
-	static _hasExternalMessages(component)
+	static __hasExternalMessages(component)
 	{
 
 		let ret = false;
@@ -237,7 +239,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _loadExternalMessages(component, localeName)
+	static __loadExternalMessages(component, localeName)
 	{
 
 		let fileName;
