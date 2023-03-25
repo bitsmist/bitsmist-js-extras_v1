@@ -438,7 +438,7 @@ ChainedSelect.prototype.getSelect = function(level)
 // -----------------------------------------------------------------------------
 
 /**
- * Assign objects to a select element.
+ * Assign objects to the select element.
  *
  * @param	{Number}		level				Level.
  * @param	{Object}		parentObject		Parent object.

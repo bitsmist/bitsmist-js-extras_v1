@@ -89,7 +89,7 @@ export default class ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Validate.
+	 * Create validation result object.
 	 *
 	 * @param	{String}		key					Key.
 	 * @param	{*}				value				Value.
@@ -215,7 +215,7 @@ export default class ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get a value from a custom function or a value.
+	 * Get the value from the custom function or the value.
 	 *
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.

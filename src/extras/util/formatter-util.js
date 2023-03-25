@@ -19,7 +19,7 @@ export default function FormatterUtil() {}
 // -----------------------------------------------------------------------------
 
 /**
- * Get a formatter.
+ * Get the formatter.
  *
  * @param	{string}		type				Variable type.
  * @param	{string}		format				Format.
@@ -119,7 +119,7 @@ FormatterUtil.formatDate = function(format, str)
 // -----------------------------------------------------------------------------
 
 /**
- * Get a deformatter.
+ * Get the deformatter.
  *
  * @param	{string}		type				Variable type.
  * @param	{string}		format				Format.

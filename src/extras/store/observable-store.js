@@ -64,7 +64,7 @@ export default class ObservableStore extends BM.ChainableStore
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Set a value to the store and notify to subscribers if the value has been changed.
+	 * Set the value to the store and notify to subscribers if the value has been changed.
 	 *
 	 * @param	{String}		key					Key to store.
 	 * @param	{Object}		value				Value to store.

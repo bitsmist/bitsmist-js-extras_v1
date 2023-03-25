@@ -22,14 +22,6 @@ export default class ObjectValidationHandler extends ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Validate.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 *
- 	 * @return  {Object}		Invalid results.
-	 */
 	static validate(values, rules)
 	{
 
@@ -55,13 +47,6 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Check validity.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 * @param	{Object}		options				Validation options.
-	 */
 	checkValidity(values, rules, options)
 	{
 
@@ -76,12 +61,6 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Report validity.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 */
 	reportValidity(values, rules)
 	{
 	}
@@ -91,7 +70,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Validate a single value.
+	 * Validate the single value.
 	 *
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.
@@ -122,7 +101,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check a single constraint.
+	 * Check the single constraint.
 	 *
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.
@@ -205,7 +184,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check a single type constraint.
+	 * Check the single type constraint.
 	 *
 	 * @param	{String}		key					Item name.
 	 * @param	{Object}		value				Value to validate.

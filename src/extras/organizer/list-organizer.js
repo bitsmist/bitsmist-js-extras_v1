@@ -98,7 +98,7 @@ export default class ListOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Change a row template html.
+	 * Change the row template html.
 	 *
      * @param	{Component}		component			Component.
 	 * @param	{String}		templateName		Template name.
@@ -117,14 +117,14 @@ export default class ListOrganizer extends BM.Organizer
 		}
 
 		return Promise.resolve().then(() => {
-			console.debug(`ListOrganizer._transformRow(): Switching a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListOrganizer._transformRow(): Switching the row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 			return component.loadTemplate(templateName);
 		}).then(() => {
 			component._activeRowTemplateName = templateName;
 		}).then(() => {
 			return component.trigger("afterTransformRow", options);
 		}).then(() => {
-			console.debug(`ListOrganizer._transformRow(): Switched a row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListOrganizer._transformRow(): Switched the row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
 
 	}

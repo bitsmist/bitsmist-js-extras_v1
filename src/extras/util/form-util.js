@@ -125,7 +125,7 @@ FormUtil.getFields = function(rootNode, options)
 	}
 
 	elements.forEach((element) => {
-		// Get a value from the element
+		// Get the value from the element
 		let key = element.getAttribute(attrName);
 		let value = FormUtil.getValue(element);
 
@@ -190,7 +190,7 @@ FormUtil.clearFields = function(rootNode, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Set a value to the element.
+ * Set the value to the element.
  *
  * @param	{HTMLElement}	element				Html element.
  * @param	{String}		value				Value.
@@ -337,7 +337,7 @@ FormUtil.clearValue = function(element, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Build a form element.
+ * Build the form element.
  *
  * @param	{HTMLElement}	element				Element to build.
  * @param	{Object}		items				Items.
@@ -360,7 +360,7 @@ FormUtil.build = function(element, items, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Build a select element.
+ * Build the select element.
  *
  * @param	{HTMLElement}	element				Element to build.
  * @param	{Object}		items				Items.
@@ -402,7 +402,7 @@ FormUtil._build_select = function(element, items, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Build a radio element.
+ * Build the radio element.
  *
  * @param	{HTMLElement}	element				Element to build.
  * @param	{Object}		items				Items.
@@ -430,7 +430,7 @@ FormUtil._build_radio = function(rootNode, fieldName, item)
 // -----------------------------------------------------------------------------
 
 /**
- * Set a value to the target positions.
+ * Set the value to the target positions.
  *
  * @param	{Object}		element				Html element.
  * @param	{String}		targets				Target poisitions.
@@ -465,7 +465,7 @@ FormUtil._setValue_target = function(element, targets, value)
 // -----------------------------------------------------------------------------
 
 /**
- * Set a value to the value attribute.
+ * Set the value to the value attribute.
  *
  * @param	{Object}		element				Html element.
  * @param	{String}		value				Value.
@@ -503,7 +503,7 @@ FormUtil._setValue_value = function(element, value)
 // -----------------------------------------------------------------------------
 
 /**
- * Set a value to the element.
+ * Set the value to the element.
  *
  * @param	{Object}		element				Html element.
  * @param	{String}		value				Value.
@@ -547,7 +547,7 @@ FormUtil._setValue_element = function(element, value)
 // -----------------------------------------------------------------------------
 
 /**
- * Get a resource value that matches given value.
+ * Get the resource value that matches given value.
  *
  * @param	{array}			resources			Resources.
  * @param	{String}		resourceName		Resource name.

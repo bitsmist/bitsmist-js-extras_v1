@@ -166,7 +166,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 			nodes.push(rootNode);
 		}
 		nodes.forEach(elem => {
-			// Get a callback function from settings
+			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
 			let callback = DatabindingOrganizer.__getCallback(component, key);
 
@@ -197,7 +197,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 			nodes.push(rootNode);
 		}
 		nodes.forEach(elem => {
-			// Get a callback function from settings
+			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
 			let callback = DatabindingOrganizer.__getCallback(component, key);
 
@@ -212,7 +212,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get a callback function from settings.
+	 * Get the callback function from settings.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{String}		key					Field name.

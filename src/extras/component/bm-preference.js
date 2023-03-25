@@ -150,7 +150,7 @@ PreferenceServer.prototype.subscribe = function(component, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Get a value from store. Return default value when specified key is not available.
+ * Get the value from store. Return default value when specified key is not available.
  *
  * @param	{String}		key					Key to get.
  * @param	{Object}		defaultValue		Value returned when key is not found.
@@ -167,7 +167,7 @@ PreferenceServer.prototype.get = function(key, defaultValue)
 // -------------------------------------------------------------------------
 
 /**
- * Set a value to the store.
+ * Set the value to the store.
  *
  * @param	{Object}		values				Values to store.
  * @param	{Object}		options				Options.
@@ -205,7 +205,7 @@ PreferenceServer.prototype._triggerEvent = function(changedItems, options)
 // -----------------------------------------------------------------------------
 
 /**
- * Check if it is a target.
+ * Check if it is the target.
  *
  * @param	{Object}		conditions			Conditions.
  * @param	{Object}		observerInfo		Observer info.

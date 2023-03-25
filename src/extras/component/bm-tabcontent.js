@@ -70,7 +70,7 @@ TabContent.prototype.switchContent = function(index)
 // -----------------------------------------------------------------------------
 
 /**
- * Get a current active content.
+ * Get the current active content.
  *
  * @return  {HTMLElement}	Current active element.
  */

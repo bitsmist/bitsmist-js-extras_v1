@@ -138,7 +138,7 @@ export default class FormOrganizer extends BM.Organizer
 
 	/**
 	 *
-	 * Build a element.
+	 * Build the element.
 	 *
      * @param	{Component}		component			Component.
 	 * @param	{HTMLElement}	element				HTMLElement to build.

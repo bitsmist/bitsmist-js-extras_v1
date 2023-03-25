@@ -151,7 +151,7 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get a translated message.
+	 * Get the translated message.
 	 *
 	 * @param	{String}		key					Key.
 	 * @param	{String}		localeName			Locale name.

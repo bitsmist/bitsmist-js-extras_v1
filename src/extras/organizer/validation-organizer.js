@@ -127,7 +127,7 @@ export default class ValidationOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-     * Add a validator.
+     * Add the validator.
      *
      * @param	{Component}		component			Component.
      * @param	{string}		validatorName		Validator name.

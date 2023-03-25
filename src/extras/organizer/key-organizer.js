@@ -327,7 +327,7 @@ export default class KeyOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Return a default handler for the action.
+	 * Return the default handler for the action.
 	 *
 	 * @param	{String}		action				Action.
 	 *

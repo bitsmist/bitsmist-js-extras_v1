@@ -95,7 +95,7 @@ export default class ArrayStore extends BM.Store
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Get a value from store. Return default value when specified key is not available.
+	 * Get the value from store. Return default value when specified key is not available.
 	 *
 	 * @param	{String}		key					Key to get.
 	 * @param	{Object}		defaultValue		Value returned when key is not found.
@@ -112,7 +112,7 @@ export default class ArrayStore extends BM.Store
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Set a value to the store. If key is empty, it sets the value to the root.
+	 * Set the value to the store. If key is empty, it sets the value to the root.
 	 *
 	 * @param	{String}		key					Key to store.
 	 * @param	{Object}		value				Value to store.

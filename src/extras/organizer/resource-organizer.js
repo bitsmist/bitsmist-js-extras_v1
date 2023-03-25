@@ -62,7 +62,7 @@ export default class ResourceOrganizer extends BM.Organizer
 				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
 					e.detail.items = resource.items;
 
-					// Set a property automatically after resource is fetched
+					// Set the property automatically after resource is fetched
 					let autoSet = this.settings.get(`resources.${resourceName}.autoSetProperty`);
 					if (autoSet)
 					{
@@ -164,7 +164,7 @@ export default class ResourceOrganizer extends BM.Organizer
 			let parameters = resource.options.get("autoLoadOptions.parameters");
 
 			return resource.get(id, parameters).then(() => {
-				// Set a property automatically after resource is fetched
+				// Set the property automatically after resource is fetched
 				let autoSet = component.settings.get(`resources.${resourceName}.autoSetProperty`);
 				if (autoSet)
 				{

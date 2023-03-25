@@ -23,14 +23,6 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Validate.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 *
- 	 * @return  {Object}		Invalid results.
-	 */
 	static validate(form, rules)
 	{
 
@@ -79,13 +71,6 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Check validity.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 * @param	{Object}		options				Validation options.
-	 */
 	checkValidity(values, rules, options)
 	{
 
@@ -108,12 +93,6 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Report validity.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 */
 	reportValidity(values, rules)
 	{
 
@@ -131,7 +110,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Validate a single value.
+	 * Validate the single value.
 	 *
 	 * @param	{HTMLElement}	element				HTML element to validaate.
 	 * @param	{String}		key					Item name.

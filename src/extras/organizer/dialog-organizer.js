@@ -211,7 +211,7 @@ export default class DialogOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Create a backdrop if not exists.
+	 * Create the backdrop if not exists.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
@@ -221,7 +221,7 @@ export default class DialogOrganizer extends BM.Organizer
 
 		if (!DialogOrganizer._backdrop)
 		{
-			// Create a backdrop
+			// Create the backdrop
 			document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
 			DialogOrganizer._backdrop = document.body.firstElementChild;
 		}

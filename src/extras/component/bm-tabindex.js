@@ -97,7 +97,7 @@ TabIndex.prototype.switchIndex = function(index)
 // -----------------------------------------------------------------------------
 
 /**
- * Get a current active index.
+ * Get the current active index.
  *
  * @return  {HTMLElement}	Current active element.
  */
