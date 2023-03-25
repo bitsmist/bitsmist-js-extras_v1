@@ -171,7 +171,7 @@ export default class RouteOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Add a route.
+	 * Add the route.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		routeInfo			Route info.
@@ -308,7 +308,7 @@ export default class RouteOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Load a spec and init.
+	 * Load the spec file and init.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{String}		specName			Spec name.
@@ -324,9 +324,7 @@ export default class RouteOrganizer extends BM.Organizer
 		return Promise.resolve().then(() => {
 			if (!component._specs[specName])
 			{
-				return RouteOrganizer._loadSpec(component, specName, options).then((spec) => {
-					component._specs[specName] = spec;
-				});
+				return RouteOrganizer._loadSpec(component, specName, options);
 			}
 		}).then(() => {
 			component._spec.items = component._specs[specName];
@@ -569,6 +567,7 @@ export default class RouteOrganizer extends BM.Organizer
 			spec = result[0];
 //			specCommon = result[0];
 //			spec = BM.Util.deepMerge(specCommon, result[1]);
+			component._specs[specName] = spec;
 
 			return spec;
 		});
@@ -625,7 +624,7 @@ export default class RouteOrganizer extends BM.Organizer
 		let specName;
 		let params = {};
 
-		// Find a matching route
+		// Find the matching route
 		for (let i = component._routes.length - 1; i >= 0; i--)
 		{
 			// Check origin
