@@ -91,10 +91,13 @@ FormUtil.setFields = function(rootNode, item, options)
 	}
 
 	elements.forEach((element) => {
-		let value = BM.Util.safeGet(item, element.getAttribute(attrName), "");
+		let value = BM.Util.safeGet(item, element.getAttribute(attrName));
 
 		// Set
-		FormUtil.setValue(element, value, options);
+		if (value !== undefined)
+		{
+			FormUtil.setValue(element, value, options);
+		}
 	});
 
 }
