@@ -238,18 +238,18 @@ export default class ApiResourceHandler extends ResourceHandler
 			query = Object.keys(parameters).reduce((result, current) => {
 				if (Array.isArray(parameters[current]))
 				{
-					result += encodeURIComponent(current) + "=" + encodeURIComponent(parameters[current].join()) + "&";
+					result += `${encodeURIComponent(current)}=${encodeURIComponent(parameters[current].join())}&`;
 				}
 				else if (parameters[current])
 				{
-					result += encodeURIComponent(current) + "=" + encodeURIComponent(parameters[current]) + "&";
+					result += `${encodeURIComponent(current)}=${encodeURIComponent(parameters[current])}&`;
 				}
 
 				return result;
 			}, "");
 		}
 
-		return ( query ? "?" + query.slice(0, -1) : "");
+		return ( query ? `?${query.slice(0, -1)}` : "");
 
 	}
 

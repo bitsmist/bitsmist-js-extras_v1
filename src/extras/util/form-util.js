@@ -174,13 +174,12 @@ FormUtil.clearFields = function(rootNode, options)
 	let target = BM.Util.safeGet(options, "target", "");
 
 	// Get input elements
-	let elements = BM.Util.scopedSelectorAll(rootNode, target + " input");
+	let elements = BM.Util.scopedSelectorAll(rootNode, `${target} input`, options);
 	elements.forEach((element) => {
 		FormUtil.clearValue(element, options);
 	});
 
-	elements = rootNode.querySelectorAll(target + " select");
-	elements = Array.prototype.slice.call(elements, 0);
+	elements = BM.Util.scopedSelectorAll(rootNode, `${target} select`, options);
 	elements.forEach((element) => {
 		FormUtil.clearValue(element, options);
 	});

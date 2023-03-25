@@ -127,7 +127,7 @@ export default class ElementOrganizer extends BM.Organizer
 		}
 		else
 		{
-			elements = component.rootElement.querySelectorAll("#" + elementName);
+			elements = component.rootElement.querySelectorAll(`#${elementName}`);
 		}
 
 		return elements;
@@ -251,7 +251,7 @@ export default class ElementOrganizer extends BM.Organizer
 			}, BM.settings.get("system.waitForTimeout", 10000));
 
 			// Resolve when finished
-			element.addEventListener(elementInfo["waitFor"] + "end", () => {
+			element.addEventListener(`${elementInfo["waitFor"]}end`, () => {
 				clearTimeout(timer);
 				resolve();
 			}, {"once":true});
@@ -420,7 +420,7 @@ export default class ElementOrganizer extends BM.Organizer
 		{
 			component._overlayPromise.then(() => {
 				component._overlayPromise = new Promise((resolve, reject) => {
-					component._overlay.addEventListener(effect + "end", () => {
+					component._overlay.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
 				});

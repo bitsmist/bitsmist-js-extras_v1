@@ -220,7 +220,7 @@ export default class RouteOrganizer extends BM.Organizer
 
 		url += ( routeInfo["url"] ? routeInfo["url"] : "" );
 		url += ( routeInfo["path"] ? routeInfo["path"] : "" );
-		url += ( routeInfo["query"] ? "?" + routeInfo["query"] : "" );
+		url += ( routeInfo["query"] ? `?{routeInfo["query"]}` : "" );
 
 		if (routeInfo["queryParameters"])
 		{
@@ -256,18 +256,18 @@ export default class RouteOrganizer extends BM.Organizer
 			query = Object.keys(options).reduce((result, current) => {
 				if (Array.isArray(options[current]))
 				{
-					result += encodeURIComponent(current) + "=" + encodeURIComponent(options[current].join()) + "&";
+					result += `${encodeURIComponent(current)}=${encodeURIComponent(options[current].join())}&`;
 				}
 				else if (options[current])
 				{
-					result += encodeURIComponent(current) + "=" + encodeURIComponent(options[current]) + "&";
+					result += `${encodeURIComponent(current)}=${encodeURIComponent(options[current])}&`;
 				}
 
 				return result;
 			}, "");
 		}
 
-		return ( query ? "?" + query.slice(0, -1) : "");
+		return ( query ? `?${query.slice(0, -1)}` : "");
 
 	}
 
@@ -597,7 +597,7 @@ export default class RouteOrganizer extends BM.Organizer
 				component.settings.get("system.specPath", "")
 			])
 		);
-		let url = path + extenderName + ".extender.js" + (query ? "?" + query : "");
+		let url = `${path}${extenderName}.extender.js` + (query ? `?${query}` : "");
 
 		return BM.AjaxUtil.loadScript(url);
 
@@ -644,7 +644,7 @@ export default class RouteOrganizer extends BM.Organizer
 					params[component._routes[i].keys[j].name] = result[j + 1];
 					let keyName = component._routes[i].keys[j].name;
 					let value = result[j + 1];
-					specName = specName.replace("{{:" + keyName + "}}", value);
+					specName = specName.replace(`{{:${keyName}}}`, value);
 				}
 
 				break;
@@ -775,11 +775,7 @@ export default class RouteOrganizer extends BM.Organizer
 				for (let i = 0; i < item.failed.length; i++)
 				{
 					console.warn("RouteOrganizer.__dumpValidationErrors(): URL validation failed.",
-						"key=" + item.key +
-						", value=" + item.value +
-						", rule=" + item.failed[i].rule +
-						", validity=" + item.failed[i].validity
-					);
+						`key=${item.key}, value=${item.value}, rule=${item.failed[i].rule}, validity=${item.failed[i].validity}`);
 				}
 			}
 		});

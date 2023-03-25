@@ -90,11 +90,11 @@ export default class CookieResourceHandler extends ResourceHandler
 	__setCookie(key, value)
 	{
 
-		let cookie = key + "=" + encodeURIComponent(JSON.stringify(value)) + "; ";
+		let cookie = key + `=${encodeURIComponent(JSON.stringify(value))}; `;
 		let options = this._options.get("cookieOptions");
 
 		cookie += Object.keys(options).reduce((result, current) => {
-			result += current + "=" + options[current] + "; ";
+			result += `${current}=${options[current]}; `;
 
 			return result;
 		}, "");

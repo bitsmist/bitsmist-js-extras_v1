@@ -253,7 +253,7 @@ export default class DialogOrganizer extends BM.Organizer
 				if (effect)
 				{
 					// Transition/Animation
-					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+					DialogOrganizer._backdrop.addEventListener(`${effect}end`, () => {
 						if (BM.Util.safeGet(options, "closeOnClick", true))
 						{
 							DialogOrganizer.__closeOnClick(component);
@@ -304,7 +304,7 @@ export default class DialogOrganizer extends BM.Organizer
 				let effect = DialogOrganizer.__getEffect();
 				if (effect)
 				{
-					DialogOrganizer._backdrop.addEventListener(effect + "end", () => {
+					DialogOrganizer._backdrop.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
 				}

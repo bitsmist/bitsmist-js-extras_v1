@@ -62,7 +62,7 @@ FormatterUtil.formatPrice = function(format, price)
 	{
 		//let locale = "ja-JP";
 		//return new Intl.NumberFormat(locale, {style:"currency", currency:"JPY"}).format(price);
-		return "¥" + String(parseInt(price)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+		return `¥${String(parseInt(price)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}`;
 	}
 	else
 	{
@@ -109,7 +109,7 @@ FormatterUtil.formatDate = function(format, str)
 	var result = "";
 	if (str && str.length === 8)
 	{
-		result = str.substr(0, 4) + "/" + str.substr(4, 2) + "/" + str.substr(6, 2);
+		result = `${str.substr(0, 4)}/${str.substr(4, 2)}/${str.substr(6, 2)}`;
 	}
 
 	return result;

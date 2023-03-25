@@ -107,7 +107,7 @@ Object.defineProperty(ChainedSelect.prototype, "items", {
 		let length = 0;
 		let level = 1;
 
-		while (this.querySelector(":scope .item[data-level='" + level + "'] select"))
+		while (this.querySelector(`:scope .item[data-level='${level}'] select`))
 		{
 			level++;
 			length++;
@@ -148,21 +148,21 @@ ChainedSelect.prototype.ChainedSelect_onAfterTransform = function(sender, e, ex)
 
 	if (!this.settings.get("settings.isAddable", true))
 	{
-		this.querySelectorAll(":scope " + this.rootNodes["newitem"]).forEach((element) => {
+		this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
 			element.style.display = "none";
 		});
 	}
 
 	if (!this.settings.get("settings.isEditable", true))
 	{
-		this.querySelectorAll(":scope " + this.rootNodes["edititem"]).forEach((element) => {
+		this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
 			element.style.display = "none";
 		});
 	}
 
 	if (!this.settings.get("settings.isRemovable", true))
 	{
-		this.querySelectorAll(":scope " + this.rootNodes["removeitem"]).forEach((element) => {
+		this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
 			element.style.display = "none";
 		});
 	}
@@ -180,9 +180,9 @@ ChainedSelect.prototype.ChainedSelect_onDoClear = function(sender, e, ex)
 	for (let i = fromLevel; i <= toLevel; i++)
 	{
 		if (this.settings.get("settings.autoClear")) {
-			this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).options.length = 0;
+			this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
 		}
-		this.querySelector(":scope .item[data-level='" + i + "'] " + this.rootNodes["select"]).selectedIndex = -1;
+		this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
 		this._initElement("select", i);
 		this._initElement("newitem", i);
 		this._initElement("edititem", i);
@@ -431,7 +431,7 @@ ChainedSelect.prototype.ChainedSelect_onDoRemove = function(sender, e, ex)
 ChainedSelect.prototype.getSelect = function(level)
 {
 
-	return this.querySelector(":scope [data-level='" + level + "'] " + this.rootNodes["select"]);
+	return this.querySelector(`:scope [data-level='${level}'] ${this.rootNodes["select"]}`);
 
 }
 
@@ -447,7 +447,7 @@ ChainedSelect.prototype.assignItems = function(level, items)
 {
 
 	// Prerequisite check
-	let selectBox = this.querySelector(":scope [data-level='" + level + "'] > select");
+	let selectBox = this.querySelector(`:scope [data-level='${level}'] > select`);
 	BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 	items = items || {};
@@ -513,7 +513,7 @@ ChainedSelect.prototype.selectItem = function(level, itemId)
 {
 
 	// Prerequisite check
-	let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+	let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 	BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 	selectBox.value = itemId;
@@ -527,7 +527,7 @@ ChainedSelect.prototype.selectItem = function(level, itemId)
 	// Refresh the child select element
 	return Promise.resolve().then(() => {
 		level++;
-		let nextSelectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+		let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 		if (nextSelectBox) {
 			this._initElement("newitem", level);
 			return this.refresh({"level":level, "value":itemId});
@@ -549,7 +549,7 @@ ChainedSelect.prototype.newItem = function(level, itemName, itemId)
 {
 
 	// Prerequisite check
-	let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+	let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 	BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 	// Backup current index since it changes after an option is added when select has no option.
@@ -578,7 +578,7 @@ ChainedSelect.prototype.editItem = function(level, itemName, itemId)
 {
 
 	// Prerequisite check
-	let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+	let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 	BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.name}, level=${level}`);
 
 	// Edit the selectbox
@@ -598,7 +598,7 @@ ChainedSelect.prototype.removeItem = function(level)
 {
 
 	// Prerequisite check
-	let selectBox = this.querySelector(":scope .item[data-level='" + level + "'] select");
+	let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 	BM.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.name}, level=${level}`);
 
 	// Remove from the select element
@@ -630,13 +630,13 @@ ChainedSelect.prototype._initElement = function(type, level, enable)
 
 	if (enable)
 	{
-		this.querySelector(":scope .item[data-level='" + level + "'] " + type).disabled = false;
-		this.querySelector(":scope .item[data-level='" + level + "'] " + type).classList.remove("disabled");
+		this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = false;
+		this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.remove("disabled");
 	}
 	else
 	{
-		this.querySelector(":scope .item[data-level='" + level + "'] " + type).disabled = true;
-		this.querySelector(":scope .item[data-level='" + level + "'] " + type).classList.add("disabled");
+		this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = true;
+		this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.add("disabled");
 	}
 
 }

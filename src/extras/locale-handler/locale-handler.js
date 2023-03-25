@@ -141,8 +141,8 @@ export default class LocaleHandler
 	get(key, localeName)
 	{
 
-		let key1 = (localeName || this._localeName) + ( key ? "." + key : "" );
-		let key2 = (this._fallbackLocaleName) + ( key ? "." + key : "" );
+		let key1 = (localeName || this._localeName) + ( key ? `.${key}` : "" );
+		let key2 = (this._fallbackLocaleName) + ( key ? `.${key}` : "" );
 
 		return this._messages.get(key1, this._messages.get(key2));
 

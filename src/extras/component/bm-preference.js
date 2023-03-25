@@ -126,7 +126,7 @@ PreferenceServer.prototype.PreferenceServer_onDoReportValidity = function(sender
 
 	let msg = `Invalid preference value. name=${this.name}`;
 	Object.keys(this.validationResult["invalids"]).forEach((key) => {
-		msg += "\n\tkey=" + this.validationResult["invalids"][key]["key"] + ", value=" + this.validationResult["invalids"][key]["value"];
+		msg += `\n\tkey=${this.validationResult["invalids"][key]["key"]}, value=${this.validationResult["invalids"][key]["value"]}`;
 	});
 	console.error(msg);
 
@@ -140,7 +140,7 @@ PreferenceServer.prototype.subscribe = function(component, options)
 {
 
 	this._store.subscribe(
-		component.name + "_" + component.uniqueId,
+		`${component.name}_${component.uniqueId}`,
 		this._triggerEvent.bind(component),
 		options,
 	);

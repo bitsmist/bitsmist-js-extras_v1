@@ -60,10 +60,10 @@ TabContent.prototype.switchContent = function(index)
 	this.querySelector(":scope > .active").classList.remove("active");
 
 	// Activate specified content
-	this.querySelector(":scope > [data-tabindex='" + index + "']").classList.add("active");
-	this.querySelector(":scope > [data-tabindex='" + index + "']").focus();
-//		this.querySelector(":scope nth-child(" + index + ")").classList.add("active");
-//		this.querySelector(":scope > [data-index='" + index + "']").focus();
+	this.querySelector(`:scope > [data-tabindex='${index}']`).classList.add("active");
+	this.querySelector(`:scope > [data-tabindex='${index}']`).focus();
+//		this.querySelector(`:scope nth-child(${index})`).classList.add("active");
+//		this.querySelector(`:scope > [data-index='${index}']`).focus();
 
 }
 

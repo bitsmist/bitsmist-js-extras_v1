@@ -82,7 +82,7 @@ TabIndex.prototype.switchIndex = function(index)
 {
 
 	this.querySelector(":scope [data-tabindex].active").classList.remove("active");
-	let tabIndex = this.querySelector(":scope [data-tabindex='" + index + "']");
+	let tabIndex = this.querySelector(`:scope [data-tabindex='${index}']`);
 	tabIndex.classList.add("active");
 
 	let container = document.querySelector(this.getAttribute("data-pair"));

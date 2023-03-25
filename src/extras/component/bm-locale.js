@@ -106,7 +106,7 @@ LocaleServer.prototype.subscribe = function(component, options)
 {
 
 	this._store.subscribe(
-		component.name + "_" + component.uniqueId,
+		`${component.name}_${component.uniqueId}`,
 		this._triggerEvent.bind(component),
 	);
 
