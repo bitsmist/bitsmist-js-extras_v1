@@ -50,7 +50,7 @@ PreferenceServer.prototype._getSettings = function()
 				"handlers": {
 					"beforeStart":		["PreferenceServer_onBeforeStart"],
 					"doFetch":			["PreferenceServer_onDoFetch"],
-					"doSubmit":			["PreferenceServer_onDoSubmit"],
+					"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
 					"doReportValidity":	["PreferenceServer_onDoReportValidity"]
 				}
 			}
@@ -109,7 +109,7 @@ PreferenceServer.prototype.PreferenceServer_onDoFetch = function(sender, e, ex)
 
 // -----------------------------------------------------------------------------
 
-PreferenceServer.prototype.PreferenceServer_onDoSubmit = function(sender, e, ex)
+PreferenceServer.prototype.PreferenceServer_onBeforeSubmit = function(sender, e, ex)
 {
 
 	this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);
