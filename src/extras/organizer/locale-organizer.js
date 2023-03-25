@@ -79,7 +79,7 @@ export default class LocaleOrganizer extends BM.Organizer
 				"localeName":		e.detail.localeName,
 			};
 
-			return LocaleOrganizer._loadExternalMessages(this, e.detail.localeName);
+			return LocaleOrganizer.__loadExternalMessages(this, e.detail.localeName);
 		}
 
 	}
@@ -176,7 +176,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		fileName = fileName ||
 			component.settings.get("locales.settings.fileName",
 				component.settings.get("settings.fileName",
-					component.tagName.toLowerCase() + ".messages"));
+					component.tagName.toLowerCase()) + ".messages");
 
 		// Split Locale
 		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
