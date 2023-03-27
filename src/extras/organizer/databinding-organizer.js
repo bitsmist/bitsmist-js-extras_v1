@@ -11,6 +11,7 @@
 import BindableArrayStore from "../store/bindable-array-store.js";
 import BindableStore from "../store/bindable-store.js";
 import BM from "../bm";
+import FormUtil from "../util/form-util.js";
 
 // =============================================================================
 //	Databinding organizer class
@@ -118,6 +119,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 		if (e.detail.items)
 		{
 			this._bindings.replace(e.detail.items);
+			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
 	}
@@ -159,7 +161,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 		rootNode = ( rootNode ? rootNode : component );
 
-		let nodes = rootNode.querySelectorAll("[bm-bind]");
+		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{
