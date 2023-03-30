@@ -22,11 +22,6 @@ export default class LocaleServerHandler extends LocaleHandler
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Name.
-	 *
-	 * @type	{String}
-	 */
 	get name()
 	{
 
@@ -34,30 +29,14 @@ export default class LocaleServerHandler extends LocaleHandler
 
 	}
 
-	get messages()
-	{
-
-		return document.querySelector("bm-locale").localeHandler.messages;
-
-	}
-
 	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	get(key, localeName)
+	init(options)
 	{
 
-		return document.querySelector("bm-locale").localeHandler.get(key, localeName);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	t(key, localeName)
-	{
-
-		return document.querySelector("bm-locale").localeHandler.t(key, localeName);
+		this._messages.chain(document.querySelector("bm-locale").localeMessages);
 
 	}
 

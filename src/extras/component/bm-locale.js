@@ -57,7 +57,7 @@ LocaleServer.prototype._getSettings = function()
 
 		// Locales
 		"locales": {
-			"settings": {
+			"default": {
 				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
 			}
 		}
@@ -109,6 +109,8 @@ LocaleServer.prototype.subscribe = function(component, options)
 		`${component.name}_${component.uniqueId}`,
 		this._triggerEvent.bind(component),
 	);
+
+	component.localeName = this.localeName;
 
 }
 
