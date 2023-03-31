@@ -9,6 +9,7 @@
 // =============================================================================
 
 import BM from "../bm";
+import FormUtil from "../util/form-util.js";
 
 // =============================================================================
 //	Locale Handler class
@@ -139,6 +140,22 @@ export default class LocaleHandler
 		key  = localeName + ( key ? `.${key}` : "" );
 
 		return this._messages.get(key);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Fill all the bm-locale fields with i18 messages.
+	 *
+	 * @param	{String}		localeName			Locale name.
+	 */
+	fill(localeName)
+	{
+
+		let messages = this.get("", localeName) || this.get("", this.fallbackLocaleName);
+
+		FormUtil.setFields(this._component, messages, {"attribute":"bm-locale"});
 
 	}
 
