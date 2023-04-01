@@ -40,6 +40,9 @@ FormatterUtil.format = function(type, format, value)
 	case "price":
 		ret = FormatterUtil.formatPrice(format, ret);
 		break;
+	default:
+		ret = format.replace("${value}", value);
+		break;
 	}
 
 	return ret;
