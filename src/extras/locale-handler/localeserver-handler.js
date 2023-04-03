@@ -36,7 +36,8 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		this._messages.chain(document.querySelector("bm-locale").localeMessages);
+		let rootNode = this._options.get("rootNode", "bm-locale");
+		this._messages.chain(document.querySelector(rootNode).localeMessages);
 
 	}
 
