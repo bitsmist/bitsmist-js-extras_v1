@@ -46,10 +46,15 @@ export default class LocaleOrganizer extends BM.Organizer
 		});
 
 		// Subscribe to the Locale Server if exists
-		if (document.querySelector("bm-locale") && this !==  document.querySelector("bm-locale"))
+		let server = document.querySelector("bm-locale");
+		if (server && this !==  server)
 		{
 			promises.push(this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-				document.querySelector("bm-locale").subscribe(this);
+				server.subscribe(this);
+
+				// Synchronize to the server's locales
+				this._localName = server.localeName;
+				this._fallbackLocaleName = server.fallbackLocaleName;
 			}));
 		}
 
@@ -96,9 +101,24 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onDoChangeLocale(sender, e, ex)
 	{
 
+		// Localize
+		LocaleOrganizer._localize(this, this.rootElement);
+
+		// Refill
+		if (this.state === "ready" && this.settings.get("locales.settings.autoLocalizeRows"))
+		{
+			this.fill();
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static LocaleOrganizer_onAfterFillRow(sender, e, ex)
+	{
+
 		Object.keys(this._localeHandlers).forEach((handlerName) => {
-			let messages = this._localeHandlers[handlerName].get("", e.detail.localeName)  ||this._localeHandlers[handlerName].get("", this.fallbackLocaleName);
-			FormUtil.setFields(this, messages, {"attribute":"bm-locale"});
+			this._localeHandlers[handlerName].localize(e.detail.element, this.localeName, this.fallbackLocaleName, e.detail.item);
 		});
 
 	}
@@ -112,7 +132,7 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		return {
 			"sections":		"locales",
-			"order":		320,
+			"order":		330,
 		};
 
 	}
@@ -141,8 +161,9 @@ export default class LocaleOrganizer extends BM.Organizer
 		});
 
 		// Add methods to component
-		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
 		component.changeLocale = function(...args) { return LocaleOrganizer._changeLocale(this, ...args); }
+		component.localize = function(...args) { return LocaleOrganizer._localize(this, ...args); }
+		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
 		component.getLocaleMessage = function(...args) { return LocaleOrganizer._getLocaleMessage(this, ...args); }
 
 		// Add event handlers to component
@@ -150,12 +171,16 @@ export default class LocaleOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "afterStart", LocaleOrganizer.LocaleOrganizer_onAfterStart);
 		this._addOrganizerHandler(component, "beforeChangeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeChangeLocale);
 		this._addOrganizerHandler(component, "doChangeLocale", LocaleOrganizer.LocaleOrganizer_onDoChangeLocale);
+		if (component.settings.get("locales.settings.autoLocalizeRows"))
+		{
+			this._addOrganizerHandler(component, "afterFillRow", LocaleOrganizer.LocaleOrganizer_onAfterFillRow);
+		}
 
 		// Init vars
 		component._localeHandlers = {};
+		component._localeMessages = new MultiStore();
 		component._localeName = component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en"));
 		component._fallbackLocaleName = component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en"));
-		component._localeMessages = new MultiStore();
 
 	}
 
@@ -186,6 +211,12 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Change locale.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{String}		localeName			Locale name.
+	 */
 	static _changeLocale(component, localeName)
 	{
 
@@ -194,10 +225,30 @@ export default class LocaleOrganizer extends BM.Organizer
 		return Promise.resolve().then(() => {
 			return component.trigger("beforeChangeLocale", options);
 		}).then(() => {
+			component._localeName = localeName;
 			return component.trigger("doChangeLocale", options);
 		}).then(() => {
-			component._localeName = localeName;
 			return component.trigger("afterChangeLocale", options);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Localize all the bm-locale fields with i18 messages using each handler.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{HTMLElement}	rootNode			Target root node to localize.
+	 * @param	{Object}		parameters			Interpolation parameters.
+	 */
+	static _localize(component, rootNode, parameters)
+	{
+
+		rootNode = rootNode || component.rootElement;
+
+		Object.keys(component._localeHandlers).forEach((handlerName) => {
+			component._localeHandlers[handlerName].localize(rootNode, component._localeName, component._fallbackLocaleName, parameters);
 		});
 
 	}
@@ -238,10 +289,10 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		localeName = localeName || component.localeName;
 
-		let value = component.localeMessages.get(key, localeName);
+		value = component.localeMessages.get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
-			value = component.localeMessages.get(key, component.fallbackLocaleName);
+			value = component.localeMessages.get(`${component.fallbackLocaleName}.${key}`);
 		}
 
 		return value;
