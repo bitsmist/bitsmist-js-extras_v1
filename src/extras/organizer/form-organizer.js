@@ -128,6 +128,7 @@ export default class FormOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._cancelSubmit = false;
+		component._lastItems;
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.FormOrganizer_onAfterTransform);
