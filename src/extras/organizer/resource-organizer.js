@@ -125,7 +125,6 @@ export default class ResourceOrganizer extends BM.Organizer
 
 		// Add methods to component
 		component.addResource = function(resourceName, options) { return ResourceOrganizer._addResource(this, resourceName, options); }
-		component.switchResource = function(resourceName) { return ResourceOrganizer._switchResource(this, resourceName); }
 
 		// Init compnoent vars
 		component._resources = {};
