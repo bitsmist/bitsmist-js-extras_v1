@@ -105,10 +105,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		LocaleOrganizer._localize(this, this.rootElement);
 
 		// Refill
-		if (this.state === "ready" && this.settings.get("locales.settings.autoLocalizeRows"))
-		{
-			this.fill();
-		}
+		this.fill();
 
 	}
 
