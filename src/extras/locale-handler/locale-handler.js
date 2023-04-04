@@ -127,7 +127,7 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get messages which belong to the locale name.
+	 * Get the message which belong to the locale name.
 	 *
 	 * @param	{String}		key					Key.
 	 * @param	{String}		localeName			Locale name.
@@ -146,16 +146,35 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Fill all the bm-locale fields with i18 messages.
+	 * Get all messages which belong to the locale name.
 	 *
 	 * @param	{String}		localeName			Locale name.
+	 *
+ 	 * @return  {String}		Messages.
 	 */
-	fill(localeName)
+	getAll(localeName)
 	{
 
-		let messages = this.get("", localeName) || this.get("", this.fallbackLocaleName);
+		return this._messages.get(localeName);
 
-		FormUtil.setFields(this._component, messages, {"attribute":"bm-locale"});
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Localize all the bm-locale fields with i18 messages.
+	 *
+	 * @param	{HTMLElement}	rootNode			Target root node to localize.
+	 * @param	{String}		localeName			Locale name.
+	 * @param	{String}		fallbackLocaleName	Fallback locale name.
+	 * @param	{Object}		parameters			Interpolation parameters.
+	 */
+	localize(rootNode, localeName, fallbackLocaleName, parameters)
+	{
+
+		let messages = (this.getAll(localeName) || this.getAll(fallbackLocaleName));
+
+		FormUtil.setFields(rootNode, messages, {"attribute":"bm-locale", "parameters":parameters});
 
 	}
 
@@ -181,14 +200,12 @@ export default class LocaleHandler
 		// Filename
 		let fileName = BM.Util.safeGet(loadOptions, "fileName",
 			this._options.get("fileName",
-			//component.settings.get("locales.settings.fileName",
 				component.settings.get("settings.fileName",
 					component.tagName.toLowerCase()) + ".messages"));
 
 		// Split Locale
 		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
 			this._options.get("splitLocale",
-			//component.settings.get("locales.settings.splitLocale",
 				component.settings.get("system.settings.splitLocale", false)));
 		if (splitLocale)
 		{
@@ -201,7 +218,6 @@ export default class LocaleHandler
 			BM.Util.concatPath([
 				component.settings.get("system.appBaseUrl", ""),
 				component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
-				//component.settings.get("locales.settings.path", component.settings.get("settings.path", "")),
 				this._options.get("path", component.settings.get("settings.path", "")),
 			])
 		);
@@ -229,7 +245,6 @@ export default class LocaleHandler
 
 		let ret = false;
 
-		//if (component.hasAttribute("bm-localeref") || component.settings.get("locales.settings.localeRef"))
 		if (component.hasAttribute("bm-localeref") || this._options.get("localeRef"))
 		{
 			ret = true;
@@ -256,7 +271,6 @@ export default class LocaleHandler
 		let localeRef = ( component.hasAttribute("bm-localeref") ?
 			component.getAttribute("bm-localeref") || true :
 			this._options.get("localeRef")
-			//component.settings.get("locales.settings.localeRef")
 		);
 
 		if (localeRef && localeRef !== true)
