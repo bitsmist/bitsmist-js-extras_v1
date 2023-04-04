@@ -104,8 +104,11 @@ export default class LocaleOrganizer extends BM.Organizer
 		// Localize
 		LocaleOrganizer._localize(this, this.rootElement);
 
-		// Refill
-		this.fill();
+		// Refill (Do not refill when starting)
+		if (this.state === "ready")
+		{
+			this.fill();
+		}
 
 	}
 
@@ -286,7 +289,7 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		localeName = localeName || component.localeName;
 
-		value = component.localeMessages.get(`${localeName}.${key}`);
+		let value = component.localeMessages.get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
 			value = component.localeMessages.get(`${component.fallbackLocaleName}.${key}`);
