@@ -237,7 +237,7 @@ export default class KeyOrganizer extends BM.Organizer
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return component.clear({"target":target});
+		return component.clear({"target":target, "options":options["options"]});
 
 	}
 
