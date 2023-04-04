@@ -54,21 +54,26 @@ export default class FormOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
+	static FormOrganizer_onBeforeFill(sender, e, ex)
+	{
+
+		e.detail.items = e.detail.items || this._lastItems;
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static FormOrganizer_onDoFill(sender, e, ex)
 	{
 
 		if (this.settings.get("form.settings.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
-			let items = e.detail.items || this._lastItems;
-
-			if (items)
-			{
-				FormUtil.setFields(rootNode, items, {"resources":this.resources, "triggerEvent":true});
-				FormUtil.showConditionalElements(this, items);
-				this._lastItems = items;
-			}
+			FormUtil.setFields(rootNode, e.detail.items, {"resources":this.resources, "triggerEvent":true});
+			FormUtil.showConditionalElements(this, e.detail.items);
 		}
+
+		this._lastItems = e.detail.items;
 
 	}
 
@@ -128,11 +133,12 @@ export default class FormOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._cancelSubmit = false;
-		component._lastItems;
+		component._lastItems = {};
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", FormOrganizer.FormOrganizer_onAfterTransform);
 		this._addOrganizerHandler(component, "doClear", FormOrganizer.FormOrganizer_onDoClear);
+		this._addOrganizerHandler(component, "beforeFill", FormOrganizer.FormOrganizer_onBeforeFill);
 		this._addOrganizerHandler(component, "doFill", FormOrganizer.FormOrganizer_onDoFill);
 		this._addOrganizerHandler(component, "doCollect", FormOrganizer.FormOrganizer_onDoCollect);
 		this._addOrganizerHandler(component, "afterCollect", FormOrganizer.FormOrganizer_onAfterCollect);

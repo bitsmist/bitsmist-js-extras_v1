@@ -45,25 +45,31 @@ export default class ListOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
+	static ListOrganizer_onBeforeFill(sender, e, ex)
+	{
+
+		e.detail.items = e.detail.items || this._lastItems;
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static ListOrganizer_onDoFill(sender, e, ex)
 	{
 
-		let items = e.detail.items || this._lastItems;
-		if (items)
-		{
-			let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
-			let fragment = document.createDocumentFragment();
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
+		let fragment = document.createDocumentFragment();
 
-			return Promise.resolve().then(() => {
-				return this.trigger("beforeBuildRows");
-			}).then(() => {
-				return builder(this, fragment, items, e.detail);
-			}).then(() => {
-				this._listRootNode.replaceChildren(fragment);
-				this._lastItems = items;
-				return this.trigger("afterBuildRows");
-			});
-		}
+		return Promise.resolve().then(() => {
+			return this.trigger("beforeBuildRows");
+		}).then(() => {
+			return builder(this, fragment, e.detail.items, e.detail);
+		}).then(() => {
+			this._listRootNode.replaceChildren(fragment);
+			this._lastItems = e.detail.items;
+
+			return this.trigger("afterBuildRows");
+		});
 
 	}
 
@@ -91,10 +97,11 @@ export default class ListOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._activeRowTemplateName = "";
-		component._lastItems;
+		component._lastItems = [];
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
+		this._addOrganizerHandler(component, "beforeFill", ListOrganizer.ListOrganizer_onBeforeFill);
 		this._addOrganizerHandler(component, "doFill", ListOrganizer.ListOrganizer_onDoFill);
 
 	}
