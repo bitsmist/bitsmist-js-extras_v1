@@ -48,17 +48,22 @@ export default class ListOrganizer extends BM.Organizer
 	static ListOrganizer_onDoFill(sender, e, ex)
 	{
 
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
-		let fragment = document.createDocumentFragment();
+		let items = e.detail.items || this._lastItems;
+		if (items)
+		{
+			let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
+			let fragment = document.createDocumentFragment();
 
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeBuildRows");
-		}).then(() => {
-			return builder(this, fragment, e.detail);
-		}).then(() => {
-			this._listRootNode.replaceChildren(fragment);
-			return this.trigger("afterBuildRows");
-		});
+			return Promise.resolve().then(() => {
+				return this.trigger("beforeBuildRows");
+			}).then(() => {
+				return builder(this, fragment, items, e.detail);
+			}).then(() => {
+				this._listRootNode.replaceChildren(fragment);
+				this._lastItems = items;
+				return this.trigger("afterBuildRows");
+			});
+		}
 
 	}
 
@@ -86,6 +91,7 @@ export default class ListOrganizer extends BM.Organizer
 
 		// Init component vars
 		component._activeRowTemplateName = "";
+		component._lastItems;
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
@@ -134,11 +140,14 @@ export default class ListOrganizer extends BM.Organizer
 	/**
 	 * Build rows synchronously.
 	 *
+     * @param	{Component}		component			Component.
 	 * @param	{DocumentFragment}	fragment		Document fragment.
+	 * @param	{Object}		items				Items.
+	 * @param	{Object}		options				Options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _buildSync(component, fragment, options)
+	static _buildSync(component, fragment, items, options)
 	{
 
 		BM.Util.assert(component._templates[component._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
@@ -147,11 +156,11 @@ export default class ListOrganizer extends BM.Organizer
 		let template = component.templates[component._activeRowTemplateName].html;
 
 		let chain = Promise.resolve();
-		for (let i = 0; i < options["items"].length; i++)
+		for (let i = 0; i < items.length; i++)
 		{
 			chain = chain.then(() => {
 				options["no"] = i;
-				options["item"] = options["items"][i];
+				options["item"] = items[i];
 
 				// Append a row
 				let element = ListOrganizer.__createRow(template);
@@ -195,7 +204,7 @@ export default class ListOrganizer extends BM.Organizer
 	 *
 	 * @param	{DocumentFragment}	fragment		Document fragment.
 	 */
-	static _buildAsync(component, fragment, options)
+	static _buildAsync(component, fragment, items, options)
 	{
 
 		BM.Util.assert(component.templates[component._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
@@ -203,10 +212,10 @@ export default class ListOrganizer extends BM.Organizer
 		let rowEvents = component.settings.get("list.rowevents");
 		let template = component.templates[component._activeRowTemplateName].html;
 
-		for (let i = 0; i < options["items"].length; i++)
+		for (let i = 0; i < items.length; i++)
 		{
 			options["no"] = i;
-			options["item"] = options["items"][i];
+			options["item"] = items[i];
 
 			// Append a row
 			let element = ListOrganizer.__createRow(template);
