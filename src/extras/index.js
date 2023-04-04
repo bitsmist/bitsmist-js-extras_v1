@@ -12,6 +12,9 @@ import BM from "./bm";
 
 // Store
 
+import MultiStore from "./store/multi-store.js";
+window.BITSMIST.v1.MultiStore = MultiStore;
+
 import ArrayStore from "./store/array-store.js";
 window.BITSMIST.v1.ArrayStore = ArrayStore;
 
@@ -120,8 +123,12 @@ window.BITSMIST.v1.BmTabindex  = BmTabindex;
 import BmTabcontent from "./component/bm-tabcontent.js";
 window.BITSMIST.v1.BmTabcontent = BmTabcontent;
 
+import PreferenceServer from "./component/bm-preference.js";
+window.BITSMIST.v1.PreferenceServer = PreferenceServer;
+
+import LocaleServer from "./component/bm-locale.js";
+window.BITSMIST.v1.LocaleServer = LocaleServer;
+
 import TagLoader from "./component/bm-tagloader.js";
 import SettingServer from "./component/bm-setting.js";
-import PreferenceServer from "./component/bm-preference.js";
 import ErrorServer from "./component/bm-error.js";
-import LocaleServer from "./component/bm-locale.js";
