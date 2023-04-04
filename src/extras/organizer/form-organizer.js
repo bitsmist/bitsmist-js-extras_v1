@@ -46,8 +46,9 @@ export default class FormOrganizer extends BM.Organizer
 	{
 
 		let target = BM.Util.safeGet(e.detail, "target", "");
+		let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
 
-		FormUtil.clearFields(this, {"target":target, "triggerEvent":"change"});
+		FormUtil.clearFields(this, options);
 
 	}
 
@@ -59,9 +60,14 @@ export default class FormOrganizer extends BM.Organizer
 		if (this.settings.get("form.settings.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
+			let items = e.detail.items || this._lastItems;
 
-			FormUtil.setFields(rootNode, e.detail.items, {"resources":this.resources, "triggerEvent":true});
-			FormUtil.showConditionalElements(this, e.detail.items);
+			if (items)
+			{
+				FormUtil.setFields(rootNode, items, {"resources":this.resources, "triggerEvent":true});
+				FormUtil.showConditionalElements(this, items);
+				this._lastItems = items;
+			}
 		}
 
 	}
