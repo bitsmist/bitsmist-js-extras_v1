@@ -190,6 +190,7 @@ export default class DialogOrganizer extends BM.Organizer
 					// Hide backdrop
 					if (component.settings.get("dialog.backdropOptions.show"))
 					{
+						DialogOrganizer.__removeCloseOnClickHandlers();
 						return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialog.backdropOptions"));
 					}
 				}).then(() => {
@@ -197,8 +198,8 @@ export default class DialogOrganizer extends BM.Organizer
 					{
 						component._modalPromise.resolve(component._modalResult);
 					}
+					console.debug(`DialogOrganizer._close(): Closed component. name=${component.name}, id=${component.id}`);
 
-						console.debug(`DialogOrganizer._close(): Closed component. name=${component.name}, id=${component.id}`);
 					return component.trigger("afterClose", options);
 				});
 			}
@@ -256,7 +257,7 @@ export default class DialogOrganizer extends BM.Organizer
 					DialogOrganizer._backdrop.addEventListener(`${effect}end`, () => {
 						if (BM.Util.safeGet(options, "closeOnClick", true))
 						{
-							DialogOrganizer.__closeOnClick(component);
+							DialogOrganizer.__installCloseOnClickHandler(component);
 						}
 						resolve();
 					}, {"once":true});
@@ -266,7 +267,7 @@ export default class DialogOrganizer extends BM.Organizer
 					// No Transition/Animation
 					if (BM.Util.safeGet(options, "closeOnClick", true))
 					{
-						DialogOrganizer.__closeOnClick(component);
+						DialogOrganizer.__installCloseOnClickHandler(component);
 					}
 
 					resolve();
@@ -326,20 +327,35 @@ export default class DialogOrganizer extends BM.Organizer
 	// -----------------------------------------------------------------------------
 
 	/**
-	 * Install an event handler to close when clicked.
+	 * Install the event handler to the backdrop to close the component when clicked.
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
-	static __closeOnClick(component, options)
+	static __installCloseOnClickHandler(component, options)
 	{
 
-		DialogOrganizer._backdrop.addEventListener("click", (e) => {
+		DialogOrganizer._backdrop.onclick = (e) => {
 			if (e.target === e.currentTarget)
 			{
 				component.close({"reason":"cancel"});
 			}
-		}, {"once":true});
+		};
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	/**
+	 * Remove click event handlers from backdrop.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	static __removeCloseOnClickHandlers()
+	{
+
+		DialogOrganizer._backdrop.onclick = null;
 
 	}
 
