@@ -72,7 +72,6 @@ LocaleServer.prototype._getSettings = function()
 LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
 {
 
-	this._localeName;
 	this._store = new ObservableStore({"async":true});
 
 }
@@ -84,6 +83,7 @@ LocaleServer.prototype.LocaleServer_onDoFetch = function(sender, e, ex)
 
 	if ("items" in e.detail)
 	{
+		// Retrieve data from ResourceHandler.
 		this._localeHandler.messages.items = e.detail.items;
 	}
 
@@ -94,6 +94,17 @@ LocaleServer.prototype.LocaleServer_onDoFetch = function(sender, e, ex)
 LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
 {
 
+	// Set locale attribute
+	if (this.settings.get("locales.settings.autoAttribute"))
+	{
+		let rootNode = this.settings.get("locales.settings.autoAttribute.rootNode");
+		let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
+		let attribName = this.settings.get("locales.settings.autoAttribute.attributeName", "data-locale");
+
+		targetElement.setAttribute(attribName, this.localeName);
+	}
+
+	// Notify locale change to clients
 	return this._store.notify("*", e.detail);
 
 }
@@ -129,7 +140,7 @@ LocaleServer.prototype.subscribe = function(component, options)
 LocaleServer.prototype._triggerEvent = function(conditions, options)
 {
 
-	return this.trigger("doChangeLocale", options);
+	return this.changeLocale(options.localeName);
 
 }
 
