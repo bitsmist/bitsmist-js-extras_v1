@@ -174,7 +174,7 @@ export default class LocaleHandler
 
 		let messages = (this.getAll(localeName) || this.getAll(fallbackLocaleName));
 
-		FormUtil.setFields(rootNode, messages, {"attribute":"bm-locale", "parameters":parameters});
+		FormUtil.setFields(rootNode, messages, {"attributeName":"bm-locale", "parameters":parameters});
 
 	}
 
