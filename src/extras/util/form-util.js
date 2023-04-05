@@ -81,7 +81,7 @@ FormUtil.hideConditionalElements = function(rootNode)
 FormUtil.setFields = function(rootNode, item, options)
 {
 
-	let attrName = (options && options["attribute"] ) || "bm-bind";
+	let attrName = (options && options["attributeName"] ) || "bm-bind";
 
 	// Get elements with the attribute
 	let elements = BM.Util.scopedSelectorAll(rootNode, `[${attrName}]`);
@@ -114,7 +114,7 @@ FormUtil.setFields = function(rootNode, item, options)
 FormUtil.getFields = function(rootNode, options)
 {
 
-	let attrName = (options && options["attribute"] ) || "bm-bind";
+	let attrName = (options && options["attributeName"] ) || "bm-bind";
 	let item = {};
 
 	// Get elements with the attribute
@@ -197,28 +197,21 @@ FormUtil.clearFields = function(rootNode, options)
 FormUtil.setValue = function(element, value, options)
 {
 
-	let attrName = (options && options["attribute"]) || "bm-bind";
+	options = options || {};
+	value =( value === undefined || value === null ? "" : String(value));
+	let attrName = (options && options["attributeName"]) || "bm-bind";
 	let eventName = "change";
 
-	if (value === undefined || value === null)
-	{
-		value = "";
-	}
-
-	// Get master value
-	if (element.hasAttribute(`${attrName}text`) && options && options["resources"])
-	{
-		let arr = element.getAttribute(`${attrName}text`).split(".");
-		let resourceName = arr[0];
-		let key = arr[1];
-		value = FormUtil._getResourceValue(options["resources"], resourceName, value, key);
-	}
-
 	// Format
-	if (element.hasAttribute("bm-format"))
+	if (element.hasAttribute(`${attrName}-format`))
 	{
-		value = FormatterUtil.format("", element.getAttribute("bm-format"), value);
+		value = FormatterUtil.format(element.getAttribute(`${attrName}-format`), value, options);
 	}
+
+	// Interpolate
+	value = FormatterUtil.interpolateResources(value, value, options["resources"]);
+	value = FormatterUtil.interpolate(value, options["parameters"]);
+	value = value.replace("${value}", value);
 
 	// Sanitize
 	//value = FormatterUtil.sanitize(value);
@@ -239,7 +232,7 @@ FormUtil.setValue = function(element, value, options)
 	}
 
 	// Trigger change event
-	if (options && options["triggerEvent"])
+	if (options["triggerEvent"])
 	{
 		let e = document.createEvent("HTMLEvents");
 		e.initEvent(eventName, true, true);
@@ -257,9 +250,10 @@ FormUtil.setValue = function(element, value, options)
  *
  * @return  {String}		Value.
  */
-FormUtil.getValue = function(element)
+FormUtil.getValue = function(element, options)
 {
 
+	let attrName = (options && options["attributeName"]) || "bm-bind";
 	let ret = undefined;
 
 	switch (element.tagName.toLowerCase())
@@ -292,9 +286,9 @@ FormUtil.getValue = function(element)
 	}
 
 	// Deformat
-	if (element.hasAttribute("bm-format"))
+	if (element.hasAttribute(`${attrName}-format`))
 	{
-		ret = BM.FormatterUtil.deformat("", element.getAttribute("bm-format"), ret);
+		ret = BM.FormatterUtil.deformat(element.getAttribute(`${attrName}-format`), ret);
 	}
 
 	return ret;
@@ -540,35 +534,5 @@ FormUtil._setValue_element = function(element, value)
 			element.innerText = value;
 			break;
 	}
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Get the resource value that matches given value.
- *
- * @param	{array}			resources			Resources.
- * @param	{String}		resourceName		Resource name.
- * @param	{String}		value				Code value.
- * @param	{String}		key					Key.
- *
- * @return  {String}		Resource value.
- */
-FormUtil._getResourceValue = function(resources, resourceName, value, key)
-{
-
-	let ret = value;
-
-	if (resources && (resourceName in resources))
-	{
-		let item = resources[resourceName].getItem(value);
-		if (item)
-		{
-			ret = item[key];
-		}
-	}
-
-	return ret;
 
 }

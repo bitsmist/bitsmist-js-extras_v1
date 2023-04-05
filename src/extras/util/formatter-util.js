@@ -19,29 +19,88 @@ export default function FormatterUtil() {}
 // -----------------------------------------------------------------------------
 
 /**
- * Get the formatter.
+ * Interpolate using parameters.
  *
- * @param	{string}		type				Variable type.
+ * @param	{String}		format				Format.
+ * @param	{Object}		parameters			Parameters.
+ *
+ * @return  {Object}		Formatted value.
+ */
+FormatterUtil.interpolate = function(format, parameters)
+{
+
+	let ret = format;
+
+	if (parameters && format.indexOf("${") > -1)
+	{
+		ret = ret.replace(/\$\{(\w+)\}/g, (_, name) => {
+			return parameters[name] || `${name}`;
+		});
+	}
+
+	return ret;
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Interpolate using resources.
+ *
+ * @param	{String}		format				Format.
+ * @param	{String}		value				Value.
+ * @param	{Object}		resources			Resources.
+ *
+ * @return  {Object}		Formatted value.
+ */
+FormatterUtil.interpolateResources = function(format, value, resources)
+{
+
+	let ret = format;
+
+	if (resources && format.indexOf("#{") > -1)
+	{
+		ret = format.replace(/\#\{(.+)\}/g, (_, name) => {
+			let arr = name.split(".");
+			let resourceName = arr[0];
+			let key = arr[1];
+			return FormatterUtil.__getResourceValue(resources, resourceName, value, key);
+		});
+	}
+
+	return ret;
+
+}
+
+// -----------------------------------------------------------------------------
+
+/**
+ * Format the value.
+ *
  * @param	{string}		format				Format.
  * @param	{string}		value				Value.
  *
- * @return  {Object}		Formatter function.
+ * @return  {Object}		Formatted value.
  */
-FormatterUtil.format = function(type, format, value)
+FormatterUtil.format = function(format, value, options)
 {
 
+	options = options || {};
 	let ret = value;
 
 	switch (format.toLowerCase())
 	{
 	case "yyyy/mm/dd":
-		ret = FormatterUtil.formatDate(format, ret);
+		ret = FormatterUtil.formatDate(format, value);
 		break;
 	case "price":
-		ret = FormatterUtil.formatPrice(format, ret);
+		ret = FormatterUtil.formatPrice(format, value);
 		break;
 	default:
-		ret = format.replace("${value}", value);
+		// Interpolate
+		ret = FormatterUtil.interpolateResources(format, value, options["resources"]);
+		ret = FormatterUtil.interpolate(ret, options["parameters"]);
+		ret = ret.replace("${value}", value);
 		break;
 	}
 
@@ -122,15 +181,14 @@ FormatterUtil.formatDate = function(format, str)
 // -----------------------------------------------------------------------------
 
 /**
- * Get the deformatter.
+ * Deformat the value.
  *
- * @param	{string}		type				Variable type.
  * @param	{string}		format				Format.
  * @param	{string}		value				Value.
  *
- * @return  {Object}		Deformatter function.
+ * @return  {Object}		Deformatted value.
  */
-FormatterUtil.deformat = function(type, format, value)
+FormatterUtil.deformat = function(format, value)
 {
 
 	let ret = value;
@@ -256,5 +314,37 @@ FormatterUtil.sanitize = function(value)
 	{
 		return value;
 	}
+
+}
+
+// -----------------------------------------------------------------------------
+//  Privates
+// -----------------------------------------------------------------------------
+
+/**
+ * Get the resource value that matches given value.
+ *
+ * @param	{array}			resources			Resources.
+ * @param	{String}		resourceName		Resource name.
+ * @param	{String}		value				Code value.
+ * @param	{String}		key					Key.
+ *
+ * @return  {String}		Resource value.
+ */
+FormatterUtil.__getResourceValue = function(resources, resourceName, value, key)
+{
+
+	let ret = value;
+
+	if (resources && (resourceName in resources))
+	{
+		let item = resources[resourceName].getItem(value);
+		if (item)
+		{
+			ret = item[key];
+		}
+	}
+
+	return ret;
 
 }
