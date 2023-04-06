@@ -48,7 +48,6 @@ LocaleServer.prototype._getSettings = function()
 		"events": {
 			"this": {
 				"handlers": {
-					"doFetch":			["LocaleServer_onDoFetch"],
 					"beforeStart":		["LocaleServer_onBeforeStart"],
 					"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
 				}
@@ -73,19 +72,6 @@ LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
 {
 
 	this._store = new ObservableStore({"async":true});
-
-}
-
-// -----------------------------------------------------------------------------
-
-LocaleServer.prototype.LocaleServer_onDoFetch = function(sender, e, ex)
-{
-
-	if ("items" in e.detail)
-	{
-		// Retrieve data from ResourceHandler.
-		this._localeHandler.messages.items = e.detail.items;
-	}
 
 }
 
