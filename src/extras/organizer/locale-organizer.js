@@ -8,10 +8,7 @@
  */
 // =============================================================================
 
-import BindableArrayStore from "../store/bindable-array-store.js";
-import BindableStore from "../store/bindable-store.js";
 import BM from "../bm";
-import FormUtil from "../util/form-util.js";
 import MultiStore from "../store/multi-store.js";
 
 // =============================================================================
@@ -78,16 +75,16 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		let promises = [];
 
-		Object.keys(this._localeHandlers).forEach((handlerName) => {
-			if (this._localeHandlers[handlerName].options.get("autoLoad"))
+		Object.keys(this._localizers).forEach((handlerName) => {
+			if (this._localizers[handlerName].options.get("autoLoad"))
 			{
-				if (!this._localeHandlers[handlerName].messages.has(e.detail.localeName))
+				if (!this._localizers[handlerName].messages.has(e.detail.localeName))
 				{
 					let loadOptions = {
 						"localeName":		e.detail.localeName,
 					};
 
-					promises.push(this._localeHandlers[handlerName].loadMessages(loadOptions));
+					promises.push(this._localizers[handlerName].loadMessages(loadOptions));
 				}
 			}
 		});
@@ -117,8 +114,8 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterFillRow(sender, e, ex)
 	{
 
-		Object.keys(this._localeHandlers).forEach((handlerName) => {
-			this._localeHandlers[handlerName].localize(e.detail.element, this.localeName, this.fallbackLocaleName, e.detail.item);
+		Object.keys(this._localizers).forEach((handlerName) => {
+			this._localizers[handlerName].localize(e.detail.element, this.localeName, this.fallbackLocaleName, e.detail.item);
 		});
 
 	}
@@ -143,11 +140,9 @@ export default class LocaleOrganizer extends BM.Organizer
 	{
 
 		// Add properties
-		/*
-		Object.defineProperty(component, 'localeHandlers', {
-			get() { return this._localeHandlers; },
+		Object.defineProperty(component, 'localizers', {
+			get() { return this._localizers; },
 		});
-		*/
 		Object.defineProperty(component, 'localeMessages', {
 			get() { return this._localeMessages; },
 		});
@@ -177,7 +172,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		}
 
 		// Init vars
-		component._localeHandlers = {};
+		component._localizers = {};
 		component._localeMessages = new MultiStore();
 		component._localeName = component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en"));
 		component._fallbackLocaleName = component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en"));
@@ -202,7 +197,7 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
 		let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
-		component._localeHandlers[handlerName] = handler;
+		component._localizers[handlerName] = handler;
 		component._localeMessages.add(handler.messages);
 
 		return handler.init(options);
@@ -247,8 +242,8 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		rootNode = rootNode || component.rootElement;
 
-		Object.keys(component._localeHandlers).forEach((handlerName) => {
-			component._localeHandlers[handlerName].localize(rootNode, component._localeName, component._fallbackLocaleName, parameters);
+		Object.keys(component._localizers).forEach((handlerName) => {
+			component._localizers[handlerName].localize(rootNode, component._localeName, component._fallbackLocaleName, parameters);
 		});
 
 	}
@@ -267,8 +262,8 @@ export default class LocaleOrganizer extends BM.Organizer
 	static _loadMessages(component)
 	{
 
-		Object.keys(component._localeHandlers).forEach((handlerName) => {
-			component._localeHandlers[handlerName].loadMessages();
+		Object.keys(component._localizers).forEach((handlerName) => {
+			component._localizers[handlerName].loadMessages();
 		});
 
 	}
