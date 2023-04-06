@@ -39,7 +39,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		let promises = [];
 
 		this._enumSettings(e.detail.settings["locales"], (sectionName, sectionValue) => {
-			promises.push(LocaleOrganizer._addHandler(this, sectionName, sectionValue));
+			promises.push(LocaleOrganizer._addLocalizer(this, sectionName, sectionValue));
 		});
 
 		// Subscribe to the Locale Server if exists
@@ -160,6 +160,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		component.localize = function(...args) { return LocaleOrganizer._localize(this, ...args); }
 		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
 		component.getLocaleMessage = function(...args) { return LocaleOrganizer._getLocaleMessage(this, ...args); }
+		component.addLocalizer = function(...args) { return LocaleOrganizer._addLocalizer(this, ...args); }
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
@@ -184,7 +185,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-     * Add the locale handler.
+     * Add the localizer.
      *
      * @param	{Component}		component			Component.
      * @param	{string}		handlerName			Locale handler name.
@@ -192,7 +193,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addHandler(component, handlerName, options)
+	static _addLocalizer(component, handlerName, options)
 	{
 
 		let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
