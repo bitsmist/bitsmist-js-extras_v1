@@ -88,7 +88,7 @@ export default class ValueUtil
 			let value;
 			if (element.hasAttribute(`${this.attributeName}-in`))
 			{
-				value = element.getAttribute(element.getAttribute(`${this.attributeName}-in`));
+				value = this.getValue(element)
 			}
 			else
 			{
@@ -204,9 +204,10 @@ export default class ValueUtil
 		let eventName = "change";
 
 		// Format
-		if (element.hasAttribute(`${this.attributeName}-format`))
+		if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
 		{
 			value = this.formatter.format(element.getAttribute(`${this.attributeName}-format`), value, options);
+			element.setAttribute(`${this.attributeName}-formatted`, "");
 		}
 
 		// Interpolate
@@ -256,33 +257,14 @@ export default class ValueUtil
 
 		let ret = undefined;
 
-		switch (element.tagName.toLowerCase())
+		let target = element.getAttribute(`${this.attributeName}-in`);
+		if (target)
 		{
-		case "input":
-			switch (element.type.toLowerCase())
-			{
-			case "radio":
-			case "checkbox":
-				if (element.checked)
-				{
-					ret = ( element.hasAttribute("value") ? element.getAttribute("value") : element.checked );
-				}
-				break;
-			default:
-				ret = element.value;
-				break;
-			}
-			break;
-		case "select":
-			// todo:multiselect
-			ret = element.value;
-			break;
-		default:
-			if (element.hasAttribute("selected"))
-			{
-				ret = element.getAttribute("value");
-			}
-			break;
+			ret = this._getValue_target(element, target);
+		}
+		else
+		{
+			ret = this._getValue_element(element);
 		}
 
 		// Deformat
@@ -448,6 +430,83 @@ export default class ValueUtil
 				element.innerText = value;
 				break;
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get the value from the target positions.
+	 *
+	 * @param	{Object}		element				Html element.
+	 * @param	{String}		target				Target poisition.
+	 *
+	 * @return  {String}		Value.
+	 */
+	static _getValue_target(element, target)
+	{
+
+		target = target.toLowerCase();
+		let ret;
+
+		switch (target)
+		{
+		case "text":
+			ret = element.innerText;
+			break;
+		default:
+			element.getAttribute(target);
+			break;
+		}
+
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+  	 * Get the value from the element.
+ 	 *
+ 	 * @param	{Object}		element				Html element.
+	 *
+	 * @return  {String}		Value.
+	 */
+	static _getValue_element(element)
+	{
+
+		let ret;
+
+		switch (element.tagName.toLowerCase())
+		{
+		case "input":
+			switch (element.type.toLowerCase())
+			{
+			case "radio":
+			case "checkbox":
+				if (element.checked)
+				{
+					ret = ( element.hasAttribute("value") ? element.getAttribute("value") : element.checked );
+				}
+				break;
+			default:
+				ret = element.value;
+				break;
+			}
+			break;
+		case "select":
+			// todo:multiselect
+			ret = element.value;
+			break;
+		default:
+			if (element.hasAttribute("selected"))
+			{
+				ret = element.getAttribute("value");
+			}
+			break;
+		}
+
+		return ret;
 
 	}
 
