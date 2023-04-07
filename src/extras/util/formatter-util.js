@@ -9,7 +9,7 @@
 // =============================================================================
 
 // =============================================================================
-//	Formatter util class
+//	Formatter Util Class
 // =============================================================================
 
 export default class FormatterUtil
@@ -65,7 +65,7 @@ export default class FormatterUtil
 				let arr = name.split(".");
 				let resourceName = arr[0];
 				let key = arr[1];
-				return FormatterUtil.__getResourceValue(resources, resourceName, value, key);
+				return this.__getResourceValue(resources, resourceName, value, key);
 			});
 		}
 
@@ -92,15 +92,15 @@ export default class FormatterUtil
 		switch (format.toLowerCase())
 		{
 		case "yyyy/mm/dd":
-			ret = FormatterUtil.formatDate(format, value);
+			ret = this.formatDate(format, value);
 			break;
 		case "price":
-			ret = FormatterUtil.formatPrice(format, value);
+			ret = this.formatPrice(format, value);
 			break;
 		default:
 			// Interpolate
-			ret = FormatterUtil.interpolateResources(format, value, options["resources"]);
-			ret = FormatterUtil.interpolate(ret, options["parameters"]);
+			ret = this.interpolateResources(format, value, options["resources"]);
+			ret = this.interpolate(ret, options["parameters"]);
 			ret = ret.replace("${value}", value);
 			break;
 		}
@@ -198,10 +198,10 @@ export default class FormatterUtil
 		switch (format)
 		{
 		case "yyyy/mm/dd":
-			ret = FormatterUtil.deformatDate(format, value);
+			ret = this.deformatDate(format, value);
 			break;
 		case "price":
-			ret = FormatterUtil.deformatPrice(format, value);
+			ret = this.deformatPrice(format, value);
 			break;
 		}
 

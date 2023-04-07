@@ -9,7 +9,7 @@
 // =============================================================================
 
 import BM from "../bm";
-import FormUtil from "../util/form-util.js";
+import ValueUtil from "../util/value-util.js";
 
 // =============================================================================
 //	Bindable store class
@@ -29,6 +29,7 @@ export default class BindableStore extends BM.Store
 		super(Object.assign(defaults, options));
 
 		this._elems = {};
+		this._valueHandler = BM.Util.safeGet(options, "valueHandler");
 
 	}
 
@@ -104,7 +105,7 @@ export default class BindableStore extends BM.Store
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
 				elem.addEventListener(eventName, (() => {
-					let value = FormUtil.getValue(elem);
+					let value = ValueUtil.getValue(elem);
 
 					this.set(key, value, null, elem);
 				}).bind(this));
@@ -156,7 +157,7 @@ export default class BindableStore extends BM.Store
 				let value = this.get(key);
 				for (let i = 0; i < this._elems[key]["elements"].length; i++)
 				{
-					FormUtil.setValue(this._elems[key]["elements"][i], value, {"resources":this._options["resources"]});
+					ValueUtil.setValue(this._elems[key]["elements"][i], value, {"resources":this._options["resources"]});
 				}
 			}
 		});

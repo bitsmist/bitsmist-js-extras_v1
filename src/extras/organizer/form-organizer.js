@@ -10,6 +10,7 @@
 
 import BM from "../bm";
 import FormUtil from "../util/form-util.js";
+import ValueUtil from "../util/value-util.js";
 
 // =============================================================================
 //	Form Organizer Class
@@ -48,7 +49,7 @@ export default class FormOrganizer extends BM.Organizer
 		let target = BM.Util.safeGet(e.detail, "target", "");
 		let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
 
-		FormUtil.clearFields(this, options);
+		ValueUtil.clearFields(this, options);
 
 	}
 
@@ -69,7 +70,7 @@ export default class FormOrganizer extends BM.Organizer
 		if (this.settings.get("form.settings.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
-			FormUtil.setFields(rootNode, e.detail.items, {"resources":this.resources, "triggerEvent":true});
+			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.resources, "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
@@ -84,7 +85,7 @@ export default class FormOrganizer extends BM.Organizer
 
 		if (this.settings.get("form.settings.autoCollect", true))
 		{
-			e.detail.items = FormUtil.getFields(this);
+			e.detail.items = ValueUtil.getFields(this);
 		}
 
 	}

@@ -9,7 +9,7 @@
 // =============================================================================
 
 import BM from "../bm";
-import FormUtil from "../util/form-util.js";
+import LocaleValueUtil from "../util/locale-value-util.js";
 
 // =============================================================================
 //	Locale Handler class
@@ -172,9 +172,10 @@ export default class LocaleHandler
 	localize(rootNode, localeName, fallbackLocaleName, parameters)
 	{
 
+
 		let messages = (this.getAll(localeName) || this.getAll(fallbackLocaleName));
 
-		FormUtil.setFields(rootNode, messages, {"attributeName":"bm-locale", "parameters":parameters});
+		LocaleValueUtil.setFields(rootNode, messages, {"attributeName":"bm-locale", "parameters":parameters});
 
 	}
 

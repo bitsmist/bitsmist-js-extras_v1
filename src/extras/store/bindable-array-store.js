@@ -10,7 +10,7 @@
 
 import BM from "../bm";
 import ArrayStore from "../store/array-store.js";
-import FormUtil from "../util/form-util.js";
+import ValueUtil from "../util/value-util.js";
 
 // =============================================================================
 //	Bindable store class
@@ -114,7 +114,7 @@ export default class BindableArrayStore extends ArrayStore
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
 				elem.addEventListener(eventName, (() => {
-					let value = FormUtil.getValue(elem);
+					let value = ValueUtil.getValue(elem);
 
 					this.set(index, key, value, null, elem);
 				}).bind(this));
@@ -169,7 +169,7 @@ export default class BindableArrayStore extends ArrayStore
 				let value = this.get(index, key);
 				for (let i = 0; i < this._elems[index][key]["elements"].length; i++)
 				{
-					FormUtil.setValue(this._elems[index][key]["elements"][i], value, {"resources":this._options["resources"]});
+					ValueUtil.setValue(this._elems[index][key]["elements"][i], value, {"resources":this._options["resources"]});
 				}
 			}
 		});

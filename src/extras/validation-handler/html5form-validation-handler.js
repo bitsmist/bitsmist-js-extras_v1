@@ -9,8 +9,8 @@
 // =============================================================================
 
 import BM from "../bm";
-import FormUtil from "../util/form-util.js";
 import ValidationHandler from "./validation-handler.js";
+import ValueUtil from "../util/value-util.js";
 
 // =============================================================================
 //	HTML5 Form validation Handler class
@@ -34,7 +34,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])")
 		elements.forEach((element) => {
 			let key = element.getAttribute("bm-bind");
-			let value = FormUtil.getValue(element);
+			let value = ValueUtil.getValue(element);
 			let rule = ( rules && rules[key] ? rules[key] : null );
 
 			let failed = HTML5FormValidationHandler._validateValue(element, key, value, rule);
@@ -80,7 +80,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		if (rules || options)
 		{
 			// Check allow/disallow list
-			let values = FormUtil.getFields(form);
+			let values = ValueUtil.getFields(form);
 			invalids1 = ValidationHandler.validate(values, rules, options);
 		}
 		invalids2 = HTML5FormValidationHandler.validate(form, rules);
