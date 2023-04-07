@@ -20,13 +20,13 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Interpolate using parameters.
-	*
-	* @param	{String}		format				Format.
-	* @param	{Object}		parameters			Parameters.
-	*
-	* @return  {Object}		Formatted value.
-	*/
+	 * Interpolate using parameters.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{Object}		parameters			Parameters.
+	 *
+	 * @return  {Object}		Formatted value.
+	 */
 	static interpolate(format, parameters)
 	{
 
@@ -46,14 +46,14 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Interpolate using resources.
-	*
-	* @param	{String}		format				Format.
-	* @param	{String}		value				Value.
-	* @param	{Object}		resources			Resources.
-	*
-	* @return  {Object}		Formatted value.
-	*/
+	 * Interpolate using ResourceHandlers.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Value.
+	 * @param	{Object}		resources			Resources.
+	 *
+	 * @return  {Object}		Formatted value.
+	 */
 	static interpolateResources(format, value, resources)
 	{
 
@@ -76,13 +76,14 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Format the value.
-	*
-	* @param	{string}		format				Format.
-	* @param	{string}		value				Value.
-	*
-	* @return  {Object}		Formatted value.
-	*/
+ 	 * Format the value.
+	 *
+	 * @param	{string}		format				Format.
+	 * @param	{string}		value				Value.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Formatted value.
+	 */
 	static format(format, value, options)
 	{
 
@@ -92,10 +93,13 @@ export default class FormatterUtil
 		switch (format.toLowerCase())
 		{
 		case "yyyy/mm/dd":
-			ret = this.formatDate(format, value);
+			ret = this.formatDate(format, value, options);
 			break;
 		case "price":
-			ret = this.formatPrice(format, value);
+			ret = this.formatPrice(format, value, options);
+			break;
+		case "number":
+			ret = this.formatNumber(format, value, options);
 			break;
 		default:
 			// Interpolate
@@ -112,20 +116,19 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Format price.
-	*
-	* @param	{integer}		price				Price.
-	*
-	* @return  {string}		Formatted price.
-	*/
-	static formatPrice(format, price)
+	 * Format price.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{Integer}		price				Price.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Formatted price.
+	 */
+	static formatPrice(format, price, options)
 	{
 
 		if (price)
 		{
-			//let locale = "ja-JP";
-			//return new Intl.NumberFormat(locale, {style:"currency", currency:"JPY"}).format(price);
-			//return `¥${String(parseInt(price)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}`;
 			return `${String(parseInt(price)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}`;
 		}
 		else
@@ -138,13 +141,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Format price.
-	*
-	* @param	{integer}		price				Price.
-	*
-	* @return  {string}		Formatted price.
-	*/
-	static formatNumber(number)
+	 * Format price.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{Integer}		price				Price.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {string}		Formatted price.
+	 */
+	static formatNumber(format, number, options)
 	{
 
 		if (number)
@@ -161,16 +166,19 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Format date.
-	*
-	* @param	{string}		str					Date.
-	*
-	* @return  {string}		Formatted date.
-	*/
-	static formatDate(format, str)
+	 * Format date.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		str					Date.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Formatted date.
+	 */
+	static formatDate(format, str, options)
 	{
 
-		var result = "";
+		let result = "";
+
 		if (str && str.length === 8)
 		{
 			result = `${str.substr(0, 4)}/${str.substr(4, 2)}/${str.substr(6, 2)}`;
@@ -183,14 +191,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Deformat the value.
-	*
-	* @param	{string}		format				Format.
-	* @param	{string}		value				Value.
-	*
-	* @return  {Object}		Deformatted value.
-	*/
-	static deformat(format, value)
+	 * Deformat the value.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Value.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Object}		Deformatted value.
+	 */
+	static deformat(format, value, options)
 	{
 
 		let ret = value;
@@ -212,13 +221,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Deformat price.
-	*
-	* @param	{string}		value				Price.
-	*
-	* @return  {string}		Deformatted price.
-	*/
-	static deformatPrice(format, value)
+	 * Deformat price.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Price.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Deformatted price.
+	 */
+	static deformatPrice(format, value, options)
 	{
 
 		var result = "";
@@ -235,13 +246,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Deformat date.
-	*
-	* @param	{string}		value				Date.
-	*
-	* @return  {string}		Deformatted date.
-	*/
-	static deformatDate(format, value)
+	 * Deformat date.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Date.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Deformatted date.
+	 */
+	static deformatDate(format, value, options)
 	{
 
 		var result = "";
@@ -258,13 +271,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Get current date time.
-	*
-	* @param	{string}		dateDelimiter		Date delimiter.
-	*
-	* @return  {string}		Current date time.
-	*/
-	static getNow(dateDelimiter)
+	 * Get current date time.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		dateDelimiter		Date delimiter.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Current date time.
+	 */
+	static getNow(format, dateDelimiter, options)
 	{
 
 		dateDelimiter = ( dateDelimiter ? dateDelimiter : "-" );
@@ -279,13 +294,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Get current date.
-	*
-	* @param	{string}		dateDelimiter		Date delimiter.
-	*
-	* @return  {string}		Current date.
-	*/
-	static getToday(dateDelimiter)
+	 * Get current date.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		dateDelimiter		Date delimiter.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {String}		Current date.
+	 */
+	static getToday(format, dateDelimiter, options)
 	{
 
 		dateDelimiter = ( dateDelimiter === undefined ? "-" : dateDelimiter );
@@ -299,13 +316,14 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Sanitize string.
-	*
-	* @param	{String}		value				Value to sanitize.
-	*
-	* @return  {String}		Sanitized string.
-	*/
-	static sanitize(value)
+	 * Sanitize string.
+	 *
+	 * @param	{String}		value				Value to sanitize.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return 	{String}		Sanitized string.
+	 */
+	static sanitize(value, options)
 	{
 
 		if (typeof value === "string")
@@ -324,15 +342,15 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	* Get the resource value that matches given value.
-	*
-	* @param	{array}			resources			Resources.
-	* @param	{String}		resourceName		Resource name.
-	* @param	{String}		value				Code value.
-	* @param	{String}		key					Key.
-	*
-	* @return  {String}		Resource value.
-	*/
+	 * Get the resource value that matches given value.
+	 *
+	 * @param	{array}			resources			Resources.
+	 * @param	{String}		resourceName		Resource name.
+	 * @param	{String}		value				Code value.
+	 * @param	{String}		key					Key.
+	 *
+	 * @return  {String}		Resource value.
+	 */
 	static __getResourceValue(resources, resourceName, value, key)
 	{
 
