@@ -112,6 +112,15 @@ window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
 import FormatterUtil from "./util/formatter-util.js";
 window.BITSMIST.v1.FormatterUtil = FormatterUtil;
 
+import LocaleFormatterUtil from "./util/locale-formatter-util.js";
+window.BITSMIST.v1.LocaleFormatterUtil = LocaleFormatterUtil;
+
+import ValueUtil from "./util/value-util.js";
+window.BITSMIST.v1.ValueUtil = ValueUtil;
+
+import LocaleValueUtil from "./util/locale-value-util.js";
+window.BITSMIST.v1.LocaleValueUtil = LocaleValueUtil;
+
 // Component
 
 import ChainedSelect from "./component/bm-chainedselect.js";
