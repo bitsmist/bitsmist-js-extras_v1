@@ -87,7 +87,7 @@ LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
 		let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
 		let attribName = this.settings.get("locales.settings.autoAttribute.attributeName", "data-locale");
 
-		targetElement.setAttribute(attribName, this.localeName);
+		targetElement.setAttribute(attribName, this.localeSettings["localeName"]);
 	}
 
 	// Notify locale change to clients
@@ -106,8 +106,6 @@ LocaleServer.prototype.subscribe = function(component, options)
 		`${component.name}_${component.uniqueId}`,
 		this._triggerEvent.bind(component),
 	);
-
-	component.localeName = this.localeName;
 
 }
 

@@ -165,17 +165,14 @@ export default class LocaleHandler
 	 * Localize all the bm-locale fields with i18 messages.
 	 *
 	 * @param	{HTMLElement}	rootNode			Target root node to localize.
-	 * @param	{String}		localeName			Locale name.
-	 * @param	{String}		fallbackLocaleName	Fallback locale name.
-	 * @param	{Object}		parameters			Interpolation parameters.
+	 * @param	{Object}		options				Options.
 	 */
-	localize(rootNode, localeName, fallbackLocaleName, parameters)
+	localize(rootNode, options)
 	{
 
+		let messages = (this.getAll(options["localeName"]) || this.getAll(options["fallbackLocaleName"]));
 
-		let messages = (this.getAll(localeName) || this.getAll(fallbackLocaleName));
-
-		LocaleValueUtil.setFields(rootNode, messages, {"attributeName":"bm-locale", "parameters":parameters});
+		LocaleValueUtil.setFields(rootNode, messages, options);
 
 	}
 

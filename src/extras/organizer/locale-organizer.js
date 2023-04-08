@@ -50,8 +50,9 @@ export default class LocaleOrganizer extends BM.Organizer
 				server.subscribe(this);
 
 				// Synchronize to the server's locales
-				this._localName = server.localeName;
-				this._fallbackLocaleName = server.fallbackLocaleName;
+				this._localeSettings["localeName"] = server._localeSettings["localeName"];
+				this._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
+				this._localeSettings["currencyName"] = server._localeSettings["currencyName"];
 			}));
 		}
 
@@ -64,7 +65,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterStart(sender, e, ex)
 	{
 
-		return LocaleOrganizer._changeLocale(this, this._localeName);
+		return LocaleOrganizer._changeLocale(this, this._localeSettings["localeName"]);
 
 	}
 
@@ -114,9 +115,8 @@ export default class LocaleOrganizer extends BM.Organizer
 	static LocaleOrganizer_onAfterFillRow(sender, e, ex)
 	{
 
-		Object.keys(this._localizers).forEach((handlerName) => {
-			this._localizers[handlerName].localize(e.detail.element, this.localeName, this.fallbackLocaleName, e.detail.item);
-		});
+		// Localize a row
+		LocaleOrganizer._localize(this, e.detail.element, e.detail.item);
 
 	}
 
@@ -146,13 +146,8 @@ export default class LocaleOrganizer extends BM.Organizer
 		Object.defineProperty(component, 'localeMessages', {
 			get() { return this._localeMessages; },
 		});
-		Object.defineProperty(component, 'localeName', {
-			get() { return this._localeName; },
-			set(value) { this._localeName = value; }
-		});
-		Object.defineProperty(component, 'fallbackLocaleName', {
-			get() { return this._fallbackLocaleName; },
-			set(value) { this._fallbackLocaleName = value; }
+		Object.defineProperty(component, 'localeSettings', {
+			get() { return this._localeSettings; },
 		});
 
 		// Add methods to component
@@ -175,8 +170,11 @@ export default class LocaleOrganizer extends BM.Organizer
 		// Init vars
 		component._localizers = {};
 		component._localeMessages = new MultiStore();
-		component._localeName = component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", "en"));
-		component._fallbackLocaleName = component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en"));
+		component._localeSettings = {
+			"localeName":			component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", navigator.language)),
+			"fallbackLocaleName":	component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
+			"currencyName":			component.settings.get("locales.settings.currencyName", component.settings.get("system.currencyName", "USD")),
+		};
 
 	}
 
@@ -221,7 +219,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		return Promise.resolve().then(() => {
 			return component.trigger("beforeChangeLocale", options);
 		}).then(() => {
-			component._localeName = localeName;
+			component._localeSettings["localeName"] = localeName;
 			return component.trigger("doChangeLocale", options);
 		}).then(() => {
 			return component.trigger("afterChangeLocale", options);
@@ -236,15 +234,15 @@ export default class LocaleOrganizer extends BM.Organizer
 	 *
      * @param	{Component}		component			Component.
 	 * @param	{HTMLElement}	rootNode			Target root node to localize.
-	 * @param	{Object}		parameters			Interpolation parameters.
+	 * @param	{Object}		interpolation		Interpolation parameters.
 	 */
-	static _localize(component, rootNode, parameters)
+	static _localize(component, rootNode, interpolation)
 	{
 
 		rootNode = rootNode || component.rootElement;
 
 		Object.keys(component._localizers).forEach((handlerName) => {
-			component._localizers[handlerName].localize(rootNode, component._localeName, component._fallbackLocaleName, parameters);
+			component._localizers[handlerName].localize(rootNode, Object.assign({"interpolation":interpolation}, component._localeSettings));
 		});
 
 	}
@@ -283,7 +281,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static _getLocaleMessage(component, key, localeName)
 	{
 
-		localeName = localeName || component.localeName;
+		localeName = localeName || component.localeSettings["localeName"];
 
 		let value = component.localeMessages.get(`${localeName}.${key}`);
 		if (value === undefined)
