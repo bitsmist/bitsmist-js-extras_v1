@@ -70,11 +70,11 @@ export default class ValueUtil
 	 * Fill fields.
 	 *
 	 * @param	{HTMLElement}	rootNode			Form node.
-	 * @param	{Ojbect}		item				Values to fill.
+	 * @param	{Ojbect}		items				Values to fill.
 	 * @param	{Object}		masters				Master values.
 	 * @param	{Object}		options				Options.
 	 */
-	static setFields(rootNode, item, options)
+	static setFields(rootNode, items, options)
 	{
 
 		// Get elements with the attribute
@@ -92,7 +92,7 @@ export default class ValueUtil
 			}
 			else
 			{
-				value = BM.Util.safeGet(item, element.getAttribute(this.attributeName));
+				value = BM.Util.safeGet(items, element.getAttribute(this.attributeName));
 			}
 
 			// Set
@@ -200,44 +200,41 @@ export default class ValueUtil
 	{
 
 		options = options || {};
-		value =( value === undefined || value === null ? "" : String(value));
-		let eventName = "change";
+		let result = ( value === undefined || value === null ? "" : String(value) );
 
 		// Format
 		if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
 		{
-			value = this.formatter.format(element.getAttribute(`${this.attributeName}-format`), value, options);
+			result = this.formatter.format(element.getAttribute(`${this.attributeName}-format`), value, options);
 			element.setAttribute(`${this.attributeName}-formatted`, "");
 		}
 
 		// Interpolate
-		value = this.formatter.interpolateResources(value, value, options["resources"]);
-		value = this.formatter.interpolate(value, options["parameters"]);
-		value = value.replace("${value}", value);
-
-		// Sanitize
-		//value = this.sanitize(value);
+		result = this.formatter.interpolateResources(result, value, options);
+		result = this.formatter.interpolate(result, options);
+		result = this.formatter.interpolateValue(result, value, options);
+//		ret = ret.replace("${value}", value);
 
 		// Set value
 		let targets = element.getAttribute(`${this.attributeName}-out`);
 		if (targets)
 		{
-			this._setValue_target(element, targets, value);
+			this._setValue_target(element, targets, result);
 		}
 		else if (element.hasAttribute("value"))
 		{
-			this._setValue_value(element, value);
+			this._setValue_value(element, result);
 		}
 		else
 		{
-			this._setValue_element(element, value);
+			this._setValue_element(element, result);
 		}
 
 		// Trigger change event
 		if (options["triggerEvent"])
 		{
 			let e = document.createEvent("HTMLEvents");
-			e.initEvent(eventName, true, true);
+			e.initEvent("change", true, true);
 			element.dispatchEvent(e);
 		}
 
