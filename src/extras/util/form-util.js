@@ -160,38 +160,3 @@ FormUtil._build_radio = function(rootNode, fieldName, item)
 	});
 
 }
-
-// -----------------------------------------------------------------------------
-
-/**
- * Set the value to the target positions.
- *
- * @param	{Object}		element				Html element.
- * @param	{String}		targets				Target poisitions.
- * @param	{String}		value				Value.
- */
-FormUtil._setValue_target = function(element, targets, value)
-{
-
-	let items = targets.split(",");
-	for (let i = 0; i < items.length; i++)
-	{
-		let item = items[i].toLowerCase();
-		switch (item)
-		{
-		case "text":
-			element.innerText = value;
-			break;
-		case "html":
-			element.innerHTML = value;
-			break;
-		case "outerhtml":
-			element.outerHTML = value;
-			break;
-		default:
-			element.setAttribute(item, value);
-			break;
-		}
-	}
-
-}
