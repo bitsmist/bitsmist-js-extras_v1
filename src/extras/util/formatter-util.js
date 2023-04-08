@@ -20,62 +20,6 @@ export default class FormatterUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Interpolate using parameters.
-	 *
-	 * @param	{String}		format				Format.
-	 * @param	{Object}		parameters			Parameters.
-	 *
-	 * @return  {Object}		Formatted value.
-	 */
-	static interpolate(format, parameters)
-	{
-
-		let ret = format;
-
-		if (parameters && format.indexOf("${") > -1)
-		{
-			ret = ret.replace(/\$\{(\w+)\}/g, (_, name) => {
-				return parameters[name] || `${name}`;
-			});
-		}
-
-		return ret;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Interpolate using ResourceHandlers.
-	 *
-	 * @param	{String}		format				Format.
-	 * @param	{String}		value				Value.
-	 * @param	{Object}		resources			Resources.
-	 *
-	 * @return  {Object}		Formatted value.
-	 */
-	static interpolateResources(format, value, resources)
-	{
-
-		let ret = format;
-
-		if (resources && format.indexOf("#{") > -1)
-		{
-			ret = format.replace(/\#\{(.+)\}/g, (_, name) => {
-				let arr = name.split(".");
-				let resourceName = arr[0];
-				let key = arr[1];
-				return this.__getResourceValue(resources, resourceName, value, key);
-			});
-		}
-
-		return ret;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
  	 * Format the value.
 	 *
 	 * @param	{string}		format				Format.
@@ -92,6 +36,7 @@ export default class FormatterUtil
 
 		switch (format.toLowerCase())
 		{
+		case "date":
 		case "yyyy/mm/dd":
 			ret = this.formatDate(format, value, options);
 			break;
@@ -103,9 +48,10 @@ export default class FormatterUtil
 			break;
 		default:
 			// Interpolate
-			ret = this.interpolateResources(format, value, options["resources"]);
-			ret = this.interpolate(ret, options["parameters"]);
-			ret = ret.replace("${value}", value);
+			ret = this.interpolateResources(format, value, options);
+			ret = this.interpolate(ret, options);
+			ret = this.interpolateValue(format, value, options);
+			//ret = ret.replace("${value}", value);
 			break;
 		}
 
@@ -119,17 +65,17 @@ export default class FormatterUtil
 	 * Format price.
 	 *
 	 * @param	{String}		format				Format.
-	 * @param	{Integer}		price				Price.
+	 * @param	{String}		value				Value.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return  {String}		Formatted price.
 	 */
-	static formatPrice(format, price, options)
+	static formatPrice(format, value, options)
 	{
 
-		if (price)
+		if (value)
 		{
-			return `${String(parseInt(price)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}`;
+			return parseInt(value).toLocaleString(navigator.language);
 		}
 		else
 		{
@@ -144,17 +90,17 @@ export default class FormatterUtil
 	 * Format price.
 	 *
 	 * @param	{String}		format				Format.
-	 * @param	{Integer}		price				Price.
+	 * @param	{String}		value				Value.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return  {string}		Formatted price.
 	 */
-	static formatNumber(format, number, options)
+	static formatNumber(format, value, options)
 	{
 
-		if (number)
+		if (value)
 		{
-			return String(parseInt(number)).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+			return parseInt(value).toLocaleString(navigator.language);
 		}
 		else
 		{
@@ -334,6 +280,111 @@ export default class FormatterUtil
 		{
 			return value;
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Interpolate using parameters.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{Object}		options				Options
+	 *
+	 * @return  {Object}		Formatted value.
+	 */
+	static interpolate(format, options)
+	{
+
+		let ret = format;
+		let parameters = options["interpolation"];
+
+		if (parameters && format.indexOf("${") > -1)
+		{
+			ret = ret.replace(/\$\{(.+)\}/g, (_, name) => {
+				let tokens = name.split(":");
+				let value = parameters[tokens[0]];
+
+				if (!value)
+				{
+					value = "${" + name + "}";
+				}
+				else if (value && tokens.length > 1)
+				{
+					value = this.format(tokens[1], value, options);
+				}
+
+				return value;
+			});
+		}
+
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Interpolate ${value} using parameters.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Value.
+	 * @param	{Object}		options				Options
+	 *
+	 * @return  {Object}		Formatted value.
+	 */
+	static interpolateValue(format, value, options)
+	{
+
+		let ret = format;
+
+		if (format.indexOf("${value") > -1)
+		{
+			ret = ret.replace(/\$\{value(.*)\}/g, (_, name) => {
+				let tokens = name.split(":");
+				let tmp = value;
+
+				if (tokens.length > 1)
+				{
+					tmp = this.format(tokens[1], value, options);
+				}
+
+				return tmp;
+			});
+		}
+
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Interpolate using ResourceHandlers.
+	 *
+	 * @param	{String}		format				Format.
+	 * @param	{String}		value				Value.
+	 * @param	{Object}		resources			Resources.
+	 *
+	 * @return  {Object}		Formatted value.
+	 */
+	static interpolateResources(format, value, options)
+	{
+
+		let ret = format;
+		let resources = options["resources"];
+
+		if (resources && format.indexOf("#{") > -1)
+		{
+			ret = format.replace(/\#\{(.+)\}/g, (_, name) => {
+				let arr = name.split(".");
+				let resourceName = arr[0];
+				let key = arr[1];
+				return this.__getResourceValue(resources, resourceName, value, key);
+			});
+		}
+
+		return ret;
 
 	}
 
