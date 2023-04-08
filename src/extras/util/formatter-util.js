@@ -34,28 +34,36 @@ export default class FormatterUtil
 		options = options || {};
 		let ret = value;
 
-		switch (format.toLowerCase())
+		let tokens = this.__bisect(format, "-");
+		let type = tokens[0];
+		let typeOption = (tokens.length > 1 ? tokens[1] : "");
+
+		switch (type)
 		{
 		case "date":
-		case "yyyy/mm/dd":
-			ret = this.formatDate(format, value, options);
+		case "datetime":
+		case "time":
+			ret = this.formatDate(type, typeOption, value, options);
 			break;
 		case "price":
-			ret = this.formatPrice(format, value, options);
+			ret = this.formatPrice(type, typeOption, value, options);
 			break;
 		case "number":
-			ret = this.formatNumber(format, value, options);
+			ret = this.formatNumber(type, typeOption, value, options);
 			break;
 		default:
-			// Interpolate
-			ret = this.interpolateResources(format, value, options);
-			ret = this.interpolate(ret, options);
-			ret = this.interpolateValue(format, value, options);
-			//ret = ret.replace("${value}", value);
+			// Interpolation
+			if (format.charAt(0) === "`")
+			{
+				ret = this.interpolateResources(format, value, options);
+				ret = this.interpolate(ret, options);
+				ret = this.interpolateValue(ret, value, options);
+				//ret = ret.replace("${value}", value);
+			}
 			break;
 		}
 
-		return ret;
+		return String(ret);
 
 	}
 
@@ -64,23 +72,24 @@ export default class FormatterUtil
 	/**
 	 * Format price.
 	 *
-	 * @param	{String}		format				Format.
+	 * @param	{String}		type				Type.
+	 * @param	{String}		typeOption			Type specific option.
 	 * @param	{String}		value				Value.
 	 * @param	{Object}		options				Options.
 	 *
-	 * @return  {String}		Formatted price.
+	 * @return  {String}		Formatted value.
 	 */
-	static formatPrice(format, value, options)
+	static formatPrice(type, typeOption, value, options)
 	{
+
+		let result = value;
 
 		if (value)
 		{
-			return parseInt(value).toLocaleString(navigator.language);
+			value = parseInt(value).toLocaleString(navigator.language);
 		}
-		else
-		{
-			return "";
-		}
+
+		return result || "";
 
 	}
 
@@ -89,23 +98,24 @@ export default class FormatterUtil
 	/**
 	 * Format price.
 	 *
-	 * @param	{String}		format				Format.
+	 * @param	{String}		type				Type.
+	 * @param	{String}		typeOption			Type specific option.
 	 * @param	{String}		value				Value.
 	 * @param	{Object}		options				Options.
 	 *
-	 * @return  {string}		Formatted price.
+	 * @return  {string}		Formatted value.
 	 */
-	static formatNumber(format, value, options)
+	static formatNumber(type, typeOption, value, options)
 	{
+
+		let result = value;
 
 		if (value)
 		{
-			return parseInt(value).toLocaleString(navigator.language);
+			value = parseInt(value).toLocaleString(navigator.language);
 		}
-		else
-		{
-			return "";
-		}
+
+		return result || "";
 
 	}
 
@@ -114,23 +124,60 @@ export default class FormatterUtil
 	/**
 	 * Format date.
 	 *
-	 * @param	{String}		format				Format.
-	 * @param	{String}		str					Date.
+	 * @param	{String}		type				Type.
+	 * @param	{String}		typeOption			Type specific option.
+	 * @param	{String}		value				Value.
 	 * @param	{Object}		options				Options.
 	 *
-	 * @return  {String}		Formatted date.
+	 * @return  {String}		Formatted value.
 	 */
-	static formatDate(format, str, options)
+	static formatDate(type, typeOption, value, options)
 	{
 
-		let result = "";
+		let result = value;
+		let inFormat;
+		let outFormat = typeOption;
 
-		if (str && str.length === 8)
+		let dt;
+		if (value.length === 8)
 		{
-			result = `${str.substr(0, 4)}/${str.substr(4, 2)}/${str.substr(6, 2)}`;
+			dt = new Date(`${value.substr(0, 4)}-${value.substr(4, 2)}-${value.substr(6, 2)}`);
+		}
+		else
+		{
+			dt = new Date(value);
 		}
 
-		return result;
+		switch (typeOption)
+		{
+		case "":
+			result = dt.toString();
+			break;
+		default:
+			let y = String(dt.getFullYear());
+			let m = String(1 + dt.getMonth());
+			let d = String(dt.getDate());
+			let h = String(dt.getHours());
+			let mi = String(dt.getMinutes());
+			let s = String(dt.getSeconds());
+
+			result = outFormat
+			result = result.replace(/YYYY/g, y.padStart(4, "0"));
+			result = result.replace(/YY/g, y.slice(-2).padStart(2, "0"));
+			result = result.replace(/MM/g, m.padStart(2, "0"));
+			result = result.replace(/M/g, m.padStart(1, "0"));
+			result = result.replace(/DD/g, d.padStart(2, "0"));
+			result = result.replace(/D/g, d.padStart(1, "0"));
+			result = result.replace(/hh/g, h.padStart(2, "0"));
+			result = result.replace(/h/g, h.padStart(1, "0"));
+			result = result.replace(/mm/g, mi.padStart(2, "0"));
+			result = result.replace(/m/g, mi.padStart(1, "0"));
+			result = result.replace(/ss/g, s.padStart(2, "0"));
+			result = result.replace(/s/g, s.padStart(1, "0"));
+			break;
+		}
+
+		return result || "";
 
 	}
 
@@ -302,7 +349,7 @@ export default class FormatterUtil
 		if (parameters && format.indexOf("${") > -1)
 		{
 			ret = ret.replace(/\$\{(.+)\}/g, (_, name) => {
-				let tokens = name.split(":");
+				let tokens = this.__bisect(name, ":");
 				let value = parameters[tokens[0]];
 
 				if (!value)
@@ -314,7 +361,7 @@ export default class FormatterUtil
 					value = this.format(tokens[1], value, options);
 				}
 
-				return value;
+				return value || "";
 			});
 		}
 
@@ -341,7 +388,7 @@ export default class FormatterUtil
 		if (format.indexOf("${value") > -1)
 		{
 			ret = ret.replace(/\$\{value(.*)\}/g, (_, name) => {
-				let tokens = name.split(":");
+				let tokens = this.__bisect(name, ":");
 				let tmp = value;
 
 				if (tokens.length > 1)
@@ -349,7 +396,7 @@ export default class FormatterUtil
 					tmp = this.format(tokens[1], value, options);
 				}
 
-				return tmp;
+				return tmp || "";
 			});
 		}
 
@@ -380,7 +427,7 @@ export default class FormatterUtil
 				let arr = name.split(".");
 				let resourceName = arr[0];
 				let key = arr[1];
-				return this.__getResourceValue(resources, resourceName, value, key);
+				return this.__getResourceValue(resources, resourceName, value, key) || "";
 			});
 		}
 
@@ -414,6 +461,36 @@ export default class FormatterUtil
 			{
 				ret = item[key];
 			}
+		}
+
+		return ret;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Split the target string into two with the delimiter.
+	 *
+	 * @param	{String}		target				Target string to divide.
+	 * @param	{String}		delimiter			Delimiter char.
+	 *
+	 * @return  {Arry}			Splitted string.
+	 */
+	static __bisect(target, delimiter)
+	{
+
+		let ret = [];
+
+		let pos = target.indexOf(delimiter);
+		if (pos > -1)
+		{
+			ret.push(target.substring(0, pos));
+			ret.push(target.substring(pos + 1));
+		}
+		else
+		{
+			ret.push(target);
 		}
 
 		return ret;

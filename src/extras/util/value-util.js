@@ -210,10 +210,14 @@ export default class ValueUtil
 		}
 
 		// Interpolate
-		result = this.formatter.interpolateResources(result, value, options);
-		result = this.formatter.interpolate(result, options);
-		result = this.formatter.interpolateValue(result, value, options);
-//		ret = ret.replace("${value}", value);
+		if (result.charAt(0) === "`")
+		{
+			result = this.formatter.interpolateResources(result, value, options);
+			result = this.formatter.interpolate(result, options);
+			result = this.formatter.interpolateValue(result, value, options);
+			result = result.replace(/^`|`$/g, '');
+	//		ret = ret.replace("${value}", value);
+		}
 
 		// Set value
 		let targets = element.getAttribute(`${this.attributeName}-out`);
