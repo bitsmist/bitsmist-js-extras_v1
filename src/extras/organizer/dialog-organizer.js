@@ -82,16 +82,11 @@ export default class DialogOrganizer extends BM.Organizer
 		component._cancelOpen;
 		component._modalResult;
 		component._modalPromise;
+		component._backdrop;
 		component._backdropPromise = Promise.resolve();
 
 		// Add event handlers to component
 		this._addOrganizerHandler(component, "afterReady", DialogOrganizer.DialogOrganizer_onAfterReady);
-
-		// Init component settings
-		component.settings.set("settings.autoRefresh", false);
-		component.settings.set("settings.autoRefreshOnOpen", true);
-		component.settings.set("settings.autoSetup", false);
-		component.settings.set("settings.autoSetupOnOpen", true);
 
 	}
 
@@ -123,13 +118,13 @@ export default class DialogOrganizer extends BM.Organizer
 					}
 				}).then(() => {
 					// Setup
-					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("settings.autoSetupOnOpen")))
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.settings.autoSetupOnOpen", true)))
 					{
 						return component.setup(options);
 					}
 				}).then(() => {
 					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("settings.autoRefreshOnOpen")))
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.settings.autoRefreshOnOpen", true)))
 					{
 						return component.refresh(options);
 					}
