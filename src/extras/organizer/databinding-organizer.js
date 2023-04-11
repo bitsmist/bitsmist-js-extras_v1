@@ -50,17 +50,17 @@ export default class DatabindingOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add properties
+		// Add properties to component
 		Object.defineProperty(component, 'bindings', {
 			get() { return this._bindings; },
 		});
 
 		if (component.settings.get("bindings.settings.dataType", "single") === "single")
 		{
-			// Add methods
+			// Add methods to component
 			component.bindData = function(...args) { return DatabindingOrganizer._bindData(this, ...args); }
 
-			// Init vars
+			// Init component vars
 			component._bindings = new BindableStore({
 				"resources":	component.resources,
 				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
@@ -72,10 +72,10 @@ export default class DatabindingOrganizer extends BM.Organizer
 		}
 		else
 		{
-			// Add methods
+			// Add methods to component
 			component.bindData = function(...args) { return DatabindingOrganizer._bindDataArray(this, ...args); }
 
-			// Init vars
+			// Init component vars
 			component._bindings = new BindableArrayStore({
 				"resources":	component.resources,
 				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
