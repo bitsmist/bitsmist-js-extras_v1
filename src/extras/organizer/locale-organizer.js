@@ -38,22 +38,29 @@ export default class LocaleOrganizer extends BM.Organizer
 
 		let promises = [];
 
-		this._enumSettings(e.detail.settings["locales"], (sectionName, sectionValue) => {
+		this._enumSettings(e.detail.settings["localizers"], (sectionName, sectionValue) => {
 			promises.push(LocaleOrganizer._addLocalizer(this, sectionName, sectionValue));
 		});
 
-		// Subscribe to the Locale Server if exists
-		let server = document.querySelector("bm-locale");
-		if (server && this !==  server)
-		{
-			promises.push(this.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-				server.subscribe(this);
 
-				// Synchronize to the server's locales
-				this._localeSettings["localeName"] = server._localeSettings["localeName"];
-				this._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
-				this._localeSettings["currencyName"] = server._localeSettings["currencyName"];
-			}));
+		// Subscribe to the Locale Server if exists
+		if (this.name !== "LocaleServer")
+		{
+			if ((document.readyState === "interactive" || document.readyState === "complete"))
+			{
+				promises.push(LocaleOrganizer.__connectToServer(this));
+			}
+			else
+			{
+				let promise = new Promise((resolve, reject) => {
+					document.addEventListener("DOMContentLoaded", () => {
+						LocaleOrganizer.__connectToServer(this).then(() => {
+							resolve();
+						});
+					});
+				});
+				promises.push(promise);
+			}
 		}
 
 		return Promise.all(promises);
@@ -128,7 +135,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"locales",
+			"sections":		"localizers",
 			"order":		330,
 		};
 
@@ -162,7 +169,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		this._addOrganizerHandler(component, "afterStart", LocaleOrganizer.LocaleOrganizer_onAfterStart);
 		this._addOrganizerHandler(component, "beforeChangeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeChangeLocale);
 		this._addOrganizerHandler(component, "doChangeLocale", LocaleOrganizer.LocaleOrganizer_onDoChangeLocale);
-		if (component.settings.get("locales.settings.autoLocalizeRows"))
+		if (component.settings.get("localizers.settings.autoLocalizeRows"))
 		{
 			this._addOrganizerHandler(component, "afterFillRow", LocaleOrganizer.LocaleOrganizer_onAfterFillRow);
 		}
@@ -171,9 +178,9 @@ export default class LocaleOrganizer extends BM.Organizer
 		component._localizers = {};
 		component._localeMessages = new MultiStore();
 		component._localeSettings = {
-			"localeName":			component.settings.get("locales.settings.localeName", component.settings.get("system.localeName", navigator.language)),
-			"fallbackLocaleName":	component.settings.get("locales.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
-			"currencyName":			component.settings.get("locales.settings.currencyName", component.settings.get("system.currencyName", "USD")),
+			"localeName":			component.settings.get("localizers.settings.localeName", component.settings.get("system.localeName", navigator.language)),
+			"fallbackLocaleName":	component.settings.get("localizers.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
+			"currencyName":			component.settings.get("localizers.settings.currencyName", component.settings.get("system.currencyName", "USD")),
 		};
 
 	}
@@ -290,6 +297,39 @@ export default class LocaleOrganizer extends BM.Organizer
 		}
 
 		return value;
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Subscript to the locale server.
+	 *
+	 * @param	{Component}		component			Component.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static __connectToServer(component)
+	{
+
+		let promise = Promise.resolve;
+		let server = document.querySelector("bm-locale");
+
+		if (server && component !==  server)
+		{
+			promise = component.waitFor([{"rootNode":"bm-locale"}]).then(() => {
+				server.subscribe(component);
+
+				// Synchronize to the server's locales
+				component._localeSettings["localeName"] = server._localeSettings["localeName"];
+				component._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
+				component._localeSettings["currencyName"] = server._localeSettings["currencyName"];
+			});
+		}
+
+		return promise;
 
 	}
 
