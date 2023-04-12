@@ -39,8 +39,8 @@ export default class PreferenceOrganizer extends BM.Organizer
 
 		if (!(this instanceof PreferenceServer))
 		{
-			return AttendanceOrganizer.call("PreferenceServer").then((server) => {
-				BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${name}`);
+			return AttendanceOrganizer.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
+				BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
 
 				return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {
 					server.subscribe(this, this.settings.get("preferences"));

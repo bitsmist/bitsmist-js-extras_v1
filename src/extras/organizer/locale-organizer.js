@@ -47,7 +47,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(AttendanceOrganizer.call("LocaleServer").then((server) => {
+			promises.push(AttendanceOrganizer.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
 					return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {

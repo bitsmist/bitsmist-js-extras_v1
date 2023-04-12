@@ -37,7 +37,9 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		return AttendanceOrganizer.call("LocaleServer").then((server) => {
+		return AttendanceOrganizer.call("LocaleServer", {"waitForAttendance":true}).then((server) => {
+			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.name}`);
+
 			this._messages.chain(server.localeMessages);
 		});
 
