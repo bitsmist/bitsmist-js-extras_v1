@@ -62,6 +62,13 @@ PreferenceServer.prototype._getSettings = function()
 				"autoCollect":			false,
 				"autoCrop":				false,
 			}
+		},
+
+		// Names
+		"names": {
+			"locale": {
+				"name": 				"PreferenceServer",
+			}
 		}
 	}
 

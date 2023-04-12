@@ -9,6 +9,8 @@
 // =============================================================================
 
 import BM from "../bm";
+import PreferenceServer from "../component/bm-preference.js";
+import NameServiceOrganizer from "../organizer/nameservice-organizer.js";
 
 // =============================================================================
 //	Preference organizer class
@@ -35,11 +37,14 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static PreferenceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
-		if (this !==  document.querySelector("bm-preference"))
+		if (!(this instanceof PreferenceServer))
 		{
-			// Wait for PreferenceManager to be ready
-			return this.waitFor([{"rootNode":"bm-preference"}]).then(() => {
-				document.querySelector("bm-preference").subscribe(this, this.settings.get("preferences"));
+			return NameServiceOrganizer.resolve("PreferenceServer").then((server) => {
+				BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${name}`);
+
+				return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {
+					server.subscribe(this, this.settings.get("preferences"));
+				});
 			});
 		}
 

@@ -59,6 +59,13 @@ LocaleServer.prototype._getSettings = function()
 			"default": {
 				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
 			}
+		},
+
+		// Names
+		"names": {
+			"locale": {
+				"name": 				"LocaleServer",
+			}
 		}
 	}
 

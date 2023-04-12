@@ -10,6 +10,7 @@
 
 import BM from "../bm";
 import LocaleHandler from "./locale-handler";
+import NameServiceOrganizer from "../organizer/nameservice-organizer.js";
 
 // =============================================================================
 //	LocaleServer Handler class
@@ -36,8 +37,9 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		let rootNode = this._options.get("rootNode", "bm-locale");
-		this._messages.chain(document.querySelector(rootNode).localeMessages);
+		return NameServiceOrganizer.resolve("LocaleServer").then((server) => {
+			this._messages.chain(server.localeMessages);
+		});
 
 	}
 

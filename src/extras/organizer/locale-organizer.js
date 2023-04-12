@@ -10,6 +10,8 @@
 
 import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
+import LocaleServer from "../component/bm-locale.js";
+import NameServiceOrganizer from "../organizer/nameservice-organizer.js";
 
 // =============================================================================
 //	Locale Organizer Class
@@ -42,25 +44,22 @@ export default class LocaleOrganizer extends BM.Organizer
 			promises.push(LocaleOrganizer._addLocalizer(this, sectionName, sectionValue));
 		});
 
-
 		// Subscribe to the Locale Server if exists
-		if (this.name !== "LocaleServer")
+		if (!(this instanceof LocaleServer))
 		{
-			if ((document.readyState === "interactive" || document.readyState === "complete"))
-			{
-				promises.push(LocaleOrganizer.__connectToServer(this));
-			}
-			else
-			{
-				let promise = new Promise((resolve, reject) => {
-					document.addEventListener("DOMContentLoaded", () => {
-						LocaleOrganizer.__connectToServer(this).then(() => {
-							resolve();
-						});
+			promises.push(NameServiceOrganizer.resolve("LocaleServer").then((server) => {
+				if (server)
+				{
+					return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {
+						server.subscribe(this);
+
+						// Synchronize to the server's locales
+						this._localeSettings["localeName"] = server._localeSettings["localeName"];
+						this._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
+						this._localeSettings["currencyName"] = server._localeSettings["currencyName"];
 					});
-				});
-				promises.push(promise);
-			}
+				}
+			}));
 		}
 
 		return Promise.all(promises);
@@ -146,7 +145,7 @@ export default class LocaleOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add properties
+		// Add properties to component
 		Object.defineProperty(component, 'localizers', {
 			get() { return this._localizers; },
 		});
@@ -174,7 +173,7 @@ export default class LocaleOrganizer extends BM.Organizer
 			this._addOrganizerHandler(component, "afterFillRow", LocaleOrganizer.LocaleOrganizer_onAfterFillRow);
 		}
 
-		// Init vars
+		// Init component vars
 		component._localizers = {};
 		component._localeMessages = new MultiStore();
 		component._localeSettings = {
@@ -297,39 +296,6 @@ export default class LocaleOrganizer extends BM.Organizer
 		}
 
 		return value;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Subscript to the locale server.
-	 *
-	 * @param	{Component}		component			Component.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static __connectToServer(component)
-	{
-
-		let promise = Promise.resolve;
-		let server = document.querySelector("bm-locale");
-
-		if (server && component !==  server)
-		{
-			promise = component.waitFor([{"rootNode":"bm-locale"}]).then(() => {
-				server.subscribe(component);
-
-				// Synchronize to the server's locales
-				component._localeSettings["localeName"] = server._localeSettings["localeName"];
-				component._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
-				component._localeSettings["currencyName"] = server._localeSettings["currencyName"];
-			});
-		}
-
-		return promise;
 
 	}
 
