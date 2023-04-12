@@ -64,8 +64,8 @@ PreferenceServer.prototype._getSettings = function()
 			}
 		},
 
-		// Names
-		"names": {
+		// Attendances
+		"attendances": {
 			"locale": {
 				"name": 				"PreferenceServer",
 			}

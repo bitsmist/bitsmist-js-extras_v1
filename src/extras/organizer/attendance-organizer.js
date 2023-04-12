@@ -35,7 +35,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 	static AttendanceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
-		this._enumSettings(e.detail.settings["names"], (sectionName, sectionValue) => {
+		this._enumSettings(e.detail.settings["attendances"], (sectionName, sectionValue) => {
 			AttendanceOrganizer.register(sectionValue["name"], this, sectionValue);
 		});
 
@@ -49,7 +49,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 	{
 
 		return {
-			"sections":		"names",
+			"sections":		"attendances",
 			"order":		330,
 		};
 
@@ -78,55 +78,28 @@ export default class AttendanceOrganizer extends BM.Organizer
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Register an organizer.
+	 * Register the component.
 	 *
-	 * @param	{Organizer}		organizer			Organizer to register.
+	 * @param	{String}		name				Register as this name.
+	 * @param	{Component}		component			Compoent to register.
 	 */
 	static register(name, component)
 	{
 
 		if (!AttendanceOrganizer._records[name])
 		{
-			AttendanceOrganizer._records[name] = {
-				"object":	 	component,
-				"waitInfo": {
-					"promise":	Promise.resolve(),
-					"resolve":	()=>{}, // dummy function
-					"reject":	()=>{}, // dummy function
-					"timer":	null,
-				}
-			};
+			AttendanceOrganizer.__createEntry(name);
 		}
 
-		AttendanceOrganizer._records[name].object = component;
-		AttendanceOrganizer._records[name].waitInfo.resolve();
-		if (AttendanceOrganizer._records[name].waitInfo["timer"])
+		let entry = AttendanceOrganizer._records[name];
+		entry.object = component;
+		entry.waitInfo.resolve();
+		if (entry.waitInfo["timer"])
 		{
-			clearTimeout(AttendanceOrganizer._records[name].waitInfo["timer"]);
+			clearTimeout(entry.waitInfo["timer"]);
 		}
 
 	}
-
-	// -------------------------------------------------------------------------
-
-/*
-	static createWaitInfo(component, waitInfo)
-	{
-
-		waitInfo = waitInfo || {
-			"promise":	Promise.resolve(),
-			"resolve":	()=>{}, // dummy function
-			"reject":	()=>{}, // dummy function
-			"timer":	null,
-		};
-
-		AttendanceOrganizer._records[name] = {
-			"object":	 	component,
-			"waitInfo":		waitInfo,
-		};
-
-	}
-*/
 
 	// -------------------------------------------------------------------------
 
@@ -141,19 +114,54 @@ export default class AttendanceOrganizer extends BM.Organizer
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;
 					waitInfo["timer"] = setTimeout(() => {
-						reject(`AttendanceOrganizer.resolve(): Timed out after ${timeout} milliseconds waiting for ${name}`);
+						reject(`AttendanceOrganizer.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
 					}, timeout);
 				});
 			waitInfo["promise"] = promise;
 
-			AttendanceOrganizer._records[name] = {
-				"waitInfo": waitInfo
-			}
+			AttendanceOrganizer.__createEntry(name, null, waitInfo);
 		}
 
-		return AttendanceOrganizer._records[name].waitInfo.promise.then(() => {
-			return AttendanceOrganizer._records[name].object;
+		let entry = AttendanceOrganizer._records[name];
+
+		return Promise.resolve().then(() => {
+			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
+			{
+				return BM.documentReady;
+			}
+		}).then(() => {
+			if (BM.Util.safeGet(options, "waitForAttendance"))
+			{
+				return entry.waitInfo.promise;
+			}
+		}).then(() => {
+			return entry.object;
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	// 	Privates
+	// -------------------------------------------------------------------------
+
+	static __createEntry(name, component, waitInfo)
+	{
+
+		waitInfo = waitInfo || {
+			"promise":	Promise.resolve(),
+			"resolve":	()=>{}, // dummy function
+			"reject":	()=>{}, // dummy function
+			"timer":	null,
+		};
+
+		let record = {
+			"object":	 	component,
+			"waitInfo":		waitInfo,
+		};
+
+		AttendanceOrganizer._records[name] = record;
+
+		return record;
 
 	}
 
