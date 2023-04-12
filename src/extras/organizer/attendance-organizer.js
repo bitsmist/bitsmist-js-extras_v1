@@ -11,10 +11,10 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Name Service Organizer Class
+//	Attendance Organizer Class
 // =============================================================================
 
-export default class NameServiceOrganizer extends BM.Organizer
+export default class AttendanceOrganizer extends BM.Organizer
 {
 
 	// -------------------------------------------------------------------------
@@ -24,7 +24,7 @@ export default class NameServiceOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "NameServiceOrganizer";
+		return "AttendanceOrganizer";
 
 	}
 
@@ -32,11 +32,11 @@ export default class NameServiceOrganizer extends BM.Organizer
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static NameServiceOrganizer_onDoOrganize(sender, e, ex)
+	static AttendanceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
 		this._enumSettings(e.detail.settings["names"], (sectionName, sectionValue) => {
-			NameServiceOrganizer.register(sectionValue["name"], this, sectionValue);
+			AttendanceOrganizer.register(sectionValue["name"], this, sectionValue);
 		});
 
 	}
@@ -61,7 +61,7 @@ export default class NameServiceOrganizer extends BM.Organizer
 	{
 
 		// Init vars
-		NameServiceOrganizer._records = {};
+		AttendanceOrganizer._records = {};
 
 	}
 
@@ -71,7 +71,7 @@ export default class NameServiceOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", NameServiceOrganizer.NameServiceOrganizer_onDoOrganize);
+		this._addOrganizerHandler(component, "doOrganize", AttendanceOrganizer.AttendanceOrganizer_onDoOrganize);
 
 	}
 
@@ -85,9 +85,9 @@ export default class NameServiceOrganizer extends BM.Organizer
 	static register(name, component)
 	{
 
-		if (!NameServiceOrganizer._records[name])
+		if (!AttendanceOrganizer._records[name])
 		{
-			NameServiceOrganizer._records[name] = {
+			AttendanceOrganizer._records[name] = {
 				"object":	 	component,
 				"waitInfo": {
 					"promise":	Promise.resolve(),
@@ -98,11 +98,11 @@ export default class NameServiceOrganizer extends BM.Organizer
 			};
 		}
 
-		NameServiceOrganizer._records[name].object = component;
-		NameServiceOrganizer._records[name].waitInfo.resolve();
-		if (NameServiceOrganizer._records[name].waitInfo["timer"])
+		AttendanceOrganizer._records[name].object = component;
+		AttendanceOrganizer._records[name].waitInfo.resolve();
+		if (AttendanceOrganizer._records[name].waitInfo["timer"])
 		{
-			clearTimeout(NameServiceOrganizer._records[name].waitInfo["timer"]);
+			clearTimeout(AttendanceOrganizer._records[name].waitInfo["timer"]);
 		}
 
 	}
@@ -120,7 +120,7 @@ export default class NameServiceOrganizer extends BM.Organizer
 			"timer":	null,
 		};
 
-		NameServiceOrganizer._records[name] = {
+		AttendanceOrganizer._records[name] = {
 			"object":	 	component,
 			"waitInfo":		waitInfo,
 		};
@@ -130,10 +130,10 @@ export default class NameServiceOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static resolve(name, options)
+	static call(name, options)
 	{
 
-		if (!NameServiceOrganizer._records[name])
+		if (!AttendanceOrganizer._records[name])
 		{
 			let waitInfo = {};
 			let timeout = BITSMIST.v1.settings.get("system.waitForTimeout", 10000);
@@ -141,18 +141,18 @@ export default class NameServiceOrganizer extends BM.Organizer
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;
 					waitInfo["timer"] = setTimeout(() => {
-						reject(`NameServiceOrganizer.resolve(): Timed out after ${timeout} milliseconds waiting for ${name}`);
+						reject(`AttendanceOrganizer.resolve(): Timed out after ${timeout} milliseconds waiting for ${name}`);
 					}, timeout);
 				});
 			waitInfo["promise"] = promise;
 
-			NameServiceOrganizer._records[name] = {
+			AttendanceOrganizer._records[name] = {
 				"waitInfo": waitInfo
 			}
 		}
 
-		return NameServiceOrganizer._records[name].waitInfo.promise.then(() => {
-			return NameServiceOrganizer._records[name].object;
+		return AttendanceOrganizer._records[name].waitInfo.promise.then(() => {
+			return AttendanceOrganizer._records[name].object;
 		});
 
 	}

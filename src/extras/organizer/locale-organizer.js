@@ -8,10 +8,10 @@
  */
 // =============================================================================
 
+import AttendanceOrganizer from "../organizer/attendance-organizer.js";
 import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
 import LocaleServer from "../component/bm-locale.js";
-import NameServiceOrganizer from "../organizer/nameservice-organizer.js";
 
 // =============================================================================
 //	Locale Organizer Class
@@ -47,7 +47,7 @@ export default class LocaleOrganizer extends BM.Organizer
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(NameServiceOrganizer.resolve("LocaleServer").then((server) => {
+			promises.push(AttendanceOrganizer.call("LocaleServer").then((server) => {
 				if (server)
 				{
 					return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {

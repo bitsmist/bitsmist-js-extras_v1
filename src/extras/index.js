@@ -71,8 +71,8 @@ BM.OrganizerOrganizer.register(PreferenceOrganizer);
 import RouteOrganizer from "./organizer/route-organizer.js";
 BM.OrganizerOrganizer.register(RouteOrganizer);
 
-import NameServiceOrganizer from "./organizer/nameservice-organizer.js";
-BM.OrganizerOrganizer.register(NameServiceOrganizer);
+import AttendanceOrganizer from "./organizer/attendance-organizer.js";
+BM.OrganizerOrganizer.register(AttendanceOrganizer);
 
 // Resource handler
 

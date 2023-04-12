@@ -8,9 +8,9 @@
  */
 // =============================================================================
 
+import AttendanceOrganizer from "../organizer/attendance-organizer.js";
 import BM from "../bm";
 import LocaleHandler from "./locale-handler";
-import NameServiceOrganizer from "../organizer/nameservice-organizer.js";
 
 // =============================================================================
 //	LocaleServer Handler class
@@ -37,7 +37,7 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		return NameServiceOrganizer.resolve("LocaleServer").then((server) => {
+		return AttendanceOrganizer.call("LocaleServer").then((server) => {
 			this._messages.chain(server.localeMessages);
 		});
 
