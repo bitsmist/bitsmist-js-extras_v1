@@ -127,7 +127,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
 			{
-				return BM.documentReady;
+				return BM.promises.documentReady;
 			}
 		}).then(() => {
 			if (BM.Util.safeGet(options, "waitForAttendance"))
