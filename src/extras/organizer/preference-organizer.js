@@ -10,7 +10,6 @@
 
 import AttendanceOrganizer from "../organizer/attendance-organizer.js";
 import BM from "../bm";
-import PreferenceServer from "../component/bm-preference.js";
 
 // =============================================================================
 //	Preference organizer class
@@ -37,16 +36,13 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static PreferenceOrganizer_onDoOrganize(sender, e, ex)
 	{
 
-		if (!(this instanceof PreferenceServer))
-		{
-			return AttendanceOrganizer.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
-				BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
+		return AttendanceOrganizer.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
+			BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
 
-				return BM.StateOrganizer.waitFor([{"object":server}]).then(() => {
-					server.subscribe(this, this.settings.get("preferences"));
-				});
+			return this.waitFor([{"object":server}]).then(() => {
+				server.subscribe(this, this.settings.get("preferences"));
 			});
-		}
+		});
 
 	}
 
