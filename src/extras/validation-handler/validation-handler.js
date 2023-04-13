@@ -99,14 +99,14 @@ export default class ValidationHandler
 	 *
  	 * @return  {Object}		Invalid result.
 	 */
-	static createValidationResult(key, value, rule, failed, extras)
+	createValidationResult(key, value, rule, failed, extras)
 	{
 
 		let result = {
 			"key":			key,
 			"value":		value,
-			"message":		ValidationHandler._getFunctionValue(key, value, "message", rule),
-			"fix":			ValidationHandler._getFunctionValue(key, value, "fix", rule),
+			"message":		this._getFunctionValue(key, value, "message", rule),
+			"fix":			this._getFunctionValue(key, value, "fix", rule),
 			"failed":		failed,
 			"extras":		extras,
 		};
@@ -126,7 +126,7 @@ export default class ValidationHandler
 	 *
  	 * @return  {Object}		Invalid results.
 	 */
-	static validate(values, rules, options)
+	validate(values, rules, options)
 	{
 
 		rules = rules || {};
@@ -140,7 +140,7 @@ export default class ValidationHandler
 				if (options["allowList"].indexOf(key) === -1)
 				{
 					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
@@ -152,7 +152,7 @@ export default class ValidationHandler
 				if (!(key in rules))
 				{
 					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
@@ -164,7 +164,7 @@ export default class ValidationHandler
 				if (options["disallowList"].indexOf(key) > -1)
 				{
 					let failed = [{"rule":"disallowList", "validity":"disallowed"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
 				}
 			});
 		}
@@ -176,7 +176,7 @@ export default class ValidationHandler
 				if (!(key in values))
 				{
 					let failed = [{"rule":"required", "validity":"valueMissing"}];
-					invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
 				}
 			}
 		});
@@ -222,7 +222,7 @@ export default class ValidationHandler
 	 * @param	{String}		target				Target name.
 	 * @param	{Object}		rule				Validation rules.
 	 */
-	static _getFunctionValue(key, value, target, rule)
+	_getFunctionValue(key, value, target, rule)
 	{
 
 		let ret;

@@ -20,10 +20,23 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 {
 
 	// -------------------------------------------------------------------------
+	//  Constructor
+	// -------------------------------------------------------------------------
+
+	constructor(component, validatorName, options)
+	{
+
+		super(component, validatorName, options);
+
+		this._valueHandler = this.options.get("valueHandler", ValueUtil);
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static validate(form, rules)
+	validate(form, rules)
 	{
 
 		let invalids = {};
@@ -34,13 +47,13 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])")
 		elements.forEach((element) => {
 			let key = element.getAttribute("bm-bind");
-			let value = ValueUtil.getValue(element);
+			let value = this._valueHandler.getValue(element);
 			let rule = ( rules && rules[key] ? rules[key] : null );
 
-			let failed = HTML5FormValidationHandler._validateValue(element, key, value, rule);
+			let failed = this._validateValue(element, key, value, rule);
 			if (failed.length > 0)
 			{
-				invalids[key] = ValidationHandler.createValidationResult(key, value, rule, failed, {"element": element});
+				invalids[key] = this.createValidationResult(key, value, rule, failed, {"element": element});
 				invalids["message"] = invalids["message"] || element.validationMessage;
 			}
 		});
@@ -80,10 +93,10 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		if (rules || options)
 		{
 			// Check allow/disallow list
-			let values = ValueUtil.getFields(form);
-			invalids1 = ValidationHandler.validate(values, rules, options);
+			let values = this._valueHandler.getFields(form);
+			invalids1 = super.validate(values, rules, options);
 		}
-		invalids2 = HTML5FormValidationHandler.validate(form, rules);
+		invalids2 = this.validate(form, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
@@ -119,7 +132,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	 *
  	 * @return  {Object}		Failed results.
 	 */
-	static _validateValue(element, key, value, rules)
+	_validateValue(element, key, value, rules)
 	{
 
 		let failed = [];

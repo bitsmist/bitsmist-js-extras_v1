@@ -22,7 +22,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static validate(values, rules)
+	validate(values, rules)
 	{
 
 		let invalids = {};
@@ -32,10 +32,10 @@ export default class ObjectValidationHandler extends ValidationHandler
 			Object.keys(values).forEach((key) => {
 				if (rules[key])
 				{
-					let failed = ObjectValidationHandler._validateValue(key, values[key], rules[key]);
+					let failed = this._validateValue(key, values[key], rules[key]);
 					if (failed.length > 0)
 					{
-						invalids[key] = ValidationHandler.createValidationResult(key, values[key], rules[key], failed);
+						invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
 					}
 				}
 			});
@@ -50,8 +50,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 	checkValidity(values, rules, options)
 	{
 
-		let invalids1 = ValidationHandler.validate(values, rules, options); // Check allow/disallow/required
-		let invalids2 = ObjectValidationHandler.validate(values, rules);
+		let invalids1 = super.validate(values, rules, options); // Check allow/disallow/required
+		let invalids2 = this.validate(values, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
@@ -78,7 +78,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 *
  	 * @return  {Object}		Failed results.
 	 */
-	static _validateValue(key, value, rules)
+	_validateValue(key, value, rules)
 	{
 
 		let failed = [];
@@ -86,7 +86,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 		if (rules && rules["constraints"])
 		{
 			Object.keys(rules["constraints"]).forEach((constraintName) => {
-				let result = ObjectValidationHandler._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
+				let result = this._checkConstraint(key, value, constraintName, rules["constraints"][constraintName]);
 				if (result)
 				{
 					failed.push(result);
@@ -110,7 +110,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 *
  	 * @return  {Object}		Failed result.
 	 */
-	static _checkConstraint(key, value, constraintName, rule)
+	_checkConstraint(key, value, constraintName, rule)
 	{
 
 		let result;
@@ -120,7 +120,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 		switch (constraintName)
 		{
 		case "type":
-			result = ObjectValidationHandler._checkType(key, value, constraintName, rule);
+			result = this._checkType(key, value, constraintName, rule);
 			break;
 		case "required":
 			if (!value)
@@ -193,7 +193,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 	 *
  	 * @return  {Object}		Failed result.
 	 */
-	static _checkType(key, value, constraintName, rule)
+	_checkType(key, value, constraintName, rule)
 	{
 
 		let result;
