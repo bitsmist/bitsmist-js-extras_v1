@@ -36,6 +36,7 @@ export default class LocaleHandler
 		this._component = component;
 		this._options = new BM.Store({"items":options});
 		this._messages = new BM.ChainableStore();
+		this._valueHandler = this.options.get("valueHandler", LocaleValueUtil);
 
 	}
 
@@ -172,7 +173,7 @@ export default class LocaleHandler
 
 		let messages = (this.getAll(options["localeName"]) || this.getAll(options["fallbackLocaleName"]));
 
-		LocaleValueUtil.setFields(rootNode, messages, options);
+		this._valueHandler.setFields(rootNode, messages, options);
 
 	}
 

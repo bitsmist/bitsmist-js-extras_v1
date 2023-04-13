@@ -29,7 +29,7 @@ export default class BindableStore extends BM.Store
 		super(Object.assign(defaults, options));
 
 		this._elems = {};
-		this._valueHandler = BM.Util.safeGet(options, "valueHandler");
+		this._valueHandler = BM.Util.safeGet(options, "valueHandler", ValueUtil);
 
 	}
 
@@ -105,7 +105,7 @@ export default class BindableStore extends BM.Store
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
 				elem.addEventListener(eventName, (() => {
-					let value = ValueUtil.getValue(elem);
+					let value = this._valueHandler.getValue(elem);
 
 					this.set(key, value, null, elem);
 				}).bind(this));
@@ -157,7 +157,7 @@ export default class BindableStore extends BM.Store
 				let value = this.get(key);
 				for (let i = 0; i < this._elems[key]["elements"].length; i++)
 				{
-					ValueUtil.setValue(this._elems[key]["elements"][i], value, {"resources":this._options["resources"]});
+					this._valueHandler.setValue(this._elems[key]["elements"][i], value, {"resources":this._options["resources"]});
 				}
 			}
 		});
