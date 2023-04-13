@@ -38,8 +38,6 @@ LocaleServer.prototype._getSettings = function()
 	return {
 		// Settings
 		"settings": {
-			"autoClear":				false,
-			"autoFill":					false,
 			"autoTransform":			false,
 			"name":						"LocaleServer",
 		},
@@ -88,11 +86,11 @@ LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
 {
 
 	// Set locale attribute
-	if (this.settings.get("locales.settings.autoAttribute"))
+	if (this.settings.get("settings.autoAttribute"))
 	{
-		let rootNode = this.settings.get("locales.settings.autoAttribute.rootNode");
+		let rootNode = this.settings.get("settings.autoAttribute.rootNode");
 		let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
-		let attribName = this.settings.get("locales.settings.autoAttribute.attributeName", "data-locale");
+		let attribName = this.settings.get("settings.autoAttribute.attributeName", "data-locale");
 
 		targetElement.setAttribute(attribName, this.localeSettings["localeName"]);
 	}
