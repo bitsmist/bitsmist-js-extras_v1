@@ -63,7 +63,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	}
 
 	/*
-	static validate(form, rules)
+	validate(form, rules)
 	{
 
 		let invalids = [];
