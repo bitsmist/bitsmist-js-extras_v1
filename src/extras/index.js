@@ -27,52 +27,52 @@ window.BITSMIST.v1.BindableStore = BindableStore;
 import BindableArrayStore from "./store/bindable-array-store.js";
 window.BITSMIST.v1.BindableArrayStore = BindableArrayStore;
 
-// Organizer
+// Perk
 
-import FileOrganizer from "./organizer/file-organizer.js";
-BM.OrganizerOrganizer.register(FileOrganizer);
+import FilePerk from "./perk/file-perk.js";
+BM.PerkPerk.register(FilePerk);
 
-import ErrorOrganizer from "./organizer/error-organizer.js";
-BM.OrganizerOrganizer.register(ErrorOrganizer);
+import ErrorPerk from "./perk/error-perk.js";
+BM.PerkPerk.register(ErrorPerk);
 
-import ElementOrganizer from "./organizer/element-organizer.js";
-BM.OrganizerOrganizer.register(ElementOrganizer);
+import ElementPerk from "./perk/element-perk.js";
+BM.PerkPerk.register(ElementPerk);
 
-import ResourceOrganizer from "./organizer/resource-organizer.js";
-BM.OrganizerOrganizer.register(ResourceOrganizer);
+import ResourcePerk from "./perk/resource-perk.js";
+BM.PerkPerk.register(ResourcePerk);
 
-import ValidationOrganizer from "./organizer/validation-organizer.js";
-BM.OrganizerOrganizer.register(ValidationOrganizer);
+import ValidationPerk from "./perk/validation-perk.js";
+BM.PerkPerk.register(ValidationPerk);
 
-import FormOrganizer from "./organizer/form-organizer.js";
-BM.OrganizerOrganizer.register(FormOrganizer);
+import FormPerk from "./perk/form-perk.js";
+BM.PerkPerk.register(FormPerk);
 
-import ListOrganizer from "./organizer/list-organizer.js";
-BM.OrganizerOrganizer.register(ListOrganizer);
+import ListPerk from "./perk/list-perk.js";
+BM.PerkPerk.register(ListPerk);
 
-import DatabindingOrganizer from "./organizer/databinding-organizer.js";
-BM.OrganizerOrganizer.register(DatabindingOrganizer);
+import DatabindingPerk from "./perk/databinding-perk.js";
+BM.PerkPerk.register(DatabindingPerk);
 
-import LocaleOrganizer from "./organizer/locale-organizer.js";
-BM.OrganizerOrganizer.register(LocaleOrganizer);
+import LocalePerk from "./perk/locale-perk.js";
+BM.PerkPerk.register(LocalePerk);
 
-import KeyOrganizer from "./organizer/key-organizer.js";
-BM.OrganizerOrganizer.register(KeyOrganizer);
+import KeyPerk from "./perk/key-perk.js";
+BM.PerkPerk.register(KeyPerk);
 
-import ChainOrganizer from "./organizer/chain-organizer.js";
-BM.OrganizerOrganizer.register(ChainOrganizer);
+import ChainPerk from "./perk/chain-perk.js";
+BM.PerkPerk.register(ChainPerk);
 
-import DialogOrganizer from "./organizer/dialog-organizer.js";
-BM.OrganizerOrganizer.register(DialogOrganizer);
+import DialogPerk from "./perk/dialog-perk.js";
+BM.PerkPerk.register(DialogPerk);
 
-import PreferenceOrganizer from "./organizer/preference-organizer.js";
-BM.OrganizerOrganizer.register(PreferenceOrganizer);
+import PreferencePerk from "./perk/preference-perk.js";
+BM.PerkPerk.register(PreferencePerk);
 
-import RouteOrganizer from "./organizer/route-organizer.js";
-BM.OrganizerOrganizer.register(RouteOrganizer);
+import RoutePerk from "./perk/route-perk.js";
+BM.PerkPerk.register(RoutePerk);
 
-import AttendanceOrganizer from "./organizer/attendance-organizer.js";
-BM.OrganizerOrganizer.register(AttendanceOrganizer);
+import AttendancePerk from "./perk/attendance-perk.js";
+BM.PerkPerk.register(AttendancePerk);
 
 // Resource handler
 
