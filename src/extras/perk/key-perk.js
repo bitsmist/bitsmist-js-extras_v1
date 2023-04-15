@@ -201,7 +201,7 @@ export default class KeyPerk extends BM.Perk
 				// Modal result
 				if (component.inventory.get("dialog.isModal"))
 				{
-					component.inventory.get("dialog.modalResult")["result"] = true;
+					component.inventory.set("dialog.modalResult.result", true);
 				}
 
 				// Auto close

@@ -36,7 +36,7 @@ export default class ResourcePerk extends BM.Perk
 		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
 
 		let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
-		component.inventory.get("resource.resources")[resourceName] = resource;
+		component.inventory.set(`resource.resources.${resourceName}`, resource);
 
 		if (resource.options.get("autoLoad"))
 		{
@@ -80,7 +80,7 @@ export default class ResourcePerk extends BM.Perk
 		let promises = [];
 
 		Object.keys(this.inventory.get("resource.resources")).forEach((resourceName) => {
-			let resource = this.inventory.get("resource.resources")[resourceName];
+			let resource = this.inventory.get(`resource.resources.${resourceName}`);
 			if (resource.options.get("autoFetch", true))
 			{
 				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
@@ -112,13 +112,13 @@ export default class ResourcePerk extends BM.Perk
 		let submitItem = BM.Util.safeGet(e.detail, "items");
 
 		Object.keys(this.inventory.get("resource.resources")).forEach((resourceName) => {
-			let resource = this.inventory.get("resource.resources")[resourceName];
+			let resource = this.inventory.get(`resource.resources.${resourceName}`);
 			if (resource.options.get("autoSubmit", true)) {
 				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
 				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
 				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
-				promises.push(this.inventory.get("resource.resources")[resourceName][method](id, submitItem, parameters));
+				promises.push(this.inventory.get(`resource.resources.${resourceName}`)[method](id, submitItem, parameters));
 			}
 		});
 

@@ -182,7 +182,7 @@ export default class ElementPerk extends BM.Perk
 					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
-					FormUtil.build(elements[i], component.inventory.get("resource.resources")[resourceName].items, elementInfo[key]);
+					FormUtil.build(elements[i], component.inventory.get(`resource.resources.${resourceName}`).items, elementInfo[key]);
 					break;
 				case "attribute":
 					ElementPerk.__setAttributes(elements[i], elementInfo[key]);
