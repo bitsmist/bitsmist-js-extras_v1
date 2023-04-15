@@ -98,7 +98,7 @@ export default class AttendancePerk extends BM.Perk
 	static AttendancePerk_onDoOrganize(sender, e, ex)
 	{
 
-		this.skills.use("setting.enumSettings", e.detail.settings["attendances"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["attendances"], (sectionName, sectionValue) => {
 			AttendancePerk.register(sectionValue["name"], this, sectionValue);
 		});
 

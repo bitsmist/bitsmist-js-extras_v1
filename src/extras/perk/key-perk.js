@@ -35,7 +35,7 @@ export default class KeyPerk extends BM.Perk
 			//this.addEventListener("compositionend", function(e){KeyPerk.onCompositionEnd.call(this, e, this, keys);});
 
 			// Init buttons
-			this.skills.use("setting.enumSettings", this.settings.get("keys"), (sectionName, sectionValue) => {
+			this.skills.use("setting.enum", this.settings.get("keys"), (sectionName, sectionValue) => {
 				KeyPerk.__initButtons(this, sectionName, sectionValue);
 			});
 		}

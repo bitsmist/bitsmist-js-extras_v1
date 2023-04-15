@@ -44,7 +44,7 @@ export default class ListPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.skills.use("skin.loadSkin", skinName);
+			return component.skills.use("skin.load", skinName);
 		}).then(() => {
 			component.inventory.set("list.activeRowSkinName", skinName);
 		}).then(() => {
@@ -196,7 +196,7 @@ export default class ListPerk extends BM.Perk
 				if (rowEvents)
 				{
 					Object.keys(rowEvents).forEach((elementName) => {
-						component.skills.use("event.initEvents", elementName, rowEvents[elementName], element);
+						component.skills.use("event.init", elementName, rowEvents[elementName], element);
 					});
 				}
 
@@ -254,7 +254,7 @@ export default class ListPerk extends BM.Perk
 			if (rowEvents)
 			{
 				Object.keys(rowEvents).forEach((elementName) => {
-					component.skills.use("event.initEvents", elementName, rowEvents[elementName], element);
+					component.skills.use("event.init", elementName, rowEvents[elementName], element);
 				});
 			}
 

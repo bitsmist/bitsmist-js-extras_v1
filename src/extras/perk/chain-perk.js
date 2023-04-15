@@ -26,8 +26,8 @@ export default class ChainPerk extends BM.Perk
 
 		let order = ChainPerk.getInfo()["order"];
 
-		this.skills.use("setting.enumSettings", e.detail.settings["chains"], (sectionName, sectionValue) => {
-			this.skills.use("event.addEventHandler", sectionName, {
+		this.skills.use("setting.enum", e.detail.settings["chains"], (sectionName, sectionValue) => {
+			this.skills.use("event.add", sectionName, {
 				"handler":ChainPerk.onDoProcess,
 				"order":	order,
 				"options":sectionValue
@@ -153,7 +153,7 @@ export default class ChainPerk extends BM.Perk
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.skills.use("state.waitFor", [{"object":element, "state":state}]).then(() => {
+			let promise = component.skills.use("state.wait", [{"object":element, "state":state}]).then(() => {
 				return element[method]({"sender":component});
 			});
 			promises.push(promise);

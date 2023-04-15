@@ -27,8 +27,8 @@ export default class ElementPerk extends BM.Perk
 
 		let order = ElementPerk.getInfo()["order"];
 
-		this.skills.use("setting.enumSettings", e.detail.settings["elements"], (sectionName, sectionValue) => {
-			this.skills.use("event.addEventHandler", sectionName, {
+		this.skills.use("setting.enum", e.detail.settings["elements"], (sectionName, sectionValue) => {
+			this.skills.use("event.add", sectionName, {
 				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,
 				"options":	{"attrs":sectionValue}

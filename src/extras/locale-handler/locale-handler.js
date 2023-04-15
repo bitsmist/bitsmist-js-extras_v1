@@ -98,7 +98,7 @@ export default class LocaleHandler
 	init(options)
 	{
 
-		this._component.skills.use("setting.enumSettings", options["messages"], (sectionName, sectionValue) => {
+		this._component.skills.use("setting.enum", options["messages"], (sectionName, sectionValue) => {
 			this._messages.set(sectionName, sectionValue);
 		});
 

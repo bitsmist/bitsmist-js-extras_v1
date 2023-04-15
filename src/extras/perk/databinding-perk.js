@@ -231,7 +231,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		let callback;
 
-		component.skills.use("setting.enumSettings", component.settings.get("bindings"), (sectionName, sectionValue) => {
+		component.skills.use("setting.enum", component.settings.get("bindings"), (sectionName, sectionValue) => {
 			if (sectionValue["callback"])
 			{
 				const pattern = sectionValue["key"] || sectionName;

@@ -28,7 +28,7 @@ export default class PreferencePerk extends BM.Perk
 		return AttendancePerk.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
 
-			return this.skills.use("state.waitFor", [{"object":server}]).then(() => {
+			return this.skills.use("state.wait", [{"object":server}]).then(() => {
 				server.subscribe(this, this.settings.get("preferences"));
 			});
 		});
