@@ -98,7 +98,7 @@ export default class LocaleHandler
 	init(options)
 	{
 
-		this._component._enumSettings(options["messages"], (sectionName, sectionValue) => {
+		this._component.skills.use("setting.enumSettings", options["messages"], (sectionName, sectionValue) => {
 			this._messages.set(sectionName, sectionValue);
 		});
 
@@ -222,7 +222,7 @@ export default class LocaleHandler
 		);
 
 		// Load messages
-		return BM.SettingOrganizer.loadFile(fileName, path, loadOptions).then((messages) => {
+		return BM.SettingPerk.loadFile(fileName, path, loadOptions).then((messages) => {
 			this._messages.merge(messages);
 		});
 

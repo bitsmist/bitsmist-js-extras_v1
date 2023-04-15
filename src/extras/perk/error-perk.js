@@ -11,10 +11,10 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Error organizer class
+//	Error Perk class
 // =============================================================================
 
-export default class ErrorOrganizer extends BM.Organizer
+export default class ErrorPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -24,7 +24,23 @@ export default class ErrorOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "ErrorOrganizer";
+		return "ErrorPerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static PreferencePerk_onDoStart(sender, e, ex)
+	{
+
+		if (document.querySelector("bm-error") && this !==  document.querySelector("bm-error"))
+		{
+			return this.waitFor([{"rootNode":"bm-error"}]).then(() => {
+				document.querySelector("bm-error").subscribe(this, this.settings.get("errors"));
+			});
+		}
 
 	}
 
@@ -44,33 +60,38 @@ export default class ErrorOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
+	/*
 	static globalInit()
 	{
 
-		ErrorOrganizer._observers = new BM.ObservableStore({"filter":ErrorOrganizer.__filter});
+		ErrorPerk._observers = new BM.ObservableStore({"filter":ErrorPerk.__filter});
 
 		// Install error listner
 		document.addEventListener("DOMContentLoaded", () => {
-			if (BM.settings.get("organizers.ErrorOrganizer.settings.captureError", true))
+			if (BM.settings.get("perks.ErrorPerk.settings.captureError", true))
 			{
-				ErrorOrganizer.__initErrorListeners();
+				ErrorPerk.__initErrorListeners();
 			}
 		});
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
+	/*
 	static init(component, options)
 	{
 
 		let errors = BM.Util.safeGet(options, "settings.errors");
 		if (errors)
 		{
-			ErrorOrganizer._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
+			console.log("@@@subscribing", component.name, errors);
+			ErrorPerk._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
 		}
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 	//  Privates
@@ -82,6 +103,7 @@ export default class ErrorOrganizer extends BM.Organizer
 	 * @param	{Component}		component			Component.
  	 * @param	{Object}		observerInfo		Observer info.
 	 */
+	/*
 	static __filter(conditions, observerInfo, ...args)
 	{
 
@@ -101,14 +123,18 @@ export default class ErrorOrganizer extends BM.Organizer
 		return result;
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
 	/**
 	* Init error handling listeners.
 	*/
+	/*
 	static __initErrorListeners()
 	{
+
+		console.log("@@@installing", this.name);
 
 		window.addEventListener("unhandledrejection", (error) => {
 			let e = {};
@@ -134,7 +160,7 @@ export default class ErrorOrganizer extends BM.Organizer
 					e.message = error;
 				}
 				e.type = error.type;
-				e.name = ErrorOrganizer.__getErrorName(error);
+				e.name = ErrorPerk.__getErrorName(error);
 				e.filename = "";
 				e.funcname = ""
 				e.lineno = "";
@@ -142,7 +168,7 @@ export default class ErrorOrganizer extends BM.Organizer
 				// e.stack = error.reason.stack;
 				// e.object = error.reason;
 				//
-				ErrorOrganizer.__handleException(e);
+				ErrorPerk.__handleException(e);
 			}
 			catch(e)
 			{
@@ -159,7 +185,7 @@ export default class ErrorOrganizer extends BM.Organizer
 			try
 			{
 				e.type = "error";
-				e.name = ErrorOrganizer.__getErrorName(error);
+				e.name = ErrorPerk.__getErrorName(error);
 				e.message = error.message;
 				e.file = error.filename;
 				e.line = error.lineno;
@@ -170,7 +196,7 @@ export default class ErrorOrganizer extends BM.Organizer
 					e.object = error.error;
 				}
 
-				ErrorOrganizer.__handleException(e);
+				ErrorPerk.__handleException(e);
 			}
 			catch(e)
 			{
@@ -182,6 +208,7 @@ export default class ErrorOrganizer extends BM.Organizer
 		});
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
@@ -192,6 +219,7 @@ export default class ErrorOrganizer extends BM.Organizer
 	*
 	* @return  {String}			Error name.
 	*/
+	/*
 	static __getErrorName(error)
 	{
 
@@ -224,6 +252,7 @@ export default class ErrorOrganizer extends BM.Organizer
 		return name;
 
 	}
+	*/
 
 	// -------------------------------------------------------------------------
 
@@ -232,11 +261,13 @@ export default class ErrorOrganizer extends BM.Organizer
 	*
 	* @param	{Object}		e					Error object.
 	*/
+	/*
 	static __handleException(e)
 	{
 
-		return ErrorOrganizer._observers.notifyAsync("error", {"sender":ErrorOrganizer, "error": e});
+		return ErrorPerk._observers.notifyAsync("error", {"sender":ErrorPerk, "error": e});
 
 	}
+	*/
 
 }

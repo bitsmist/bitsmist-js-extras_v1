@@ -11,43 +11,32 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Key organizer class
+//	Key Perk class
 // =============================================================================
 
-export default class KeyOrganizer extends BM.Organizer
+export default class KeyPerk extends BM.Perk
 {
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "KeyOrganizer";
-
-	}
 
 	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static KeyOrganizer_onAfterTransform(sender, e, ex)
+	static KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
 		let keys = this.settings.get("keys");
 		if (keys)
 		{
 			// Init keys
-			let actions = KeyOrganizer.__getActions(keys);
-			this.addEventListener("keydown", function(e){KeyOrganizer.KeyOrganizer_onKeyDown.call(this, e, this);});
-			this.addEventListener("keyup", function(e){KeyOrganizer.KeyOrganizer_onKeyUp.call(this, e, this, keys, actions);});
-			//this.addEventListener("compositionstart", function(e){KeyOrganizer.onCompositionStart.call(this, e, this, keys);});
-			//this.addEventListener("compositionend", function(e){KeyOrganizer.onCompositionEnd.call(this, e, this, keys);});
+			let actions = KeyPerk.__getActions(keys);
+			this.addEventListener("keydown", function(e){KeyPerk.KeyPerk_onKeyDown.call(this, e, this);});
+			this.addEventListener("keyup", function(e){KeyPerk.KeyPerk_onKeyUp.call(this, e, this, keys, actions);});
+			//this.addEventListener("compositionstart", function(e){KeyPerk.onCompositionStart.call(this, e, this, keys);});
+			//this.addEventListener("compositionend", function(e){KeyPerk.onCompositionEnd.call(this, e, this, keys);});
 
 			// Init buttons
-			this._enumSettings(this.settings.get("keys"), (sectionName, sectionValue) => {
-				KeyOrganizer.__initButtons(this, sectionName, sectionValue);
+			this.skills.use("setting.enumSettings", this.settings.get("keys"), (sectionName, sectionValue) => {
+				KeyPerk.__initButtons(this, sectionName, sectionValue);
 			});
 		}
 
@@ -61,10 +50,10 @@ export default class KeyOrganizer extends BM.Organizer
 	 * @param	{Object}		e					Event info.
 	 * @param	{Component}		component			Component.
 	 */
-	static KeyOrganizer_onKeyDown(e, component)
+	static KeyPerk_onKeyDown(e, component)
 	{
 
-		component.__isComposing = ( e.keyCode === 229 ? true : false );
+		component.inventory.set("key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -78,16 +67,16 @@ export default class KeyOrganizer extends BM.Organizer
 	 * @param	{Object}		options				Options.
 	 * @param	{Object}		actions				Action info.
 	 */
-	static KeyOrganizer_onKeyUp(e, component, options, actions)
+	static KeyPerk_onKeyUp(e, component, options, actions)
 	{
 
 		// Ignore all key input when composing.
-		if (component.__isComposing)
+		if (component.inventory.get("key.isComposing"))
 		{
 			return;
 		}
 
-		let key  = ( e.key ? e.key : KeyOrganizer.__getKeyfromKeyCode(e.keyCode) );
+		let key  = ( e.key ? e.key : KeyPerk.__getKeyfromKeyCode(e.keyCode) );
 		switch (key)
 		{
 			case "Esc":		key = "Escape";		break;
@@ -143,6 +132,29 @@ export default class KeyOrganizer extends BM.Organizer
 	*/
 
 	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "KeyPerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		"keys",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -162,10 +174,10 @@ export default class KeyOrganizer extends BM.Organizer
 	{
 
 		// Init component vars
-		component.__isComposing = false;
+		component.inventory.set("key.isComposing", false);
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterTransform", KeyOrganizer.KeyOrganizer_onAfterTransform);
+		this._addPerkHandler(component, "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
 
@@ -183,19 +195,19 @@ export default class KeyOrganizer extends BM.Organizer
 	static _defaultSubmit(e, component, options)
 	{
 
-		return component.submit().then(() => {
-			if (!component.cancelSubmit)
+		return component.skills.use("form.submit").then(() => {
+			if (!component.inventory.get("form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.isModal)
+				if (component.inventory.get("dialog.isModal"))
 				{
-					component.modalResult["result"] = true;
+					component.inventory.get("dialog.modalResult")["result"] = true;
 				}
 
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					component.close({"reason":"submit"});
+					return component.skills.use("dialog.close", {"reason":"submit"});
 				}
 			}
 		});
@@ -214,7 +226,7 @@ export default class KeyOrganizer extends BM.Organizer
 	static _defaultCancel(e, component, options)
 	{
 
-		return component.close({"reason":"cancel"});
+		return component.skills.use("dialog.close", {"reason":"cancel"});
 
 	}
 
@@ -283,7 +295,7 @@ export default class KeyOrganizer extends BM.Organizer
 
 		if (options && options["rootNode"])
 		{
-			let handler = ( options["handler"] ? options["handler"] : KeyOrganizer.__getDefaultHandler(action) );
+			let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
 			let elements = component.querySelectorAll(options["rootNode"]);
 			elements = Array.prototype.slice.call(elements, 0);
 
@@ -315,7 +327,7 @@ export default class KeyOrganizer extends BM.Organizer
 			{
 				actions[keys[i]] = {};
 				actions[keys[i]]["type"] = key;
-				actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyOrganizer.__getDefaultHandler(key) );
+				actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyPerk.__getDefaultHandler(key) );
 				actions[keys[i]]["option"] = settings[key];
 			}
 		});
@@ -341,13 +353,13 @@ export default class KeyOrganizer extends BM.Organizer
 		switch (action)
 		{
 		case "submit":
-			handler = KeyOrganizer._defaultSubmit;
+			handler = KeyPerk._defaultSubmit;
 			break;
 		case "clear":
-			handler = KeyOrganizer._defaultClear;
+			handler = KeyPerk._defaultClear;
 			break;
 		case "cancel":
-			handler = KeyOrganizer._defaultCancel;
+			handler = KeyPerk._defaultCancel;
 			break;
 		}
 

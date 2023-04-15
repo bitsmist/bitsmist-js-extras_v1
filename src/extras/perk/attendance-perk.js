@@ -11,11 +11,98 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Attendance Organizer Class
+//	Attendance Perk Class
 // =============================================================================
 
-export default class AttendanceOrganizer extends BM.Organizer
+export default class AttendancePerk extends BM.Perk
 {
+
+	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Register the component.
+	 *
+	 * @param	{Component}		component			Compoent to register.
+	 * @param	{String}		name				Register as this name.
+	 */
+	static _attend(component, name)
+	{
+
+		if (!AttendancePerk._records[name])
+		{
+			AttendancePerk.__createEntry(name);
+		}
+
+		let entry = AttendancePerk._records[name];
+		entry.object = component;
+		entry.waitInfo.resolve();
+		if (entry.waitInfo["timer"])
+		{
+			clearTimeout(entry.waitInfo["timer"]);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Call out the component.
+	 *
+	 * @param	{Component}		component			Compoent to register.
+	 * @param	{String}		name				Register as this name.
+	 * @param	{Object}		options				Options.
+	 */
+	static _callOut(component, name, options)
+	{
+
+		if (!AttendancePerk._records[name])
+		{
+			let waitInfo = {};
+			let timeout = BITSMIST.v1.settings.get("system.waitForTimeout", 10000);
+			let promise = new Promise((resolve, reject) => {
+					waitInfo["resolve"] = resolve;
+					waitInfo["reject"] = reject;
+					waitInfo["timer"] = setTimeout(() => {
+						reject(`AttendancePerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
+					}, timeout);
+				});
+			waitInfo["promise"] = promise;
+
+			AttendancePerk.__createEntry(name, null, waitInfo);
+		}
+
+		let entry = AttendancePerk._records[name];
+
+		return Promise.resolve().then(() => {
+			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
+			{
+				return BM.promises.documentReady;
+			}
+		}).then(() => {
+			if (BM.Util.safeGet(options, "waitForAttendance"))
+			{
+				return entry.waitInfo.promise;
+			}
+		}).then(() => {
+			return entry.object;
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static AttendancePerk_onDoOrganize(sender, e, ex)
+	{
+
+		this.skills.use("setting.enumSettings", e.detail.settings["attendances"], (sectionName, sectionValue) => {
+			AttendancePerk.register(sectionValue["name"], this, sectionValue);
+		});
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -24,20 +111,19 @@ export default class AttendanceOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "AttendanceOrganizer";
+		return "AttendancePerk";
 
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
 
-	static AttendanceOrganizer_onDoOrganize(sender, e, ex)
+	static get info()
 	{
 
-		this._enumSettings(e.detail.settings["attendances"], (sectionName, sectionValue) => {
-			AttendanceOrganizer.register(sectionValue["name"], this, sectionValue);
-		});
+		return {
+			"sections":		"attendances",
+			"order":		330,
+		};
 
 	}
 
@@ -61,7 +147,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 	{
 
 		// Init vars
-		AttendanceOrganizer._records = {};
+		AttendancePerk._records = {};
 
 	}
 
@@ -70,34 +156,12 @@ export default class AttendanceOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
+		// Add skills to component;
+		component.skills.set("attendance.attend", function(...args) { return AttendancePerk._attend(...args); });
+		component.skills.set("attendance.callOut", function(...args) { return AttendancePerk._callOut(...args); });
+
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", AttendanceOrganizer.AttendanceOrganizer_onDoOrganize);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Register the component.
-	 *
-	 * @param	{String}		name				Register as this name.
-	 * @param	{Component}		component			Compoent to register.
-	 */
-	static register(name, component)
-	{
-
-		if (!AttendanceOrganizer._records[name])
-		{
-			AttendanceOrganizer.__createEntry(name);
-		}
-
-		let entry = AttendanceOrganizer._records[name];
-		entry.object = component;
-		entry.waitInfo.resolve();
-		if (entry.waitInfo["timer"])
-		{
-			clearTimeout(entry.waitInfo["timer"]);
-		}
+		this._addPerkHandler(component, "doOrganize", AttendancePerk.AttendancePerk_onDoOrganize);
 
 	}
 
@@ -106,7 +170,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 	static call(name, options)
 	{
 
-		if (!AttendanceOrganizer._records[name])
+		if (!AttendancePerk._records[name])
 		{
 			let waitInfo = {};
 			let timeout = BITSMIST.v1.settings.get("system.waitForTimeout", 10000);
@@ -114,15 +178,15 @@ export default class AttendanceOrganizer extends BM.Organizer
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;
 					waitInfo["timer"] = setTimeout(() => {
-						reject(`AttendanceOrganizer.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
+						reject(`AttendancePerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
 					}, timeout);
 				});
 			waitInfo["promise"] = promise;
 
-			AttendanceOrganizer.__createEntry(name, null, waitInfo);
+			AttendancePerk.__createEntry(name, null, waitInfo);
 		}
 
-		let entry = AttendanceOrganizer._records[name];
+		let entry = AttendancePerk._records[name];
 
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
@@ -137,6 +201,32 @@ export default class AttendanceOrganizer extends BM.Organizer
 		}).then(() => {
 			return entry.object;
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Register the component.
+	 *
+	 * @param	{String}		name				Register as this name.
+	 * @param	{Component}		component			Compoent to register.
+	 */
+	static register(name, component)
+	{
+
+		if (!AttendancePerk._records[name])
+		{
+			AttendancePerk.__createEntry(name);
+		}
+
+		let entry = AttendancePerk._records[name];
+		entry.object = component;
+		entry.waitInfo.resolve();
+		if (entry.waitInfo["timer"])
+		{
+			clearTimeout(entry.waitInfo["timer"]);
+		}
 
 	}
 
@@ -159,7 +249,7 @@ export default class AttendanceOrganizer extends BM.Organizer
 			"waitInfo":		waitInfo,
 		};
 
-		AttendanceOrganizer._records[name] = record;
+		AttendancePerk._records[name] = record;
 
 		return record;
 

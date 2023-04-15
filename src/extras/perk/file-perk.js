@@ -11,10 +11,10 @@
 import BM from "../bm";
 
 // =============================================================================
-//	File organizer class
+//	File Perk class
 // =============================================================================
 
-export default class FileOrganizer extends BM.Organizer
+export default class FilePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -24,7 +24,7 @@ export default class FileOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "FileOrganizer";
+		return "FilePerk";
 
 	}
 
@@ -32,12 +32,12 @@ export default class FileOrganizer extends BM.Organizer
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static FileOrganizer_onDoOrganize(sender, e, ex)
+	static FilePerk_onDoOrganize(sender, e, ex)
 	{
 
 		let promises = [];
 
-		this._enumSettings(e.detail.settings["files"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enumSettings", e.detail.settings["files"], (sectionName, sectionValue) => {
 			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
 		});
 
@@ -65,7 +65,7 @@ export default class FileOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", FileOrganizer.FileOrganizer_onDoOrganize);
+		this._addPerkHandler(component, "doOrganize", FilePerk.FilePerk_onDoOrganize);
 
 	}
 

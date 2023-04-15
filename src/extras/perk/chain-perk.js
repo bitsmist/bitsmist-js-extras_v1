@@ -11,22 +11,11 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Chain organizer class
+//	Chain Perk class
 // =============================================================================
 
-export default class ChainOrganizer extends BM.Organizer
+export default class ChainPerk extends BM.Perk
 {
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "ChainOrganizer";
-
-	}
 
 	// -------------------------------------------------------------------------
 	//	Event handlers
@@ -35,11 +24,11 @@ export default class ChainOrganizer extends BM.Organizer
 	static onDoOrganize(sender, e, ex)
 	{
 
-		let order = ChainOrganizer.getInfo()["order"];
+		let order = ChainPerk.getInfo()["order"];
 
-		this._enumSettings(e.detail.settings["chains"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {
-				"handler":ChainOrganizer.onDoProcess,
+		this.skills.use("setting.enumSettings", e.detail.settings["chains"], (sectionName, sectionValue) => {
+			this.skills.use("event.addEventHandler", sectionName, {
+				"handler":ChainPerk.onDoProcess,
 				"order":	order,
 				"options":sectionValue
 			});
@@ -64,22 +53,45 @@ export default class ChainOrganizer extends BM.Organizer
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			nodes = Array.prototype.slice.call(nodes, 0);
-			BM.Util.assert(nodes.length > 0, `ChainOrganizer.onDoOrganizer(): Node not found. name=${this.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
 			if (sync)
 			{
 				chain = chain.then(() => {
-					return ChainOrganizer.__execTarget(this, nodes, method, state);
+					return ChainPerk.__execTarget(this, nodes, method, state);
 				});
 			}
 			else
 			{
-				chain = ChainOrganizer.__execTarget(this, nodes, method, state);
+				chain = ChainPerk.__execTarget(this, nodes, method, state);
 			}
 			promises.push(chain);
 		}
 
 		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ChainPerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		"chains",
+			"order":		800,
+		};
 
 	}
 
@@ -103,7 +115,7 @@ export default class ChainOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ChainOrganizer.onDoOrganize);
+		this._addPerkHandler(component, "doOrganize", ChainPerk.onDoOrganize);
 
 	}
 
@@ -116,7 +128,7 @@ export default class ChainOrganizer extends BM.Organizer
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
-				component.removeEventHandler(eventName, {"handler":ChainOrganizer.onDoOrganize, "options":chains[eventName]});
+				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoOrganize, "options":chains[eventName]});
 			});
 		}
 
@@ -141,7 +153,7 @@ export default class ChainOrganizer extends BM.Organizer
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.waitFor([{"object":element, "state":state}]).then(() => {
+			let promise = component.skills.use("state.waitFor", [{"object":element, "state":state}]).then(() => {
 				return element[method]({"sender":component});
 			});
 			promises.push(promise);

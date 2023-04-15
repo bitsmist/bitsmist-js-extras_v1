@@ -129,7 +129,7 @@ LocaleServer.prototype.subscribe = function(component, options)
 LocaleServer.prototype._triggerEvent = function(conditions, options)
 {
 
-	return this.changeLocale(options.localeName);
+	return this.skills.use("locale.changeLocale", options.localeName);
 
 }
 

@@ -12,35 +12,24 @@ import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
-//	Element organizer class
+//	Element Perk class
 // =============================================================================
 
-export default class ElementOrganizer extends BM.Organizer
+export default class ElementPerk extends BM.Perk
 {
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "ElementOrganizer";
-
-	}
 
 	// -----------------------------------------------------------------------------
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static ElementOrganizer_onDoOrganize(sender, e, ex)
+	static ElementPerk_onDoOrganize(sender, e, ex)
 	{
 
-		let order = ElementOrganizer.getInfo()["order"];
+		let order = ElementPerk.getInfo()["order"];
 
-		this._enumSettings(e.detail.settings["elements"], (sectionName, sectionValue) => {
-			this.addEventHandler(sectionName, {
-				"handler":	ElementOrganizer.ElementOrganizer_onDoProcess,
+		this.skills.use("setting.enumSettings", e.detail.settings["elements"], (sectionName, sectionValue) => {
+			this.skills.use("event.addEventHandler", sectionName, {
+				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,
 				"options":	{"attrs":sectionValue}
 			});
@@ -50,17 +39,40 @@ export default class ElementOrganizer extends BM.Organizer
 
 	// -----------------------------------------------------------------------------
 
-	static ElementOrganizer_onDoProcess(sender, e, ex)
+	static ElementPerk_onDoProcess(sender, e, ex)
 	{
 
 		let settings = ex.options["attrs"];
 		let promises = [];
 
 		Object.keys(settings).forEach((elementName) => {
-			promises = promises.concat(ElementOrganizer.__initElements(this, e, elementName, settings[elementName]));
+			promises = promises.concat(ElementPerk.__initElements(this, e, elementName, settings[elementName]));
 		});
 
 		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "ElementPerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		"elements",
+			"order":		220,
+		};
 
 	}
 
@@ -83,12 +95,12 @@ export default class ElementOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Init component vars
-		component._overlay;
-		component._overlayPromise = Promise.resolve();
+		// Add inventory items to Component
+		component.inventory.set("element.overlay", );
+		component.inventory.set("element.overlayPromise", Promise.resolve());
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ElementOrganizer.ElementOrganizer_onDoOrganize);
+		this._addPerkHandler(component, "doOrganize", ElementPerk.ElementPerk_onDoOrganize);
 
 	}
 
@@ -148,7 +160,7 @@ export default class ElementOrganizer extends BM.Organizer
 	{
 
 		let ret = [];
-		let elements = ElementOrganizer.__getTargetElements(component, elementName, elementInfo);
+		let elements = ElementPerk.__getTargetElements(component, elementName, elementInfo);
 
 		for (let i = 0; i < elements.length; i++)
 		{
@@ -161,22 +173,22 @@ export default class ElementOrganizer extends BM.Organizer
 					elements[i].scrollTo(elementInfo[key]);
 					break;
 				case "showLoader":
-					ElementOrganizer.__showOverlay(component, elementInfo[key]);
-					waitForElement = component._overlay;
+					ElementPerk.__showOverlay(component, elementInfo[key]);
+					waitForElement = component.inventory.get("element.overlay");
 					break;
 				case "hideLoader":
-					ElementOrganizer.__hideOverlay(component, elementInfo[key]);
-					waitForElement = component._overlay;
+					ElementPerk.__hideOverlay(component, elementInfo[key]);
+					waitForElement = component.inventory.get("element.overlay");
 					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
-					FormUtil.build(elements[i], component.resources[resourceName].items, elementInfo[key]);
+					FormUtil.build(elements[i], component.inventory.get("resource.resources")[resourceName].items, elementInfo[key]);
 					break;
 				case "attribute":
-					ElementOrganizer.__setAttributes(elements[i], elementInfo[key]);
+					ElementPerk.__setAttributes(elements[i], elementInfo[key]);
 					break;
 				case "class":
-					ElementOrganizer.__setClasses(elements[i], elementInfo[key]);
+					ElementPerk.__setClasses(elements[i], elementInfo[key]);
 					break;
 				case "style":
 					Object.keys(elementInfo[key]).forEach((styleName) => {
@@ -195,7 +207,7 @@ export default class ElementOrganizer extends BM.Organizer
 				case "waitFor":
 					break;
 				default:
-					console.warn(`ElementOrganizer.__initAttr(): Invalid type. name=${component.name}, eventName=${eventInfo.type}, type=${key}`);
+					console.warn(`ElementPerk.__initAttr(): Invalid type. name=${component.name}, eventName=${eventInfo.type}, type=${key}`);
 					break;
 				}
 			});
@@ -203,7 +215,7 @@ export default class ElementOrganizer extends BM.Organizer
 			// Wait for transition/animation to finish
 			if (elementInfo["waitFor"])
 			{
-				ret.push(ElementOrganizer.__waitFor(component, eventInfo, elementName, elementInfo, waitForElement));
+				ret.push(ElementPerk.__waitFor(component, eventInfo, elementName, elementInfo, waitForElement));
 			}
 		}
 
@@ -238,16 +250,16 @@ export default class ElementOrganizer extends BM.Organizer
 			inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
 			break;
 		default:
-			console.warn(`ElementOrganizer.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+			console.warn(`ElementPerk.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
 			break;
 		}
 
-		BM.Util.warn(inTransition, `ElementOrganizer.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+		BM.Util.warn(inTransition, `ElementPerk.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
 
 		return new Promise((resolve, reject) => {
 			// Timeout timer
 			let timer = setTimeout(() => {
-				reject(`ElementOrganizer.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
 			}, BM.settings.get("system.waitForTimeout", 10000));
 
 			// Resolve when finished
@@ -285,7 +297,7 @@ export default class ElementOrganizer extends BM.Organizer
 				};
 				break;
 			default:
-				console.warn(`ElementOrganizer.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
+				console.warn(`ElementPerk.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
 				break;
 			}
 		});
@@ -317,7 +329,7 @@ export default class ElementOrganizer extends BM.Organizer
 				element.setAttribute("class", options[mode]);
 				break;
 			default:
-				console.warn(`ElementOrganizer.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
+				console.warn(`ElementPerk.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
 				break;
 			}
 		});
@@ -335,11 +347,14 @@ export default class ElementOrganizer extends BM.Organizer
 	static __createOverlay(component, options)
 	{
 
-		if (!component._overlay)
+		if (!component.inventory.get("element.overlay"))
 		{
 			component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
-			component._overlay = component.firstElementChild;
+			let overlay = component.firstElementChild;
+			component.inventory.set("element.overlay", component.firstElementChild);
 		}
+
+		return component.inventory.get("element.overlay");
 
 	}
 
@@ -354,7 +369,7 @@ export default class ElementOrganizer extends BM.Organizer
 	static __closeOnClick(component, options)
 	{
 
-		component._overlay.addEventListener("click", (e) => {
+		component.inventory.get("element.overlay").addEventListener("click", (e) => {
 			if (e.target === e.currentTarget && typeof component.close === "function")
 			{
 				component.close({"reason":"cancel"});
@@ -401,29 +416,29 @@ export default class ElementOrganizer extends BM.Organizer
 	static __showOverlay(component, options)
 	{
 
-		ElementOrganizer.__createOverlay(component);
+		let overlay = ElementPerk.__createOverlay(component);
 
 		// Add close on click event handler
 		if (BM.Util.safeGet(options, "closeOnClick"))
 		{
-			ElementOrganizer.__closeOnClick(component);
+			ElementPerk.__closeOnClick(component);
 		}
 
-		window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+		window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
 		let addClasses = ["show"].concat(BM.Util.safeGet(options, "addClasses", []));
-		component._overlay.classList.add(...addClasses);
-		component._overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
+		overlay.classList.add(...addClasses);
+		overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
 
-		let effect = ElementOrganizer.__getEffect(component._overlay);
+		let effect = ElementPerk.__getEffect(overlay);
 		if (effect)
 		{
-			component._overlayPromise.then(() => {
-				component._overlayPromise = new Promise((resolve, reject) => {
-					component._overlay.addEventListener(`${effect}end`, () => {
+			component.inventory.get("element.overlayPromise").then(() => {
+				component.inventory.set("element.overlayPromise", new Promise((resolve, reject) => {
+					overlay.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
-				});
+				}));
 			});
 		}
 		else
@@ -444,12 +459,14 @@ export default class ElementOrganizer extends BM.Organizer
 	static __hideOverlay(component, options)
 	{
 
-		component._overlayPromise.then(() => {
-			window.getComputedStyle(component._overlay).getPropertyValue("visibility"); // Recalc styles
+		let overlay = component.inventory.get("element.overlay");
+
+		component.inventory.get("element.overlayPromise").then(() => {
+			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
 			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
-			component._overlay.classList.remove(...removeClasses);
-			component._overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+			overlay.classList.remove(...removeClasses);
+			overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
 		});
 	}
 

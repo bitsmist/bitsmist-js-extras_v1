@@ -54,8 +54,8 @@ export default class ObjectValidationHandler extends ValidationHandler
 		let invalids2 = this.validate(values, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
-		this._component.validationResult["result"] = ( Object.keys(invalids).length > 0 ? false : true );
-		this._component.validationResult["invalids"] = invalids;
+		this._component.inventory.get("validation.validationResult")["result"] = ( Object.keys(invalids).length > 0 ? false : true );
+		this._component.inventory.get("validation.validationResult")["invalids"] = invalids;
 
 	}
 

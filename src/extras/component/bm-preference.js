@@ -182,7 +182,7 @@ PreferenceServer.prototype.set = function(values, options, ...args)
 
 	let validatorName = this.settings.get("settings.validatorName");
 
-	return this.submit({"items":values, "options":options, "args":args, "validatorName":validatorName});
+	return this.skills.use("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 
 }
 
@@ -203,7 +203,7 @@ PreferenceServer.prototype._triggerEvent = function(changedItems, options)
 	let eventName = this.settings.get("settings.eventName", "doSetup");
 	let sender = BM.Util.safeGet(options, "sender");
 
-	return this.trigger(eventName, {"sender":sender, "items":changedItems});
+	return this.skills.use("event.trigger", eventName, {"sender":sender, "items":changedItems});
 
 }
 

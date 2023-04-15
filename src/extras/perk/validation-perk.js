@@ -11,11 +11,66 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Validation Organizer Class
+//	Validation Perk Class
 // =============================================================================
 
-export default class ValidationOrganizer extends BM.Organizer
+export default class ValidationPerk extends BM.Perk
 {
+
+	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoOrganize(sender, e, ex)
+	{
+
+		this.skills.use("setting.enumSettings", e.detail.settings["validators"], (sectionName, sectionValue) => {
+			ValidationPerk._addValidator(this, sectionName, sectionValue);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoValidate(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this.inventory.get("validation.validators")[validatorName], `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail, "items");
+			let rules = this.settings.get(`validators.${validatorName}.rules`);
+			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
+
+			this.inventory.get("validation.validators")[validatorName].checkValidity(items, rules, options);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoReportValidity(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this.inventory.get("validation.validators")[validatorName], `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail, "items");
+			let rules = this.settings.get(`validators.${validatorName}.rules`);
+			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
+
+			this.inventory.get("validation.validators")[validatorName].reportValidity(items, rules, options);
+		}
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -24,58 +79,19 @@ export default class ValidationOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "ValidationOrganizer";
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static ValidationOrganizer_onDoOrganize(sender, e, ex)
-	{
-
-		this._enumSettings(e.detail.settings["validators"], (sectionName, sectionValue) => {
-			ValidationOrganizer._addValidator(this, sectionName, sectionValue);
-		});
+		return "ValidationPerk";
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static ValidationOrganizer_onDoValidate(sender, e, ex)
+	static get info()
 	{
 
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get(`validators.${validatorName}.rules`);
-			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
-
-			this._validators[validatorName].checkValidity(items, rules, options);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static ValidationOrganizer_onDoReportValidity(sender, e, ex)
-	{
-
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this._validators[validatorName], `ValidationOrganizer.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get(`validators.${validatorName}.rules`);
-			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
-
-			this._validators[validatorName].reportValidity(items, rules, options);
-		}
+		return {
+			"sections":		["validators"],
+			"order":		310,
+		};
 
 	}
 
@@ -98,26 +114,18 @@ export default class ValidationOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add properties to component
-		Object.defineProperty(component, 'validators', {
-			get() { return this._validators; },
-		});
-		Object.defineProperty(component, 'validationResult', {
-			get() { return this._validationResult; },
-		})
+		// Add skills to component;
+		component.skills.set("validation.addValidator", function(...args) { return ValidationPerk._addValidator(...args); });
+		component.skills.set("validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 
-		// Add methods to component
-		component.addValidator = function(...args) { return ValidationOrganizer._addValidator(this, ...args); }
-		component.validate = function(...args) { return ValidationOrganizer._validate(this, ...args); }
-
-		// Init component vars
-		component._validators = {};
-		component._validationResult = {};
+		// Add inventory items to Component
+		component.inventory.set("validation.validators", {});
+		component.inventory.set("validation.validationResult", {});
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", ValidationOrganizer.ValidationOrganizer_onDoOrganize);
-		this._addOrganizerHandler(component, "doValidate", ValidationOrganizer.ValidationOrganizer_onDoValidate);
-		this._addOrganizerHandler(component, "doReportValidity", ValidationOrganizer.ValidationOrganizer_onDoReportValidity);
+		this._addPerkHandler(component, "doOrganize", ValidationPerk.ValidationPerk_onDoOrganize);
+		this._addPerkHandler(component, "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
+		this._addPerkHandler(component, "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
 
 	}
 
@@ -140,7 +148,7 @@ export default class ValidationOrganizer extends BM.Organizer
 		if (options["handlerClassName"])
 		{
 			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
-			component._validators[validatorName] = validator;
+			component.inventory.get("validation.validators")[validatorName] = validator;
 		}
 
 		return validator;
@@ -161,31 +169,31 @@ export default class ValidationOrganizer extends BM.Organizer
 	{
 
 		options = options || {};
-		component._validationResult = {"result":true};
+		component.inventory.set("validation.validationResult", {"result":true});
 
 		return Promise.resolve().then(() => {
-			console.debug(`ValidationOrganizer._validate(): Validating component. name=${component.name}, id=${component.id}`);
-			return component.trigger("beforeValidate", options);
+			console.debug(`ValidationPerk._validate(): Validating component. name=${component.name}, id=${component.id}`);
+			return component.skills.use("event.trigger", "beforeValidate", options);
 		}).then(() => {
-			return component.trigger("doValidate", options);
+			return component.skills.use("event.trigger", "doValidate", options);
 		}).then(() => {
-			if (component.validationResult["result"])
+			if (component.inventory.get("validation.validationResult")["result"])
 			{
-				console.debug(`ValidationOrganizer._validate(): Validation Success. name=${component.name}, id=${component.id}`);
-				return component.trigger("doValidateSuccess", options);
+				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.name}, id=${component.id}`);
+				return component.skills.use("event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
-				console.debug(`ValidationOrganizer._validate(): Validation Failed. name=${component.name}, id=${component.id}`);
-				return component.trigger("doValidateFail", options);
+				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.name}, id=${component.id}`);
+				return component.skills.use("event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
-			if (!component._validationResult["result"])
+			if (!component.inventory.get("validation.validationResult")["result"])
 			{
-				return component.trigger("doReportValidity", options);
+				return component.skills.use("event.trigger", "doReportValidity", options);
 			}
 		}).then(() => {
-			return component.trigger("afterValidate", options);
+			return component.skills.use("event.trigger", "afterValidate", options);
 		});
 
 	}

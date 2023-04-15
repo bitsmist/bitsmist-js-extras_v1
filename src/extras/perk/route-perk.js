@@ -12,10 +12,10 @@ import BM from "../bm";
 import { pathToRegexp } from "path-to-regexp";
 
 // =============================================================================
-//	Route organizer class
+//	Route Perk class
 // =============================================================================
 
-export default class RouteOrganizer extends BM.Organizer
+export default class RoutePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -25,7 +25,7 @@ export default class RouteOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "RouteOrganizer";
+		return "RoutePerk";
 
 	}
 
@@ -33,19 +33,19 @@ export default class RouteOrganizer extends BM.Organizer
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onDoOrganize(sender, e, ex)
+	static RoutePerk_onDoOrganize(sender, e, ex)
 	{
 
 		// Routings
-		this._enumSettings(e.detail.settings["routings"], (sectionName, sectionValue) => {
-			RouteOrganizer._addRoute(this, sectionValue);
+		this.skills.use("setting.enumSettings", e.detail.settings["routings"], (sectionName, sectionValue) => {
+			RoutePerk._addRoute(this, sectionValue);
 		});
 
 		// Set current route info.
-		this._routeInfo = RouteOrganizer.__loadRouteInfo(this, window.location.href);
+		this._routeInfo = RoutePerk.__loadRouteInfo(this, window.location.href);
 
 		// Specs
-		this._enumSettings(e.detail.settings["specs"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enumSettings", e.detail.settings["specs"], (sectionName, sectionValue) => {
 			this._specs[sectionName] = sectionValue;
 		});
 
@@ -53,7 +53,7 @@ export default class RouteOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onDoStart(sender, e, ex)
+	static RoutePerk_onDoStart(sender, e, ex)
 	{
 
 		if (this.routeInfo["specName"])
@@ -69,7 +69,7 @@ export default class RouteOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onAfterReady(sender, e, ex)
+	static RoutePerk_onAfterReady(sender, e, ex)
 	{
 
 		return this.openRoute();
@@ -78,24 +78,24 @@ export default class RouteOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onDoValidateFail(sender, e, ex)
+	static RoutePerk_onDoValidateFail(sender, e, ex)
 	{
 
 		// Try to fix URL when validation failed
 		if (this.settings.get("routings.settings.autoFix"))
 		{
-			RouteOrganizer.__fixRoute(this, e.detail.url);
+			RoutePerk.__fixRoute(this, e.detail.url);
 		}
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static RouteOrganizer_onDoReportValidity(sender, e, ex)
+	static RoutePerk_onDoReportValidity(sender, e, ex)
 	{
 
 		// Dump errors when validation failed
-		RouteOrganizer.__dumpValidationErrors(this);
+		RoutePerk.__dumpValidationErrors(this);
 		throw new URIError("URL validation failed.");
 
 	}
@@ -110,7 +110,7 @@ export default class RouteOrganizer extends BM.Organizer
 		return {
 			"sections":		["routings", "specs"],
 			"order":		900,
-			"depends":		"ValidationOrganizer",
+			"depends":		"ValidationPerk",
 		};
 
 	}
@@ -121,7 +121,7 @@ export default class RouteOrganizer extends BM.Organizer
 	{
 
 		// Set state on the first page
-		history.replaceState(RouteOrganizer.__getState("connect"), null, null);
+		history.replaceState(RoutePerk.__getState("connect"), null, null);
 
 	}
 
@@ -136,14 +136,14 @@ export default class RouteOrganizer extends BM.Organizer
 		Object.defineProperty(component, 'spec', { get() { return this._spec; }, });
 
 		// Add methods to component
-		component.loadParameters = function(url) { return RouteOrganizer._loadParameters(url); }
-		component.switchSpec = function(specName, options) { return RouteOrganizer._switchSpec(this, specName, options); }
-		component.openRoute = function(routeInfo, options) { return RouteOrganizer._open(this, routeInfo, options); }
-		component.jumpRoute = function(routeInfo, options) { return RouteOrganizer._jumpRoute(this, routeInfo, options); }
-		component.updateRoute = function(routeInfo, options) { return RouteOrganizer._updateRoute(this, routeInfo, options); }
-		component.refreshRoute = function(routeInfo, options) { return RouteOrganizer._refreshRoute(this, routeInfo, options); }
-		component.replaceRoute = function(routeInfo, options) { return RouteOrganizer._replaceRoute(this, routeInfo, options); }
-		component.normalizeRoute = function() { return RouteOrganizer._normalizeRoute(this); }
+		component.loadParameters = function(url) { return RoutePerk._loadParameters(url); }
+		component.switchSpec = function(specName, options) { return RoutePerk._switchSpec(this, specName, options); }
+		component.openRoute = function(routeInfo, options) { return RoutePerk._open(this, routeInfo, options); }
+		component.jumpRoute = function(routeInfo, options) { return RoutePerk._jumpRoute(this, routeInfo, options); }
+		component.updateRoute = function(routeInfo, options) { return RoutePerk._updateRoute(this, routeInfo, options); }
+		component.refreshRoute = function(routeInfo, options) { return RoutePerk._refreshRoute(this, routeInfo, options); }
+		component.replaceRoute = function(routeInfo, options) { return RoutePerk._replaceRoute(this, routeInfo, options); }
+		component.normalizeRoute = function() { return RoutePerk._normalizeRoute(this); }
 
 		// Init component vars
 		component._routes = [];
@@ -152,17 +152,17 @@ export default class RouteOrganizer extends BM.Organizer
 		Object.defineProperty(component, "settings", { get() { return this._spec; }, }); // Tweak to see settings through spec
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", RouteOrganizer.RouteOrganizer_onDoOrganize);
-		this._addOrganizerHandler(component, "doStart", RouteOrganizer.RouteOrganizer_onDoStart);
-		this._addOrganizerHandler(component, "afterReady", RouteOrganizer.RouteOrganizer_onAfterReady);
-		this._addOrganizerHandler(component, "doValidateFail", RouteOrganizer.RouteOrganizer_onDoValidateFail);
-		this._addOrganizerHandler(component, "doReportValidity", RouteOrganizer.RouteOrganizer_onDoReportValidity);
+		this._addPerkHandler(component, "doOrganize", RoutePerk.RoutePerk_onDoOrganize);
+		this._addPerkHandler(component, "doStart", RoutePerk.RoutePerk_onDoStart);
+		this._addPerkHandler(component, "afterReady", RoutePerk.RoutePerk_onAfterReady);
+		this._addPerkHandler(component, "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
+		this._addPerkHandler(component, "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
 
 		// Load settings from attributes
-		RouteOrganizer._loadAttrSettings(component);
+		RoutePerk._loadAttrSettings(component);
 
 		// Init popstate handler
-		RouteOrganizer.__initPopState(component);
+		RoutePerk.__initPopState(component);
 
 	}
 
@@ -230,7 +230,7 @@ export default class RouteOrganizer extends BM.Organizer
 				params = Object.assign(params, component.routeInfo["queryParameters"]);
 			}
 			params = Object.assign(params, routeInfo["queryParameters"]);
-			url += RouteOrganizer._buildUrlQuery(params);
+			url += RoutePerk._buildUrlQuery(params);
 		}
 
 		return ( url ? url : "/" );
@@ -319,26 +319,26 @@ export default class RouteOrganizer extends BM.Organizer
 	static _switchSpec(component, specName, options)
 	{
 
-		BM.Util.assert(specName, "RouteOrganizer._switchSpec(): A spec name not specified.", TypeError);
+		BM.Util.assert(specName, "RoutePerk._switchSpec(): A spec name not specified.", TypeError);
 
 		return Promise.resolve().then(() => {
 			if (!component._specs[specName])
 			{
-				return RouteOrganizer._loadSpec(component, specName, options);
+				return RoutePerk._loadSpec(component, specName, options);
 			}
 		}).then(() => {
 			component._spec.items = component._specs[specName];
 		}).then(() => {
 			if (component.settings.get("settings.hasExtender"))
 			{
-				return RouteOrganizer._loadExtender(component, specName, options);
+				return RoutePerk._loadExtender(component, specName, options);
 			}
 		}).then(() => {
-			return component.attachOrganizers({"settings":component._specs[component._routeInfo["specName"]]});
+			return component.skills.use("perk.attachPerks", {"settings":component._specs[component._routeInfo["specName"]]});
 		}).then(() => {
-			return component.trigger("doOrganize", {"settings":component._specs[component._routeInfo["specName"]]});
+			return component.skills.use("event.trigger", "doOrganize", {"settings":component._specs[component._routeInfo["specName"]]});
 		}).then(() => {
-			return component.trigger("afterLoadSettings", {"settings":component._specs[component._routeInfo["specName"]]});
+			return component.skills.use("event.trigger", "afterLoadSettings", {"settings":component._specs[component._routeInfo["specName"]]});
 		});
 
 	}
@@ -367,8 +367,8 @@ export default class RouteOrganizer extends BM.Organizer
 		let newRouteInfo;
 		if (routeInfo)
 		{
-			newUrl = RouteOrganizer._buildUrl(component, routeInfo, options);
-			newRouteInfo = RouteOrganizer.__loadRouteInfo(component, newUrl);
+			newUrl = RoutePerk._buildUrl(component, routeInfo, options);
+			newRouteInfo = RoutePerk.__loadRouteInfo(component, newUrl);
 		}
 		else
 		{
@@ -381,7 +381,7 @@ export default class RouteOrganizer extends BM.Organizer
 				|| ( curRouteInfo["specName"] != newRouteInfo["specName"]) // <--- remove this when _update() is ready.
 		)
 		{
-			RouteOrganizer._jumpRoute(component, {"url":newUrl});
+			RoutePerk._jumpRoute(component, {"url":newUrl});
 			return;
 		}
 
@@ -389,14 +389,14 @@ export default class RouteOrganizer extends BM.Organizer
 			// Replace URL
 			if (pushState)
 			{
-				history.pushState(RouteOrganizer.__getState("_open.pushState"), null, newUrl);
+				history.pushState(RoutePerk.__getState("_open.pushState"), null, newUrl);
 			}
 			component._routeInfo = newRouteInfo;
 		}).then(() => {
 			// Load other component when new spec is different from the current spec
 			if (curRouteInfo["specName"] != newRouteInfo["specName"])
 			{
-				return RouteOrganizer._updateRoute(component, curRouteInfo, newRouteInfo, options);
+				return RoutePerk._updateRoute(component, curRouteInfo, newRouteInfo, options);
 			}
 		}).then(() => {
 			// Validate URL
@@ -404,17 +404,17 @@ export default class RouteOrganizer extends BM.Organizer
 			{
 				let validateOptions = {
 					"validatorName":	component.settings.get("routings.settings.validatorName"),
-					"items":			RouteOrganizer._loadParameters(newUrl),
+					"items":			RoutePerk._loadParameters(newUrl),
 					"url":				newUrl,
 				};
-				return component.validate(validateOptions);
+				return component.skills.use("validation.validate", validateOptions);
 			}
 		}).then(() => {
 			// Refresh
-			return RouteOrganizer._refreshRoute(component, newRouteInfo, options);
+			return RoutePerk._refreshRoute(component, newRouteInfo, options);
 		}).then(() => {
 			// Normalize URL
-			return RouteOrganizer._normalizeRoute(component, window.location.href);
+			return RoutePerk._normalizeRoute(component, window.location.href);
 		});
 
 	}
@@ -431,7 +431,7 @@ export default class RouteOrganizer extends BM.Organizer
 	static _jumpRoute(component, routeInfo, options)
 	{
 
-		let url = RouteOrganizer._buildUrl(component, routeInfo, options);
+		let url = RoutePerk._buildUrl(component, routeInfo, options);
 		window.location.href = url;
 
 	}
@@ -450,7 +450,7 @@ export default class RouteOrganizer extends BM.Organizer
 	static _updateRoute(component, curRouteInfo, newRouteInfo, options)
 	{
 
-		return RouteOrganizer._switchSpec(component, newRouteInfo["specName"]);
+		return RoutePerk._switchSpec(component, newRouteInfo["specName"]);
 
 	}
 
@@ -484,8 +484,8 @@ export default class RouteOrganizer extends BM.Organizer
 	static _replaceRoute(component, routeInfo, options)
 	{
 
-		history.replaceState(RouteOrganizer.__getState("replaceRoute", window.history.state), null, RouteOrganizer._buildUrl(component, routeInfo, options));
-		component._routeInfo = RouteOrganizer.__loadRouteInfo(component, window.location.href);
+		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, RoutePerk._buildUrl(component, routeInfo, options));
+		component._routeInfo = RoutePerk.__loadRouteInfo(component, window.location.href);
 
 	}
 
@@ -503,11 +503,11 @@ export default class RouteOrganizer extends BM.Organizer
 	{
 
 		return Promise.resolve().then(() => {
-			return component.trigger("beforeNormalizeURL");
+			return component.skills.use("event.trigger", "beforeNormalizeURL");
 		}).then(() => {
-			return component.trigger("doNormalizeURL");
+			return component.skills.use("event.trigger", "doNormalizeURL");
 		}).then(() => {
-			return component.trigger("afterNormalizeURL");
+			return component.skills.use("event.trigger", "afterNormalizeURL");
 		});
 
 	}
@@ -549,7 +549,7 @@ export default class RouteOrganizer extends BM.Organizer
 //		let specCommon;
 		let promises = [];
 
-		console.debug(`RouteOrganizer._loadSpec(): Loading spec file. name=${component.name}, specName=${specName}`);
+		console.debug(`RoutePerk._loadSpec(): Loading spec file. name=${component.name}, specName=${specName}`);
 
 		// Path
 		let path = BM.Util.safeGet(loadOptions, "path",
@@ -561,7 +561,7 @@ export default class RouteOrganizer extends BM.Organizer
 
 		// Load specs
 		let options = BM.Util.deepMerge({"type": "js", "bindTo": this}, loadOptions);
-		promises.push(BM.SettingOrganizer.loadFile(specName, path, options));
+		promises.push(BM.SettingPerk.loadFile(specName, path, options));
 
 		return Promise.all(promises).then((result) => {
 			spec = result[0];
@@ -588,7 +588,7 @@ export default class RouteOrganizer extends BM.Organizer
 	static _loadExtender(component, extenderName, loadOptions)
 	{
 
-		console.debug(`RouteOrganizer._loadExtender(): Loading extender file. name=${component.name}, extenderName=${extenderName}`);
+		console.debug(`RoutePerk._loadExtender(): Loading extender file. name=${component.name}, extenderName=${extenderName}`);
 
 		let query = BM.Util.safeGet(loadOptions, "query");
 		let path = BM.Util.safeGet(loadOptions, "path",
@@ -658,7 +658,7 @@ export default class RouteOrganizer extends BM.Organizer
 		routeInfo["query"] = parsedUrl.search;
 		routeInfo["parsedUrl"] = parsedUrl;
 		routeInfo["routeParameters"] = params;
-		routeInfo["queryParameters"] = RouteOrganizer._loadParameters(url);
+		routeInfo["queryParameters"] = RoutePerk._loadParameters(url);
 
 		return routeInfo;
 
@@ -676,11 +676,11 @@ export default class RouteOrganizer extends BM.Organizer
 
 		window.addEventListener("popstate", (e) => {
 			return Promise.resolve().then(() => {
-				return component.trigger("beforePopState");
+				return component.skills.use("event.trigger", "beforePopState");
 			}).then(() => {
-				return RouteOrganizer._open(component, {"url":window.location.href}, {"pushState":false});
+				return RoutePerk._open(component, {"url":window.location.href}, {"pushState":false});
 			}).then(() => {
-				return component.trigger("afterPopState");
+				return component.skills.use("event.trigger", "afterPopState");
 			});
 		});
 
@@ -726,11 +726,11 @@ export default class RouteOrganizer extends BM.Organizer
 	{
 
 		let isOk = true;
-		let newParams = RouteOrganizer._loadParameters(url);
+		let newParams = RoutePerk._loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(component.validationResult["invalids"]).forEach((key) => {
-			let item = component.validationResult["invalids"][key];
+		Object.keys(component.inventory.get("validation.validationResult")["invalids"]).forEach((key) => {
+			let item = component.inventory.get("validation.validationResult")["invalids"][key];
 
 			if (item["fix"] !== undefined)
 			{
@@ -749,10 +749,10 @@ export default class RouteOrganizer extends BM.Organizer
 		if (isOk)
 		{
 			// Replace URL
-			RouteOrganizer._replaceRoute(component, {"queryParameters":newParams});
+			RoutePerk._replaceRoute(component, {"queryParameters":newParams});
 
 			// Fixed
-			component.validationResult["result"] = true;
+			component.inventory.get("validation.validationResult")["result"] = true;
 		}
 
 	}
@@ -767,14 +767,14 @@ export default class RouteOrganizer extends BM.Organizer
 	static __dumpValidationErrors(component)
 	{
 
-		Object.keys(component.validationResult["invalids"]).forEach((key) => {
-			let item = component.validationResult["invalids"][key];
+		Object.keys(component.inventory.get("validation.validationResult")["invalids"]).forEach((key) => {
+			let item = component.inventory.get("validation.validationResult")["invalids"][key];
 
 			if (item.failed)
 			{
 				for (let i = 0; i < item.failed.length; i++)
 				{
-					console.warn("RouteOrganizer.__dumpValidationErrors(): URL validation failed.",
+					console.warn("RoutePerk.__dumpValidationErrors(): URL validation failed.",
 						`key=${item.key}, value=${item.value}, rule=${item.failed[i].rule}, validity=${item.failed[i].validity}`);
 				}
 			}

@@ -226,20 +226,20 @@ ChainedSelect.prototype.ChainedSelect_onBtnNewItemClick = function(sender, e, ex
 		"validatorName": "",
 	};
 
-	return this.trigger("beforeAdd", options).then(() => {
+	return this.skills.use("event.trigger", "beforeAdd", options).then(() => {
 		if (this.modalResult["result"])
 		{
 			return this.validate(options).then(() => {
 				if(this.validationResult["result"])
 				{
 					return Promise.resolve().then(() => {
-						return this.trigger("doAdd", options);
+						return this.skills.use("event.trigger", "doAdd", options);
 					}).then(() => {
-						return this.trigger("afterAdd", options);
+						return this.skills.use("event.trigger", "afterAdd", options);
 					}).then(() => {
 						if (this.settings.get("settings.autoSubmit", true))
 						{
-							return this.submit(options);
+							return this.skills.use("form.submit", options);
 						}
 					});
 				}
@@ -265,20 +265,20 @@ ChainedSelect.prototype.ChainedSelect_onBtnEditItemClick = function(sender, e, e
 		"validatorName": "",
 	};
 
-	return this.trigger("beforeEdit", options).then(() => {
+	return this.skills.use("event.trigger", "beforeEdit", options).then(() => {
 		if (this.modalResult["result"])
 		{
 			return this.validate(options).then(() => {
 				if(this.validationResult["result"])
 				{
 					return Promise.resolve().then(() => {
-						return this.trigger("doEdit", options);
+						return this.skills.use("event.trigger", "doEdit", options);
 					}).then(() => {
-						return this.trigger("afterEdit", options);
+						return this.skills.use("event.trigger", "afterEdit", options);
 					}).then(() => {
 						if (this.settings.get("settings.autoSubmit", true))
 						{
-							return this.submit(options);
+							return this.skills.use("form.submit", options);
 						}
 					});
 				}
@@ -304,20 +304,20 @@ ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, 
 		"validatorName": "",
 	};
 
-	return this.trigger("beforeRemove", options).then(() => {
+	return this.skills.use("event.trigger", "beforeRemove", options).then(() => {
 		if (this.modalResult["result"])
 		{
 			return this.validate(options).then(() => {
 				if(this.validationResult["result"])
 				{
 					return Promise.resolve().then(() => {
-						return this.trigger("doRemove", options);
+						return this.skills.use("event.trigger", "doRemove", options);
 					}).then(() => {
-						return this.trigger("afterRemove", options);
+						return this.skills.use("event.trigger", "afterRemove", options);
 					}).then(() => {
 						if (this.settings.get("settings.autoSubmit", true))
 						{
-							return this.submit(options);
+							return this.skills.use("form.submit", options);
 						}
 					});
 				}

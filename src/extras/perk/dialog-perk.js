@@ -11,11 +11,141 @@
 import BM from "../bm";
 
 // =============================================================================
-//	Dialog organizer class
+//	Dialog Perk class
 // =============================================================================
 
-export default class DialogOrganizer extends BM.Organizer
+export default class DialogPerk extends BM.Perk
 {
+
+	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Open component.
+	 *
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _open(component, options)
+	{
+
+		options = options || {};
+
+		console.debug(`DialogPerk._open(): Opening component. name=${component.name}, id=${component.id}`);
+		return component.skills.use("event.trigger", "beforeOpen", options).then(() => {
+			//if (!component._cancelOpen)
+			if (!component.inventory.get("dialog.cancelOpen"))
+			{
+				return Promise.resolve().then(() => {
+					// Show backdrop
+					if (component.settings.get("dialog.backdropOptions.show"))
+					{
+						return DialogPerk.__showBackdrop(component, component.settings.get("dialog.backdropOptions"));
+					}
+				}).then(() => {
+					// Setup
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.settings.autoSetupOnOpen", true)))
+					{
+						return component.setup(options);
+					}
+				}).then(() => {
+					// Refresh
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.settings.autoRefreshOnOpen", true)))
+					{
+						return component.refresh(options);
+					}
+				}).then(() => {
+					return component.skills.use("event.trigger", "doOpen", options);
+				}).then(() => {
+					console.debug(`DialogPerk._open(): Opened component. name=${component.name}, id=${component.id}`);
+					return component.skills.use("event.trigger", "afterOpen", options);
+				});
+			}
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Open component modal.
+	 *
+	 * @param	{array}			options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _openModal(component, options)
+	{
+
+		console.debug(`DialogPerk._openModal(): Opening component modal. name=${component.name}, id=${component.id}`);
+
+		return new Promise((resolve, reject) => {
+			component.inventory.set("dialog.isModal", true);
+			component.inventory.set("dialog.modalResult", {"result":false});
+			component.inventory.set("dialog.modalPromise", {"resolve":resolve,"reject":reject});
+			return DialogPerk._open(component, options);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Close component.
+	 *
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _close(component, options)
+	{
+
+		options = options || {};
+		component.inventory.set("dialog.cancelClose", false);
+
+		console.debug(`DialogPerk._close(): Closing component. name=${component.name}, id=${component.id}`);
+		return component.skills.use("event.trigger", "beforeClose", options).then(() => {
+			if (!component.inventory.get("dialog.cancelClose"))
+			{
+				return component.skills.use("event.trigger", "doClose", options).then(() => {
+					// Hide backdrop
+					if (component.settings.get("dialog.backdropOptions.show"))
+					{
+						DialogPerk.__removeCloseOnClickHandlers();
+						return DialogPerk.__hideBackdrop(component, component.settings.get("dialog.backdropOptions"));
+					}
+				}).then(() => {
+					if (component.inventory.get("dialog.isModal"))
+					{
+						component.inventory.get("dialog.modalPromise").resolve(component.inventory.get("dialog.modalResult"));
+					}
+					console.debug(`DialogPerk._close(): Closed component. name=${component.name}, id=${component.id}`);
+
+					return component.skills.use("event.trigger", "afterClose", options);
+				});
+			}
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event Handlers
+	// -------------------------------------------------------------------------
+
+	static DialogPerk_onAfterReady(sender, e, ex)
+	{
+
+		if (this.settings.get("dialog.settings.autoOpen"))
+		{
+			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
+
+			//return this.open();
+			return this.skills.use("dialog.open");
+		}
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -24,23 +154,19 @@ export default class DialogOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "DialogOrganizer";
+		return "DialogPerk";
 
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event Handlers
-	// -------------------------------------------------------------------------
 
-	static DialogOrganizer_onAfterReady(sender, e, ex)
+	static get info()
 	{
 
-		if (this.settings.get("dialog.settings.autoOpen"))
-		{
-			console.debug(`DialogOrganizer.DialogOrganizer_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
-
-			return this.open();
-		}
+		return {
+			"sections":		"dialog",
+			"order":		800,
+		};
 
 	}
 
@@ -63,142 +189,21 @@ export default class DialogOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add properties to component
-		Object.defineProperty(component, 'modalResult', {
-			get() { return this._modalResult; },
-		});
-		Object.defineProperty(component, 'isModal', {
-			get() { return this._isModal; },
-		});
+		// Add skills to component;
+		component.skills.set("dialog.open", function(...args) { return DialogPerk._open(...args); });
+		component.skills.set("dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
+		component.skills.set("dialog.close", function(...args) { return DialogPerk._close(...args); });
 
-		// Add methods to component
-		component.open = function(options) { return DialogOrganizer._open(this, options); }
-		component.openModal = function(options) { return DialogOrganizer._openModal(this, options); }
-		component.close = function(options) { return DialogOrganizer._close(this, options); }
-
-		// Init component vars
-		component._isModal = false;
-		component._cancelClose;
-		component._cancelOpen;
-		component._modalResult;
-		component._modalPromise;
-		component._backdrop;
-		component._backdropPromise = Promise.resolve();
+		// Add inventory items to Component
+		component.inventory.set("dialog.isModal", false);
+		component.inventory.set("dialog.cancelClose");
+		component.inventory.set("dialog.modalResult");
+		component.inventory.set("dialog.modalPromise");
+		component.inventory.set("dialog.backdrop");
+		component.inventory.set("dialog.backdropPromise", Promise.resolve());
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterReady", DialogOrganizer.DialogOrganizer_onAfterReady);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Open component.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _open(component, options)
-	{
-
-		options = options || {};
-
-		console.debug(`DialogOrganizer._open(): Opening component. name=${component.name}, id=${component.id}`);
-		return component.trigger("beforeOpen", options).then(() => {
-			if (!component._cancelOpen)
-			{
-				return Promise.resolve().then(() => {
-					// Show backdrop
-					if (component.settings.get("dialog.backdropOptions.show"))
-					{
-						return DialogOrganizer.__showBackdrop(component, component.settings.get("dialog.backdropOptions"));
-					}
-				}).then(() => {
-					// Setup
-					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.settings.autoSetupOnOpen", true)))
-					{
-						return component.setup(options);
-					}
-				}).then(() => {
-					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.settings.autoRefreshOnOpen", true)))
-					{
-						return component.refresh(options);
-					}
-				}).then(() => {
-					return component.trigger("doOpen", options);
-				}).then(() => {
-					console.debug(`DialogOrganizer._open(): Opened component. name=${component.name}, id=${component.id}`);
-					return component.trigger("afterOpen", options);
-				});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Open component modal.
-	 *
-	 * @param	{array}			options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _openModal(component, options)
-	{
-
-		console.debug(`DialogOrganizer._openModal(): Opening component modal. name=${component.name}, id=${component.id}`);
-
-		return new Promise((resolve, reject) => {
-			component._isModal = true;
-			component._modalResult = {"result":false};
-			component._modalPromise = { "resolve": resolve, "reject": reject };
-			return DialogOrganizer._open(component, options);
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Close component.
-	 *
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _close(component, options)
-	{
-
-		options = options || {};
-		component._cancelClose = false;
-
-		console.debug(`DialogOrganizer._close(): Closing component. name=${component.name}, id=${component.id}`);
-		return component.trigger("beforeClose", options).then(() => {
-			if (!component._cancelClose)
-			{
-				return component.trigger("doClose", options).then(() => {
-					// Hide backdrop
-					if (component.settings.get("dialog.backdropOptions.show"))
-					{
-						DialogOrganizer.__removeCloseOnClickHandlers();
-						return DialogOrganizer.__hideBackdrop(component, component.settings.get("dialog.backdropOptions"));
-					}
-				}).then(() => {
-					if (component._isModal)
-					{
-						component._modalPromise.resolve(component._modalResult);
-					}
-					console.debug(`DialogOrganizer._close(): Closed component. name=${component.name}, id=${component.id}`);
-
-					return component.trigger("afterClose", options);
-				});
-			}
-		});
+		this._addPerkHandler(component, "afterReady", DialogPerk.DialogPerk_onAfterReady);
 
 	}
 
@@ -215,11 +220,11 @@ export default class DialogOrganizer extends BM.Organizer
 	static __createBackdrop(component, options)
 	{
 
-		if (!DialogOrganizer._backdrop)
+		if (!DialogPerk._backdrop)
 		{
 			// Create the backdrop
 			document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
-			DialogOrganizer._backdrop = document.body.firstElementChild;
+			DialogPerk._backdrop = document.body.firstElementChild;
 		}
 
 	}
@@ -235,24 +240,24 @@ export default class DialogOrganizer extends BM.Organizer
 	static __showBackdrop(component, options)
 	{
 
-		DialogOrganizer.__createBackdrop(component);
+		DialogPerk.__createBackdrop(component);
 
-		return component._backdropPromise.then(() => {
-			component._backdropPromise = new Promise((resolve, reject) => {
-				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+		return component.inventory.get("dialog.backdropPromise").then(() => {
+			component.inventory.set("dialog.backdropPromise", new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let addClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.showOptions.addClasses", []));
-				DialogOrganizer._backdrop.classList.add(...addClasses);
-				DialogOrganizer._backdrop.classList.remove(...component.settings.get("dialog.backdropOptions.showOptions.removeClasses", []));
+				DialogPerk._backdrop.classList.add(...addClasses);
+				DialogPerk._backdrop.classList.remove(...component.settings.get("dialog.backdropOptions.showOptions.removeClasses", []));
 
-				let effect = DialogOrganizer.__getEffect();
+				let effect = DialogPerk.__getEffect();
 				if (effect)
 				{
 					// Transition/Animation
-					DialogOrganizer._backdrop.addEventListener(`${effect}end`, () => {
+					DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
 						if (BM.Util.safeGet(options, "closeOnClick", true))
 						{
-							DialogOrganizer.__installCloseOnClickHandler(component);
+							DialogPerk.__installCloseOnClickHandler(component);
 						}
 						resolve();
 					}, {"once":true});
@@ -262,17 +267,17 @@ export default class DialogOrganizer extends BM.Organizer
 					// No Transition/Animation
 					if (BM.Util.safeGet(options, "closeOnClick", true))
 					{
-						DialogOrganizer.__installCloseOnClickHandler(component);
+						DialogPerk.__installCloseOnClickHandler(component);
 					}
 
 					resolve();
 				}
-			});
+			}));
 
 			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return component._backdropPromise;
+				return component.inventory.get("dialog.backdropPromise");
 			}
 		});
 
@@ -289,18 +294,18 @@ export default class DialogOrganizer extends BM.Organizer
 	static __hideBackdrop(component, options)
 	{
 
-		return component._backdropPromise.then(() => {
-			component._backdropPromise = new Promise((resolve, reject) => {
-				window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue("visibility"); // Recalc styles
+		return component.inventory.get("dialog.backdropPromise").then(() => {
+			component.inventory.set("dialog.backdropPromise",  new Promise((resolve, reject) => {
+				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let removeClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.hideOptions.removeClasses", []));
-				DialogOrganizer._backdrop.classList.remove(...removeClasses);
-				DialogOrganizer._backdrop.classList.add(...component.settings.get("dialog.backdropOptions.hideOptions.addClasses", []));
+				DialogPerk._backdrop.classList.remove(...removeClasses);
+				DialogPerk._backdrop.classList.add(...component.settings.get("dialog.backdropOptions.hideOptions.addClasses", []));
 
-				let effect = DialogOrganizer.__getEffect();
+				let effect = DialogPerk.__getEffect();
 				if (effect)
 				{
-					DialogOrganizer._backdrop.addEventListener(`${effect}end`, () => {
+					DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
 				}
@@ -308,12 +313,12 @@ export default class DialogOrganizer extends BM.Organizer
 				{
 					resolve();
 				}
-			});
+			}));
 
 			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return component._backdropPromise;
+				return component.inventory.get("dialog.backdropPromise");
 			}
 		});
 
@@ -330,10 +335,10 @@ export default class DialogOrganizer extends BM.Organizer
 	static __installCloseOnClickHandler(component, options)
 	{
 
-		DialogOrganizer._backdrop.onclick = (e) => {
+		DialogPerk._backdrop.onclick = (e) => {
 			if (e.target === e.currentTarget)
 			{
-				component.close({"reason":"cancel"});
+				DialogPerk._close(component, {"reason":"cancel"});
 			}
 		};
 
@@ -350,7 +355,7 @@ export default class DialogOrganizer extends BM.Organizer
 	static __removeCloseOnClickHandlers()
 	{
 
-		DialogOrganizer._backdrop.onclick = null;
+		DialogPerk._backdrop.onclick = null;
 
 	}
 
@@ -366,11 +371,11 @@ export default class DialogOrganizer extends BM.Organizer
 
 		let effect = "";
 
-		if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('transition-duration') !== "0s")
+		if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('transition-duration') !== "0s")
 		{
 			effect = "transition";
 		}
-		else if (window.getComputedStyle(DialogOrganizer._backdrop).getPropertyValue('animation-name') !== "none")
+		else if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('animation-name') !== "none")
 		{
 			effect = "animation";
 		}

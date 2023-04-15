@@ -14,140 +14,14 @@ import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 
 // =============================================================================
-//	Databinding organizer class
+//	Databinding Perk class
 // =============================================================================
 
-export default class DatabindingOrganizer extends BM.Organizer
+export default class DatabindingPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "DatabindingOrganizer";
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"bindings",
-			"order":		320,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Add properties to component
-		Object.defineProperty(component, 'bindings', {
-			get() { return this._bindings; },
-		});
-
-		if (component.settings.get("bindings.settings.dataType", "single") === "single")
-		{
-			// Add methods to component
-			component.bindData = function(...args) { return DatabindingOrganizer._bindData(this, ...args); }
-
-			// Init component vars
-			component._bindings = new BindableStore({
-				"resources":	component.resources,
-				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
-			});
-
-			// Add event handlers to component
-			this._addOrganizerHandler(component, "afterTransform", DatabindingOrganizer.DatabindingOrganizer_onAfterTransform);
-			this._addOrganizerHandler(component, "doFill", DatabindingOrganizer.DatabindingOrganizer_onDoFill);
-		}
-		else
-		{
-			// Add methods to component
-			component.bindData = function(...args) { return DatabindingOrganizer._bindDataArray(this, ...args); }
-
-			// Init component vars
-			component._bindings = new BindableArrayStore({
-				"resources":	component.resources,
-				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
-			});
-
-			// Add event handlers to component
-			this._addOrganizerHandler(component, "beforeFill", DatabindingOrganizer.DatabindingOrganizer_onBeforeFill);
-			this._addOrganizerHandler(component, "doFillRow", DatabindingOrganizer.DatabindingOrganizer_onDoFillRow);
-		}
-
-		// Add event handlers to component
-		this._addOrganizerHandler(component, "doCollect", DatabindingOrganizer.DatabindingOrganizer_onDoCollect);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onAfterTransform(sender, e, ex)
-	{
-
-		DatabindingOrganizer._bindData(this);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onBeforeFill(sender, e, ex)
-	{
-
-		this._bindings.clear();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onDoFill(sender, e, ex)
-	{
-
-		if (e.detail.items)
-		{
-			this._bindings.replace(e.detail.items);
-			FormUtil.showConditionalElements(this, e.detail.items);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onDoFillRow(sender, e, ex)
-	{
-
-		DatabindingOrganizer._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-		this._bindings.replace(e.detail.no, e.detail.item);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingOrganizer_onDoCollect(sender, e, ex)
-	{
-
-		if (this.settings.get("bindings.settings.autoCollect", true))
-		{
-			e.detail.items = this._bindings.items;
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
+	//  Skills
 	// -------------------------------------------------------------------------
 
 	/**
@@ -170,10 +44,10 @@ export default class DatabindingOrganizer extends BM.Organizer
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingOrganizer.__getCallback(component, key);
+			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component._bindings.bindTo(key, elem, callback);
+			component.inventory.get("databinding.bindings").bindTo(key, elem, callback);
 		});
 
 	}
@@ -201,16 +75,150 @@ export default class DatabindingOrganizer extends BM.Organizer
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingOrganizer.__getCallback(component, key);
+			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component._bindings.bindTo(index, key, elem, callback);
+			component.inventory.get("databinding.bindings").bindTo(index, key, elem, callback);
 		});
 
 	}
 
 	// -------------------------------------------------------------------------
-	//  Protected
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onAfterTransform(sender, e, ex)
+	{
+
+		DatabindingPerk._bindData(this);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onBeforeFill(sender, e, ex)
+	{
+
+		this.inventory.get("databinding.bindings").clear();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoFill(sender, e, ex)
+	{
+
+		if (e.detail.items)
+		{
+			this.inventory.get("databinding.bindings").replace(e.detail.items);
+			FormUtil.showConditionalElements(this, e.detail.items);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoFillRow(sender, e, ex)
+	{
+
+		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
+		this.inventory.get("databinding.bindings").replace(e.detail.no, e.detail.item);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoCollect(sender, e, ex)
+	{
+
+		if (this.settings.get("bindings.settings.autoCollect", true))
+		{
+			e.detail.items = this.inventory.get("databinding.bindings").items;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "DatabindingPerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		"bindings",
+			"order":		320,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static getInfo()
+	{
+
+		return {
+			"sections":		"bindings",
+			"order":		320,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		if (component.settings.get("bindings.settings.dataType", "single") === "single")
+		{
+			// Add skills to component;
+			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+
+			// Add inventory items to Component
+			component.inventory.set("databinding.bindings", new BindableStore({
+				//"resources":	component.resources,
+				"resources":	component.inventory.get("resource.resources"),
+				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
+			}));
+
+			// Add event handlers to component
+			this._addPerkHandler(component, "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
+			this._addPerkHandler(component, "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+		}
+		else
+		{
+			// Add skills to component;
+			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+
+			// Add inventory items to Component
+			component.inventory.set("databinding.bindings", new BindableArrayStore({
+				"resources":	component.resources,
+				"direction":	component.settings.get("bindings.settings.direction", "two-way"),
+			}));
+
+			// Add event handlers to component
+			this._addPerkHandler(component, "beforeFill", DatabindingPerk.DatabindingPerk_onBeforeFill);
+			this._addPerkHandler(component, "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+		}
+
+		// Add event handlers to component
+		this._addPerkHandler(component, "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
@@ -224,7 +232,7 @@ export default class DatabindingOrganizer extends BM.Organizer
 
 		let callback;
 
-		component._enumSettings(component.settings.get("bindings"), (sectionName, sectionValue) => {
+		component.skills.use("setting.enumSettings", component.settings.get("bindings"), (sectionName, sectionValue) => {
 			if (sectionValue["callback"])
 			{
 				const pattern = sectionValue["key"] || sectionName;

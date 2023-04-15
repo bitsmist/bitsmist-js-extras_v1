@@ -54,12 +54,12 @@ TagLoader.prototype.start = function(settings)
 	return BM.Component.prototype.start.call(this, settings).then(() => {
 		if (document.readyState !== "loading")
 		{
-			BM.LoaderOrganizer.load(document.body, this.settings);
+			BM.LoaderPerk.load(document.body, this.settings);
 		}
 		else
 		{
 			document.addEventListener("DOMContentLoaded", () => {
-				BM.LoaderOrganizer.load(document.body, this.settings);
+				BM.LoaderPerk.load(document.body, this.settings);
 			});
 		}
 	});

@@ -13,11 +13,91 @@ import FormUtil from "../util/form-util.js";
 import ValueUtil from "../util/value-util.js";
 
 // =============================================================================
-//	List Organizer Class
+//	List Perk Class
 // =============================================================================
 
-export default class ListOrganizer extends BM.Organizer
+export default class ListPerk extends BM.Perk
 {
+
+	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Change the row skin.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{String}		skinName			Skin name.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _transformRow(component, skinName, options)
+	{
+
+		options = options || {};
+
+		if (component.inventory.get("list.activeRowSkinName") === skinName)
+		{
+			return Promise.resolve();
+		}
+
+		return Promise.resolve().then(() => {
+			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			return component.skills.use("skin.loadSkin", skinName);
+		}).then(() => {
+			component.inventory.set("list.activeRowSkinName", skinName);
+		}).then(() => {
+			return component.skills.use("event.trigger", "afterTransformRow", options);
+		}).then(() => {
+			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static ListPerk_onAfterTransform(sender, e, ex)
+	{
+
+		this._listRootNode = this.querySelector(this.settings.get("list.settings.listRootNode"));
+		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
+
+		return ListPerk._transformRow(this, this.settings.get("list.settings.rowSkinName"));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ListPerk_onBeforeFill(sender, e, ex)
+	{
+
+		e.detail.items = e.detail.items || this.inventory.get("list.lastItems");
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ListPerk_onDoFill(sender, e, ex)
+	{
+
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListPerk._buildAsync : ListPerk._buildSync );
+		let fragment = document.createDocumentFragment();
+
+		return Promise.resolve().then(() => {
+			return this.skills.use("event.trigger", "beforeBuildRows");
+		}).then(() => {
+			return builder(this, fragment, e.detail.items, e.detail);
+		}).then(() => {
+			this._listRootNode.replaceChildren(fragment);
+			this.inventory.set("list.lastItems", e.detail.items);
+
+			return this.skills.use("event.trigger", "afterBuildRows");
+		});
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -26,51 +106,19 @@ export default class ListOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "ListOrganizer";
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static ListOrganizer_onAfterTransform(sender, e, ex)
-	{
-
-		this._listRootNode = this.querySelector(this.settings.get("list.settings.listRootNode"));
-		BM.Util.assert(this._listRootNode, `List.ListOrganizer_onAfterTransform(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("settings.listRootNode")}`);
-
-		return this.transformRow(this.settings.get("list.settings.rowTemplateName"));
+		return "ListPerk";
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static ListOrganizer_onBeforeFill(sender, e, ex)
+	static get info()
 	{
 
-		e.detail.items = e.detail.items || this._lastItems;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static ListOrganizer_onDoFill(sender, e, ex)
-	{
-
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListOrganizer._buildAsync : ListOrganizer._buildSync );
-		let fragment = document.createDocumentFragment();
-
-		return Promise.resolve().then(() => {
-			return this.trigger("beforeBuildRows");
-		}).then(() => {
-			return builder(this, fragment, e.detail.items, e.detail);
-		}).then(() => {
-			this._listRootNode.replaceChildren(fragment);
-			this._lastItems = e.detail.items;
-
-			return this.trigger("afterBuildRows");
-		});
+		return {
+			"sections":		"list",
+			"order":		310,
+		};
 
 	}
 
@@ -93,56 +141,22 @@ export default class ListOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add methods to component
-		component.transformRow = function(...args) { return ListOrganizer._transformRow(this, ...args); }
+		// Add skills to component;
+		component.skills.set("list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 
-		// Init component vars
-		component._activeRowTemplateName = "";
-		component._lastItems = [];
+		// Add inventory items to Component
+		component.inventory.set("list.activeRowName", "");
+		component.inventory.set("list.lastItems", {});
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "afterTransform", ListOrganizer.ListOrganizer_onAfterTransform);
-		this._addOrganizerHandler(component, "beforeFill", ListOrganizer.ListOrganizer_onBeforeFill);
-		this._addOrganizerHandler(component, "doFill", ListOrganizer.ListOrganizer_onDoFill);
+		this._addPerkHandler(component, "afterTransform", ListPerk.ListPerk_onAfterTransform);
+		this._addPerkHandler(component, "beforeFill", ListPerk.ListPerk_onBeforeFill);
+		this._addPerkHandler(component, "doFill", ListPerk.ListPerk_onDoFill);
 
 	}
 
 	// -------------------------------------------------------------------------
 	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Change the row template html.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{String}		templateName		Template name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _transformRow(component, templateName, options)
-	{
-
-		options = options || {};
-
-		if (component._activeRowTemplateName === templateName)
-		{
-			return Promise.resolve();
-		}
-
-		return Promise.resolve().then(() => {
-			console.debug(`ListOrganizer._transformRow(): Switching the row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.loadTemplate(templateName);
-		}).then(() => {
-			component._activeRowTemplateName = templateName;
-		}).then(() => {
-			return component.trigger("afterTransformRow", options);
-		}).then(() => {
-			console.debug(`ListOrganizer._transformRow(): Switched the row template. name=${component.name}, rowTemplateName=${templateName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-		});
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -158,10 +172,13 @@ export default class ListOrganizer extends BM.Organizer
 	static _buildSync(component, fragment, items, options)
 	{
 
-		BM.Util.assert(component._templates[component._activeRowTemplateName], `List._buildSync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
+		let skinInfo = component.inventory.get("skin.skins");
+		let activeRowSkinName = component.inventory.get("list.activeRowSkinName");
+
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${component._activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
-		let template = component.templates[component._activeRowTemplateName].html;
+		let skin = skinInfo[activeRowSkinName].html;
 
 		let chain = Promise.resolve();
 		for (let i = 0; i < items.length; i++)
@@ -171,7 +188,7 @@ export default class ListOrganizer extends BM.Organizer
 				options["item"] = items[i];
 
 				// Append a row
-				let element = ListOrganizer.__createRow(template);
+				let element = ListPerk.__createRow(skin);
 				fragment.appendChild(element);
 				options["element"] = element;
 
@@ -179,20 +196,20 @@ export default class ListOrganizer extends BM.Organizer
 				if (rowEvents)
 				{
 					Object.keys(rowEvents).forEach((elementName) => {
-						component.initEvents(elementName, rowEvents[elementName], element);
+						component.skills.use("event.initEvents", elementName, rowEvents[elementName], element);
 					});
 				}
 
-				return component.trigger("beforeFillRow", options).then(() => {
+				return component.skills.use("event.trigger", "beforeFillRow", options).then(() => {
 					if (component.settings.get("list.settings.autoFill", true))
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
-						ValueUtil.setFields(element, options["item"], {"resources":component.resources});
+						ValueUtil.setFields(element, options["item"], {"resources":component.inventory.get("resource.resources")});
 					}
-					return component.triggerAsync("doFillRow", options);
+					return component.skills.use("event.trigger", "doFillRow", options);
 				}).then(() => {
-					return component.trigger("afterFillRow", options);
+					return component.skills.use("event.trigger", "afterFillRow", options);
 				});
 			});
 		}
@@ -215,10 +232,13 @@ export default class ListOrganizer extends BM.Organizer
 	static _buildAsync(component, fragment, items, options)
 	{
 
-		BM.Util.assert(component.templates[component._activeRowTemplateName], `List._buildAsync(): Row template not loaded yet. name=${component.name}, rowTemplateName=${component._activeRowTemplateName}`);
+		let skinInfo = component.inventory.get("skin.skins");
+		let activeRowSkinName = component.inventory.get("list.activeRowSkinName");
+
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${component._activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
-		let template = component.templates[component._activeRowTemplateName].html;
+		let skin = skinInfo[activeRowSkinName].html;
 
 		for (let i = 0; i < items.length; i++)
 		{
@@ -226,7 +246,7 @@ export default class ListOrganizer extends BM.Organizer
 			options["item"] = items[i];
 
 			// Append a row
-			let element = ListOrganizer.__createRow(template);
+			let element = ListPerk.__createRow(skin);
 			fragment.appendChild(element);
 			options["element"] = element;
 
@@ -234,19 +254,19 @@ export default class ListOrganizer extends BM.Organizer
 			if (rowEvents)
 			{
 				Object.keys(rowEvents).forEach((elementName) => {
-					component.initEvents(elementName, rowEvents[elementName], element);
+					component.skills.use("event.initEvents", elementName, rowEvents[elementName], element);
 				});
 			}
 
 			// Call event handlers
-			component.triggerAsync("beforeFillRow", options);
+			component.skills.use("event.triggerAsync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
 			if (component.settings.get("list.settings.autoFill", true))
 			{
-				ValueUtil.setFields(element, options["item"], {"resources":component.resources});
+				ValueUtil.setFields(element, options["item"], {"resources":component.inventory.get("resource.resources")});
 			}
-			component.triggerAsync("doFillRow", options);
-			component.triggerAsync("afterFillRow", options);
+			component.skills.use("event.triggerAsync", "doFillRow", options);
+			component.skills.use("event.triggerAsync", "afterFillRow", options);
 		}
 
 		delete options["no"];
@@ -262,15 +282,15 @@ export default class ListOrganizer extends BM.Organizer
 	/**
 	 * Create a row element.
 	 *
-	 * @param	{String}		template				Template html.
+	 * @param	{String}		skin					Skin.
 	 *
 	 * @return  {HTMLElement}	Row element.
 	 */
-	static __createRow(template)
+	static __createRow(skin)
 	{
 
 		let ele = document.createElement("tbody");
-		ele.innerHTML = template;
+		ele.innerHTML = skin;
 		let element = ele.firstElementChild;
 		element.setAttribute("bm-powered", "");
 

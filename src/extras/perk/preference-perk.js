@@ -8,15 +8,32 @@
  */
 // =============================================================================
 
-import AttendanceOrganizer from "../organizer/attendance-organizer.js";
+import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 
 // =============================================================================
-//	Preference organizer class
+//	Preference Perk class
 // =============================================================================
 
-export default class PreferenceOrganizer extends BM.Organizer
+export default class PreferencePerk extends BM.Perk
 {
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static PreferencePerk_onDoOrganize(sender, e, ex)
+	{
+
+		return AttendancePerk.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
+			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
+
+			return this.skills.use("state.waitFor", [{"object":server}]).then(() => {
+				server.subscribe(this, this.settings.get("preferences"));
+			});
+		});
+
+	}
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
@@ -25,24 +42,19 @@ export default class PreferenceOrganizer extends BM.Organizer
 	static get name()
 	{
 
-		return "PreferenceOrganizer";
+		return "PreferencePerk";
 
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
 
-	static PreferenceOrganizer_onDoOrganize(sender, e, ex)
+	static get info()
 	{
 
-		return AttendanceOrganizer.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
-			BM.Util.assert(server, `PreferenceOrganizer.PreferenceOrganizer_onDoOrganize(): PreferenceServer doesn't exist. name=${this.name}`);
-
-			return this.waitFor([{"object":server}]).then(() => {
-				server.subscribe(this, this.settings.get("preferences"));
-			});
-		});
+		return {
+			"sections":		"preferences",
+			"order":		900,
+		};
 
 	}
 
@@ -66,7 +78,7 @@ export default class PreferenceOrganizer extends BM.Organizer
 	{
 
 		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", PreferenceOrganizer.PreferenceOrganizer_onDoOrganize);
+		this._addPerkHandler(component, "doOrganize", PreferencePerk.PreferencePerk_onDoOrganize);
 
 	}
 

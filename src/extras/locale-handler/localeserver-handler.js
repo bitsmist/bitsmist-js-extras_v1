@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import AttendanceOrganizer from "../organizer/attendance-organizer.js";
+import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 import LocaleHandler from "./locale-handler";
 
@@ -37,10 +37,10 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		return AttendanceOrganizer.call("LocaleServer", {"waitForAttendance":true}).then((server) => {
+		return AttendancePerk.call("LocaleServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.name}`);
 
-			this._messages.chain(server.localeMessages);
+			this._messages.chain(server.inventory.get("locale.messages"));
 		});
 
 	}

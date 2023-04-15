@@ -8,55 +8,164 @@
  */
 // =============================================================================
 
-import AttendanceOrganizer from "../organizer/attendance-organizer.js";
+import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
 import LocaleServer from "../component/bm-locale.js";
 
 // =============================================================================
-//	Locale Organizer Class
+//	Locale Perk Class
 // =============================================================================
 
-export default class LocaleOrganizer extends BM.Organizer
+export default class LocalePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Skills
 	// -------------------------------------------------------------------------
 
-	static get name()
+	/**
+     * Add the localizer.
+     *
+     * @param	{Component}		component			Component.
+     * @param	{string}		handlerName			Locale handler name.
+     * @param	{array}			options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+     */
+	static _addLocalizer(component, handlerName, options)
 	{
 
-		return "LocaleOrganizer";
+		let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
+		let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
+		component.inventory.get("locale.localizers")[handlerName] = handler;
+		component.inventory.get("locale.messages").add(handler.messages);
+
+		return handler.init(options);
 
 	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Change locale.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{String}		localeName			Locale name.
+	 */
+	static _changeLocale(component, localeName)
+	{
+
+		let options = {"localeName":localeName};
+
+		return Promise.resolve().then(() => {
+			return component.skills.use("event.trigger", "beforeChangeLocale", options);
+		}).then(() => {
+			component.inventory.get("locale.localeSettings")["localeName"] = localeName;
+			return component.skills.use("event.trigger", "doChangeLocale", options);
+		}).then(() => {
+			return component.skills.use("event.trigger", "afterChangeLocale", options);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Localize all the bm-locale fields with i18 messages using each handler.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{HTMLElement}	rootNode			Target root node to localize.
+	 * @param	{Object}		interpolation		Interpolation parameters.
+	 */
+	static _localize(component, rootNode, interpolation)
+	{
+
+		rootNode = rootNode || component.rootElement;
+
+		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
+			component.inventory.get("locale.localizers")[handlerName].localize(
+				rootNode,
+				Object.assign({"interpolation":interpolation}, component.inventory.get("locale.localeSettings"))
+			);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load the messages file.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		fileName			File name. Use "" to use default name.
+	 * @param	{Object}		loadOptions			Load options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _loadMessages(component)
+	{
+
+		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
+			component.inventory.get("locale.localizers")[handlerName].loadMessages();
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get the locale message.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		key					Key.
+	 * @param	{String}		localeName			Locale name.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _getLocaleMessage(component, key, localeName)
+	{
+
+		localeName = localeName || component.inventory.get("locale.localeSettings")["localeName"];
+
+		let value = component.inventory.get("locale.messages").get(`${localeName}.${key}`);
+		if (value === undefined)
+		{
+			value = component.inventory.get("locale.messages").get(`${component.inventory.get("locale.localeSettings.fallbackLocaleName")}.${key}`);
+		}
+
+		return value;
+
+	}
+
 
 	// -------------------------------------------------------------------------
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onDoOrganize(sender, e, ex)
+	static LocalePerk_onDoOrganize(sender, e, ex)
 	{
 
 		let promises = [];
 
-		this._enumSettings(e.detail.settings["localizers"], (sectionName, sectionValue) => {
-			promises.push(LocaleOrganizer._addLocalizer(this, sectionName, sectionValue));
+		this.skills.use("setting.enumSettings", e.detail.settings["localizers"], (sectionName, sectionValue) => {
+			promises.push(LocalePerk._addLocalizer(this, sectionName, sectionValue));
 		});
 
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(AttendanceOrganizer.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
+			promises.push(AttendancePerk.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.waitFor([{"object":server}]).then(() => {
+					return this.skills.use("state.waitFor", [{"object":server}]).then(() => {
 						server.subscribe(this);
 
 						// Synchronize to the server's locales
-						this._localeSettings["localeName"] = server._localeSettings["localeName"];
-						this._localeSettings["fallbackLocaleName"] = server._localeSettings["fallbackLocaleName"];
-						this._localeSettings["currencyName"] = server._localeSettings["currencyName"];
+						let localeSettings = server.inventory.get("locale.localeSettings");
+						this.inventory.get("locale.localeSettings")["localeName"] = localeSettings["localeName"];
+						this.inventory.get("locale.localeSettings")["fallbackLocaleName"] = localeSettings["fallbackLocaleName"];
+						this.inventory.get("locale.localeSettings")["currencyName"] = localeSettings["currencyName"];
 					});
 				}
 			}));
@@ -68,30 +177,30 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onAfterStart(sender, e, ex)
+	static LocalePerk_onAfterStart(sender, e, ex)
 	{
 
-		return LocaleOrganizer._changeLocale(this, this._localeSettings["localeName"]);
+		return LocalePerk._changeLocale(this, this.inventory.get("locale.localeSettings")["localeName"]);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onBeforeChangeLocale(sender, e, ex)
+	static LocalePerk_onBeforeChangeLocale(sender, e, ex)
 	{
 
 		let promises = [];
 
-		Object.keys(this._localizers).forEach((handlerName) => {
-			if (this._localizers[handlerName].options.get("autoLoad"))
+		Object.keys(this.inventory.get("locale.localizers")).forEach((handlerName) => {
+			if (this.inventory.get("locale.localizers")[handlerName].options.get("autoLoad"))
 			{
-				if (!this._localizers[handlerName].messages.has(e.detail.localeName))
+				if (!this.inventory.get("locale.localizers")[handlerName].messages.has(e.detail.localeName))
 				{
 					let loadOptions = {
 						"localeName":		e.detail.localeName,
 					};
 
-					promises.push(this._localizers[handlerName].loadMessages(loadOptions));
+					promises.push(this.inventory.get("locale.localizers")[handlerName].loadMessages(loadOptions));
 				}
 			}
 		});
@@ -102,14 +211,14 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onDoChangeLocale(sender, e, ex)
+	static LocalePerk_onDoChangeLocale(sender, e, ex)
 	{
 
 		// Localize
-		LocaleOrganizer._localize(this, this.rootElement);
+		LocalePerk._localize(this, this.rootElement);
 
 		// Refill (Do not refill when starting)
-		if (this.state === "ready")
+		if (this.stats.get("state.state") === "ready")
 		{
 			this.fill();
 		}
@@ -118,11 +227,34 @@ export default class LocaleOrganizer extends BM.Organizer
 
 	// -------------------------------------------------------------------------
 
-	static LocaleOrganizer_onAfterFillRow(sender, e, ex)
+	static LocalePerk_onAfterFillRow(sender, e, ex)
 	{
 
 		// Localize a row
-		LocaleOrganizer._localize(this, e.detail.element, e.detail.item);
+		LocalePerk._localize(this, e.detail.element, e.detail.item);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "LocalePerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		"localizers",
+			"order":		330,
+		};
 
 	}
 
@@ -145,157 +277,31 @@ export default class LocaleOrganizer extends BM.Organizer
 	static init(component, options)
 	{
 
-		// Add properties to component
-		Object.defineProperty(component, 'localizers', {
-			get() { return this._localizers; },
-		});
-		Object.defineProperty(component, 'localeMessages', {
-			get() { return this._localeMessages; },
-		});
-		Object.defineProperty(component, 'localeSettings', {
-			get() { return this._localeSettings; },
-		});
+		// Add skills to component;
+		component.skills.set("locale.changeLocale", function(...args) { return LocalePerk._changeLocale(...args); });
+		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
+		component.skills.set("locale.loadMessages", function(...args) { return LocalePerk._loadMessages(...args); });
+		component.skills.set("locale.getLocaleMessage", function(...args) { return LocalePerk._getLocaleMessage(...args); });
+		component.skills.set("locale.addLocalizer", function(...args) { return LocalePerk._addLocalizer(...args); });
 
-		// Add methods to component
-		component.changeLocale = function(...args) { return LocaleOrganizer._changeLocale(this, ...args); }
-		component.localize = function(...args) { return LocaleOrganizer._localize(this, ...args); }
-		component.loadMessages = function(...args) { return LocaleOrganizer._loadMessages(this, ...args); }
-		component.getLocaleMessage = function(...args) { return LocaleOrganizer._getLocaleMessage(this, ...args); }
-		component.addLocalizer = function(...args) { return LocaleOrganizer._addLocalizer(this, ...args); }
-
-		// Add event handlers to component
-		this._addOrganizerHandler(component, "doOrganize", LocaleOrganizer.LocaleOrganizer_onDoOrganize);
-		this._addOrganizerHandler(component, "afterStart", LocaleOrganizer.LocaleOrganizer_onAfterStart);
-		this._addOrganizerHandler(component, "beforeChangeLocale", LocaleOrganizer.LocaleOrganizer_onBeforeChangeLocale);
-		this._addOrganizerHandler(component, "doChangeLocale", LocaleOrganizer.LocaleOrganizer_onDoChangeLocale);
-		if (component.settings.get("localizers.settings.autoLocalizeRows"))
-		{
-			this._addOrganizerHandler(component, "afterFillRow", LocaleOrganizer.LocaleOrganizer_onAfterFillRow);
-		}
-
-		// Init component vars
-		component._localizers = {};
-		component._localeMessages = new MultiStore();
-		component._localeSettings = {
+		// Add inventory items to Component
+		component.inventory.set("locale.localizers", {});
+		component.inventory.set("locale.messages", new MultiStore());
+		component.inventory.set("locale.localeSettings", {
 			"localeName":			component.settings.get("localizers.settings.localeName", component.settings.get("system.localeName", navigator.language)),
 			"fallbackLocaleName":	component.settings.get("localizers.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
 			"currencyName":			component.settings.get("localizers.settings.currencyName", component.settings.get("system.currencyName", "USD")),
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-     * Add the localizer.
-     *
-     * @param	{Component}		component			Component.
-     * @param	{string}		handlerName			Locale handler name.
-     * @param	{array}			options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-     */
-	static _addLocalizer(component, handlerName, options)
-	{
-
-		let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-		let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
-		component._localizers[handlerName] = handler;
-		component._localeMessages.add(handler.messages);
-
-		return handler.init(options);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Change locale.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{String}		localeName			Locale name.
-	 */
-	static _changeLocale(component, localeName)
-	{
-
-		let options = {"localeName":localeName};
-
-		return Promise.resolve().then(() => {
-			return component.trigger("beforeChangeLocale", options);
-		}).then(() => {
-			component._localeSettings["localeName"] = localeName;
-			return component.trigger("doChangeLocale", options);
-		}).then(() => {
-			return component.trigger("afterChangeLocale", options);
 		});
 
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Localize all the bm-locale fields with i18 messages using each handler.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{HTMLElement}	rootNode			Target root node to localize.
-	 * @param	{Object}		interpolation		Interpolation parameters.
-	 */
-	static _localize(component, rootNode, interpolation)
-	{
-
-		rootNode = rootNode || component.rootElement;
-
-		Object.keys(component._localizers).forEach((handlerName) => {
-			component._localizers[handlerName].localize(rootNode, Object.assign({"interpolation":interpolation}, component._localeSettings));
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Load the messages file.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		fileName			File name. Use "" to use default name.
-	 * @param	{Object}		loadOptions			Load options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _loadMessages(component)
-	{
-
-		Object.keys(component._localizers).forEach((handlerName) => {
-			component._localizers[handlerName].loadMessages();
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the locale message.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		key					Key.
-	 * @param	{String}		localeName			Locale name.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _getLocaleMessage(component, key, localeName)
-	{
-
-		localeName = localeName || component.localeSettings["localeName"];
-
-		let value = component.localeMessages.get(`${localeName}.${key}`);
-		if (value === undefined)
+		// Add event handlers to component
+		this._addPerkHandler(component, "doOrganize", LocalePerk.LocalePerk_onDoOrganize);
+		this._addPerkHandler(component, "afterStart", LocalePerk.LocalePerk_onAfterStart);
+		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
+		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);
+		if (component.settings.get("localizers.settings.autoLocalizeRows"))
 		{
-			value = component.localeMessages.get(`${component.fallbackLocaleName}.${key}`);
+			this._addPerkHandler(component, "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}
-
-		return value;
 
 	}
 

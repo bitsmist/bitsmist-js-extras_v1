@@ -46,6 +46,9 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	set data(value)
 	{
+
+//		throw TypeError("LinkedResourceHandler is read only.");
+
 	}
 
 	// -------------------------------------------------------------------------
@@ -87,8 +90,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 		let rootNode = this._options.get("rootNode");
 		let resourceName = this._options.get("resourceName") || this._resourceName;
 
-		return this._component.waitFor([{"rootNode":rootNode}]).then(() => {
-			this._ref = document.querySelector(rootNode).resources[resourceName];
+		return this._component.skills.use("state.waitFor", [{"rootNode":rootNode}]).then(() => {
+			this._ref = document.querySelector(rootNode).inventory.get("resource.resources")[resourceName];
 			return this._ref;
 		});
 
@@ -99,7 +102,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 	_delete(id, parameters)
 	{
 
-		return this._ref.delete(id, parameters);
+//		return this._ref.delete(id, parameters);
+		throw TypeError("LinkedResourceHandler is read only.");
 
 	}
 
@@ -108,7 +112,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 	_post(id, data, parameters)
 	{
 
-		return this._ref.post(id, data, parameters);
+		//return this._ref.post(id, data, parameters);
+		throw TypeError("LinkedResourceHandler is read only.");
 
 	}
 
@@ -117,7 +122,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 	_put(id, data, parameters)
 	{
 
-		return this._ref.put(id, data, parameters);
+//		return this._ref.put(id, data, parameters);
+		throw TypeError("LinkedResourceHandler is read only.");
 
 	}
 
