@@ -61,7 +61,7 @@ export default class LocalePerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			return component.skills.use("event.trigger", "beforeChangeLocale", options);
 		}).then(() => {
-			component.inventory.set(`locale.localeSettings.${localeName}`, localeName);
+			component.inventory.set("locale.localeSettings.localeName", localeName);
 			return component.skills.use("event.trigger", "doChangeLocale", options);
 		}).then(() => {
 			return component.skills.use("event.trigger", "afterChangeLocale", options);
@@ -126,7 +126,7 @@ export default class LocalePerk extends BM.Perk
 	static _getLocaleMessage(component, key, localeName)
 	{
 
-		localeName = localeName || component.inventory.get(`locale.localeSettings.${localeName}`);
+		localeName = localeName || component.inventory.get("locale.localeSettings.localeName");
 
 		let value = component.inventory.get("locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
