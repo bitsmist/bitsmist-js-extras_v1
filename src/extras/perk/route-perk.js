@@ -729,8 +729,8 @@ export default class RoutePerk extends BM.Perk
 		let newParams = RoutePerk._loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(component.inventory.get("validation.validationResult")["invalids"]).forEach((key) => {
-			let item = component.inventory.get("validation.validationResult")["invalids"][key];
+		Object.keys(component.stats.get("validation.validationResult.invalids")).forEach((key) => {
+			let item = component.stats.get(`validation.validationResult.invalids.${key}`);
 
 			if (item["fix"] !== undefined)
 			{
@@ -752,7 +752,7 @@ export default class RoutePerk extends BM.Perk
 			RoutePerk._replaceRoute(component, {"queryParameters":newParams});
 
 			// Fixed
-			component.inventory.get("validation.validationResult")["result"] = true;
+			component.stats.set("validation.validationResult.result", true);
 		}
 
 	}
@@ -767,8 +767,8 @@ export default class RoutePerk extends BM.Perk
 	static __dumpValidationErrors(component)
 	{
 
-		Object.keys(component.inventory.get("validation.validationResult")["invalids"]).forEach((key) => {
-			let item = component.inventory.get("validation.validationResult")["invalids"][key];
+		Object.keys(component.stats.get("validation.validationResult.invalids")).forEach((key) => {
+			let item = component.stats.get(`validation.validationResult.invalids.${key}`);
 
 			if (item.failed)
 			{

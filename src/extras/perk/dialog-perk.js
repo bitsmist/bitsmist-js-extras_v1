@@ -83,7 +83,7 @@ export default class DialogPerk extends BM.Perk
 
 		return new Promise((resolve, reject) => {
 			component.inventory.set("dialog.isModal", true);
-			component.inventory.set("dialog.modalResult", {"result":false});
+			component.stats.set("dialog.modalResult", {"result":false});
 			component.inventory.set("dialog.modalPromise", {"resolve":resolve,"reject":reject});
 			return DialogPerk._open(component, options);
 		});
@@ -119,7 +119,7 @@ export default class DialogPerk extends BM.Perk
 				}).then(() => {
 					if (component.inventory.get("dialog.isModal"))
 					{
-						component.inventory.get("dialog.modalPromise").resolve(component.inventory.get("dialog.modalResult"));
+						component.inventory.get("dialog.modalPromise").resolve(component.stats.get("dialog.modalResult"));
 					}
 					console.debug(`DialogPerk._close(): Closed component. name=${component.name}, id=${component.id}`);
 
@@ -194,13 +194,15 @@ export default class DialogPerk extends BM.Perk
 		component.skills.set("dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
 		component.skills.set("dialog.close", function(...args) { return DialogPerk._close(...args); });
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("dialog.isModal", false);
 		component.inventory.set("dialog.cancelClose");
-		component.inventory.set("dialog.modalResult");
 		component.inventory.set("dialog.modalPromise");
 		component.inventory.set("dialog.backdrop");
 		component.inventory.set("dialog.backdropPromise", Promise.resolve());
+
+		// Add stats to component
+		component.inventory.set("dialog.modalResult", {});
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "afterReady", DialogPerk.DialogPerk_onAfterReady);

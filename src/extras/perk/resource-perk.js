@@ -171,7 +171,7 @@ export default class ResourcePerk extends BM.Perk
 		// Add skills to component;
 		component.skills.set("resource.addResource", function(...args) { return ResourcePerk._addResource(...args); });
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("resource.resources", {});
 
 		// Add event handlers to component

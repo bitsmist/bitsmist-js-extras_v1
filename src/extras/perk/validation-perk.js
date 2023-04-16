@@ -118,9 +118,11 @@ export default class ValidationPerk extends BM.Perk
 		component.skills.set("validation.addValidator", function(...args) { return ValidationPerk._addValidator(...args); });
 		component.skills.set("validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("validation.validators", {});
-		component.inventory.set("validation.validationResult", {});
+
+		// Add stats to component
+		component.stats.set("validation.validationResult", {});
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doOrganize", ValidationPerk.ValidationPerk_onDoOrganize);
@@ -169,7 +171,7 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		options = options || {};
-		component.inventory.set("validation.validationResult", {"result":true});
+		component.stats.set("validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
 			console.debug(`ValidationPerk._validate(): Validating component. name=${component.name}, id=${component.id}`);
@@ -177,7 +179,7 @@ export default class ValidationPerk extends BM.Perk
 		}).then(() => {
 			return component.skills.use("event.trigger", "doValidate", options);
 		}).then(() => {
-			if (component.inventory.get("validation.validationResult.result"))
+			if (component.stats.get("validation.validationResult.result"))
 			{
 				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.name}, id=${component.id}`);
 				return component.skills.use("event.trigger", "doValidateSuccess", options);
@@ -188,7 +190,7 @@ export default class ValidationPerk extends BM.Perk
 				return component.skills.use("event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
-			if (!component.inventory.get("validation.validationResult.result"))
+			if (!component.stats.get("validation.validationResult.result"))
 			{
 				return component.skills.use("event.trigger", "doReportValidity", options);
 			}

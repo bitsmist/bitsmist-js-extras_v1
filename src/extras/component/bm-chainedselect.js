@@ -206,7 +206,7 @@ ChainedSelect.prototype.ChainedSelect_onDoFill = function(sender, e, ex)
 ChainedSelect.prototype.ChainedSelect_onCmbItemChange = function(sender, e, ex)
 {
 
-return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
+	return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
 
 }
 
@@ -220,17 +220,17 @@ ChainedSelect.prototype.ChainedSelect_onBtnNewItemClick = function(sender, e, ex
 	}
 
 	let level = sender.parentNode.getAttribute("data-level")
-	this.modalResult = {"result":false};
+	this.stats.set("dialog.modalResult.result", false);
 	let options = {
 		"level":level,
 		"validatorName": "",
 	};
 
 	return this.skills.use("event.trigger", "beforeAdd", options).then(() => {
-		if (this.modalResult["result"])
+		if (this.stats.get("dialog.modalResult.result"))
 		{
 			return this.validate(options).then(() => {
-				if(this.validationResult["result"])
+				if(this.stats.get("validation.validationResult.result"))
 				{
 					return Promise.resolve().then(() => {
 						return this.skills.use("event.trigger", "doAdd", options);
@@ -259,17 +259,17 @@ ChainedSelect.prototype.ChainedSelect_onBtnEditItemClick = function(sender, e, e
 	}
 
 	let level = sender.parentNode.getAttribute("data-level")
-	this.modalResult = {"result":false};
+	this.stats.set("dialog.modalResult.result", false);
 	let options = {
 		"level":level,
 		"validatorName": "",
 	};
 
 	return this.skills.use("event.trigger", "beforeEdit", options).then(() => {
-		if (this.modalResult["result"])
+		if (this.stats.get("dialog.modalResult.result"))
 		{
 			return this.validate(options).then(() => {
-				if(this.validationResult["result"])
+				if(this.stats.get("validation.validationResult.result"))
 				{
 					return Promise.resolve().then(() => {
 						return this.skills.use("event.trigger", "doEdit", options);
@@ -298,17 +298,17 @@ ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, 
 	}
 
 	let level = sender.parentNode.getAttribute("data-level")
-	this.modalResult = {"result":false};
+	this.stats.set("dialog.modalResult.result", false);
 	let options = {
 		"level":level,
 		"validatorName": "",
 	};
 
 	return this.skills.use("event.trigger", "beforeRemove", options).then(() => {
-		if (this.modalResult["result"])
+		if (this.stats.get("dialog.modalResult.result"))
 		{
 			return this.validate(options).then(() => {
-				if(this.validationResult["result"])
+				if(this.stats.get("validation.validationResult.result"))
 				{
 					return Promise.resolve().then(() => {
 						return this.skills.use("event.trigger", "doRemove", options);
@@ -336,9 +336,9 @@ ChainedSelect.prototype.ChainedSelect_onBeforeAdd = function(sender, e, ex)
 		let text = window.prompt("アイテム名を入力してください", "");
 		if (text)
 		{
-			this.modalResult["text"] = text;
-			this.modalResult["value"] = text;
-			this.modalResult["result"] = true;
+			this.stats.set("dialog.modalResult.text", text);
+			this.stats.set("dialog.modalResult.value", text);
+			this.stats.set("dialog.modalResult.result", true);
 		}
 		resolve();
 	});
@@ -350,7 +350,7 @@ ChainedSelect.prototype.ChainedSelect_onBeforeAdd = function(sender, e, ex)
 ChainedSelect.prototype.ChainedSelect_onDoAdd = function(sender, e, ex)
 {
 
-	return this.newItem(e.detail.level, this.modalResult.text, this.modalResult.value);
+	return this.newItem(e.detail.level, this.stats.get("dialog.modalResult.text"), this.stats.get("dialog.modalResult.value"));
 
 }
 
@@ -366,15 +366,15 @@ ChainedSelect.prototype.ChainedSelect_onBeforeEdit = function(sender, e, ex)
 		let text = window.prompt("アイテム名を入力してください", "");
 		if (text)
 		{
-			this.modalResult["old"] = {
+			this.stats.set("dialog.modalResult.old", {
 				"text": selectBox.options[selectBox.selectedIndex].text,
 				"value": selectBox.value
-			};
-			this.modalResult["new"] = {
+			});
+			this.stats.set("dialog.modalResult.new", {
 				"text": text,
 				"value": text
-			}
-			this.modalResult["result"] = true;
+			});
+			this.stats.set("dialog.modalResult.result", true);
 		}
 		resolve();
 	});
@@ -386,7 +386,7 @@ ChainedSelect.prototype.ChainedSelect_onBeforeEdit = function(sender, e, ex)
 ChainedSelect.prototype.ChainedSelect_onDoEdit = function(sender, e, ex)
 {
 
-	this.editItem(e.detail.level, this.modalResult.new.text, this.modalResult.new.value);
+	return this.editItem(e.detail.level, this.stats.get("dialog.modalResult.new.text"), this.stats.get("dialog.modalResult.new.value"));
 
 }
 
@@ -401,9 +401,9 @@ ChainedSelect.prototype.ChainedSelect_onBeforeRemove = function(sender, e, ex)
 			let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
 			let selectBox = this.getSelect(level);
 
-			this.modalResult["text"] = selectBox.options[selectBox.selectedIndex].text;
-			this.modalResult["value"] = selectBox.value;
-			this.modalResult["result"] = true;
+			this.stats.set("dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
+			this.stats.set("dialog.modalResult.value", selectBox.value);
+			this.stats.set("dialog.modalResult.result", true);
 		}
 		resolve();
 	});

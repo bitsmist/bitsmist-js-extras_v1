@@ -95,7 +95,7 @@ export default class ElementPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("element.overlay", );
 		component.inventory.set("element.overlayPromise", Promise.resolve());
 

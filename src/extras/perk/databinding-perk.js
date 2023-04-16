@@ -185,7 +185,7 @@ export default class DatabindingPerk extends BM.Perk
 			// Add skills to component;
 			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
 
-			// Add inventory items to Component
+			// Add inventory items to component
 			component.inventory.set("databinding.bindings", new BindableStore({
 				"resources":	component.inventory.get("resource.resources"),
 				"direction":	component.settings.get("bindings.settings.direction", "two-way"),

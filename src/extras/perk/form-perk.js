@@ -61,8 +61,7 @@ export default class FormPerk extends BM.Perk
 			{
 				options["validatorName"] = options["validatorName"] || component.settings.get("form.settings.validatorName");
 				return component.skills.use("validation.validate", options).then(() => {
-					//if (!component.inventory.get("validation.validationResult")["result"])
-					if (!component.inventory.get("validation.validationResult.result"))
+					if (!component.stats.get("validation.validationResult.result"))
 					{
 						component.inventory.set("form.cancelSubmit", true);
 					}
@@ -208,7 +207,7 @@ export default class FormPerk extends BM.Perk
 		component.skills.set("form.build", function(...args) { return FormPerk._build(...args); });
 		component.skills.set("form.submit", function(...args) { return FormPerk._submit(...args); });
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("form.cancelSubmit", false);
 		component.inventory.set("form.lastItems", {});
 

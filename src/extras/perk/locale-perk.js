@@ -61,7 +61,7 @@ export default class LocalePerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			return component.skills.use("event.trigger", "beforeChangeLocale", options);
 		}).then(() => {
-			component.inventory.set("locale.localeSettings.localeName", localeName);
+			component.stats.set("locale.localeName", localeName);
 			return component.skills.use("event.trigger", "doChangeLocale", options);
 		}).then(() => {
 			return component.skills.use("event.trigger", "afterChangeLocale", options);
@@ -86,7 +86,7 @@ export default class LocalePerk extends BM.Perk
 		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
 			component.inventory.get(`locale.localizers.${handlerName}`).localize(
 				rootNode,
-				Object.assign({"interpolation":interpolation}, component.inventory.get("locale.localeSettings"))
+				Object.assign({"interpolation":interpolation}, component.stats.get("locale"))
 			);
 		});
 
@@ -126,12 +126,12 @@ export default class LocalePerk extends BM.Perk
 	static _getLocaleMessage(component, key, localeName)
 	{
 
-		localeName = localeName || component.inventory.get("locale.localeSettings.localeName");
+		localeName = localeName || component.stats.get("locale.localeName");
 
 		let value = component.inventory.get("locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
-			value = component.inventory.get("locale.messages").get(`${component.inventory.get("locale.localeSettings.fallbackLocaleName")}.${key}`);
+			value = component.inventory.get("locale.messages").get(`${component.stats.get("locale.fallbackLocaleName")}.${key}`);
 		}
 
 		return value;
@@ -148,7 +148,7 @@ export default class LocalePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enumSettings", e.detail.settings["localizers"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["localizers"], (sectionName, sectionValue) => {
 			promises.push(LocalePerk._addLocalizer(this, sectionName, sectionValue));
 		});
 
@@ -158,14 +158,14 @@ export default class LocalePerk extends BM.Perk
 			promises.push(AttendancePerk.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.skills.use("state.waitFor", [{"object":server}]).then(() => {
+					return this.skills.use("state.wait", [{"object":server}]).then(() => {
 						server.subscribe(this);
 
 						// Synchronize to the server's locales
-						let localeSettings = server.inventory.get("locale.localeSettings");
-						this.inventory.set("locale.localeSettings.localeName", localeSettings["localeName"]);
-						this.inventory.set("locale.localeSettings.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-						this.inventory.set("locale.localeSettings.currencyName", localeSettings["currencyName"]);
+						let localeSettings = server.stats.get("locale");
+						this.stats.set("locale.localeName", localeSettings["localeName"]);
+						this.stats.set("locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+						this.stats.set("locale.currencyName", localeSettings["currencyName"]);
 					});
 				}
 			}));
@@ -180,7 +180,7 @@ export default class LocalePerk extends BM.Perk
 	static LocalePerk_onAfterStart(sender, e, ex)
 	{
 
-		return LocalePerk._changeLocale(this, this.inventory.get("locale.localeSettings.localeName"));
+		return LocalePerk._changeLocale(this, this.stats.get("locale.localeName"));
 
 	}
 
@@ -278,16 +278,16 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		// Add skills to component;
-		component.skills.set("locale.changeLocale", function(...args) { return LocalePerk._changeLocale(...args); });
+		component.skills.set("locale.change", function(...args) { return LocalePerk._changeLocale(...args); });
 		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		component.skills.set("locale.loadMessages", function(...args) { return LocalePerk._loadMessages(...args); });
-		component.skills.set("locale.getLocaleMessage", function(...args) { return LocalePerk._getLocaleMessage(...args); });
+		component.skills.set("locale.load", function(...args) { return LocalePerk._loadMessages(...args); });
+		component.skills.set("locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
 		component.skills.set("locale.addLocalizer", function(...args) { return LocalePerk._addLocalizer(...args); });
 
-		// Add inventory items to Component
+		// Add inventory items to component
 		component.inventory.set("locale.localizers", {});
 		component.inventory.set("locale.messages", new MultiStore());
-		component.inventory.set("locale.localeSettings", {
+		component.stats.set("locale", {
 			"localeName":			component.settings.get("localizers.settings.localeName", component.settings.get("system.localeName", navigator.language)),
 			"fallbackLocaleName":	component.settings.get("localizers.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
 			"currencyName":			component.settings.get("localizers.settings.currencyName", component.settings.get("system.currencyName", "USD")),
