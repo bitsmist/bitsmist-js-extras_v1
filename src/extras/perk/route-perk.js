@@ -19,17 +19,6 @@ export default class RoutePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "RoutePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -97,6 +86,30 @@ export default class RoutePerk extends BM.Perk
 		// Dump errors when validation failed
 		RoutePerk.__dumpValidationErrors(this);
 		throw new URIError("URL validation failed.");
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Setter/Getter
+	// -------------------------------------------------------------------------
+
+	static get name()
+	{
+
+		return "RoutePerk";
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"sections":		["routings", "specs"],
+			"order":		900,
+			"depends":		"ValidationPerk",
+		};
 
 	}
 
