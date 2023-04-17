@@ -158,18 +158,6 @@ export default class KeyPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"keys",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 

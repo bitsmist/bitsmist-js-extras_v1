@@ -126,18 +126,6 @@ export default class ListPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"list",
-			"order":		310,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 

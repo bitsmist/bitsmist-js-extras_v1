@@ -174,18 +174,6 @@ export default class DialogPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"dialog",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 

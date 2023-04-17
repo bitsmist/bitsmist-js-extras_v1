@@ -60,18 +60,6 @@ export default class ErrorPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"errors",
-			"order":		120,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	/*
 	static globalInit()
 	{

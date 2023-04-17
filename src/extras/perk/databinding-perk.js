@@ -165,18 +165,6 @@ export default class DatabindingPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"bindings",
-			"order":		320,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 

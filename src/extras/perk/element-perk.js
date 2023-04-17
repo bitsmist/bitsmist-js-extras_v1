@@ -25,7 +25,7 @@ export default class ElementPerk extends BM.Perk
 	static ElementPerk_onDoOrganize(sender, e, ex)
 	{
 
-		let order = ElementPerk.getInfo()["order"];
+		let order = ElementPerk.info["order"];
 
 		this.skills.use("setting.enum", e.detail.settings["elements"], (sectionName, sectionValue) => {
 			this.skills.use("event.add", sectionName, {
@@ -78,18 +78,6 @@ export default class ElementPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"elements",
-			"order":		220,
-		};
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	static init(component, options)

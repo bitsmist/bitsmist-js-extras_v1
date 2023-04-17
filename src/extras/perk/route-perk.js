@@ -117,19 +117,6 @@ export default class RoutePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		["routings", "specs"],
-			"order":		900,
-			"depends":		"ValidationPerk",
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static globalInit()
 	{
 

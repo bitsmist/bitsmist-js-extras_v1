@@ -153,18 +153,6 @@ export default class ResourcePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"resources",
-			"order":		300,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 

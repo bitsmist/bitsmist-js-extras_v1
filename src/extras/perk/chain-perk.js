@@ -24,7 +24,7 @@ export default class ChainPerk extends BM.Perk
 	static onDoOrganize(sender, e, ex)
 	{
 
-		let order = ChainPerk.getInfo()["order"];
+		let order = ChainPerk.info["order"];
 
 		this.skills.use("setting.enum", e.detail.settings["chains"], (sectionName, sectionValue) => {
 			this.skills.use("event.add", sectionName, {
@@ -97,18 +97,6 @@ export default class ChainPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 	//  Methods
-	// -------------------------------------------------------------------------
-
-	static getInfo()
-	{
-
-		return {
-			"sections":		"chains",
-			"order":		800,
-		};
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	static init(component, options)

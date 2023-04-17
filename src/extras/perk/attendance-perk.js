@@ -131,18 +131,6 @@ export default class AttendancePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"attendances",
-			"order":		330,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static globalInit()
 	{
 

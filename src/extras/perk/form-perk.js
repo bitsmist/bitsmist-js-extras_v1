@@ -187,19 +187,6 @@ export default class FormPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static getInfo()
-	{
-
-		return {
-			"sections":		"form",
-			"order":		310,
-			"depends":		"ValidationPerk",
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(component, options)
 	{
 
