@@ -131,7 +131,7 @@ export default class DatabindingPerk extends BM.Perk
 	static DatabindingPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.settings.get("binding.settings.autoCollect", true))
+		if (this.settings.get("databinding.settings.autoCollect", true))
 		{
 			e.detail.items = this.inventory.get("databinding.bindings").items;
 		}
@@ -155,7 +155,7 @@ export default class DatabindingPerk extends BM.Perk
 	{
 
 		return {
-			"section":		"binding",
+			"section":		"databinding",
 			"order":		320,
 		};
 
@@ -168,7 +168,7 @@ export default class DatabindingPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		if (component.settings.get("binding.settings.dataType", "single") === "single")
+		if (component.settings.get("databinding.settings.dataType", "single") === "single")
 		{
 			// Add skills to component;
 			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
@@ -176,7 +176,7 @@ export default class DatabindingPerk extends BM.Perk
 			// Add inventory items to component
 			component.inventory.set("databinding.bindings", new BindableStore({
 				"resources":	component.inventory.get("resource.resources"),
-				"direction":	component.settings.get("binding.settings.direction", "two-way"),
+				"direction":	component.settings.get("databinding.settings.direction", "two-way"),
 			}));
 
 			// Add event handlers to component
@@ -191,7 +191,7 @@ export default class DatabindingPerk extends BM.Perk
 			// Add inventory items to Component
 			component.inventory.set("databinding.bindings", new BindableArrayStore({
 				"resources":	component.resources,
-				"direction":	component.settings.get("binding.settings.direction", "two-way"),
+				"direction":	component.settings.get("databinding.settings.direction", "two-way"),
 			}));
 
 			// Add event handlers to component
