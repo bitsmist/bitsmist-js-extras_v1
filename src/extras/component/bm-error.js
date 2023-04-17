@@ -36,13 +36,10 @@ ErrorServer.prototype._getSettings = function()
 {
 
 	return {
-		// Setting
 		"setting": {
 			"autoTransform":			false,
 			"name":						"ErrorServer",
 		},
-
-		// Event
 		"event": {
 			"this": {
 				"handlers": {
@@ -50,8 +47,6 @@ ErrorServer.prototype._getSettings = function()
 				}
 			}
 		},
-
-		// Attendance
 		"attendance": {
 			"error": {
 				"name": 				"ErrorServer",

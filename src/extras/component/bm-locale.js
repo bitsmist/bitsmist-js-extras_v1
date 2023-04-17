@@ -36,13 +36,10 @@ LocaleServer.prototype._getSettings = function()
 {
 
 	return {
-		// Setting
 		"setting": {
 			"autoTransform":			false,
 			"name":						"LocaleServer",
 		},
-
-		// Event
 		"event": {
 			"this": {
 				"handlers": {
@@ -51,15 +48,11 @@ LocaleServer.prototype._getSettings = function()
 				}
 			}
 		},
-
-		// Localizer
 		"locale": {
 			"default": {
 				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
 			}
 		},
-
-		// Attendance
 		"attendance": {
 			"locale": {
 				"name": 				"LocaleServer",

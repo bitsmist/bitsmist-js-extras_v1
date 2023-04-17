@@ -36,13 +36,10 @@ PreferenceServer.prototype._getSettings = function()
 {
 
 	return {
-		// Setting
 		"setting": {
 			"autoTransform":			false,
 			"name":						"PreferenceServer",
 		},
-
-		// Event
 		"event": {
 			"this": {
 				"handlers": {
@@ -53,16 +50,12 @@ PreferenceServer.prototype._getSettings = function()
 				}
 			}
 		},
-
-		// Form
 		"form": {
 			"settings": {
 				"autoCollect":			false,
 				"autoCrop":				false,
 			}
 		},
-
-		// Attendance
 		"attendance": {
 			"locale": {
 				"name": 				"PreferenceServer",

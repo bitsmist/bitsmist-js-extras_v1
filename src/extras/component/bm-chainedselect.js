@@ -35,7 +35,6 @@ ChainedSelect.prototype._getSettings = function()
 {
 
 	return {
-		// Setting
 		"setting": {
 			"name":						"ChainedSelect",
 			"autoClear":				true,
@@ -48,8 +47,6 @@ ChainedSelect.prototype._getSettings = function()
 				"select":				"select"
 			},
 		},
-
-		// Event
 		"event": {
 			"this": {
 				"handlers": {
@@ -84,9 +81,7 @@ ChainedSelect.prototype._getSettings = function()
 				}
 			}
 		},
-
-		// Validator
-		"validator": {
+		"validation": {
 		}
 	}
 

@@ -35,7 +35,6 @@ TabContent.prototype._getSettings = function()
 {
 
 	return {
-		// Setting
 		"setting": {
 			"autoTransform":		false,
 			"name":					"BmTabcontent",
