@@ -53,7 +53,7 @@ LocaleServer.prototype._getSettings = function()
 		},
 
 		// Localizer
-		"localizer": {
+		"locale": {
 			"default": {
 				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
 			}
