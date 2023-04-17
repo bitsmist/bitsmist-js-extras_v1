@@ -24,7 +24,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let keys = this.settings.get("keys");
+		let keys = this.settings.get("key");
 		if (keys)
 		{
 			// Init keys
@@ -35,7 +35,7 @@ export default class KeyPerk extends BM.Perk
 			//this.addEventListener("compositionend", function(e){KeyPerk.onCompositionEnd.call(this, e, this, keys);});
 
 			// Init buttons
-			this.skills.use("setting.enum", this.settings.get("keys"), (sectionName, sectionValue) => {
+			this.skills.use("setting.enum", this.settings.get("key"), (sectionName, sectionValue) => {
 				KeyPerk.__initButtons(this, sectionName, sectionValue);
 			});
 		}
@@ -148,7 +148,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"keys",
+			"section":		"key",
 			"order":		800,
 		};
 

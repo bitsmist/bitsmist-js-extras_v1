@@ -164,7 +164,7 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"dialog",
+			"section":		"dialog",
 			"order":		800,
 		};
 

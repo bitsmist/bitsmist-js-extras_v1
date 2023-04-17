@@ -36,14 +36,14 @@ LocaleServer.prototype._getSettings = function()
 {
 
 	return {
-		// Settings
-		"settings": {
+		// Setting
+		"setting": {
 			"autoTransform":			false,
 			"name":						"LocaleServer",
 		},
 
-		// Events
-		"events": {
+		// Event
+		"event": {
 			"this": {
 				"handlers": {
 					"beforeStart":		["LocaleServer_onBeforeStart"],
@@ -52,15 +52,15 @@ LocaleServer.prototype._getSettings = function()
 			}
 		},
 
-		// Localizers
-		"localizers": {
+		// Localizer
+		"localizer": {
 			"default": {
 				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
 			}
 		},
 
-		// Attendances
-		"attendances": {
+		// Attendance
+		"attendance": {
 			"locale": {
 				"name": 				"LocaleServer",
 			}
@@ -86,11 +86,11 @@ LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
 {
 
 	// Set locale attribute
-	if (this.settings.get("settings.autoAttribute"))
+	if (this.settings.get("setting.autoAttribute"))
 	{
-		let rootNode = this.settings.get("settings.autoAttribute.rootNode");
+		let rootNode = this.settings.get("setting.autoAttribute.rootNode");
 		let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
-		let attribName = this.settings.get("settings.autoAttribute.attributeName", "data-locale");
+		let attribName = this.settings.get("setting.autoAttribute.attributeName", "data-locale");
 
 		targetElement.setAttribute(attribName, this.stats.get("locale.localeName"));
 	}

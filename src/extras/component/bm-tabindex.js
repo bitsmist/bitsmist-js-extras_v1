@@ -35,14 +35,14 @@ TabIndex.prototype._getSettings = function()
 {
 
 	return {
-		// Settings
-		"settings": {
+		// Setting
+		"setting": {
 			"autoTransform":		false,
 			"name":					"BmTabindex",
 		},
 
-		// Events
-		"events": {
+		// Event
+		"event": {
 			"tab-indices": {
 				"rootNode": 		"[data-tabindex]",
 				"handlers": {

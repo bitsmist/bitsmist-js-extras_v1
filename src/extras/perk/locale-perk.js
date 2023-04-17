@@ -148,7 +148,7 @@ export default class LocalePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enum", e.detail.settings["localizers"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["localizer"], (sectionName, sectionValue) => {
 			promises.push(LocalePerk._addLocalizer(this, sectionName, sectionValue));
 		});
 
@@ -252,7 +252,7 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"localizers",
+			"section":		"localizer",
 			"order":		330,
 		};
 
@@ -276,9 +276,9 @@ export default class LocalePerk extends BM.Perk
 		component.inventory.set("locale.localizers", {});
 		component.inventory.set("locale.messages", new MultiStore());
 		component.stats.set("locale", {
-			"localeName":			component.settings.get("localizers.settings.localeName", component.settings.get("system.localeName", navigator.language)),
-			"fallbackLocaleName":	component.settings.get("localizers.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
-			"currencyName":			component.settings.get("localizers.settings.currencyName", component.settings.get("system.currencyName", "USD")),
+			"localeName":			component.settings.get("localizer.settings.localeName", component.settings.get("system.localeName", navigator.language)),
+			"fallbackLocaleName":	component.settings.get("localizer.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
+			"currencyName":			component.settings.get("localizer.settings.currencyName", component.settings.get("system.currencyName", "USD")),
 		});
 
 		// Add event handlers to component
@@ -286,7 +286,7 @@ export default class LocalePerk extends BM.Perk
 		this._addPerkHandler(component, "afterStart", LocalePerk.LocalePerk_onAfterStart);
 		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
 		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);
-		if (component.settings.get("localizers.settings.autoLocalizeRows"))
+		if (component.settings.get("localizer.settings.autoLocalizeRows"))
 		{
 			this._addPerkHandler(component, "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}

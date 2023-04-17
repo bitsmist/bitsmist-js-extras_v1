@@ -39,7 +39,7 @@ SettingServer.prototype._getSettings = function()
 {
 
 	return {
-		"settings": {
+		"setting": {
 			"name":					"SettingServer",
 			"autoSetup":			false,
 		}

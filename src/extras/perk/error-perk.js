@@ -50,7 +50,7 @@ export default class ErrorPerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"errors",
+			"section":		"error",
 			"order":		120,
 		};
 
@@ -83,7 +83,7 @@ export default class ErrorPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		let errors = BM.Util.safeGet(options, "settings.errors");
+		let errors = BM.Util.safeGet(options, "setting.errors");
 		if (errors)
 		{
 			console.log("@@@subscribing", component.name, errors);
@@ -128,8 +128,8 @@ export default class ErrorPerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	* Init error handling listeners.
-	*/
+	 * Init error handling listeners.
+	 */
 	/*
 	static __initErrorListeners()
 	{

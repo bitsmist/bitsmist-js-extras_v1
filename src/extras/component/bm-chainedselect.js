@@ -35,8 +35,8 @@ ChainedSelect.prototype._getSettings = function()
 {
 
 	return {
-		// Settings
-		"settings": {
+		// Setting
+		"setting": {
 			"name":						"ChainedSelect",
 			"autoClear":				true,
 			"autoSubmit":				true,
@@ -49,8 +49,8 @@ ChainedSelect.prototype._getSettings = function()
 			},
 		},
 
-		// Events
-		"events": {
+		// Event
+		"event": {
 			"this": {
 				"handlers": {
 					"beforeStart":		["ChainedSelect_onBeforeStart"],
@@ -85,8 +85,8 @@ ChainedSelect.prototype._getSettings = function()
 			}
 		},
 
-		// Validators
-		"validators": {
+		// Validator
+		"validator": {
 		}
 	}
 
@@ -124,9 +124,9 @@ Object.defineProperty(ChainedSelect.prototype, "items", {
 ChainedSelect.prototype.ChainedSelect_onBeforeStart = function(sender, e, ex)
 {
 
-	this.rootNodes = this.settings.get("settings.rootNodes");
+	this.rootNodes = this.settings.get("setting.rootNodes");
 
-	if (this.settings.get("settings.useDefaultInput", true))
+	if (this.settings.get("setting.useDefaultInput", true))
 	{
 		this.addEventHandler("beforeAdd", "ChainedSelect_onBeforeAdd");
 		this.addEventHandler("doAdd", "ChainedSelect_onDoAdd");
@@ -146,21 +146,21 @@ ChainedSelect.prototype.ChainedSelect_onAfterTransform = function(sender, e, ex)
 	// Init select elements (disable all)
 	this.clear({"fromLevel":1, "toLevel":this.length});
 
-	if (!this.settings.get("settings.isAddable", true))
+	if (!this.settings.get("setting.isAddable", true))
 	{
 		this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
 			element.style.display = "none";
 		});
 	}
 
-	if (!this.settings.get("settings.isEditable", true))
+	if (!this.settings.get("setting.isEditable", true))
 	{
 		this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
 			element.style.display = "none";
 		});
 	}
 
-	if (!this.settings.get("settings.isRemovable", true))
+	if (!this.settings.get("setting.isRemovable", true))
 	{
 		this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
 			element.style.display = "none";
@@ -179,7 +179,7 @@ ChainedSelect.prototype.ChainedSelect_onDoClear = function(sender, e, ex)
 
 	for (let i = fromLevel; i <= toLevel; i++)
 	{
-		if (this.settings.get("settings.autoClear")) {
+		if (this.settings.get("setting.autoClear")) {
 			this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
 		}
 		this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
@@ -237,7 +237,7 @@ ChainedSelect.prototype.ChainedSelect_onBtnNewItemClick = function(sender, e, ex
 					}).then(() => {
 						return this.skills.use("event.trigger", "afterAdd", options);
 					}).then(() => {
-						if (this.settings.get("settings.autoSubmit", true))
+						if (this.settings.get("setting.autoSubmit", true))
 						{
 							return this.skills.use("form.submit", options);
 						}
@@ -276,7 +276,7 @@ ChainedSelect.prototype.ChainedSelect_onBtnEditItemClick = function(sender, e, e
 					}).then(() => {
 						return this.skills.use("event.trigger", "afterEdit", options);
 					}).then(() => {
-						if (this.settings.get("settings.autoSubmit", true))
+						if (this.settings.get("setting.autoSubmit", true))
 						{
 							return this.skills.use("form.submit", options);
 						}
@@ -315,7 +315,7 @@ ChainedSelect.prototype.onChainedSelect_onBtnRemoveItemClick = function(sender, 
 					}).then(() => {
 						return this.skills.use("event.trigger", "afterRemove", options);
 					}).then(() => {
-						if (this.settings.get("settings.autoSubmit", true))
+						if (this.settings.get("setting.autoSubmit", true))
 						{
 							return this.skills.use("form.submit", options);
 						}

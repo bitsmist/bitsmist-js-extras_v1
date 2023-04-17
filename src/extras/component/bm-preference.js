@@ -36,14 +36,14 @@ PreferenceServer.prototype._getSettings = function()
 {
 
 	return {
-		// Settings
-		"settings": {
+		// Setting
+		"setting": {
 			"autoTransform":			false,
 			"name":						"PreferenceServer",
 		},
 
-		// Events
-		"events": {
+		// Event
+		"event": {
 			"this": {
 				"handlers": {
 					"beforeStart":		["PreferenceServer_onBeforeStart"],
@@ -62,8 +62,8 @@ PreferenceServer.prototype._getSettings = function()
 			}
 		},
 
-		// Attendances
-		"attendances": {
+		// Attendance
+		"attendance": {
 			"locale": {
 				"name": 				"PreferenceServer",
 			}
@@ -95,7 +95,7 @@ Object.defineProperty(PreferenceServer.prototype, 'items', {
 PreferenceServer.prototype.PreferenceServer_onBeforeStart = function(sender, e, ex)
 {
 
-	this._defaults = new BM.ChainableStore({"items":this.settings.get("settings.defaults")});
+	this._defaults = new BM.ChainableStore({"items":this.settings.get("setting.defaults")});
 	this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
 
 }
@@ -180,7 +180,7 @@ PreferenceServer.prototype.get = function(key, defaultValue)
 PreferenceServer.prototype.set = function(values, options, ...args)
 {
 
-	let validatorName = this.settings.get("settings.validatorName");
+	let validatorName = this.settings.get("setting.validatorName");
 
 	return this.skills.use("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 
@@ -200,7 +200,7 @@ PreferenceServer.prototype.set = function(values, options, ...args)
 PreferenceServer.prototype._triggerEvent = function(changedItems, options)
 {
 
-	let eventName = this.settings.get("settings.eventName", "doSetup");
+	let eventName = this.settings.get("setting.eventName", "doSetup");
 	let sender = BM.Util.safeGet(options, "sender");
 
 	return this.skills.use("event.trigger", eventName, {"sender":sender, "items":changedItems});

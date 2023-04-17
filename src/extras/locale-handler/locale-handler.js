@@ -199,7 +199,7 @@ export default class LocaleHandler
 		// Filename
 		let fileName = BM.Util.safeGet(loadOptions, "fileName",
 			this._options.get("fileName",
-				component.settings.get("settings.fileName",
+				component.settings.get("setting.fileName",
 					component.tagName.toLowerCase()) + ".messages"));
 
 		// Split Locale
@@ -217,7 +217,7 @@ export default class LocaleHandler
 			BM.Util.concatPath([
 				component.settings.get("system.appBaseUrl", ""),
 				component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
-				this._options.get("path", component.settings.get("settings.path", "")),
+				this._options.get("path", component.settings.get("setting.path", "")),
 			])
 		);
 

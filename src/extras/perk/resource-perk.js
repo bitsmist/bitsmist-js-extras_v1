@@ -45,7 +45,7 @@ export default class ResourcePerk extends BM.Perk
 
 			return resource.get(id, parameters).then(() => {
 				// Set the property automatically after resource is fetched
-				let autoSet = component.settings.get(`resources.${resourceName}.autoSetProperty`);
+				let autoSet = component.settings.get(`resource.${resourceName}.autoSetProperty`);
 				if (autoSet)
 				{
 					component[autoSet] = resource.items;
@@ -64,7 +64,7 @@ export default class ResourcePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enum", e.detail.settings["resources"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["resource"], (sectionName, sectionValue) => {
 			promises.push(ResourcePerk._addResource(this, sectionName, sectionValue));
 		});
 
@@ -90,7 +90,7 @@ export default class ResourcePerk extends BM.Perk
 					e.detail.items = resource.items;
 
 					// Set the property automatically after resource is fetched
-					let autoSet = this.settings.get(`resources.${resourceName}.autoSetProperty`);
+					let autoSet = this.settings.get(`resource.${resourceName}.autoSetProperty`);
 					if (autoSet)
 					{
 						this[autoSet] = resource.items;
@@ -143,7 +143,7 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"resources",
+			"section":		"resource",
 			"order":		300,
 		};
 

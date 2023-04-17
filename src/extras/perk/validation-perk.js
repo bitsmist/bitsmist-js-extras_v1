@@ -28,7 +28,7 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoOrganize(sender, e, ex)
 	{
 
-		this.skills.use("setting.enum", e.detail.settings["validators"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["validator"], (sectionName, sectionValue) => {
 			ValidationPerk._addValidator(this, sectionName, sectionValue);
 		});
 
@@ -89,7 +89,7 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		return {
-			"sections":		["validators"],
+			"section":		"validator",
 			"order":		310,
 		};
 

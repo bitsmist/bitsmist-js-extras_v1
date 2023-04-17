@@ -176,7 +176,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		return {
-			"sections":		"form",
+			"section":		"form",
 			"order":		310,
 			"depends":		"ValidationPerk",
 		};

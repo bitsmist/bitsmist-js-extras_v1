@@ -26,7 +26,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Routings
-		this.skills.use("setting.enum", e.detail.settings["routings"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["routing"], (sectionName, sectionValue) => {
 			RoutePerk._addRoute(this, sectionValue);
 		});
 
@@ -34,7 +34,7 @@ export default class RoutePerk extends BM.Perk
 		this._routeInfo = RoutePerk.__loadRouteInfo(this, window.location.href);
 
 		// Specs
-		this.skills.use("setting.enum", e.detail.settings["specs"], (sectionName, sectionValue) => {
+		this.skills.use("setting.enum", e.detail.settings["spec"], (sectionName, sectionValue) => {
 			this._specs[sectionName] = sectionValue;
 		});
 
@@ -48,7 +48,7 @@ export default class RoutePerk extends BM.Perk
 		if (this.routeInfo["specName"])
 		{
 			let options = {
-				"query": this.settings.get("settings.query")
+				"query": this.settings.get("setting.query")
 			};
 
 			return this.switchSpec(this.routeInfo["specName"], options);
@@ -71,7 +71,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Try to fix URL when validation failed
-		if (this.settings.get("routings.settings.autoFix"))
+		if (this.settings.get("routing.settings.autoFix"))
 		{
 			RoutePerk.__fixRoute(this, e.detail.url);
 		}
@@ -106,7 +106,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return {
-			"sections":		["routings", "specs"],
+			"section":		"routing",
 			"order":		900,
 			"depends":		"ValidationPerk",
 		};
@@ -329,7 +329,7 @@ export default class RoutePerk extends BM.Perk
 		}).then(() => {
 			component._spec.items = component._specs[specName];
 		}).then(() => {
-			if (component.settings.get("settings.hasExtender"))
+			if (component.settings.get("setting.hasExtender"))
 			{
 				return RoutePerk._loadExtender(component, specName, options);
 			}
@@ -400,10 +400,10 @@ export default class RoutePerk extends BM.Perk
 			}
 		}).then(() => {
 			// Validate URL
-			if (component.settings.get("routings.settings.autoValidate"))
+			if (component.settings.get("routing.settings.autoValidate"))
 			{
 				let validateOptions = {
-					"validatorName":	component.settings.get("routings.settings.validatorName"),
+					"validatorName":	component.settings.get("routing.settings.validatorName"),
 					"items":			RoutePerk._loadParameters(newUrl),
 					"url":				newUrl,
 				};
