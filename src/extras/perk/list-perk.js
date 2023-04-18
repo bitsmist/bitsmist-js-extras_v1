@@ -37,7 +37,7 @@ export default class ListPerk extends BM.Perk
 
 		options = options || {};
 
-		if (component.inventory.get("list.activeRowSkinName") === skinName)
+		if (component.stats.get("list.activeRowSkinName") === skinName)
 		{
 			return Promise.resolve();
 		}
@@ -46,7 +46,7 @@ export default class ListPerk extends BM.Perk
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 			return component.skills.use("skin.load", skinName);
 		}).then(() => {
-			component.inventory.set("list.activeRowSkinName", skinName);
+			component.stats.set("list.activeRowSkinName", skinName);
 		}).then(() => {
 			return component.skills.use("event.trigger", "afterTransformRow", options);
 		}).then(() => {
@@ -161,9 +161,9 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = component.inventory.get("skin.skins");
-		let activeRowSkinName = component.inventory.get("list.activeRowSkinName");
+		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${component._activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
@@ -221,9 +221,9 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = component.inventory.get("skin.skins");
-		let activeRowSkinName = component.inventory.get("list.activeRowSkinName");
+		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${component._activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
