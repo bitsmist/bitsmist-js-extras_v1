@@ -41,15 +41,19 @@ ErrorServer.prototype._getSettings = function()
 			"name":						"ErrorServer",
 		},
 		"event": {
-			"this": {
-				"handlers": {
-					"beforeStart":		["ErrorServer_onBeforeStart"],
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["ErrorServer_onBeforeStart"],
+					}
 				}
 			}
 		},
 		"attendance": {
-			"error": {
-				"name": 				"ErrorServer",
+			"targets": {
+				"error": {
+					"name": 				"ErrorServer",
+				}
 			}
 		}
 	}

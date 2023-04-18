@@ -41,12 +41,14 @@ PreferenceServer.prototype._getSettings = function()
 			"name":						"PreferenceServer",
 		},
 		"event": {
-			"this": {
-				"handlers": {
-					"beforeStart":		["PreferenceServer_onBeforeStart"],
-					"doFetch":			["PreferenceServer_onDoFetch"],
-					"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
-					"doReportValidity":	["PreferenceServer_onDoReportValidity"]
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["PreferenceServer_onBeforeStart"],
+						"doFetch":			["PreferenceServer_onDoFetch"],
+						"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
+						"doReportValidity":	["PreferenceServer_onDoReportValidity"]
+					}
 				}
 			}
 		},
@@ -57,8 +59,10 @@ PreferenceServer.prototype._getSettings = function()
 			}
 		},
 		"attendance": {
-			"locale": {
-				"name": 				"PreferenceServer",
+			"targets": {
+				"locale": {
+					"name": 				"PreferenceServer",
+				}
 			}
 		}
 	}

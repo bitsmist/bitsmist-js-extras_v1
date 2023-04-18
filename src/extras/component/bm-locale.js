@@ -41,21 +41,27 @@ LocaleServer.prototype._getSettings = function()
 			"name":						"LocaleServer",
 		},
 		"event": {
-			"this": {
-				"handlers": {
-					"beforeStart":		["LocaleServer_onBeforeStart"],
-					"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["LocaleServer_onBeforeStart"],
+						"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
+					}
 				}
 			}
 		},
 		"locale": {
-			"default": {
-				"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+			"handlers": {
+				"default": {
+					"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+				}
 			}
 		},
 		"attendance": {
-			"locale": {
-				"name": 				"LocaleServer",
+			"targets": {
+				"locale": {
+					"name": 				"LocaleServer",
+				}
 			}
 		}
 	}

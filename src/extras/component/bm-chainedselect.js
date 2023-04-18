@@ -48,36 +48,38 @@ ChainedSelect.prototype._getSettings = function()
 			},
 		},
 		"event": {
-			"this": {
-				"handlers": {
-					"beforeStart":		["ChainedSelect_onBeforeStart"],
-					"afterTransform":	["ChainedSelect_onAfterTransform"],
-					"doClear":			["ChainedSelect_onDoClear"],
-					"doFill":			["ChainedSelect_onDoFill"],
-				}
-			},
-			"cmb-item": {
-				"rootNode":				"select",
-				"handlers": {
-					"change": 			["ChainedSelect_onCmbItemChange"],
-				}
-			},
-			"btn-newitem": {
-				"rootNode":				".btn-newitem",
-				"handlers": {
-					"click":			["ChainedSelect_onBtnNewItemClick"],
-				}
-			},
-			"btn-edititem": {
-				"rootNode":				".btn-edititem",
-				"handlers": {
-					"click":			["ChainedSelect_onBtnEditItemClick"],
-				}
-			},
-			"btn-removeitem": {
-				"rootNode":				".btn-removeitem",
-				"handlers": {
-					"click": 			["ChainedSelect_onBtnRemoveItemClick"],
+			"events": {
+				"this": {
+					"handlers": {
+						"beforeStart":		["ChainedSelect_onBeforeStart"],
+						"afterTransform":	["ChainedSelect_onAfterTransform"],
+						"doClear":			["ChainedSelect_onDoClear"],
+						"doFill":			["ChainedSelect_onDoFill"],
+					}
+				},
+				"cmb-item": {
+					"rootNode":				"select",
+					"handlers": {
+						"change": 			["ChainedSelect_onCmbItemChange"],
+					}
+				},
+				"btn-newitem": {
+					"rootNode":				".btn-newitem",
+					"handlers": {
+						"click":			["ChainedSelect_onBtnNewItemClick"],
+					}
+				},
+				"btn-edititem": {
+					"rootNode":				".btn-edititem",
+					"handlers": {
+						"click":			["ChainedSelect_onBtnEditItemClick"],
+					}
+				},
+				"btn-removeitem": {
+					"rootNode":				".btn-removeitem",
+					"handlers": {
+						"click": 			["ChainedSelect_onBtnRemoveItemClick"],
+					}
 				}
 			}
 		},

@@ -40,12 +40,14 @@ TabIndex.prototype._getSettings = function()
 			"name":					"BmTabindex",
 		},
 		"event": {
-			"tab-indices": {
-				"rootNode": 		"[data-tabindex]",
-				"handlers": {
-					"click": 		["TabIndex_onTabIndexClick"]
-				}
-			},
+			"events": {
+				"tab-indices": {
+					"rootNode": 		"[data-tabindex]",
+					"handlers": {
+						"click": 		["TabIndex_onTabIndexClick"]
+					}
+				},
+			}
 		},
 	}
 
