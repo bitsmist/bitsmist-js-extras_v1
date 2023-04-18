@@ -26,7 +26,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Routings
-		this.skills.use("setting.enum", e.detail.settings["routing"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("routing.routes", {})).forEach(([sectionName, sectionValue]) => {
 			RoutePerk._addRoute(this, sectionValue);
 		});
 
@@ -34,7 +34,7 @@ export default class RoutePerk extends BM.Perk
 		this._routeInfo = RoutePerk.__loadRouteInfo(this, window.location.href);
 
 		// Specs
-		this.skills.use("setting.enum", e.detail.settings["spec"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("routing.specs", {})).forEach(([sectionName, sectionValue]) => {
 			this._specs[sectionName] = sectionValue;
 		});
 

@@ -26,7 +26,7 @@ export default class ChainPerk extends BM.Perk
 
 		let order = ChainPerk.info["order"];
 
-		this.skills.use("setting.enum", e.detail.settings["chain"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("chain.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.skills.use("event.add", sectionName, {
 				"handler":ChainPerk.onDoProcess,
 				"order":	order,

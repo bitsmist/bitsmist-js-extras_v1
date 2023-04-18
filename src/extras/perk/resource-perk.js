@@ -64,7 +64,7 @@ export default class ResourcePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enum", e.detail.settings["resource"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(ResourcePerk._addResource(this, sectionName, sectionValue));
 		});
 

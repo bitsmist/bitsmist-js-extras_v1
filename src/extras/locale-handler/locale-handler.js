@@ -98,7 +98,7 @@ export default class LocaleHandler
 	init(options)
 	{
 
-		this._component.skills.use("setting.enum", options["messages"], (sectionName, sectionValue) => {
+		Object.entries(options["messages"] || {}).forEach(([sectionName, sectionValue]) => {
 			this._messages.set(sectionName, sectionValue);
 		});
 
@@ -205,7 +205,7 @@ export default class LocaleHandler
 		// Split Locale
 		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
 			this._options.get("splitLocale",
-				component.settings.get("system.settings.splitLocale", false)));
+				component.settings.get("system.splitLocale", false)));
 		if (splitLocale)
 		{
 			let localeName = BM.Util.safeGet(loadOptions, "localeName");

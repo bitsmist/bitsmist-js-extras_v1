@@ -26,7 +26,7 @@ export default class FilePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enum", e.detail.settings["file"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("file.targets", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
 		});
 

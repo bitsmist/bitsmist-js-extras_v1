@@ -148,7 +148,7 @@ export default class LocalePerk extends BM.Perk
 
 		let promises = [];
 
-		this.skills.use("setting.enum", e.detail.settings["locale"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(LocalePerk._addLocalizer(this, sectionName, sectionValue));
 		});
 

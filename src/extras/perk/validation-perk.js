@@ -28,7 +28,7 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoOrganize(sender, e, ex)
 	{
 
-		this.skills.use("setting.enum", e.detail.settings["validation"], (sectionName, sectionValue) => {
+		Object.entries(this.settings.get("validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			ValidationPerk._addValidator(this, sectionName, sectionValue);
 		});
 
@@ -39,14 +39,15 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoValidate(sender, e, ex)
 	{
 
+
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
 			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get(`validators.${validatorName}.rules`);
-			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
+			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);
+			let options = this.settings.get(`validation.handlers.${validatorName}.handlerOptions`);
 
 			this.inventory.get(`validation.validators.${validatorName}`).checkValidity(items, rules, options);
 		}
@@ -64,8 +65,8 @@ export default class ValidationPerk extends BM.Perk
 			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.settings.get(`validators.${validatorName}.rules`);
-			let options = this.settings.get(`validators.${validatorName}.handlerOptions`);
+			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);
+			let options = this.settings.get(`validation.handlers.${validatorName}.handlerOptions`);
 
 			this.inventory.get(`validation.validators.${validatorName}`).reportValidity(items, rules, options);
 		}
