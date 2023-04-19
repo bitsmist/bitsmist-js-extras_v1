@@ -133,8 +133,10 @@ export default class ListPerk extends BM.Perk
 		component.skills.set("list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 
 		// Add inventory items to component
-		component.inventory.set("list.activeRowName", "");
 		component.inventory.set("list.lastItems", {});
+
+		// Add stats to component
+		component.stats.set("list.activeRowName", "");
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "afterTransform", ListPerk.ListPerk_onAfterTransform);
