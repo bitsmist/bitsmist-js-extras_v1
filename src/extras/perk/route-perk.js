@@ -71,7 +71,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Try to fix URL when validation failed
-		if (this.settings.get("routing.settings.autoFix"))
+		if (this.settings.get("routing.options.autoFix"))
 		{
 			RoutePerk.__fixRoute(this, e.detail.url);
 		}
@@ -400,10 +400,10 @@ export default class RoutePerk extends BM.Perk
 			}
 		}).then(() => {
 			// Validate URL
-			if (component.settings.get("routing.settings.autoValidate"))
+			if (component.settings.get("routing.options.autoValidate"))
 			{
 				let validateOptions = {
-					"validatorName":	component.settings.get("routing.settings.validatorName"),
+					"validatorName":	component.settings.get("routing.options.validatorName"),
 					"items":			RoutePerk._loadParameters(newUrl),
 					"url":				newUrl,
 				};

@@ -57,9 +57,9 @@ export default class FormPerk extends BM.Perk
 
 		return FormPerk._collect(component, options).then(() => {
 			// Validate values
-			if (component.settings.get("form.settings.autoValidate", true))
+			if (component.settings.get("form.options.autoValidate", true))
 			{
-				options["validatorName"] = options["validatorName"] || component.settings.get("form.settings.validatorName");
+				options["validatorName"] = options["validatorName"] || component.settings.get("form.options.validatorName");
 				return component.skills.use("validation.validate", options).then(() => {
 					if (!component.stats.get("validation.validationResult.result"))
 					{
@@ -122,7 +122,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoFill(sender, e, ex)
 	{
 
-		if (this.settings.get("form.settings.autoFill", true))
+		if (this.settings.get("form.options.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
 			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.inventory.get("resource.resources"), "triggerEvent":true});
@@ -139,7 +139,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.settings.get("form.settings.autoCollect", true))
+		if (this.settings.get("form.options.autoCollect", true))
 		{
 			e.detail.items = ValueUtil.getFields(this);
 		}
@@ -152,7 +152,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		// Collect only submittable data
-		if (this.settings.get("form.settings.autoCrop", true))
+		if (this.settings.get("form.options.autoCrop", true))
 		{
 			e.detail.items = FormPerk.__collectData(this, e.detail.items);
 		}

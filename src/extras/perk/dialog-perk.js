@@ -46,13 +46,13 @@ export default class DialogPerk extends BM.Perk
 					}
 				}).then(() => {
 					// Setup
-					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.settings.autoSetupOnOpen", true)))
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.options.autoSetupOnOpen", true)))
 					{
 						return component.setup(options);
 					}
 				}).then(() => {
 					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.settings.autoRefreshOnOpen", true)))
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.options.autoRefreshOnOpen", true)))
 					{
 						return component.refresh(options);
 					}
@@ -137,7 +137,7 @@ export default class DialogPerk extends BM.Perk
 	static DialogPerk_onAfterReady(sender, e, ex)
 	{
 
-		if (this.settings.get("dialog.settings.autoOpen"))
+		if (this.settings.get("dialog.options.autoOpen"))
 		{
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
 

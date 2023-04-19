@@ -62,10 +62,10 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onAfterTransform(sender, e, ex)
 	{
 
-		this._listRootNode = this.querySelector(this.settings.get("list.settings.listRootNode"));
+		this._listRootNode = this.querySelector(this.settings.get("list.options.listRootNode"));
 		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("setting.listRootNode")}`);
 
-		return ListPerk._transformRow(this, this.settings.get("list.settings.rowSkinName"));
+		return ListPerk._transformRow(this, this.settings.get("list.options.rowSkinName"));
 
 	}
 
@@ -83,7 +83,7 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onDoFill(sender, e, ex)
 	{
 
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.settings.async", true)) ? ListPerk._buildAsync : ListPerk._buildSync );
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.options.async", true)) ? ListPerk._buildAsync : ListPerk._buildSync );
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
@@ -189,7 +189,7 @@ export default class ListPerk extends BM.Perk
 				}
 
 				return component.skills.use("event.trigger", "beforeFillRow", options).then(() => {
-					if (component.settings.get("list.settings.autoFill", true))
+					if (component.settings.get("list.options.autoFill", true))
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
@@ -249,7 +249,7 @@ export default class ListPerk extends BM.Perk
 			// Call event handlers
 			component.skills.use("event.triggerAsync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
-			if (component.settings.get("list.settings.autoFill", true))
+			if (component.settings.get("list.options.autoFill", true))
 			{
 				ValueUtil.setFields(element, options["item"], {"resources":component.inventory.get("resource.resources")});
 			}

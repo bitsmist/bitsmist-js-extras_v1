@@ -275,10 +275,12 @@ export default class LocalePerk extends BM.Perk
 		// Add inventory items to component
 		component.inventory.set("locale.localizers", {});
 		component.inventory.set("locale.messages", new MultiStore());
+
+		// Add stats to component
 		component.stats.set("locale", {
-			"localeName":			component.settings.get("locale.settings.localeName", component.settings.get("system.localeName", navigator.language)),
-			"fallbackLocaleName":	component.settings.get("locale.settings.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
-			"currencyName":			component.settings.get("locale.settings.currencyName", component.settings.get("system.currencyName", "USD")),
+			"localeName":			component.settings.get("locale.options.localeName", component.settings.get("system.localeName", navigator.language)),
+			"fallbackLocaleName":	component.settings.get("locale.options.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
+			"currencyName":			component.settings.get("locale.options.currencyName", component.settings.get("system.currencyName", "USD")),
 		});
 
 		// Add event handlers to component
@@ -286,7 +288,7 @@ export default class LocalePerk extends BM.Perk
 		this._addPerkHandler(component, "afterStart", LocalePerk.LocalePerk_onAfterStart);
 		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
 		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);
-		if (component.settings.get("locale.settings.autoLocalizeRows"))
+		if (component.settings.get("locale.options.autoLocalizeRows"))
 		{
 			this._addPerkHandler(component, "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}
