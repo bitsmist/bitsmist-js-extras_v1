@@ -48,13 +48,13 @@ export default class DialogPerk extends BM.Perk
 					// Setup
 					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.options.autoSetupOnOpen", true)))
 					{
-						return component.setup(options);
+						return component.skills.use("basic.setup", options);
 					}
 				}).then(() => {
 					// Refresh
 					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.options.autoRefreshOnOpen", true)))
 					{
-						return component.refresh(options);
+						return component.skills.use("basic.refresh", options);
 					}
 				}).then(() => {
 					return component.skills.use("event.trigger", "doOpen", options);

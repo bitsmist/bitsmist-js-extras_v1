@@ -47,7 +47,7 @@ export default class ChainPerk extends BM.Perk
 
 		for (let i = 0; i < targets.length; i++)
 		{
-			let method = targets[i]["method"] || "refresh";
+			let method = targets[i]["skillName"] || "basic.refresh";
 			let state = targets[i]["state"] || "ready";
 			let sync = targets[i]["sync"];
 
@@ -131,18 +131,19 @@ export default class ChainPerk extends BM.Perk
 	 *
 	 * @param	{Component}		component			Component.
 	 * @param	{Array}			nodes				Nodes.
-	 * @param	{String}		string				Method name to exec.
+	 * @param	{String}		skillName			Skill name to exec.
+	 * @param	{String}		state				State to wait.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __execTarget(component, nodes, method, state)
+	static __execTarget(component, nodes, skillName, state)
 	{
 
 		let promises = [];
 
 		nodes.forEach((element) => {
 			let promise = component.skills.use("state.wait", [{"object":element, "state":state}]).then(() => {
-				return element[method]({"sender":component});
+				return element.skills.use(skillName, {"sender":component});
 			});
 			promises.push(promise);
 		});

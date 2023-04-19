@@ -237,7 +237,7 @@ export default class KeyPerk extends BM.Perk
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return component.clear({"target":target, "options":options["options"]});
+		return component.skills.use("basic.clear", {"target":target, "options":options["options"]});
 
 	}
 

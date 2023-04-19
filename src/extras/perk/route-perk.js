@@ -468,7 +468,7 @@ export default class RoutePerk extends BM.Perk
 	static _refreshRoute(component, routeInfo, options)
 	{
 
-		return component.refresh(options);
+		return component.skills.use("basic.refresh", options);
 
 	}
 

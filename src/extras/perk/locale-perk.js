@@ -220,7 +220,7 @@ export default class LocalePerk extends BM.Perk
 		// Refill (Do not refill when starting)
 		if (this.stats.get("state.state") === "ready")
 		{
-			this.fill();
+			this.skills.use("basic.fill");
 		}
 
 	}

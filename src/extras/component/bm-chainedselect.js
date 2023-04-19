@@ -141,7 +141,7 @@ ChainedSelect.prototype.ChainedSelect_onAfterTransform = function(sender, e, ex)
 {
 
 	// Init select elements (disable all)
-	this.clear({"fromLevel":1, "toLevel":this.length});
+	this.skill.use("basic.clear", {"fromLevel":1, "toLevel":this.length});
 
 	if (!this.settings.get("setting.isAddable", true))
 	{
@@ -519,7 +519,7 @@ ChainedSelect.prototype.selectItem = function(level, itemId)
 	this._initElement("removeitem", level, true);
 
 	// Clear children
-	this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+	this.skills.use("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 	// Refresh the child select element
 	return Promise.resolve().then(() => {
@@ -527,7 +527,7 @@ ChainedSelect.prototype.selectItem = function(level, itemId)
 		let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 		if (nextSelectBox) {
 			this._initElement("newitem", level);
-			return this.refresh({"level":level, "value":itemId});
+			return this.skills.use("basic.refresh", {"level":level, "value":itemId});
 		}
 	});
 
@@ -605,7 +605,7 @@ ChainedSelect.prototype.removeItem = function(level)
 	this._initElement("removeitem", level);
 
 	// Reset children select elements
-	this.clear({"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+	this.skills.use("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 }
 
