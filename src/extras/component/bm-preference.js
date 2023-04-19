@@ -53,7 +53,7 @@ PreferenceServer.prototype._getSettings = function()
 			}
 		},
 		"form": {
-			"settings": {
+			"options": {
 				"autoCollect":			false,
 				"autoCrop":				false,
 			}
