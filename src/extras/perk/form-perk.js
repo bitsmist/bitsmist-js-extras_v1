@@ -113,7 +113,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.inventory.get("form.lastItems");
+		e.detail.items = e.detail.items || this.vault.get("form.lastItems");
 
 	}
 
@@ -129,8 +129,7 @@ export default class FormPerk extends BM.Perk
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
-		//this._lastItems = e.detail.items;
-		this.inventory.set("form.lastItems", e.detail.items);
+		this.vault.set("form.lastItems", e.detail.items);
 
 	}
 
@@ -196,7 +195,9 @@ export default class FormPerk extends BM.Perk
 
 		// Add inventory items to component
 		component.inventory.set("form.cancelSubmit", false);
-		component.inventory.set("form.lastItems", {});
+
+		// Add vault items to component
+		component.vault.set("form.lastItems", {});
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "afterTransform", FormPerk.FormPerk_onAfterTransform);

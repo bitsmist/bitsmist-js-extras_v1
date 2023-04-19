@@ -83,9 +83,9 @@ export default class ElementPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add inventory items to component
-		component.inventory.set("element.overlay", );
-		component.inventory.set("element.overlayPromise", Promise.resolve());
+		// Add vault items to component
+		component.vault.set("element.overlay", );
+		component.vault.set("element.overlayPromise", Promise.resolve());
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doOrganize", ElementPerk.ElementPerk_onDoOrganize);
@@ -162,11 +162,11 @@ export default class ElementPerk extends BM.Perk
 					break;
 				case "showLoader":
 					ElementPerk.__showOverlay(component, elementInfo[key]);
-					waitForElement = component.inventory.get("element.overlay");
+					waitForElement = component.vault.get("element.overlay");
 					break;
 				case "hideLoader":
 					ElementPerk.__hideOverlay(component, elementInfo[key]);
-					waitForElement = component.inventory.get("element.overlay");
+					waitForElement = component.vault.get("element.overlay");
 					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
@@ -335,14 +335,14 @@ export default class ElementPerk extends BM.Perk
 	static __createOverlay(component, options)
 	{
 
-		if (!component.inventory.get("element.overlay"))
+		if (!component.vault.get("element.overlay"))
 		{
 			component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
 			let overlay = component.firstElementChild;
-			component.inventory.set("element.overlay", component.firstElementChild);
+			component.vault.set("element.overlay", component.firstElementChild);
 		}
 
-		return component.inventory.get("element.overlay");
+		return component.vault.get("element.overlay");
 
 	}
 
@@ -357,7 +357,7 @@ export default class ElementPerk extends BM.Perk
 	static __closeOnClick(component, options)
 	{
 
-		component.inventory.get("element.overlay").addEventListener("click", (e) => {
+		component.vault.get("element.overlay").addEventListener("click", (e) => {
 			if (e.target === e.currentTarget && typeof component.close === "function")
 			{
 				component.close({"reason":"cancel"});
@@ -421,8 +421,8 @@ export default class ElementPerk extends BM.Perk
 		let effect = ElementPerk.__getEffect(overlay);
 		if (effect)
 		{
-			component.inventory.get("element.overlayPromise").then(() => {
-				component.inventory.set("element.overlayPromise", new Promise((resolve, reject) => {
+			component.vault.get("element.overlayPromise").then(() => {
+				component.vault.set("element.overlayPromise", new Promise((resolve, reject) => {
 					overlay.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
@@ -447,9 +447,9 @@ export default class ElementPerk extends BM.Perk
 	static __hideOverlay(component, options)
 	{
 
-		let overlay = component.inventory.get("element.overlay");
+		let overlay = component.vault.get("element.overlay");
 
-		component.inventory.get("element.overlayPromise").then(() => {
+		component.vault.get("element.overlayPromise").then(() => {
 			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
 			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));

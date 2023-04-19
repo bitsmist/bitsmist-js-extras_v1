@@ -74,7 +74,7 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.inventory.get("list.lastItems");
+		e.detail.items = e.detail.items || this.vault.get("list.lastItems");
 
 	}
 
@@ -92,7 +92,7 @@ export default class ListPerk extends BM.Perk
 			return builder(this, fragment, e.detail.items, e.detail);
 		}).then(() => {
 			this._listRootNode.replaceChildren(fragment);
-			this.inventory.set("list.lastItems", e.detail.items);
+			this.vault.set("list.lastItems", e.detail.items);
 
 			return this.skills.use("event.trigger", "afterBuildRows");
 		});
@@ -132,8 +132,8 @@ export default class ListPerk extends BM.Perk
 		// Add skills to component;
 		component.skills.set("list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 
-		// Add inventory items to component
-		component.inventory.set("list.lastItems", {});
+		// Add valut items to component
+		component.vault.set("list.lastItems", {});
 
 		// Add stats to component
 		component.stats.set("list.activeRowName", "");

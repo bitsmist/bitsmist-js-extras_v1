@@ -47,7 +47,7 @@ export default class DatabindingPerk extends BM.Perk
 			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component.inventory.get("databinding.bindings").bindTo(key, elem, callback);
+			component.vault.get("databinding.store").bindTo(key, elem, callback);
 		});
 
 	}
@@ -78,7 +78,7 @@ export default class DatabindingPerk extends BM.Perk
 			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component.inventory.get("databinding.bindings").bindTo(index, key, elem, callback);
+			component.vault.get("databinding.store").bindTo(index, key, elem, callback);
 		});
 
 	}
@@ -99,7 +99,7 @@ export default class DatabindingPerk extends BM.Perk
 	static DatabindingPerk_onBeforeFill(sender, e, ex)
 	{
 
-		this.inventory.get("databinding.bindings").clear();
+		this.vault.get("databinding.store").clear();
 
 	}
 
@@ -110,7 +110,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (e.detail.items)
 		{
-			this.inventory.get("databinding.bindings").replace(e.detail.items);
+			this.vault.get("databinding.store").replace(e.detail.items);
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
@@ -122,7 +122,7 @@ export default class DatabindingPerk extends BM.Perk
 	{
 
 		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-		this.inventory.get("databinding.bindings").replace(e.detail.no, e.detail.item);
+		this.vault.get("databinding.store").replace(e.detail.no, e.detail.item);
 
 	}
 
@@ -133,7 +133,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (this.settings.get("databinding.options.autoCollect", true))
 		{
-			e.detail.items = this.inventory.get("databinding.bindings").items;
+			e.detail.items = this.vault.get("databinding.store").items;
 		}
 
 	}
@@ -173,8 +173,8 @@ export default class DatabindingPerk extends BM.Perk
 			// Add skills to component;
 			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
 
-			// Add inventory items to component
-			component.inventory.set("databinding.bindings", new BindableStore({
+			// Add vault items to component
+			component.vault.set("databinding.store", new BindableStore({
 				"resources":	component.inventory.get("resource.resources"),
 				"direction":	component.settings.get("databinding.options.direction", "two-way"),
 			}));
@@ -188,8 +188,8 @@ export default class DatabindingPerk extends BM.Perk
 			// Add skills to component;
 			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
 
-			// Add inventory items to Component
-			component.inventory.set("databinding.bindings", new BindableArrayStore({
+			// Add vault items to component
+			component.vault.set("databinding.store", new BindableArrayStore({
 				"resources":	component.resources,
 				"direction":	component.settings.get("databinding.options.direction", "two-way"),
 			}));

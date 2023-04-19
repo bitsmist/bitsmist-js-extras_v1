@@ -187,7 +187,7 @@ export default class KeyPerk extends BM.Perk
 			if (!component.inventory.get("form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.inventory.get("dialog.isModal"))
+				if (component.stats.get("dialog.isModal"))
 				{
 					component.stats.set("dialog.modalResult.result", true);
 				}
