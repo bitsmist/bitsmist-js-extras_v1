@@ -44,7 +44,7 @@ export default class ListPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.skills.use("skin.load", skinName);
+			return component.skills.use("skin.summon", skinName);
 		}).then(() => {
 			component.stats.set("list.activeRowSkinName", skinName);
 		}).then(() => {

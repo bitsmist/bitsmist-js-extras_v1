@@ -268,7 +268,7 @@ export default class LocalePerk extends BM.Perk
 		// Add skills to component;
 		component.skills.set("locale.change", function(...args) { return LocalePerk._changeLocale(...args); });
 		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		component.skills.set("locale.load", function(...args) { return LocalePerk._loadMessages(...args); });
+		component.skills.set("locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
 		component.skills.set("locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
 		component.skills.set("locale.addLocalizer", function(...args) { return LocalePerk._addLocalizer(...args); });
 
