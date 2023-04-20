@@ -84,7 +84,7 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onDoFill(sender, e, ex)
 	{
 
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.options.async", true)) ? ListPerk._buildAsync : ListPerk._buildSync );
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
@@ -138,7 +138,7 @@ export default class ListPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Protected
+	//  Private
 	// -------------------------------------------------------------------------
 
 	/**
@@ -151,13 +151,13 @@ export default class ListPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _buildSync(component, fragment, items, options)
+	static __buildSync(component, fragment, items, options)
 	{
 
 		let skinInfo = component.inventory.get("skin.skins");
 		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
@@ -211,13 +211,13 @@ export default class ListPerk extends BM.Perk
 	 *
 	 * @param	{DocumentFragment}	fragment		Document fragment.
 	 */
-	static _buildAsync(component, fragment, items, options)
+	static __buildAsync(component, fragment, items, options)
 	{
 
 		let skinInfo = component.inventory.get("skin.skins");
 		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
@@ -257,8 +257,6 @@ export default class ListPerk extends BM.Perk
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**

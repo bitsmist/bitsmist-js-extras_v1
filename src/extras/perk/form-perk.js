@@ -55,7 +55,7 @@ export default class FormPerk extends BM.Perk
 		options = options || {};
 		component.inventory.set("form.cancelSubmit", false);
 
-		return FormPerk._collect(component, options).then(() => {
+		return FormPerk.__collect(component, options).then(() => {
 			// Validate values
 			if (component.settings.get("form.options.autoValidate", true))
 			{
@@ -201,7 +201,7 @@ export default class FormPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Protected
+	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
@@ -212,7 +212,7 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _collect(component, options)
+	static __collect(component, options)
 	{
 
 		return Promise.resolve().then(() => {
@@ -225,9 +225,6 @@ export default class FormPerk extends BM.Perk
 
 	}
 
-
-	// -------------------------------------------------------------------------
-	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**

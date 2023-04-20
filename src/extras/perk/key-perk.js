@@ -161,7 +161,7 @@ export default class KeyPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Protected
+	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
@@ -171,7 +171,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
-	static _defaultSubmit(e, component, options)
+	static __defaultSubmit(e, component, options)
 	{
 
 		return component.skills.use("form.submit").then(() => {
@@ -202,7 +202,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
-	static _defaultCancel(e, component, options)
+	static __defaultCancel(e, component, options)
 	{
 
 		return component.skills.use("dialog.close", {"reason":"cancel"});
@@ -218,7 +218,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
-	static _defaultClear(e, component, options)
+	static __defaultClear(e, component, options)
 	{
 
 		let target = "";
@@ -232,8 +232,6 @@ export default class KeyPerk extends BM.Perk
 
 	}
 
-	// -------------------------------------------------------------------------
-	//  Privates
 	// -------------------------------------------------------------------------
 
 	/**
@@ -332,13 +330,13 @@ export default class KeyPerk extends BM.Perk
 		switch (action)
 		{
 		case "submit":
-			handler = KeyPerk._defaultSubmit;
+			handler = KeyPerk.__defaultSubmit;
 			break;
 		case "clear":
-			handler = KeyPerk._defaultClear;
+			handler = KeyPerk.__defaultClear;
 			break;
 		case "cancel":
-			handler = KeyPerk._defaultCancel;
+			handler = KeyPerk.__defaultCancel;
 			break;
 		}
 
