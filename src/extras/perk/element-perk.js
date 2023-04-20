@@ -195,7 +195,7 @@ export default class ElementPerk extends BM.Perk
 				case "waitFor":
 					break;
 				default:
-					console.warn(`ElementPerk.__initAttr(): Invalid type. name=${component.name}, eventName=${eventInfo.type}, type=${key}`);
+					console.warn(`ElementPerk.__initAttr(): Invalid type. name=${component.tagName}, eventName=${eventInfo.type}, type=${key}`);
 					break;
 				}
 			});
@@ -238,16 +238,16 @@ export default class ElementPerk extends BM.Perk
 			inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
 			break;
 		default:
-			console.warn(`ElementPerk.__initAttr(): Invalid waitFor. name=${component.name}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+			console.warn(`ElementPerk.__initAttr(): Invalid waitFor. name=${component.tagName}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
 			break;
 		}
 
-		BM.Util.warn(inTransition, `ElementPerk.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+		BM.Util.warn(inTransition, `ElementPerk.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${component.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 
 		return new Promise((resolve, reject) => {
 			// Timeout timer
 			let timer = setTimeout(() => {
-				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.name}, eventName=${eventInfo.type}, elementName=${elementName}`);
+				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 			}, BM.settings.get("system.waitForTimeout", 10000));
 
 			// Resolve when finished

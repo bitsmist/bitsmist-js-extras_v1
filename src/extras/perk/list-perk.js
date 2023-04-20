@@ -43,14 +43,14 @@ export default class ListPerk extends BM.Perk
 		}
 
 		return Promise.resolve().then(() => {
-			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 			return component.skills.use("skin.summon", skinName);
 		}).then(() => {
 			component.stats.set("list.activeRowSkinName", skinName);
 		}).then(() => {
 			return component.skills.use("event.trigger", "afterTransformRow", options);
 		}).then(() => {
-			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.name}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
 
 	}
@@ -165,7 +165,7 @@ export default class ListPerk extends BM.Perk
 		let skinInfo = component.inventory.get("skin.skins");
 		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
@@ -225,7 +225,7 @@ export default class ListPerk extends BM.Perk
 		let skinInfo = component.inventory.get("skin.skins");
 		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
 
-		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.name}, rowSkinName=${activeRowSkinName}`);
+		BM.Util.assert(skinInfo[activeRowSkinName], `List._buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.settings.get("list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;

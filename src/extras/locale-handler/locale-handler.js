@@ -192,7 +192,7 @@ export default class LocaleHandler
 	loadMessages(loadOptions)
 	{
 
-		console.debug(`LocaleHandler._loadMessages(): Loading the messages file. name=${this._component.name}`);
+		console.debug(`LocaleHandler._loadMessages(): Loading the messages file. name=${this._component.tagName}`);
 
 		let component = this._component;
 

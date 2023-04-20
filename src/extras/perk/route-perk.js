@@ -549,7 +549,7 @@ export default class RoutePerk extends BM.Perk
 //		let specCommon;
 		let promises = [];
 
-		console.debug(`RoutePerk._loadSpec(): Loading spec file. name=${component.name}, specName=${specName}`);
+		console.debug(`RoutePerk._loadSpec(): Loading spec file. name=${component.tagName}, specName=${specName}`);
 
 		// Path
 		let path = BM.Util.safeGet(loadOptions, "path",
@@ -588,7 +588,7 @@ export default class RoutePerk extends BM.Perk
 	static _loadExtender(component, extenderName, loadOptions)
 	{
 
-		console.debug(`RoutePerk._loadExtender(): Loading extender file. name=${component.name}, extenderName=${extenderName}`);
+		console.debug(`RoutePerk._loadExtender(): Loading extender file. name=${component.tagName}, extenderName=${extenderName}`);
 
 		let query = BM.Util.safeGet(loadOptions, "query");
 		let path = BM.Util.safeGet(loadOptions, "path",

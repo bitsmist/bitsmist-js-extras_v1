@@ -69,14 +69,14 @@ export default class FormPerk extends BM.Perk
 			}
 		}).then(() => {
 			// Submit values
-			console.debug(`FormPerk._submit(): Submitting component. name=${component.name}, id=${component.id}`);
+			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
 			return component.skills.use("event.trigger", "beforeSubmit", options).then(() => {
 				if (!component.inventory.get("form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
 						return component.skills.use("event.trigger", "doSubmit", options);
 					}).then(() => {
-						console.debug(`FormPerk._submit(): Submitted component. name=${component.name}, id=${component.id}`);
+						console.debug(`FormPerk._submit(): Submitted component. name=${component.tagName}, id=${component.id}`);
 						return component.skills.use("event.trigger", "afterSubmit", options);
 					});
 				}

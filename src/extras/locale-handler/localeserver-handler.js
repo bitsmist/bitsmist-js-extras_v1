@@ -38,7 +38,7 @@ export default class LocaleServerHandler extends LocaleHandler
 	{
 
 		return AttendancePerk.call("LocaleServer", {"waitForAttendance":true}).then((server) => {
-			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.name}`);
+			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.tagName}`);
 
 			this._messages.chain(server.inventory.get("locale.messages"));
 		});

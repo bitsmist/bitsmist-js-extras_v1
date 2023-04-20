@@ -162,7 +162,7 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._get(id, parameters);
 		}).then((data) => {
-//			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.name}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+//			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 			this.data = data;
 

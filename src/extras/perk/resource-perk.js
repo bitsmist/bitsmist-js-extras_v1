@@ -33,7 +33,7 @@ export default class ResourcePerk extends BM.Perk
 	static _addResource(component, resourceName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.name}, resourceName=${resourceName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.tagName}, resourceName=${resourceName}`);
 
 		let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
 		component.inventory.set(`resource.resources.${resourceName}`, resource);

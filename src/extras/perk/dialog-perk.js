@@ -33,7 +33,7 @@ export default class DialogPerk extends BM.Perk
 
 		options = options || {};
 
-		console.debug(`DialogPerk._open(): Opening component. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogPerk._open(): Opening component. name=${component.tagName}, id=${component.id}`);
 		return component.skills.use("event.trigger", "beforeOpen", options).then(() => {
 			//if (!component._cancelOpen)
 			if (!component.inventory.get("dialog.cancelOpen"))
@@ -59,7 +59,7 @@ export default class DialogPerk extends BM.Perk
 				}).then(() => {
 					return component.skills.use("event.trigger", "doOpen", options);
 				}).then(() => {
-					console.debug(`DialogPerk._open(): Opened component. name=${component.name}, id=${component.id}`);
+					console.debug(`DialogPerk._open(): Opened component. name=${component.tagName}, id=${component.id}`);
 					return component.skills.use("event.trigger", "afterOpen", options);
 				});
 			}
@@ -79,7 +79,7 @@ export default class DialogPerk extends BM.Perk
 	static _openModal(component, options)
 	{
 
-		console.debug(`DialogPerk._openModal(): Opening component modal. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogPerk._openModal(): Opening component modal. name=${component.tagName}, id=${component.id}`);
 
 		return new Promise((resolve, reject) => {
 			component.stats.set("dialog.isModal", true);
@@ -105,7 +105,7 @@ export default class DialogPerk extends BM.Perk
 		options = options || {};
 		component.inventory.set("dialog.cancelClose", false);
 
-		console.debug(`DialogPerk._close(): Closing component. name=${component.name}, id=${component.id}`);
+		console.debug(`DialogPerk._close(): Closing component. name=${component.tagName}, id=${component.id}`);
 		return component.skills.use("event.trigger", "beforeClose", options).then(() => {
 			if (!component.inventory.get("dialog.cancelClose"))
 			{
@@ -121,7 +121,7 @@ export default class DialogPerk extends BM.Perk
 					{
 						component.vault.get("dialog.modalPromise").resolve(component.stats.get("dialog.modalResult"));
 					}
-					console.debug(`DialogPerk._close(): Closed component. name=${component.name}, id=${component.id}`);
+					console.debug(`DialogPerk._close(): Closed component. name=${component.tagName}, id=${component.id}`);
 
 					return component.skills.use("event.trigger", "afterClose", options);
 				});

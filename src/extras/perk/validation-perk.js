@@ -163,19 +163,19 @@ export default class ValidationPerk extends BM.Perk
 		component.stats.set("validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
-			console.debug(`ValidationPerk._validate(): Validating component. name=${component.name}, id=${component.id}`);
+			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
 			return component.skills.use("event.trigger", "beforeValidate", options);
 		}).then(() => {
 			return component.skills.use("event.trigger", "doValidate", options);
 		}).then(() => {
 			if (component.stats.get("validation.validationResult.result"))
 			{
-				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.name}, id=${component.id}`);
+				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
 				return component.skills.use("event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
-				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.name}, id=${component.id}`);
+				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.tagName}, id=${component.id}`);
 				return component.skills.use("event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
