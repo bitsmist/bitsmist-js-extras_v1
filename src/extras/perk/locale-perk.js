@@ -81,7 +81,7 @@ export default class LocalePerk extends BM.Perk
 	static _localize(component, rootNode, interpolation)
 	{
 
-		rootNode = rootNode || component.rootElement;
+		rootNode = rootNode || component;
 
 		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
 			component.inventory.get(`locale.localizers.${handlerName}`).localize(
@@ -215,7 +215,7 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		// Localize
-		LocalePerk._localize(this, this.rootElement);
+		LocalePerk._localize(this, this);
 
 		// Refill (Do not refill when starting)
 		if (this.stats.get("state.state") === "ready")
