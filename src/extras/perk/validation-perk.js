@@ -21,6 +21,71 @@ export default class ValidationPerk extends BM.Perk
 	//  Skills
 	// -------------------------------------------------------------------------
 
+	/**
+     * Add the validator.
+     *
+     * @param	{Component}		component			Component.
+     * @param	{string}		validatorName		Validator name.
+     * @param	{array}			options				Options.
+     */
+	static _addValidator(component, validatorName, options)
+	{
+
+		let validator;
+
+		if (options["handlerClassName"])
+		{
+			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
+			component.inventory.set(`validation.validators.${validatorName}`, validator);
+		}
+
+		return validator;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Validate the form.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _validate(component, options)
+	{
+
+		options = options || {};
+		component.stats.set("validation.validationResult.result", true);
+
+		return Promise.resolve().then(() => {
+			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
+			return component.skills.use("event.trigger", "beforeValidate", options);
+		}).then(() => {
+			return component.skills.use("event.trigger", "doValidate", options);
+		}).then(() => {
+			if (component.stats.get("validation.validationResult.result"))
+			{
+				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
+				return component.skills.use("event.trigger", "doValidateSuccess", options);
+			}
+			else
+			{
+				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.tagName}, id=${component.id}`);
+				return component.skills.use("event.trigger", "doValidateFail", options);
+			}
+		}).then(() => {
+			if (!component.stats.get("validation.validationResult.result"))
+			{
+				return component.skills.use("event.trigger", "doReportValidity", options);
+			}
+		}).then(() => {
+			return component.skills.use("event.trigger", "afterValidate", options);
+		});
+
+	}
+
 	// -------------------------------------------------------------------------
 	//	Event handlers
 	// -------------------------------------------------------------------------
@@ -108,75 +173,6 @@ export default class ValidationPerk extends BM.Perk
 		this._addPerkHandler(component, "doOrganize", ValidationPerk.ValidationPerk_onDoOrganize);
 		this._addPerkHandler(component, "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
 		this._addPerkHandler(component, "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
-
-	/**
-     * Add the validator.
-     *
-     * @param	{Component}		component			Component.
-     * @param	{string}		validatorName		Validator name.
-     * @param	{array}			options				Options.
-     */
-	static _addValidator(component, validatorName, options)
-	{
-
-		let validator;
-
-		if (options["handlerClassName"])
-		{
-			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
-			component.inventory.set(`validation.validators.${validatorName}`, validator);
-		}
-
-		return validator;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Validate the form.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _validate(component, options)
-	{
-
-		options = options || {};
-		component.stats.set("validation.validationResult.result", true);
-
-		return Promise.resolve().then(() => {
-			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
-			return component.skills.use("event.trigger", "beforeValidate", options);
-		}).then(() => {
-			return component.skills.use("event.trigger", "doValidate", options);
-		}).then(() => {
-			if (component.stats.get("validation.validationResult.result"))
-			{
-				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
-				return component.skills.use("event.trigger", "doValidateSuccess", options);
-			}
-			else
-			{
-				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.tagName}, id=${component.id}`);
-				return component.skills.use("event.trigger", "doValidateFail", options);
-			}
-		}).then(() => {
-			if (!component.stats.get("validation.validationResult.result"))
-			{
-				return component.skills.use("event.trigger", "doReportValidity", options);
-			}
-		}).then(() => {
-			return component.skills.use("event.trigger", "afterValidate", options);
-		});
 
 	}
 
