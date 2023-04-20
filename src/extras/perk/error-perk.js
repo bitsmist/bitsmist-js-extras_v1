@@ -37,15 +37,6 @@ export default class ErrorPerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "ErrorPerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 
@@ -86,7 +77,6 @@ export default class ErrorPerk extends BM.Perk
 		let errors = BM.Util.safeGet(options, "setting.errors");
 		if (errors)
 		{
-			console.log("@@@subscribing", component.name, errors);
 			ErrorPerk._observers.subscribe(component.uniqueId, component.trigger.bind(component), {"component":component});
 		}
 
@@ -133,8 +123,6 @@ export default class ErrorPerk extends BM.Perk
 	/*
 	static __initErrorListeners()
 	{
-
-		console.log("@@@installing", this.name);
 
 		window.addEventListener("unhandledrejection", (error) => {
 			let e = {};

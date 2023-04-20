@@ -135,15 +135,6 @@ export default class KeyPerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "KeyPerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

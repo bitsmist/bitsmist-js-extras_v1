@@ -93,15 +93,6 @@ export default class RoutePerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "RoutePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

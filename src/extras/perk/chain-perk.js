@@ -76,15 +76,6 @@ export default class ChainPerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "ChainPerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

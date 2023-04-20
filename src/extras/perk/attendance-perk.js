@@ -78,7 +78,7 @@ export default class AttendancePerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
 			{
-				return BM.promises.documentReady;
+				return BM.Origin.promises.documentReady;
 			}
 		}).then(() => {
 			if (BM.Util.safeGet(options, "waitForAttendance"))
@@ -106,15 +106,6 @@ export default class AttendancePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get name()
-	{
-
-		return "AttendancePerk";
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	static get info()
@@ -179,7 +170,7 @@ export default class AttendancePerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
 			{
-				return BM.promises.documentReady;
+				return BM.Origin.promises.documentReady;
 			}
 		}).then(() => {
 			if (BM.Util.safeGet(options, "waitForAttendance"))

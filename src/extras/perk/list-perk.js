@@ -103,15 +103,6 @@ export default class ListPerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "ListPerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

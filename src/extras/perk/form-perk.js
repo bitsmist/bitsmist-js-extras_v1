@@ -162,15 +162,6 @@ export default class FormPerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "FormPerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

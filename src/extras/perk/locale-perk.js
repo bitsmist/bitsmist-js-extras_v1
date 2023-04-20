@@ -239,15 +239,6 @@ export default class LocalePerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "LocalePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

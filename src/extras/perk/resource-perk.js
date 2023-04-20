@@ -130,15 +130,6 @@ export default class ResourcePerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "ResourcePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

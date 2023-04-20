@@ -39,15 +39,6 @@ export default class PreferencePerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "PreferencePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 

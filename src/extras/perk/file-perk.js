@@ -38,15 +38,6 @@ export default class FilePerk extends BM.Perk
 	//  Setter/Getter
 	// -------------------------------------------------------------------------
 
-	static get name()
-	{
-
-		return "FilePerk";
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static get info()
 	{
 
