@@ -58,6 +58,19 @@ export default class ValidationHandler
 	// -------------------------------------------------------------------------
 
 	/**
+     * Init the handler.
+     *
+     * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+     */
+	init(options)
+	{
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
 	 * Check validity (Need to override).
 	 *
 	 * @param	{Object}		values				Values to validate.

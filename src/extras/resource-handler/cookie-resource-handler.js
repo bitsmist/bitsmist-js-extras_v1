@@ -28,7 +28,6 @@ export default class CookieResourceHandler extends ResourceHandler
 		let defaults = {"autoLoad":true};
 		super(component, resourceName, Object.assign(defaults, options));
 
-		this._name = "CookieResourceHandler";
 		this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 	}
@@ -41,6 +40,15 @@ export default class CookieResourceHandler extends ResourceHandler
 	{
 
 		return this.__getCookie(this._cookieName);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	_post(id, data, parameters)
+	{
+
+		this.__setCookie(this._cookieName, data);
 
 	}
 

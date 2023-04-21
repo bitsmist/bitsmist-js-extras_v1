@@ -25,21 +25,24 @@ export default class ValidationPerk extends BM.Perk
      * Add the validator.
      *
      * @param	{Component}		component			Component.
-     * @param	{string}		validatorName		Validator name.
+     * @param	{string}		handlerName			Validation handler name.
      * @param	{array}			options				Options.
      */
-	static _addValidator(component, validatorName, options)
+	static _addValidator(component, handlerName, options)
 	{
 
-		let validator;
+		let promise = Promise.resolve();
+		let handler = component.inventory.get(`validation.validators.${handlerName}`);
 
-		if (options["handlerClassName"])
+		if (options["handlerClassName"] && !handler)
 		{
-			validator = BM.ClassUtil.createObject(options["handlerClassName"], component, validatorName, options);
-			component.inventory.set(`validation.validators.${validatorName}`, validator);
+			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
+			component.inventory.set(`validation.validators.${handlerName}`, handler);
+
+			promise = handler.init(options);
 		}
 
-		return validator;
+		return promise;
 
 	}
 
@@ -93,9 +96,13 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoOrganize(sender, e, ex)
 	{
 
+		let promises = [];
+
 		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			ValidationPerk._addValidator(this, sectionName, sectionValue);
+			promises.push(ValidationPerk._addValidator(this, sectionName, sectionValue));
 		});
+
+		return Promise.all(promises);
 
 	}
 

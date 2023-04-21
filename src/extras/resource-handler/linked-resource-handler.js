@@ -28,7 +28,6 @@ export default class LinkedResourceHandler extends ResourceHandler
 		let defaults = {"autoLoad":true, "autoFetch":false, "autoSubmit":false};
 		super(component, resourceName, Object.assign(defaults, options));
 
-		this._name = "LinkedResourceHandler";
 		this._ref;
 
 	}
@@ -47,7 +46,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 	set data(value)
 	{
 
-//		throw TypeError("LinkedResourceHandler is read only.");
+		//return this._ref.data = value;
+		//throw TypeError("LinkedResourceHandler is read only.");
 
 	}
 

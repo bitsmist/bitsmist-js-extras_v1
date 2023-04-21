@@ -36,12 +36,19 @@ export default class LocalePerk extends BM.Perk
 	static _addLocalizer(component, handlerName, options)
 	{
 
-		let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-		let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
-		component.inventory.set(`locale.localizers.${handlerName}`, handler);
-		component.inventory.get("locale.messages").add(handler.messages);
+		let promise = Promise.resolve();
+		let handler = component.inventory.get(`locale.localizers.${handlerName}`);
 
-		return handler.init(options);
+		if (!handler)
+		{
+			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
+			handler = BM.ClassUtil.createObject(handlerClassName, component, options);
+			component.inventory.set(`locale.localizers.${handlerName}`, handler);
+
+			promise = handler.init(options);
+		}
+
+		return promise;
 
 	}
 

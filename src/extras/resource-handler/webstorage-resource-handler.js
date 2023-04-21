@@ -19,20 +19,6 @@ export default class WebstorageResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
-	//  Constructor
-	// -------------------------------------------------------------------------
-
-	constructor(component, resourceName, options)
-	{
-
-		let defaults = {};
-		super(component, resourceName, Object.assign(defaults, options));
-
-		this._name = "WebstorageResourceHandler";
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Protected
 	// -------------------------------------------------------------------------
 

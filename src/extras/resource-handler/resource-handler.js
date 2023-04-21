@@ -37,7 +37,6 @@ export default class ResourceHandler
 		this._options = new BM.Store({"items":options});
 		this._data = {};
 		this._items = [];
-		this._name = "ResourceHandler";
 		this._target = {};
 		this._currentIndex = 0;
 
@@ -45,20 +44,6 @@ export default class ResourceHandler
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Resource handler name.
-	 *
-	 * @type	{String}
-	 */
-	get name()
-	{
-
-		return this._name;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -146,6 +131,35 @@ export default class ResourceHandler
 
 	// -------------------------------------------------------------------------
 	//  Methods
+	// -------------------------------------------------------------------------
+
+	/**
+     * Init the handler.
+     *
+     * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+     */
+	init(options)
+	{
+
+		if (this._options.get("autoLoad"))
+		{
+			let id = this._options.get("autoLoadOptions.id");
+			let parameters = this._options.get("autoLoadOptions.parameters");
+
+			return this.get(id, parameters).then(() => {
+				// Set the property automatically after resource is fetched
+				let autoSet = this._options.get("autoSetProperty");
+				if (autoSet)
+				{
+					this._component[autoSet] = this.items;
+				}
+			});
+		}
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**

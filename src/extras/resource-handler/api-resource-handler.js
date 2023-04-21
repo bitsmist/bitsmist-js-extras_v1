@@ -19,19 +19,6 @@ export default class ApiResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
-	//  Constructor
-	// -------------------------------------------------------------------------
-
-	constructor(component, resourceName, options)
-	{
-
-		super(component, resourceName, options);
-
-		this._name = "ApiResourceHandler";
-
-	}
-
-	// -------------------------------------------------------------------------
 	// 	Protected
 	// -------------------------------------------------------------------------
 

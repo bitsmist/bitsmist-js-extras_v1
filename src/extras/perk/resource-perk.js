@@ -25,33 +25,28 @@ export default class ResourcePerk extends BM.Perk
      * Add resource. Load data if "autoLoad" option is true using added resource.
      *
      * @param	{Component}		component			Component.
-     * @param	{string}		resourceName		Resource name.
+     * @param	{string}		handlerName			Resource handler name.
      * @param	{array}			options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addResource(component, resourceName, options)
+	static _addResource(component, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.tagName}, resourceName=${resourceName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
 
-		let resource = BM.ClassUtil.createObject(options["handlerClassName"], component, resourceName, options["handlerOptions"]);
-		component.inventory.set(`resource.resources.${resourceName}`, resource);
+		let promise = Promise.resolve();
+		let handler = component.inventory.get(`resource.resources.${handlerName}`);
 
-		if (resource.options.get("autoLoad"))
+		if (!handler)
 		{
-			let id = resource.options.get("autoLoadOptions.id");
-			let parameters = resource.options.get("autoLoadOptions.parameters");
+			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
+			component.inventory.set(`resource.resources.${handlerName}`, handler);
 
-			return resource.get(id, parameters).then(() => {
-				// Set the property automatically after resource is fetched
-				let autoSet = component.settings.get(`resource.${resourceName}.autoSetProperty`);
-				if (autoSet)
-				{
-					component[autoSet] = resource.items;
-				}
-			});
+			promise = handler.init(options);
 		}
+
+		return promise;
 
 	}
 

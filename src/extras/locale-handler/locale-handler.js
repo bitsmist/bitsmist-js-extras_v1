@@ -45,20 +45,6 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Name.
-	 *
-	 * @type	{String}
-	 */
-	get name()
-	{
-
-		return "LocaleHandler";
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Options.
 	 *
 	 * @type	{Object}
@@ -98,14 +84,21 @@ export default class LocaleHandler
 	init(options)
 	{
 
+		// Add messages from settings
 		Object.entries(options["messages"] || {}).forEach(([sectionName, sectionValue]) => {
 			this._messages.set(sectionName, sectionValue);
 		});
 
-		if (this.__hasExternalMessages(this._component))
-		{
-			return this.__loadExternalMessages(this._component);
-		}
+		Promise.resolve().then(() => {
+			// Add messages from external file
+			if (this.__hasExternalMessages(this._component))
+			{
+				return this.__loadExternalMessages(this._component);
+
+			}
+		}).then(() => {
+			this._component.inventory.get("locale.messages").add(this.messages);
+		});
 
 	}
 
@@ -222,7 +215,7 @@ export default class LocaleHandler
 		);
 
 		// Load messages
-		return BM.SettingPerk.loadFile(fileName, path, loadOptions).then((messages) => {
+		return BM.SettingPerk.__loadFile(fileName, path, loadOptions).then((messages) => {
 			this._messages.merge(messages);
 		});
 
