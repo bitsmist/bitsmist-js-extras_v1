@@ -11,7 +11,13 @@ export default [
 				file: 'dist/bitsmist-js-extras_v1.min.js',
 				format: 'iife',
 				sourcemap: false,
-				plugins: [terser({format:{comments:false},compress:{drop_console:true}})],
+				plugins: [
+					terser({
+						format:				{comments:false},
+						compress:			{drop_console:true},
+						keep_classnames:	true,
+					})
+				],
 			},
 			{
 				file: 'dist/bitsmist-js-extras_v1.js',
@@ -24,6 +30,7 @@ export default [
 			commonjs()
 		]
 	},
+	/*
 	{
 		input: 'src/extras/index.js',
 		output: [
@@ -40,4 +47,5 @@ export default [
 			buble()
 		]
 	}
+	*/
 ]

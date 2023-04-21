@@ -14,99 +14,88 @@ import BM from "../bm";
 //	Tab Index Class
 // =============================================================================
 
-// -----------------------------------------------------------------------------
-//  Constructor
-// -----------------------------------------------------------------------------
-
-export default function TabIndex(settings)
+export default class TabIndex extends BM.Component
 {
 
-	return Reflect.construct(BM.Component, [settings], this.constructor);
+	// -------------------------------------------------------------------------
+	//	Settings
+	// -------------------------------------------------------------------------
 
-}
+	_getSettings()
+	{
 
-BM.ClassUtil.inherit(TabIndex, BM.Component);
+		return {
+			"setting": {
+				"autoTransform":				false,
+			},
+			"event": {
+				"events": {
+					"tab-indices": {
+						"rootNode": 			"[data-tabindex]",
+						"handlers": {
+							"click": 			["TabIndex_onTabIndexClick"]
+						}
+					},
+				}
+			},
+		}
 
-// -----------------------------------------------------------------------------
-//	Settings
-// -----------------------------------------------------------------------------
+	}
 
-TabIndex.prototype._getSettings = function()
-{
+	// -------------------------------------------------------------------------
+	//	Event Handlers
+	// -------------------------------------------------------------------------
 
-	return {
-		"setting": {
-			"autoTransform":		false,
-			"name":					"BmTabindex",
-		},
-		"event": {
-			"events": {
-				"tab-indices": {
-					"rootNode": 		"[data-tabindex]",
-					"handlers": {
-						"click": 		["TabIndex_onTabIndexClick"]
-					}
-				},
-			}
-		},
+	TabIndex_onTabIndexClick(sender, e, ex)
+	{
+
+		if (sender.classList.contains("active")) {
+			return;
+		}
+
+		this.switchIndex(sender.getAttribute("data-tabindex"));
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Switch to the specified index.
+	 *
+	 * @param	{String}		index				Index.
+	 */
+	switchIndex(index)
+	{
+
+		this.querySelector(":scope [data-tabindex].active").classList.remove("active");
+		let tabIndex = this.querySelector(`:scope [data-tabindex='${index}']`);
+		tabIndex.classList.add("active");
+
+		let container = document.querySelector(this.getAttribute("data-pair"));
+		if (container) {
+			container.switchContent(index);
+		} else {
+			console.log("@@@no pair");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get the current active index.
+	 *
+	 * @return  {HTMLElement}	Current active element.
+	 */
+	getActiveIndex()
+	{
+
+		return this.querySelector(":scope .active");
+
 	}
 
 }
-
-// -----------------------------------------------------------------------------
-//	Event Handlers
-// -----------------------------------------------------------------------------
-
-TabIndex.prototype.TabIndex_onTabIndexClick = function(sender, e, ex)
-{
-
-	if (sender.classList.contains("active")) {
-		return;
-	}
-
-	this.switchIndex(sender.getAttribute("data-tabindex"));
-
-}
-
-// -----------------------------------------------------------------------------
-//	Methods
-// -----------------------------------------------------------------------------
-
-/**
- * Switch to the specified index.
- *
- * @param	{String}		index				Index.
- */
-TabIndex.prototype.switchIndex = function(index)
-{
-
-	this.querySelector(":scope [data-tabindex].active").classList.remove("active");
-	let tabIndex = this.querySelector(`:scope [data-tabindex='${index}']`);
-	tabIndex.classList.add("active");
-
-	let container = document.querySelector(this.getAttribute("data-pair"));
-	if (container) {
-		container.switchContent(index);
-	} else {
-		console.log("@@@no pair");
-	}
-
-}
-
-// -----------------------------------------------------------------------------
-
-/**
- * Get the current active index.
- *
- * @return  {HTMLElement}	Current active element.
- */
-TabIndex.prototype.getActiveIndex = function()
-{
-
-	return this.querySelector(":scope .active");
-
-}
-
-// -----------------------------------------------------------------------------
 
 customElements.define("bm-tabindex", TabIndex);

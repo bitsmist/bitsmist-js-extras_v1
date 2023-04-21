@@ -15,123 +15,118 @@ import ObservableStore from "../store/observable-store.js";
 //	Locale Server Class
 // =============================================================================
 
-// -----------------------------------------------------------------------------
-//  Constructor
-// -----------------------------------------------------------------------------
-
-export default function LocaleServer(settings)
+export default class LocaleServer extends BM.Component
 {
 
-	return Reflect.construct(BM.Component, [settings], this.constructor);
+	// -------------------------------------------------------------------------
+	//	Settings
+	// -------------------------------------------------------------------------
 
-}
+	_getSettings()
+	{
 
-BM.ClassUtil.inherit(LocaleServer, BM.Component);
-
-// -----------------------------------------------------------------------------
-//	Settings
-// -----------------------------------------------------------------------------
-
-LocaleServer.prototype._getSettings = function()
-{
-
-	return {
-		"setting": {
-			"autoTransform":			false,
-			"name":						"LocaleServer",
-		},
-		"event": {
-			"events": {
-				"this": {
-					"handlers": {
-						"beforeStart":		["LocaleServer_onBeforeStart"],
-						"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
+		return {
+			"setting": {
+				"autoTransform":				false,
+			},
+			"event": {
+				"events": {
+					"this": {
+						"handlers": {
+							"beforeStart":		["LocaleServer_onBeforeStart"],
+							"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
+						}
+					}
+				}
+			},
+			"locale": {
+				"handlers": {
+					"default": {
+						"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+					}
+				}
+			},
+			"attendance": {
+				"targets": {
+					"locale": {
+						"name": 				"LocaleServer",
 					}
 				}
 			}
-		},
-		"locale": {
-			"handlers": {
-				"default": {
-					"handlerClassName":		"BITSMIST.v1.LocaleHandler",
-				}
-			}
-		},
-		"attendance": {
-			"targets": {
-				"locale": {
-					"name": 				"LocaleServer",
-				}
-			}
 		}
+
 	}
 
-}
+	// -------------------------------------------------------------------------
+	//  Event Handlers
+	// -------------------------------------------------------------------------
 
-// -----------------------------------------------------------------------------
-//  Event Handlers
-// -----------------------------------------------------------------------------
-
-LocaleServer.prototype.LocaleServer_onBeforeStart = function(sender, e, ex)
-{
-
-	this._store = new ObservableStore({"async":true});
-
-}
-
-// -----------------------------------------------------------------------------
-
-LocaleServer.prototype.LocaleServer_onDoChangeLocale = function(sender, e, ex)
-{
-
-	// Set locale attribute
-	if (this.settings.get("setting.autoAttribute"))
+	LocaleServer_onBeforeStart(sender, e, ex)
 	{
-		let rootNode = this.settings.get("setting.autoAttribute.rootNode");
-		let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
-		let attribName = this.settings.get("setting.autoAttribute.attributeName", "data-locale");
 
-		targetElement.setAttribute(attribName, this.stats.get("locale.localeName"));
+		this._store = new ObservableStore({"async":true});
+
 	}
 
-	// Notify locale change to clients
-	return this._store.notify("*", e.detail);
+	// -------------------------------------------------------------------------
+
+	LocaleServer_onDoChangeLocale(sender, e, ex)
+	{
+
+		// Set locale attribute
+		if (this.settings.get("setting.autoAttribute"))
+		{
+			let rootNode = this.settings.get("setting.autoAttribute.rootNode");
+			let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
+			let attribName = this.settings.get("setting.autoAttribute.attributeName", "data-locale");
+
+			targetElement.setAttribute(attribName, this.stats.get("locale.localeName"));
+		}
+
+		// Notify locale change to clients
+		return this._store.notify("*", e.detail);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Subscribe to the Server. Get a notification when prefrence changed.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 */
+	subscribe(component, options)
+	{
+
+		this._store.subscribe(
+			`${component.tagName}_${component.uniqueId}`,
+			this.__triggerEvent.bind(component),
+		);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Trigger preference changed events.
+	 *
+	 * @param	{String}		conditions			Notify conditions.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	__triggerEvent(conditions, options)
+	{
+
+		return this.skills.use("locale.change", options.localeName);
+
+	}
 
 }
-
-// -----------------------------------------------------------------------------
-//  Methods
-// -----------------------------------------------------------------------------
-
-LocaleServer.prototype.subscribe = function(component, options)
-{
-
-	this._store.subscribe(
-		`${component.tagName}_${component.uniqueId}`,
-		this._triggerEvent.bind(component),
-	);
-
-}
-
-// -----------------------------------------------------------------------------
-//  Privates
-// -----------------------------------------------------------------------------
-
-/**
- * Trigger preference changed events.
- *
- * @param	{String}		conditions			Notify conditions.
- * @param	{Object}		options				Options.
- *
- * @return  {Promise}		Promise.
- */
-LocaleServer.prototype._triggerEvent = function(conditions, options)
-{
-
-	return this.skills.use("locale.change", options.localeName);
-
-}
-
-// ----------------------------------------------------------------------------
 
 customElements.define("bm-locale", LocaleServer);

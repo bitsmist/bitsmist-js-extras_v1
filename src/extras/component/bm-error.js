@@ -237,7 +237,7 @@ ErrorServer.prototype.__getErrorName = function(error)
 ErrorServer.prototype.__handleException = function(e)
 {
 
-	console.log("@@@error", this.name, e);
+	console.log("@@@error", this.tagName, e);
 	//window.stop();
 
 	let statusCode = e.object.status;
