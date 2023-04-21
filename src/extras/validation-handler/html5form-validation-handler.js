@@ -36,7 +36,45 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	validate(form, rules)
+	checkValidity(values, rules, options)
+	{
+
+		let invalids1 = {};
+		let invalids2;
+		let form = this._component.querySelector("form");
+		if (rules || options)
+		{
+			// Check allow/disallow list
+			let values = this._valueHandler.getFields(form);
+			invalids1 = super._validate(values, rules, options);
+		}
+		invalids2 = this._validate(form, rules);
+		let invalids = BM.Util.deepMerge(invalids1, invalids2);
+
+		this._component.stats.set("validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
+		this._component.stats.set("validation.validationResult.invalids", invalids);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	reportValidity(values, rules)
+	{
+
+		let form = this._component.querySelector("form");
+
+		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
+
+		form.reportValidity();
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Protected
+	// -------------------------------------------------------------------------
+
+	_validate(form, rules)
 	{
 
 		let invalids = {};
@@ -53,7 +91,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 			let failed = this._validateValue(element, key, value, rule);
 			if (failed.length > 0)
 			{
-				invalids[key] = this.createValidationResult(key, value, rule, failed, {"element": element});
+				invalids[key] = this._createValidationResult(key, value, rule, failed, {"element": element});
 				invalids["message"] = invalids["message"] || element.validationMessage;
 			}
 		});
@@ -84,43 +122,6 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 
-	checkValidity(values, rules, options)
-	{
-
-		let invalids1 = {};
-		let invalids2;
-		let form = this._component.querySelector("form");
-		if (rules || options)
-		{
-			// Check allow/disallow list
-			let values = this._valueHandler.getFields(form);
-			invalids1 = super.validate(values, rules, options);
-		}
-		invalids2 = this.validate(form, rules);
-		let invalids = BM.Util.deepMerge(invalids1, invalids2);
-
-		this._component.stats.set("validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
-		this._component.stats.set("validation.validationResult.invalids", invalids);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	reportValidity(values, rules)
-	{
-
-		let form = this._component.querySelector("form");
-
-		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
-		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
-
-		form.reportValidity();
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Protected
-	// -------------------------------------------------------------------------
 
 	/**
 	 * Validate the single value.

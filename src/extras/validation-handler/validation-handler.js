@@ -32,7 +32,6 @@ export default class ValidationHandler
 
 		options = options || {};
 
-		this._name = validatorName;
 		this._component = component;
 		this._options = new BM.Store({"items":options});
 
@@ -40,36 +39,6 @@ export default class ValidationHandler
 
 	// -------------------------------------------------------------------------
 	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Name.
-	 *
-	 * @type	{String}
-	 */
-	get name()
-	{
-
-		return this._name;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Items.
-	 *
-	 * @type	{Object}
-	 */
-	/*
-	get items()
-	{
-
-		return this._items;
-
-	}
-	*/
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -86,105 +55,6 @@ export default class ValidationHandler
 
 	// -------------------------------------------------------------------------
 	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Create validation result object.
-	 *
-	 * @param	{String}		key					Key.
-	 * @param	{*}				value				Value.
-	 * @param	{Object}		rule				Validation rule.
-	 * @param	{Object}		failed				Failed reports.
-	 * @param	{Object}		extra				Extra reports.
-	 *
- 	 * @return  {Object}		Invalid result.
-	 */
-	createValidationResult(key, value, rule, failed, extras)
-	{
-
-		let result = {
-			"key":			key,
-			"value":		value,
-			"message":		this._getFunctionValue(key, value, "message", rule),
-			"fix":			this._getFunctionValue(key, value, "fix", rule),
-			"failed":		failed,
-			"extras":		extras,
-		};
-
-		return result;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Validate.
-	 *
-	 * @param	{Object}		values				Values to validate.
-	 * @param	{Object}		rules				Validation rules.
-	 * @param	{Object}		options				Validation options.
-	 *
- 	 * @return  {Object}		Invalid results.
-	 */
-	validate(values, rules, options)
-	{
-
-		rules = rules || {};
-		options = options || {};
-		let invalids = {};
-
-		// Allow list
-		if (options["allowList"])
-		{
-			Object.keys(values).forEach((key) => {
-				if (options["allowList"].indexOf(key) === -1)
-				{
-					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
-
-		// Allow only in rules
-		if (options["allowOnlyInRules"])
-		{
-			Object.keys(values).forEach((key) => {
-				if (!(key in rules))
-				{
-					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
-					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
-
-		// Disallow list
-		if (options["disallowList"])
-		{
-			Object.keys(values).forEach((key) => {
-				if (options["disallowList"].indexOf(key) > -1)
-				{
-					let failed = [{"rule":"disallowList", "validity":"disallowed"}];
-					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
-				}
-			});
-		}
-
-		// Required
-		Object.keys(rules).forEach((key) => {
-			if ("constraints" in rules[key] && rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
-			{
-				if (!(key in values))
-				{
-					let failed = [{"rule":"required", "validity":"valueMissing"}];
-					invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
-				}
-			}
-		});
-
-		return invalids;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -212,6 +82,105 @@ export default class ValidationHandler
 
 	// -------------------------------------------------------------------------
 	//  Protected
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Validate.
+	 *
+	 * @param	{Object}		values				Values to validate.
+	 * @param	{Object}		rules				Validation rules.
+	 * @param	{Object}		options				Validation options.
+	 *
+ 	 * @return  {Object}		Invalid results.
+	 */
+	_validate(values, rules, options)
+	{
+
+		rules = rules || {};
+		options = options || {};
+		let invalids = {};
+
+		// Allow list
+		if (options["allowList"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (options["allowList"].indexOf(key) === -1)
+				{
+					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+					invalids[key] = this._createValidationResult(key, values[key], rules[key], failed);
+				}
+			});
+		}
+
+		// Allow only in rules
+		if (options["allowOnlyInRules"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (!(key in rules))
+				{
+					let failed = [{"rule":"allowList", "validity":"notAllowed"}];
+					invalids[key] = this._createValidationResult(key, values[key], rules[key], failed);
+				}
+			});
+		}
+
+		// Disallow list
+		if (options["disallowList"])
+		{
+			Object.keys(values).forEach((key) => {
+				if (options["disallowList"].indexOf(key) > -1)
+				{
+					let failed = [{"rule":"disallowList", "validity":"disallowed"}];
+					invalids[key] = this._createValidationResult(key, values[key], rules[key], failed);
+				}
+			});
+		}
+
+		// Required
+		Object.keys(rules).forEach((key) => {
+			if ("constraints" in rules[key] && rules[key]["constraints"] && "required" in rules[key]["constraints"] && rules[key]["constraints"]["required"])
+			{
+				if (!(key in values))
+				{
+					let failed = [{"rule":"required", "validity":"valueMissing"}];
+					invalids[key] = this._createValidationResult(key, values[key], rules[key], failed);
+				}
+			}
+		});
+
+		return invalids;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Create validation result object.
+	 *
+	 * @param	{String}		key					Key.
+	 * @param	{*}				value				Value.
+	 * @param	{Object}		rule				Validation rule.
+	 * @param	{Object}		failed				Failed reports.
+	 * @param	{Object}		extra				Extra reports.
+	 *
+ 	 * @return  {Object}		Invalid result.
+	 */
+	_createValidationResult(key, value, rule, failed, extras)
+	{
+
+		let result = {
+			"key":			key,
+			"value":		value,
+			"message":		this._getFunctionValue(key, value, "message", rule),
+			"fix":			this._getFunctionValue(key, value, "fix", rule),
+			"failed":		failed,
+			"extras":		extras,
+		};
+
+		return result;
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**

@@ -22,36 +22,11 @@ export default class ObjectValidationHandler extends ValidationHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	validate(values, rules)
-	{
-
-		let invalids = {};
-
-		if (rules)
-		{
-			Object.keys(values).forEach((key) => {
-				if (rules[key])
-				{
-					let failed = this._validateValue(key, values[key], rules[key]);
-					if (failed.length > 0)
-					{
-						invalids[key] = this.createValidationResult(key, values[key], rules[key], failed);
-					}
-				}
-			});
-		}
-
-		return invalids;
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	checkValidity(values, rules, options)
 	{
 
-		let invalids1 = super.validate(values, rules, options); // Check allow/disallow/required
-		let invalids2 = this.validate(values, rules);
+		let invalids1 = super._validate(values, rules, options); // Check allow/disallow/required
+		let invalids2 = this._validate(values, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
 		this._component.stats.set("validation.validationResult.result", ( Object.keys(invalids).length > 0 ? false : true ));
@@ -67,6 +42,31 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 	// -------------------------------------------------------------------------
 	//  Protected
+	// -------------------------------------------------------------------------
+
+	_validate(values, rules)
+	{
+
+		let invalids = {};
+
+		if (rules)
+		{
+			Object.keys(values).forEach((key) => {
+				if (rules[key])
+				{
+					let failed = this._validateValue(key, values[key], rules[key]);
+					if (failed.length > 0)
+					{
+						invalids[key] = this._createValidationResult(key, values[key], rules[key], failed);
+					}
+				}
+			});
+		}
+
+		return invalids;
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
