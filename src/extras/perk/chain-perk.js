@@ -53,7 +53,7 @@ export default class ChainPerk extends BM.Perk
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			nodes = Array.prototype.slice.call(nodes, 0);
-			BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.name}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
 			if (sync)
 			{

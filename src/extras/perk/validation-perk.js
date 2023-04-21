@@ -108,7 +108,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);
@@ -127,7 +127,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.name}, validatorName=${validatorName}`);
+			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);

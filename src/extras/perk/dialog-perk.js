@@ -139,7 +139,7 @@ export default class DialogPerk extends BM.Perk
 
 		if (this.settings.get("dialog.options.autoOpen"))
 		{
-			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.name}, id=${this.id}`);
+			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.tagName}, id=${this.id}`);
 
 			//return this.open();
 			return this.skills.use("dialog.open");

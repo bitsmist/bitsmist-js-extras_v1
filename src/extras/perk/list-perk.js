@@ -64,7 +64,7 @@ export default class ListPerk extends BM.Perk
 
 		let rootNode = this.settings.get("list.options.listRootNode");
 		this._listRootNode = ( rootNode ? this.querySelector(rootNode) : this );
-		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.name}, listRootNode=${this.settings.get("setting.listRootNode")}`);
+		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.settings.get("setting.listRootNode")}`);
 
 		return ListPerk._transformRow(this, this.settings.get("list.options.rowSkinName", "row"));
 
