@@ -19,6 +19,251 @@ export default class RoutePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Create options array from the current url.
+	 *
+	 * @return  {Array}			Options array.
+	 */
+	static _loadParameters(component, url)
+	{
+
+		url = url || window.location.href;
+		let vars = {}
+		let hash;
+		let value;
+
+		if (window.location.href.indexOf("?") > -1)
+		{
+			let hashes = url.slice(url.indexOf('?') + 1).split('&');
+
+			for(let i = 0; i < hashes.length; i++) {
+				hash = hashes[i].split('=');
+				if (hash[1]){
+					value = hash[1].split('#')[0];
+				} else {
+					value = hash[1];
+				}
+				vars[hash[0]] = decodeURIComponent(value);
+			}
+		}
+
+		return vars;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Load the spec file and init.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		specName			Spec name.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static _switchSpec(component, specName, options)
+	{
+
+		BM.Util.assert(specName, "RoutePerk._switchSpec(): A spec name not specified.", TypeError);
+
+		let newSpec;
+		return Promise.resolve().then(() => {
+			if (!component.inventory.get(`routings.specs.${specName}`))
+			{
+				return RoutePerk._loadSpec(component, specName, options);
+			}
+		}).then((spec) => {
+			newSpec = spec;
+			component.inventory.get("routing.spec").items = newSpec;
+		}).then(() => {
+			if (component.settings.get("setting.hasExtender"))
+			{
+				return RoutePerk._loadExtender(component, specName, options);
+			}
+		}).then(() => {
+			return component.skills.use("perk.attachPerks", {"settings":newSpec});
+		}).then(() => {
+			return component.skills.use("event.trigger", "doOrganize", {"settings":newSpec});
+		}).then(() => {
+			return component.skills.use("event.trigger", "afterLoadSettings", {"settings":newSpec});
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Open route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static _open(component, routeInfo, options)
+	{
+
+		options = Object.assign({}, options);
+		let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
+
+		// Current route info
+		let curRouteInfo = component.inventory.get("routing.routeInfo");
+
+		let newUrl;
+		let newRouteInfo;
+		if (routeInfo)
+		{
+			newUrl = RoutePerk._buildUrl(component, routeInfo, options);
+			newRouteInfo = RoutePerk.__loadRouteInfo(component, newUrl);
+		}
+		else
+		{
+			newUrl = window.location.href;
+			newRouteInfo = curRouteInfo;
+		}
+
+		// Jump to another page
+		if (options["jump"] || !newRouteInfo["name"]
+				|| ( curRouteInfo["specName"] != newRouteInfo["specName"]) // <--- remove this when _update() is ready.
+		)
+		{
+			RoutePerk._jumpRoute(component, {"url":newUrl});
+			return;
+		}
+
+		return Promise.resolve().then(() => {
+			// Replace URL
+			if (pushState)
+			{
+				history.pushState(RoutePerk.__getState("_open.pushState"), null, newUrl);
+			}
+			component.inventory.set("routing.routeInfo", newRouteInfo);
+		}).then(() => {
+			// Load other component when new spec is different from the current spec
+			if (curRouteInfo["specName"] != newRouteInfo["specName"])
+			{
+				return RoutePerk._updateRoute(component, curRouteInfo, newRouteInfo, options);
+			}
+		}).then(() => {
+			// Validate URL
+			if (component.settings.get("routing.options.autoValidate"))
+			{
+				let validateOptions = {
+					"validatorName":	component.settings.get("routing.options.validatorName"),
+					"items":			RoutePerk._loadParameters(component, newUrl),
+					"url":				newUrl,
+				};
+				return component.skills.use("validation.validate", validateOptions);
+			}
+		}).then(() => {
+			// Refresh
+			return RoutePerk._refreshRoute(component, newRouteInfo, options);
+		}).then(() => {
+			// Normalize URL
+			return RoutePerk._normalizeRoute(component, window.location.href);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Jump to url.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Options.
+	 */
+	static _jumpRoute(component, routeInfo, options)
+	{
+
+		let url = RoutePerk._buildUrl(component, routeInfo, options);
+		window.location.href = url;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Update route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static _updateRoute(component, curRouteInfo, newRouteInfo, options)
+	{
+
+		return RoutePerk._switchSpec(component, newRouteInfo["specName"]);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Refresh route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static _refreshRoute(component, routeInfo, options)
+	{
+
+		return component.skills.use("basic.refresh", options);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Replace current url.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{Object}		routeInfo			Route information.
+	 * @param	{Object}		options				Options.
+	 */
+	static _replaceRoute(component, routeInfo, options)
+	{
+
+		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, RoutePerk._buildUrl(component, routeInfo, options));
+		component.inventory.set("routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Normalize route.
+	 *
+	 * @param	{Component}		component			Component.
+	 * @param	{String}		url					Url to normalize.
+	 *
+	 * @return 	{Promise}		Promise.
+	 */
+	static _normalizeRoute(component, url)
+	{
+
+		return Promise.resolve().then(() => {
+			return component.skills.use("event.trigger", "beforeNormalizeURL");
+		}).then(() => {
+			return component.skills.use("event.trigger", "doNormalizeURL");
+		}).then(() => {
+			return component.skills.use("event.trigger", "afterNormalizeURL");
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -26,16 +271,17 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Routings
-		Object.entries(this.settings.get("routing.routes", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(BM.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
 			RoutePerk._addRoute(this, sectionValue);
 		});
 
 		// Set current route info.
-		this._routeInfo = RoutePerk.__loadRouteInfo(this, window.location.href);
+		this.inventory.set("routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
 
 		// Specs
-		Object.entries(this.settings.get("routing.specs", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(BM.Util.safeGet(e.detail, "settings.routing.specs", {})).forEach(([sectionName, sectionValue]) => {
 			this._specs[sectionName] = sectionValue;
+			this.inventory.get(`routing.specs.${sectionName}`, sectionValue);
 		});
 
 	}
@@ -45,13 +291,14 @@ export default class RoutePerk extends BM.Perk
 	static RoutePerk_onDoStart(sender, e, ex)
 	{
 
-		if (this.routeInfo["specName"])
+		let specName = this.inventory.get("routing.routeInfo.specName");
+		if (specName)
 		{
 			let options = {
 				"query": this.settings.get("setting.query")
 			};
 
-			return this.switchSpec(this.routeInfo["specName"], options);
+			return this.skills.use("routing.switchSpec", specName, options);
 		}
 
 	};
@@ -61,7 +308,8 @@ export default class RoutePerk extends BM.Perk
 	static RoutePerk_onAfterReady(sender, e, ex)
 	{
 
-		return this.openRoute();
+		//return this.openRoute();
+		return this.skills.use("routing.openRoute");
 
 	}
 
@@ -121,26 +369,24 @@ export default class RoutePerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add properties to component
-		Object.defineProperty(component, 'routeInfo', { get() { return this._routeInfo; }, });
-		Object.defineProperty(component, 'specs', { get() { return this._specs; }, });
-		Object.defineProperty(component, 'spec', { get() { return this._spec; }, });
+		// Add skills to component;
+		component.skills.set("routing.loadParameters", function(...args) { return RoutePerk._loadParameters(...args); });
+		component.skills.set("routing.switchSpec", function(...args) { return RoutePerk._switchSpec(...args); });
+		component.skills.set("routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		component.skills.set("routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
+		component.skills.set("routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		component.skills.set("routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		component.skills.set("routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
+		component.skills.set("routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
 
-		// Add methods to component
-		component.loadParameters = function(url) { return RoutePerk._loadParameters(url); }
-		component.switchSpec = function(specName, options) { return RoutePerk._switchSpec(this, specName, options); }
-		component.openRoute = function(routeInfo, options) { return RoutePerk._open(this, routeInfo, options); }
-		component.jumpRoute = function(routeInfo, options) { return RoutePerk._jumpRoute(this, routeInfo, options); }
-		component.updateRoute = function(routeInfo, options) { return RoutePerk._updateRoute(this, routeInfo, options); }
-		component.refreshRoute = function(routeInfo, options) { return RoutePerk._refreshRoute(this, routeInfo, options); }
-		component.replaceRoute = function(routeInfo, options) { return RoutePerk._replaceRoute(this, routeInfo, options); }
-		component.normalizeRoute = function() { return RoutePerk._normalizeRoute(this); }
+		// Add inventory items to component
+		component.inventory.set("routing.routeInfo", {});
+		component.inventory.set("routing.specs", {});
+		component.inventory.set("routing.spec", new BM.ChainableStore({"chain":component.settings, "writeThrough":true}));
+		Object.defineProperty(component, "settings", { get() { return this.inventory.get("routing.spec"); }, }); // Tweak to see settings through spec
 
-		// Init component vars
-		component._routes = [];
-		component._specs = {};
-		component._spec = new BM.ChainableStore({"chain":component.settings, "writeThrough":true});
-		Object.defineProperty(component, "settings", { get() { return this._spec; }, }); // Tweak to see settings through spec
+		// Add vault items to component
+		component.vault.set("routing.routes", []);
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doOrganize", RoutePerk.RoutePerk_onDoOrganize);
@@ -184,11 +430,11 @@ export default class RoutePerk extends BM.Perk
 
 		if (first)
 		{
-			component._routes.unshift(route);
+			component.vault.get("routing.routes").unshift(route);
 		}
 		else
 		{
-			component._routes.push(route);
+			component.vault.get("routing.routes").push(route);
 		}
 
 	}
@@ -218,7 +464,7 @@ export default class RoutePerk extends BM.Perk
 			let params = {};
 			if (options && options["mergeParameters"])
 			{
-				params = Object.assign(params, component.routeInfo["queryParameters"]);
+				params = Object.assign(params, component.inventory.get("routing.routeInfo.queryParameters"));
 			}
 			params = Object.assign(params, routeInfo["queryParameters"]);
 			url += RoutePerk._buildUrlQuery(params);
@@ -228,7 +474,7 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Build query string from the options object.
@@ -262,247 +508,6 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Create options array from the current url.
-	 *
-	 * @return  {Array}			Options array.
-	 */
-	static _loadParameters(url)
-	{
-
-		url = url || window.location.href;
-		let vars = {}
-		let hash;
-		let value;
-
-		if (window.location.href.indexOf("?") > -1)
-		{
-			let hashes = url.slice(url.indexOf('?') + 1).split('&');
-
-			for(let i = 0; i < hashes.length; i++) {
-				hash = hashes[i].split('=');
-				if (hash[1]){
-					value = hash[1].split('#')[0];
-				} else {
-					value = hash[1];
-				}
-				vars[hash[0]] = decodeURIComponent(value);
-			}
-		}
-
-		return vars;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Load the spec file and init.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		specName			Spec name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _switchSpec(component, specName, options)
-	{
-
-		BM.Util.assert(specName, "RoutePerk._switchSpec(): A spec name not specified.", TypeError);
-
-		return Promise.resolve().then(() => {
-			if (!component._specs[specName])
-			{
-				return RoutePerk._loadSpec(component, specName, options);
-			}
-		}).then(() => {
-			component._spec.items = component._specs[specName];
-		}).then(() => {
-			if (component.settings.get("setting.hasExtender"))
-			{
-				return RoutePerk._loadExtender(component, specName, options);
-			}
-		}).then(() => {
-			return component.skills.use("perk.attachPerks", {"settings":component._specs[component._routeInfo["specName"]]});
-		}).then(() => {
-			return component.skills.use("event.trigger", "doOrganize", {"settings":component._specs[component._routeInfo["specName"]]});
-		}).then(() => {
-			return component.skills.use("event.trigger", "afterLoadSettings", {"settings":component._specs[component._routeInfo["specName"]]});
-		});
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Open route.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _open(component, routeInfo, options)
-	{
-
-		options = Object.assign({}, options);
-		let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
-
-		// Current route info
-		let curRouteInfo = component._routeInfo;
-
-		let newUrl;
-		let newRouteInfo;
-		if (routeInfo)
-		{
-			newUrl = RoutePerk._buildUrl(component, routeInfo, options);
-			newRouteInfo = RoutePerk.__loadRouteInfo(component, newUrl);
-		}
-		else
-		{
-			newUrl = window.location.href;
-			newRouteInfo = curRouteInfo;
-		}
-
-		// Jump to another page
-		if (options["jump"] || !newRouteInfo["name"]
-				|| ( curRouteInfo["specName"] != newRouteInfo["specName"]) // <--- remove this when _update() is ready.
-		)
-		{
-			RoutePerk._jumpRoute(component, {"url":newUrl});
-			return;
-		}
-
-		return Promise.resolve().then(() => {
-			// Replace URL
-			if (pushState)
-			{
-				history.pushState(RoutePerk.__getState("_open.pushState"), null, newUrl);
-			}
-			component._routeInfo = newRouteInfo;
-		}).then(() => {
-			// Load other component when new spec is different from the current spec
-			if (curRouteInfo["specName"] != newRouteInfo["specName"])
-			{
-				return RoutePerk._updateRoute(component, curRouteInfo, newRouteInfo, options);
-			}
-		}).then(() => {
-			// Validate URL
-			if (component.settings.get("routing.options.autoValidate"))
-			{
-				let validateOptions = {
-					"validatorName":	component.settings.get("routing.options.validatorName"),
-					"items":			RoutePerk._loadParameters(newUrl),
-					"url":				newUrl,
-				};
-				return component.skills.use("validation.validate", validateOptions);
-			}
-		}).then(() => {
-			// Refresh
-			return RoutePerk._refreshRoute(component, newRouteInfo, options);
-		}).then(() => {
-			// Normalize URL
-			return RoutePerk._normalizeRoute(component, window.location.href);
-		});
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Jump to url.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 */
-	static _jumpRoute(component, routeInfo, options)
-	{
-
-		let url = RoutePerk._buildUrl(component, routeInfo, options);
-		window.location.href = url;
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Update route.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _updateRoute(component, curRouteInfo, newRouteInfo, options)
-	{
-
-		return RoutePerk._switchSpec(component, newRouteInfo["specName"]);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Refresh route.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _refreshRoute(component, routeInfo, options)
-	{
-
-		return component.skills.use("basic.refresh", options);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Replace current url.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 */
-	static _replaceRoute(component, routeInfo, options)
-	{
-
-		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, RoutePerk._buildUrl(component, routeInfo, options));
-		component._routeInfo = RoutePerk.__loadRouteInfo(component, window.location.href);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	/**
-	 * Normalize route.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		url					Url to normalize.
-	 *
-	 * @return 	{Promise}		Promise.
-	 */
-	static _normalizeRoute(component, url)
-	{
-
-		return Promise.resolve().then(() => {
-			return component.skills.use("event.trigger", "beforeNormalizeURL");
-		}).then(() => {
-			return component.skills.use("event.trigger", "doNormalizeURL");
-		}).then(() => {
-			return component.skills.use("event.trigger", "afterNormalizeURL");
-		});
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -522,7 +527,7 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Load the spec file for this page.
@@ -552,20 +557,20 @@ export default class RoutePerk extends BM.Perk
 
 		// Load specs
 		let options = BM.Util.deepMerge({"type": "js", "bindTo": this}, loadOptions);
-		promises.push(BM.SettingPerk.loadFile(specName, path, options));
+		promises.push(BM.SettingPerk.__loadFile(specName, path, options));
 
 		return Promise.all(promises).then((result) => {
 			spec = result[0];
 //			specCommon = result[0];
 //			spec = BM.Util.deepMerge(specCommon, result[1]);
-			component._specs[specName] = spec;
+			component.inventory.set(`routing.specs.${specName}`, spec);
 
 			return spec;
 		});
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Load the extender file for this page.
@@ -614,26 +619,27 @@ export default class RoutePerk extends BM.Perk
 		let parsedUrl = new URL(url, window.location.href);
 		let specName;
 		let params = {};
+		let routes = component.vault.get("routing.routes");
 
 		// Find the matching route
-		for (let i = component._routes.length - 1; i >= 0; i--)
+		for (let i = routes.length - 1; i >= 0; i--)
 		{
 			// Check origin
-			if (component._routes[i]["origin"] && parsedUrl.origin != component._routes[i]["origin"])
+			if (routes[i]["origin"] && parsedUrl.origin != routes[i]["origin"])
 			{
 				continue;
 			}
 
 			// Check path
-			let result = ( !component._routes[i]["path"] ? [] : component._routes[i].re.exec(parsedUrl.pathname) );
+			let result = ( !routes[i]["path"] ? [] : routes[i].re.exec(parsedUrl.pathname) );
 			if (result)
 			{
-				routeName = component._routes[i].name;
-				specName = ( component._routes[i].specName ? component._routes[i].specName : "" );
+				routeName = routes[i].name;
+				specName = ( routes[i].specName ? routes[i].specName : "" );
 				for (let j = 0; j < result.length - 1; j++)
 				{
-					params[component._routes[i].keys[j].name] = result[j + 1];
-					let keyName = component._routes[i].keys[j].name;
+					params[routes[i].keys[j].name] = result[j + 1];
+					let keyName = routes[i].keys[j].name;
 					let value = result[j + 1];
 					specName = specName.replace(`{{:${keyName}}}`, value);
 				}
@@ -649,13 +655,13 @@ export default class RoutePerk extends BM.Perk
 		routeInfo["query"] = parsedUrl.search;
 		routeInfo["parsedUrl"] = parsedUrl;
 		routeInfo["routeParameters"] = params;
-		routeInfo["queryParameters"] = RoutePerk._loadParameters(url);
+		routeInfo["queryParameters"] = RoutePerk._loadParameters(component, url);
 
 		return routeInfo;
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Init pop state handling.
@@ -677,7 +683,7 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Return history state.
@@ -703,7 +709,7 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Fix route.
@@ -717,7 +723,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		let isOk = true;
-		let newParams = RoutePerk._loadParameters(url);
+		let newParams = RoutePerk._loadParameters(component, url);
 
 		// Fix invalid paramters
 		Object.keys(component.stats.get("validation.validationResult.invalids")).forEach((key) => {
@@ -748,7 +754,7 @@ export default class RoutePerk extends BM.Perk
 
 	}
 
-	// -----------------------------------------------------------------------------
+	// -------------------------------------------------------------------------
 
 	/**
 	 * Dump validation errors.
