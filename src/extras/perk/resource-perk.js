@@ -64,7 +64,7 @@ export default class ResourcePerk extends BM.Perk
 
 		let promises = [];
 
-		Object.entries(this.settings.get("resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(BM.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(ResourcePerk._addResource(this, sectionName, sectionValue));
 		});
 

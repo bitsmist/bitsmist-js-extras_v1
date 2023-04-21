@@ -27,7 +27,7 @@ export default class ElementPerk extends BM.Perk
 
 		let order = ElementPerk.info["order"];
 
-		Object.entries(this.settings.get("element.targets", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(BM.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.skills.use("event.add", sectionName, {
 				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,

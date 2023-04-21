@@ -93,7 +93,7 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoOrganize(sender, e, ex)
 	{
 
-		Object.entries(this.settings.get("validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			ValidationPerk._addValidator(this, sectionName, sectionValue);
 		});
 

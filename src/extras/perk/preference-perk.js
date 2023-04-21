@@ -29,7 +29,7 @@ export default class PreferencePerk extends BM.Perk
 			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoOrganize(): PreferenceServer doesn't exist. name=${this.tagName}`);
 
 			return this.skills.use("state.wait", [{"object":server}]).then(() => {
-				server.subscribe(this, this.settings.get("preference"));
+				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 			});
 		});
 
