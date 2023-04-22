@@ -346,7 +346,7 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get and reshape items from raw data on get.
+	 * Get and reshape items from raw data on load.
 	 *
 	 * @param	{Object}		data				Raw data from which items are retrieved.
 	 *
@@ -360,9 +360,9 @@ export default class ResourceHandler
 		let items = ( itemsField ? BM.Util.safeGet(data, itemsField) : data );
 
 		// Reshape
-		if (this._options.get("reshapeOptions.get.reshape"))
+		if (this._options.get("reshapeOptions.load.reshape"))
 		{
-			let reshaper = this._options.get("reshapeOptions.get.reshaper", this.__reshaper_get.bind(this));
+			let reshaper = this._options.get("reshapeOptions.load.reshaper", this.__reshaper_load.bind(this));
 			items = reshaper(items);
 		}
 
@@ -373,7 +373,7 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Reshape request data on post/put.
+	 * Reshape request data on add/update.
 	 *
 	 * @param	{Object}		data				Data to reshape.
 	 *
@@ -382,9 +382,9 @@ export default class ResourceHandler
 	__reshapeData(data)
 	{
 
-		if (this._options.get("reshapeOptions.put.reshape"))
+		if (this._options.get("reshapeOptions.update.reshape"))
 		{
-			let reshaper = this._options.get("reshapeOptions.put.reshaper", () => { return data; });
+			let reshaper = this._options.get("reshapeOptions.update.reshaper", () => { return data; });
 			data = reshaper(data);
 		}
 
@@ -395,13 +395,13 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-     * Reshape items on get.
+     * Reshape items on load.
      *
      * @param	{Object}		target				Target to reshape.
 	 *
 	 * @return  {Object}		Master object.
      */
-	__reshaper_get(target)
+	__reshaper_load(target)
 	{
 
 		let items;
