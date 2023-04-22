@@ -215,7 +215,7 @@ export default class LocaleHandler
 		);
 
 		// Load messages
-		return BM.SettingPerk.__loadFile(fileName, path, loadOptions).then((messages) => {
+		return BM.AjaxUtil.loadJSON(BM.Util.concatPath([path, fileName]), loadOptions).then((messages) => {
 			this._messages.merge(messages);
 		});
 

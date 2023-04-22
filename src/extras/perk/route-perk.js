@@ -557,7 +557,7 @@ export default class RoutePerk extends BM.Perk
 
 		// Load specs
 		let options = BM.Util.deepMerge({"type": "js", "bindTo": this}, loadOptions);
-		promises.push(BM.SettingPerk.__loadFile(specName, path, options));
+		promises.push(BM.AjaxUtil.loadJSON(BM.Util.concatPath([path, specName]), options));
 
 		return Promise.all(promises).then((result) => {
 			spec = result[0];
