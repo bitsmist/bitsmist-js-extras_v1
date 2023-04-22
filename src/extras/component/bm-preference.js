@@ -34,7 +34,6 @@ export default class PreferenceServer extends BM.Component
 					"this": {
 						"handlers": {
 							"beforeStart":		["PreferenceServer_onBeforeStart"],
-							"doFetch":			["PreferenceServer_onDoFetch"],
 							"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
 							"doReportValidity":	["PreferenceServer_onDoReportValidity"]
 						}
@@ -84,17 +83,9 @@ export default class PreferenceServer extends BM.Component
 		this._defaults = new BM.ChainableStore({"items":this.settings.get("setting.defaults")});
 		this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
 
-	}
-
-	// -------------------------------------------------------------------------
-
-	PreferenceServer_onDoFetch = function(sender, e, ex)
-	{
-
-		if ("items" in e.detail)
-		{
-			this._store.items = e.detail.items;
-		}
+		Object.keys(this.inventory.get("resource.resources")).forEach((key) => {
+			this._store.merge(this.inventory.get(`resource.resources.${key}`).items);
+		});
 
 	}
 
