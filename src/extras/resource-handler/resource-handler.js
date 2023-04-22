@@ -143,19 +143,18 @@ export default class ResourceHandler
 	init(options)
 	{
 
+		if (this._options.get("queryOptions"))
+		{
+			this._target.id = this._options.get("queryOptions.id", this.target.id);
+			this._target.parameters = this._options.get("queryOptions.parameters", this.target.parameters);
+		}
+
 		if (this._options.get("autoLoad"))
 		{
-			let id = this._options.get("autoLoadOptions.id");
-			let parameters = this._options.get("autoLoadOptions.parameters");
+			let id = this._target.id;
+			let parameters = this._target.parameters;
 
-			return this.get(id, parameters).then(() => {
-				// Set the property automatically after resource is fetched
-				let autoSet = this._options.get("autoSetProperty");
-				if (autoSet)
-				{
-					this._component[autoSet] = this.items;
-				}
-			});
+			return this.get(id, parameters);
 		}
 
 	}
@@ -174,6 +173,7 @@ export default class ResourceHandler
 	{
 
 		return Promise.resolve().then(() => {
+			console.log("@@@get", this._component.tagName, this.constructor.name, this._resourceName, id, parameters);
 			return this._get(id, parameters);
 		}).then((data) => {
 //			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
@@ -198,9 +198,7 @@ export default class ResourceHandler
 	delete(id, parameters)
 	{
 
-		return Promise.resolve().then(() => {
-			return this._delete(id, parameters);
-		});
+		return this._delete(id, parameters);
 
 	}
 
@@ -220,9 +218,7 @@ export default class ResourceHandler
 
 		data = this.__reshapeData(data);
 
-		return Promise.resolve().then(() => {
-			return this._post(id, data, parameters);
-		});
+		return this._post(id, data, parameters);
 
 	}
 
@@ -242,9 +238,7 @@ export default class ResourceHandler
 
 		data = this.__reshapeData(data);
 
-		return Promise.resolve().then(() => {
-			return this._put(id, data, parameters);
-		});
+		return this._put(id, data, parameters);
 
 	}
 
