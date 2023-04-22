@@ -33,7 +33,7 @@ export default class LocalePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addLocalizer(component, handlerName, options)
+	static _addHandler(component, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
@@ -156,7 +156,7 @@ export default class LocalePerk extends BM.Perk
 		let promises = [];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(LocalePerk._addLocalizer(this, sectionName, sectionValue));
+			promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
 		});
 
 		// Subscribe to the Locale Server if exists
@@ -268,7 +268,7 @@ export default class LocalePerk extends BM.Perk
 		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
 		component.skills.set("locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
 		component.skills.set("locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-		component.skills.set("locale.addLocalizer", function(...args) { return LocalePerk._addLocalizer(...args); });
+		component.skills.set("locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
 
 		// Add inventory items to component
 		component.inventory.set("locale.localizers", {});

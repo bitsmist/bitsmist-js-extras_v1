@@ -28,7 +28,7 @@ export default class ValidationPerk extends BM.Perk
      * @param	{string}		handlerName			Validation handler name.
      * @param	{array}			options				Options.
      */
-	static _addValidator(component, handlerName, options)
+	static _addHandler(component, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
@@ -99,7 +99,7 @@ export default class ValidationPerk extends BM.Perk
 		let promises = [];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ValidationPerk._addValidator(this, sectionName, sectionValue));
+			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
 		});
 
 		return Promise.all(promises);
@@ -167,7 +167,7 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		// Add skills to component;
-		component.skills.set("validation.addValidator", function(...args) { return ValidationPerk._addValidator(...args); });
+		component.skills.set("validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
 		component.skills.set("validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 
 		// Add inventory items to component

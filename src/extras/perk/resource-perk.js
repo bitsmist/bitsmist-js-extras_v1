@@ -30,10 +30,10 @@ export default class ResourcePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addResource(component, handlerName, options)
+	static _addHandler(component, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addResource(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
 		let handler = component.inventory.get(`resource.resources.${handlerName}`);
@@ -60,7 +60,7 @@ export default class ResourcePerk extends BM.Perk
 		let promises = [];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ResourcePerk._addResource(this, sectionName, sectionValue));
+			promises.push(ResourcePerk._addHandler(this, sectionName, sectionValue));
 		});
 
 		return Promise.all(promises);
@@ -81,7 +81,7 @@ export default class ResourcePerk extends BM.Perk
 				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
 				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
-				promises.push(resource.get(resource.target["id"], resource.target["parameters"]).then(() => {
+				promises.push(resource.load(resource.target["id"], resource.target["parameters"]).then(() => {
 					e.detail.items = resource.items;
 
 					// Set the property automatically after resource is fetched
@@ -109,7 +109,7 @@ export default class ResourcePerk extends BM.Perk
 		Object.keys(this.inventory.get("resource.resources")).forEach((resourceName) => {
 			let resource = this.inventory.get(`resource.resources.${resourceName}`);
 			if (resource.options.get("autoSubmit", true)) {
-				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "put"); // Default is "put"
+				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
 				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
 				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
@@ -143,7 +143,7 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		// Add skills to component;
-		component.skills.set("resource.addResource", function(...args) { return ResourcePerk._addResource(...args); });
+		component.skills.set("resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
 
 		// Add inventory items to component
 		component.inventory.set("resource.resources", {});
