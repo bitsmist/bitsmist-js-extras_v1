@@ -22,13 +22,6 @@ export default class ObjectResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	/**
-     * Constructor.
-     *
-	 * @param	{Object}		component			Component.
-     * @param	{String}		resourceName		Resource name.
-     * @param	{Object}		options				Options.
-     */
 	constructor(component, resourceName, options)
 	{
 
@@ -46,15 +39,7 @@ export default class ObjectResourceHandler extends ResourceHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Get data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	_get(id, parameters)
+	_load(id, parameters)
 	{
 
 		return this._data;
@@ -63,16 +48,7 @@ export default class ObjectResourceHandler extends ResourceHandler
 
     // -------------------------------------------------------------------------
 
-	/**
-	 * Update data.
-	 *
-	 * @param	{String}		id					Target id.
-	 * @param	{Object}		data				Data to update.
-	 * @param	{Object}		parameters			Query parameters.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	_put(id, data, parameters)
+	_update(id, data, parameters)
 	{
 
 		this.data = data;

@@ -151,10 +151,7 @@ export default class ResourceHandler
 
 		if (this._options.get("autoLoad"))
 		{
-			let id = this._target.id;
-			let parameters = this._target.parameters;
-
-			return this.get(id, parameters);
+			return this.load(this._target.id, this._target.parameters);
 		}
 
 	}
@@ -162,21 +159,20 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get data.
+	 * Load data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	get(id, parameters)
+	load(id, parameters)
 	{
 
 		return Promise.resolve().then(() => {
-			console.log("@@@get", this._component.tagName, this.constructor.name, this._resourceName, id, parameters);
-			return this._get(id, parameters);
+			return this._load(id, parameters);
 		}).then((data) => {
-//			BM.Util.warn(data, `ResourceHandler.get(): No data returned. name=${this._component.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+//			BM.Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._component.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 			this.data = data;
 
@@ -188,24 +184,24 @@ export default class ResourceHandler
     // -------------------------------------------------------------------------
 
 	/**
-	 * Delete data.
+	 * Remove data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	delete(id, parameters)
+	remove(id, parameters)
 	{
 
-		return this._delete(id, parameters);
+		return this._remove(id, parameters);
 
 	}
 
     // -------------------------------------------------------------------------
 
 	/**
-	 * Insert data.
+	 * Add data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		data				Data to insert.
@@ -213,12 +209,10 @@ export default class ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	post(id, data, parameters)
+	add(id, data, parameters)
 	{
 
-		data = this.__reshapeData(data);
-
-		return this._post(id, data, parameters);
+		return this._add(id, this.__reshapeData(data), parameters);
 
 	}
 
@@ -233,12 +227,10 @@ export default class ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	put(id, data, parameters)
+	update(id, data, parameters)
 	{
 
-		data = this.__reshapeData(data);
-
-		return this._put(id, data, parameters);
+		return this._update(id, this.__reshapeData(data), parameters);
 
 	}
 
@@ -294,35 +286,35 @@ export default class ResourceHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Get data.
+	 * Load data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_get(id, parameters)
+	_load(id, parameters)
 	{
 	}
 
     // -------------------------------------------------------------------------
 
 	/**
-	 * Delete data.
+	 * Remove data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		parameters			Query parameters.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_delete(id, parameters)
+	_remove(id, parameters)
 	{
 	}
 
     // -------------------------------------------------------------------------
 
 	/**
-	 * Insert data.
+	 * Add data.
 	 *
 	 * @param	{String}		id					Target id.
 	 * @param	{Object}		data				Data to insert.
@@ -330,7 +322,7 @@ export default class ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_post(id, data, parameters)
+	_add(id, data, parameters)
 	{
 	}
 
@@ -345,7 +337,7 @@ export default class ResourceHandler
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_put(id, data, parameters)
+	_update(id, data, parameters)
 	{
 	}
 

@@ -36,7 +36,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	//  Protected
 	// -------------------------------------------------------------------------
 
-	_get(id, parameters)
+	_load(id, parameters)
 	{
 
 		return this.__getCookie(this._cookieName);
@@ -45,7 +45,7 @@ export default class CookieResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	_post(id, data, parameters)
+	_add(id, data, parameters)
 	{
 
 		this.__setCookie(this._cookieName, data);
@@ -54,7 +54,7 @@ export default class CookieResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	_put(id, data, parameters)
+	_update(id, data, parameters)
 	{
 
 		this.__setCookie(this._cookieName, data);

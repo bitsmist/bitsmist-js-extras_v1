@@ -22,7 +22,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	// 	Protected
 	// -------------------------------------------------------------------------
 
-	_get(id, parameters)
+	_load(id, parameters)
 	{
 
 		let method = "GET";
@@ -41,7 +41,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
     // -------------------------------------------------------------------------
 
-	_delete(id, parameters)
+	_remove(id, parameters)
 	{
 
 		let method = "DELETE";
@@ -58,7 +58,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
     // -------------------------------------------------------------------------
 
-	_post(id, data, parameters)
+	_add(id, data, parameters)
 	{
 
 		let method = "POST";
@@ -75,7 +75,7 @@ export default class ApiResourceHandler extends ResourceHandler
 
     // -------------------------------------------------------------------------
 
-	_put(id, data, parameters)
+	_update(id, data, parameters)
 	{
 
 		let method = "PUT";

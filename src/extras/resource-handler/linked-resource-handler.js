@@ -84,7 +84,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	//  Protected
 	// -------------------------------------------------------------------------
 
-	_get(id, parameters)
+	_load(id, parameters)
 	{
 
 		let rootNode = this._options.get("rootNode");
@@ -99,7 +99,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	_delete(id, parameters)
+	_remove(id, parameters)
 	{
 
 //		return this._ref.delete(id, parameters);
@@ -109,7 +109,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	_post(id, data, parameters)
+	_add(id, data, parameters)
 	{
 
 		//return this._ref.post(id, data, parameters);
@@ -119,7 +119,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 
 	// -------------------------------------------------------------------------
 
-	_put(id, data, parameters)
+	//_put(id, data, parameters)
+	_update(id, data, parameters)
 	{
 
 //		return this._ref.put(id, data, parameters);
