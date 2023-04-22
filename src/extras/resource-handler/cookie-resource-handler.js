@@ -25,7 +25,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	constructor(component, resourceName, options)
 	{
 
-		let defaults = {"autoLoad":true};
+		let defaults = {"autoLoad":true, "autoFetch":false};
 		super(component, resourceName, Object.assign(defaults, options));
 
 		this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
