@@ -587,13 +587,19 @@ export default class RoutePerk extends BM.Perk
 		console.debug(`RoutePerk._loadExtender(): Loading extender file. name=${component.tagName}, extenderName=${extenderName}`);
 
 		let query = BM.Util.safeGet(loadOptions, "query");
+
+		// Filename
+		let fileName = component.settings.get("setting.fileName", component.tagName.toLowerCase());
+
+		// Path
 		let path = BM.Util.safeGet(loadOptions, "path",
 			BM.Util.concatPath([
 				component.settings.get("system.appBaseUrl", ""),
-				component.settings.get("system.specPath", "")
+				component.settings.get("system.componentPath", ""),
+				component.settings.get("setting.path", ""),
 			])
 		);
-		let url = `${path}${extenderName}.extender.js` + (query ? `?${query}` : "");
+		let url = BM.Util.concatPath([path, fileName]) + `.${extenderName}.js` + (query ? `?${query}` : "");
 
 		return BM.AjaxUtil.loadScript(url);
 
