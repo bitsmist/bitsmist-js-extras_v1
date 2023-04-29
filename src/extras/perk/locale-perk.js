@@ -105,16 +105,16 @@ export default class LocalePerk extends BM.Perk
 	 * Load the messages file.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{String}		fileName			File name. Use "" to use default name.
-	 * @param	{Object}		loadOptions			Load options.
+	 * @param	{String}		localeName			Locale name.
+	 * @param	{Object}		options				Load options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _loadMessages(component)
+	static _loadMessages(component, localeName, options)
 	{
 
 		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
-			component.inventory.get(`locale.localizers.${handlerName}`).loadMessages();
+			component.inventory.get(`locale.localizers.${handlerName}`).loadMessages(localeName, options);
 		});
 
 	}
@@ -155,6 +155,7 @@ export default class LocalePerk extends BM.Perk
 
 		let promises = [];
 
+		// Add locale handlers
 		Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
 		});
@@ -165,7 +166,7 @@ export default class LocalePerk extends BM.Perk
 			promises.push(AttendancePerk.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.skills.use("state.wait", [{"object":server}]).then(() => {
+					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
 						server.subscribe(this);
 
 						// Synchronize to the server's locales
@@ -199,16 +200,10 @@ export default class LocalePerk extends BM.Perk
 		let promises = [];
 
 		Object.keys(this.inventory.get("locale.localizers")).forEach((handlerName) => {
-			if (this.inventory.get(`locale.localizers.${handlerName}`).options.get("autoLoad"))
+			if (this.inventory.get(`locale.localizers.${handlerName}`).options.get("autoLoad") &&
+				!this.inventory.get(`locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
 			{
-				if (!this.inventory.get(`locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
-				{
-					let loadOptions = {
-						"localeName": e.detail.localeName,
-					};
-
-					promises.push(this.inventory.get(`locale.localizers.${handlerName}`).loadMessages(loadOptions));
-				}
+				promises.push(this.inventory.get(`locale.localizers.${handlerName}`).loadMessages(e.detail.localeName));
 			}
 		});
 

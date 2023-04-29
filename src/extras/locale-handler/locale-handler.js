@@ -89,13 +89,9 @@ export default class LocaleHandler
 			this._messages.set(sectionName, sectionValue);
 		});
 
+		// Load external messages
 		Promise.resolve().then(() => {
-			// Add messages from external file
-			if (this.__hasExternalMessages(this._component))
-			{
-				return this.__loadExternalMessages(this._component);
-
-			}
+			return this.loadMessages();
 		}).then(() => {
 			this._component.inventory.get("locale.messages").add(this.messages);
 		});
@@ -175,49 +171,20 @@ export default class LocaleHandler
 	/**
 	 * Load the messages file.
 	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{String}		fileName			File name. Use "" to use default name.
-	 * @param	{Object}		loadOptions			Load options.
+	 * @param	{String}		localeName			Locale name.
+	 * @param	{Object}		options				Load options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	//static loadMessages(component, fileName, loadOptions)
-	loadMessages(loadOptions)
+	loadMessages(localeName, options)
 	{
 
-		console.debug(`LocaleHandler._loadMessages(): Loading the messages file. name=${this._component.tagName}`);
-
-		let component = this._component;
-
-		// Filename
-		let fileName = BM.Util.safeGet(loadOptions, "fileName",
-			this._options.get("fileName",
-				component.settings.get("setting.fileName",
-					component.tagName.toLowerCase()) + ".messages"));
-
-		// Split Locale
-		let splitLocale = BM.Util.safeGet(loadOptions, "splitLocale",
-			this._options.get("splitLocale",
-				component.settings.get("system.splitLocale", false)));
-		if (splitLocale)
+		if (this.__hasExternalMessages(this._component, localeName))
 		{
-			let localeName = BM.Util.safeGet(loadOptions, "localeName");
-			fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
+			return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._component, localeName), options).then((messages) => {
+				this._messages.merge(messages);
+			});
 		}
-
-		// Path
-		let path = BM.Util.safeGet(loadOptions, "path",
-			BM.Util.concatPath([
-				component.settings.get("system.appBaseUrl", ""),
-				component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
-				this._options.get("path", component.settings.get("setting.path", "")),
-			])
-		);
-
-		// Load messages
-		return BM.AjaxUtil.loadJSON(BM.Util.concatPath([path, fileName]), loadOptions).then((messages) => {
-			this._messages.merge(messages);
-		});
 
 	}
 
@@ -249,32 +216,51 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Load an external messages file.
+	 * Return URL to messages file.
 	 *
 	 * @param	{Component}		component			Component.
-	 * @param	{String}		localeName			Locale name to load.
+	 * @param	{String}		localeName			Locale name.
 	 *
-	 * @return  {Promise}		Promise.
+	 * @return  {String}		URL.
 	 */
-	__loadExternalMessages(component, localeName)
+	__getMessageURL(component, localeName)
 	{
 
-		let loadOptions = {"localeName":localeName};
-		let localeRef = ( component.hasAttribute("bm-localeref") ?
-			component.getAttribute("bm-localeref") || true :
-			this._options.get("localeRef")
-		);
+		let path;
+		let fileName;
+		let query;
 
+		let localeRef = (component.hasAttribute("bm-localeref") ?  component.getAttribute("bm-localeref") || true : this._options.get("localeRef"));
 		if (localeRef && localeRef !== true)
 		{
+			// If URL is specified in ref, use it
 			let url = BM.Util.parseURL(localeRef);
-			loadOptions["fileName"] = url.filenameWithoutExtension;
-			loadOptions["path"] = url.path;
-			loadOptions["query"] = url.query;
+			fileName = url.filename;
+			path = url.path;
+			query = url.query;
+		}
+		else
+		{
+			// Use default path and filename
+			path = BM.Util.concatPath([
+					component.settings.get("system.appBaseUrl", ""),
+					component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
+					component.settings.get("setting.path", ""),
+				]);
+
+			fileName = this._options.get("fileName", component.settings.get("setting.fileName", component.tagName.toLowerCase()));
 		}
 
-		//return LocaleHandler._loadMessages(component, fileName, loadOptions);
-		return this.loadMessages(loadOptions);
+		// Split Locale
+		let splitLocale = this._options.get("splitLocale", component.settings.get("system.splitLocale", false));
+		if (splitLocale)
+		{
+			fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
+		}
+
+		fileName = `${fileName}.messages`;
+
+		return BM.Util.concatPath([path, fileName]) + ( query ? `?${query}` : "" );
 
 	}
 
