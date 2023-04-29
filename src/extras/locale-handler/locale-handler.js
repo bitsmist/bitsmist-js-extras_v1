@@ -247,8 +247,8 @@ export default class LocaleHandler
 					component.settings.get("system.localePath", component.settings.get("system.componentPath", "")),
 					component.settings.get("setting.path", ""),
 				]);
-
 			fileName = this._options.get("fileName", component.settings.get("setting.fileName", component.tagName.toLowerCase()));
+			query = component.settings.get("setting.query");
 		}
 
 		// Split Locale
@@ -260,7 +260,7 @@ export default class LocaleHandler
 
 		fileName = `${fileName}.messages`;
 
-		return BM.Util.concatPath([path, fileName]) + ( query ? `?${query}` : "" );
+		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 

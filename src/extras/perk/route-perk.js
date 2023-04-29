@@ -622,11 +622,11 @@ export default class RoutePerk extends BM.Perk
 					component.settings.get("system.componentPath", ""),
 					component.settings.get("setting.path", ""),
 				]);
-
 			fileName = component.settings.get("setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings";
+			query = component.settings.get("setting.query");
 		}
 
-		return BM.Util.concatPath([path, fileName]) + ( query ? `?${query}` : "" );
+		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 
@@ -688,11 +688,11 @@ export default class RoutePerk extends BM.Perk
 					component.settings.get("system.componentPath", ""),
 					component.settings.get("setting.path", ""),
 				]);
-
 			fileName = fileName || component.settings.get("setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
+			query = component.settings.get("setting.query");
 		}
 
-		return BM.Util.concatPath([path, fileName]) + ( query ? `?${query}` : "" );
+		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 
