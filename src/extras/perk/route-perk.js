@@ -76,8 +76,7 @@ export default class RoutePerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			if (RoutePerk.__hasExternalSettings(component, routeName))
 			{
-				console.log("@@@settings", RoutePerk.__getSettingsURL(component, routeName));
-				return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"type":"js", "bindTo":this}, options)).then((settings) => {
+				return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
 					component.stats.set("routing.routeInfo.setting", settings);
 				});
 			}
@@ -102,7 +101,6 @@ export default class RoutePerk extends BM.Perk
 		Promise.resolve().then(() => {
 			if (RoutePerk.__hasExternalExtender(component, routeName))
 			{
-				console.log("@@@extender", RoutePerk.__getExtenderURL(component, routeName));
 				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(component, routeName)).then((extender) => {
 					component.stats.set("routing.routeInfo.extender", extender);
 				});
@@ -239,11 +237,13 @@ export default class RoutePerk extends BM.Perk
 
 		let newSettings;
 		return Promise.resolve().then(() => {
-			return RoutePerk._loadSettings(component);
+			return RoutePerk._loadSettings(component, routeName);
 		}).then(() => {
 			return RoutePerk._loadExtender(component);
 		}).then(() => {
 			newSettings = component.stats.get("routing.routeInfo.setting");
+			component._routeSettings.items = newSettings;
+
 			return component.skills.use("perk.attachPerks", {"settings":newSettings});
 		}).then(() => {
 			return component.skills.use("event.trigger", "doOrganize", {"settings":newSettings});
@@ -527,6 +527,10 @@ export default class RoutePerk extends BM.Perk
 	static init(component, options)
 	{
 
+		// Init component vars
+		component._routeSettings = new BM.ChainableStore({"chain":component.settings, "writeThrough":true});
+		Object.defineProperty(component, "settings", { get() { return this._routeSettings; }, }); // Tweak to see settings through routeSettings
+
 		// Add skills to component;
 		component.skills.set("routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
 		component.skills.set("routing.loadParameters", function(...args) { return RoutePerk._loadParameters(...args); });
@@ -539,10 +543,6 @@ export default class RoutePerk extends BM.Perk
 		component.skills.set("routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
 		component.skills.set("routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
 		component.skills.set("routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("routing.spec", new BM.ChainableStore({"chain":component.settings, "writeThrough":true}));
-		Object.defineProperty(component, "settings", { get() { return this.inventory.get("routing.spec"); }, }); // Tweak to see settings through spec
 
 		// Add vault items to component
 		component.vault.set("routing.routes", []);
@@ -622,8 +622,11 @@ export default class RoutePerk extends BM.Perk
 					component.settings.get("system.componentPath", ""),
 					component.settings.get("setting.path", ""),
 				]);
-			fileName = component.settings.get("setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings";
-			query = component.settings.get("setting.query");
+			let ext = component.settings.get("routing.options.settingFormat",
+					component.settings.get("system.settingFormat",
+						"json"));
+			fileName = component.settings.get("setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			query = component.settings.get("setting.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -709,12 +712,12 @@ export default class RoutePerk extends BM.Perk
 	static __loadRouteInfo(component, url)
 	{
 
-		let parsedUrl = new URL(url, window.location.href);
+		let parsedURL = new URL(url, window.location.href);
 		let routeInfo = {
 			"url":				url,
-			"path":				parsedUrl.pathname,
-			"query":			parsedUrl.search,
-			"parsedUrl":		parsedUrl,
+			"path":				parsedURL.pathname,
+			"query":			parsedURL.search,
+			"parsedURL":		parsedURL,
 			"queryParameters":	RoutePerk._loadParameters(component, url),
 		};
 
@@ -723,13 +726,13 @@ export default class RoutePerk extends BM.Perk
 		for (let i = routes.length - 1; i >= 0; i--)
 		{
 			// Check origin
-			if (routes[i]["origin"] && parsedUrl.origin != routes[i]["origin"])
+			if (routes[i]["origin"] && parsedURL.origin != routes[i]["origin"])
 			{
 				continue;
 			}
 
 			// Check path
-			let result = ( !routes[i]["path"] ? [] : routes[i]._re.exec(parsedUrl.pathname) );
+			let result = ( !routes[i]["path"] ? [] : routes[i]._re.exec(parsedURL.pathname) );
 			if (result)
 			{
 				let params = {};

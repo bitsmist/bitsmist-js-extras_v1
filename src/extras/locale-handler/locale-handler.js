@@ -85,9 +85,33 @@ export default class LocaleHandler
 	{
 
 		// Add messages from settings
-		Object.entries(options["messages"] || {}).forEach(([sectionName, sectionValue]) => {
-			this._messages.set(sectionName, sectionValue);
-		});
+		if (options && options["messages"])
+		{
+			let messages;
+			if (typeof(options["messages"]) === "object")
+			{
+				// Object
+				messages = options["messages"];
+			}
+			else
+			{
+				// String
+				if (this.__getMessageFormat(component) === "js")
+				{
+					// Javascript Object
+					messages = BM.Util.safeEval(options["messages"]);
+				}
+				else
+				{
+					// JSON
+					messages = JSON.parse(options["messages"]);
+				}
+			}
+
+			Object.entries(messages).forEach(([sectionName, sectionValue]) => {
+				this._messages.set(sectionName, sectionValue);
+			});
+		}
 
 		// Load external messages
 		Promise.resolve().then(() => {
@@ -248,19 +272,39 @@ export default class LocaleHandler
 					component.settings.get("setting.path", ""),
 				]);
 			fileName = this._options.get("fileName", component.settings.get("setting.fileName", component.tagName.toLowerCase()));
+			let ext = this.__getMessageFormat(component);
 			query = component.settings.get("setting.query");
-		}
 
-		// Split Locale
-		let splitLocale = this._options.get("splitLocale", component.settings.get("system.splitLocale", false));
-		if (splitLocale)
-		{
-			fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
-		}
+			// Split Locale
+			let splitLocale = this._options.get("splitLocale", component.settings.get("system.splitLocale", false));
+			if (splitLocale)
+			{
+				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
+			}
 
-		fileName = `${fileName}.messages`;
+			fileName = `${fileName}.messages.${ext}`;
+		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Return messages file format.
+	 *
+	 * @param	{Component}		component			Component.
+	 *
+	 * @return  {String}		"js" or "json".
+	 */
+	__getMessageFormat(component)
+	{
+
+		return this._options.get("messageFormat",
+			component.settings.get("locale.options.messageFormat",
+				component.settings.get("system.messageFormat",
+					"json")));
 
 	}
 
