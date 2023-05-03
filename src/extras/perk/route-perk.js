@@ -732,7 +732,7 @@ export default class RoutePerk extends BM.Perk
 			}
 
 			// Check path
-			let result = ( !routes[i]["path"] ? [] : routes[i]._re.exec(parsedURL.pathname) );
+			let result = (!routes[i]["path"] ? [] : routes[i]._re.exec(parsedURL.pathname));
 			if (result)
 			{
 				let params = {};
@@ -746,7 +746,7 @@ export default class RoutePerk extends BM.Perk
 				let settingRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingRef`, routes[i].settingRef);
 				routeInfo["settingRef"] = RoutePerk.__interpolate(settingRef, params);
 				let setting = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.setting`, routes[i].setting);
-				routeInfo["setting"] = ( setting ? BM.Util.safeEval(setting) : null);
+				routeInfo["setting"] = BM.Util.getObject(setting, {"format":RoutePerk.__getSettingFormat(component)});
 				let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
 				routeInfo["extenderRef"] = RoutePerk.__interpolate(extenderRef, params);
 				routeInfo["extender"] = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
@@ -902,6 +902,24 @@ export default class RoutePerk extends BM.Perk
 				}
 			}
 		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Return default setting file format.
+	 *
+	 * @param	{Component}		component			Component.
+	 *
+	 * @return  {String}		"js" or "json".
+	 */
+	static __getSettingFormat(component)
+	{
+
+		return component.settings.get("routing.options.settingFormat",
+				component.settings.get("system.settingFormat",
+					"json"));
 
 	}
 

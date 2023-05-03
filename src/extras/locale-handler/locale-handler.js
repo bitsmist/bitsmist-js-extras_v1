@@ -85,29 +85,9 @@ export default class LocaleHandler
 	{
 
 		// Add messages from settings
-		if (options && options["messages"])
+		let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._component)});
+		if (messages)
 		{
-			let messages;
-			if (typeof(options["messages"]) === "object")
-			{
-				// Object
-				messages = options["messages"];
-			}
-			else
-			{
-				// String
-				if (this.__getMessageFormat(component) === "js")
-				{
-					// Javascript Object
-					messages = BM.Util.safeEval(options["messages"]);
-				}
-				else
-				{
-					// JSON
-					messages = JSON.parse(options["messages"]);
-				}
-			}
-
 			Object.entries(messages).forEach(([sectionName, sectionValue]) => {
 				this._messages.set(sectionName, sectionValue);
 			});
@@ -292,7 +272,7 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Return messages file format.
+	 * Return default messages file format.
 	 *
 	 * @param	{Component}		component			Component.
 	 *
