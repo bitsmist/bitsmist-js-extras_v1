@@ -94,7 +94,7 @@ export default class LocaleHandler
 		}
 
 		// Load external messages
-		Promise.resolve().then(() => {
+		return Promise.resolve().then(() => {
 			return this.loadMessages();
 		}).then(() => {
 			this._component.inventory.get("locale.messages").add(this.messages);
