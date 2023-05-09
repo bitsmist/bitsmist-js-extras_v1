@@ -111,7 +111,6 @@ export default class ValidationPerk extends BM.Perk
 	static ValidationPerk_onDoValidate(sender, e, ex)
 	{
 
-
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
