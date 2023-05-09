@@ -183,10 +183,9 @@ export default class PreferenceServer extends BM.Component
 	_triggerEvent(changedItems, options)
 	{
 
-		let eventName = this.settings.get("setting.eventName", "doSetup");
-		let sender = BM.Util.safeGet(options, "sender");
+		let sender = BM.Util.safeGet(options, "sender", this);
 
-		return this.skills.use("event.trigger", eventName, {"sender":sender, "items":changedItems});
+		return this.skills.use("preference.apply", {"sender":sender, "items":changedItems});
 
 	}
 
