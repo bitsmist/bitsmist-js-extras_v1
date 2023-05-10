@@ -58,17 +58,15 @@ export default class LocalePerk extends BM.Perk
 	 * Change locale.
 	 *
      * @param	{Component}		component			Component.
-	 * @param	{String}		localeName			Locale name.
+	 * @param	{Object}		options				Options.
 	 */
-	static _changeLocale(component, localeName)
+	static _changeLocale(component, options)
 	{
-
-		let options = {"localeName":localeName};
 
 		return Promise.resolve().then(() => {
 			return component.skills.use("event.trigger", "beforeChangeLocale", options);
 		}).then(() => {
-			component.stats.set("locale.localeName", localeName);
+			component.stats.set("locale.localeName", options["localeName"]);
 			return component.skills.use("event.trigger", "doChangeLocale", options);
 		}).then(() => {
 			return component.skills.use("event.trigger", "afterChangeLocale", options);
@@ -188,7 +186,7 @@ export default class LocalePerk extends BM.Perk
 	static LocalePerk_onAfterStart(sender, e, ex)
 	{
 
-		return LocalePerk._changeLocale(this, this.stats.get("locale.localeName"));
+		return LocalePerk._changeLocale(this, {"localeName":this.stats.get("locale.localeName")});
 
 	}
 
