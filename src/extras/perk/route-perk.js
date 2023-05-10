@@ -244,11 +244,7 @@ export default class RoutePerk extends BM.Perk
 			newSettings = component.stats.get("routing.routeInfo.setting");
 			component._routeSettings.items = newSettings;
 
-			return component.skills.use("perk.attachPerks", {"settings":newSettings});
-		}).then(() => {
-			return component.skills.use("event.trigger", "doOrganize", {"settings":newSettings});
-		}).then(() => {
-			return component.skills.use("event.trigger", "afterLoadSettings", {"settings":newSettings});
+			return component.skills.use("setting.apply", {"settings":newSettings});
 		});
 
 	}
