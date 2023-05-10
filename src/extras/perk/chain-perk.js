@@ -21,7 +21,7 @@ export default class ChainPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static onDoOrganize(sender, e, ex)
+	static onDoApplySettings(sender, e, ex)
 	{
 
 		let order = ChainPerk.info["order"];
@@ -94,7 +94,7 @@ export default class ChainPerk extends BM.Perk
 	{
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", ChainPerk.onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", ChainPerk.onDoApplySettings);
 
 	}
 
@@ -107,7 +107,7 @@ export default class ChainPerk extends BM.Perk
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
-				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoOrganize, "options":chains[eventName]});
+				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
 			});
 		}
 

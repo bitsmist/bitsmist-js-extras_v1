@@ -21,7 +21,7 @@ export default class FilePerk extends BM.Perk
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static FilePerk_onDoOrganize(sender, e, ex)
+	static FilePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
@@ -56,7 +56,7 @@ export default class FilePerk extends BM.Perk
 	{
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", FilePerk.FilePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
 
 	}
 

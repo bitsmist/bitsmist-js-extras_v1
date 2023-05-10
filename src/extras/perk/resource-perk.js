@@ -54,7 +54,7 @@ export default class ResourcePerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static ResourcePerk_onDoOrganize(sender, e, ex)
+	static ResourcePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
@@ -149,7 +149,7 @@ export default class ResourcePerk extends BM.Perk
 		component.inventory.set("resource.resources", {});
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", ResourcePerk.ResourcePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
 		this._addPerkHandler(component, "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
 		this._addPerkHandler(component, "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
 

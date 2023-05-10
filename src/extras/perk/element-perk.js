@@ -22,7 +22,7 @@ export default class ElementPerk extends BM.Perk
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static ElementPerk_onDoOrganize(sender, e, ex)
+	static ElementPerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let order = ElementPerk.info["order"];
@@ -79,7 +79,7 @@ export default class ElementPerk extends BM.Perk
 		component.vault.set("element.overlayPromise", Promise.resolve());
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", ElementPerk.ElementPerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
 
 	}
 

@@ -93,7 +93,7 @@ export default class ValidationPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static ValidationPerk_onDoOrganize(sender, e, ex)
+	static ValidationPerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
@@ -114,7 +114,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);
@@ -133,7 +133,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.organize(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			BM.Util.assert(this.inventory.get(`validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.settings.get(`validation.handlers.${validatorName}.rules`);
@@ -176,7 +176,7 @@ export default class ValidationPerk extends BM.Perk
 		component.stats.set("validation.validationResult", {});
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", ValidationPerk.ValidationPerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
 		this._addPerkHandler(component, "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
 		this._addPerkHandler(component, "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
 

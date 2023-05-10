@@ -45,11 +45,11 @@ export default class PreferencePerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static PreferencePerk_onDoOrganize(sender, e, ex)
+	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		return AttendancePerk.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
-			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoOrganize(): PreferenceServer doesn't exist. name=${this.tagName}`);
+			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoApplySettings(): PreferenceServer doesn't exist. name=${this.tagName}`);
 
 			return this.skills.use("state.wait", [{"object":server, "state":"started"}]).then(() => {
 				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
@@ -96,7 +96,7 @@ export default class PreferencePerk extends BM.Perk
 		component.vault.set("preference.server");
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", PreferencePerk.PreferencePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
 		this._addPerkHandler(component, "beforeSetup", PreferencePerk.PreferencePerk_onBeforeSetup);
 
 	}

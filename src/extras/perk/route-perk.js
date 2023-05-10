@@ -424,7 +424,7 @@ export default class RoutePerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static RoutePerk_onDoOrganize(sender, e, ex)
+	static RoutePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		// Routings
@@ -547,7 +547,7 @@ export default class RoutePerk extends BM.Perk
 		component.stats.set("routing.routeInfo", {});
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", RoutePerk.RoutePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
 		this._addPerkHandler(component, "doStart", RoutePerk.RoutePerk_onDoStart);
 		this._addPerkHandler(component, "afterReady", RoutePerk.RoutePerk_onAfterReady);
 		this._addPerkHandler(component, "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);

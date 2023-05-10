@@ -148,7 +148,7 @@ export default class LocalePerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onDoOrganize(sender, e, ex)
+	static LocalePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
@@ -275,7 +275,7 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", LocalePerk.LocalePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
 		this._addPerkHandler(component, "afterStart", LocalePerk.LocalePerk_onAfterStart);
 		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
 		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);

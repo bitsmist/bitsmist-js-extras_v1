@@ -95,7 +95,7 @@ export default class AttendancePerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static AttendancePerk_onDoOrganize(sender, e, ex)
+	static AttendancePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.attendance.targets", {})).forEach(([sectionName, sectionValue]) => {
@@ -140,7 +140,7 @@ export default class AttendancePerk extends BM.Perk
 		component.skills.set("attendance.callOut", function(...args) { return AttendancePerk._callOut(...args); });
 
 		// Add event handlers to component
-		this._addPerkHandler(component, "doOrganize", AttendancePerk.AttendancePerk_onDoOrganize);
+		this._addPerkHandler(component, "doApplySettings", AttendancePerk.AttendancePerk_onDoApplySettings);
 
 	}
 
