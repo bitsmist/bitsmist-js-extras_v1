@@ -64,7 +64,7 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onBeforeSetup(sender, e, ex)
 	{
 
-		return this.skills.use("preference.apply", {"items":this.vault.get("preference.server").items});
+		e.detail.preferences = this.vault.get("preference.server").items;
 
 	}
 
