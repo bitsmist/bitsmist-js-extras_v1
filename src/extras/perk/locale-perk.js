@@ -166,6 +166,7 @@ export default class LocalePerk extends BM.Perk
 				{
 					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
 						server.subscribe(this);
+						this.vault.set("locale.server", server);
 
 						// Synchronize to the server's locales
 						let localeSettings = server.stats.get("locale");
@@ -183,7 +184,7 @@ export default class LocalePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onAfterStart(sender, e, ex)
+	static LocalePerk_onDoSetup(sender, e, ex)
 	{
 
 		return LocalePerk._changeLocale(this, {"localeName":this.stats.get("locale.localeName")});
@@ -276,7 +277,7 @@ export default class LocalePerk extends BM.Perk
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this._addPerkHandler(component, "afterStart", LocalePerk.LocalePerk_onAfterStart);
+		this._addPerkHandler(component, "doSetup", LocalePerk.LocalePerk_onDoSetup);
 		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
 		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);
 		if (component.settings.get("locale.options.autoLocalizeRows"))
