@@ -185,7 +185,7 @@ export default class PreferenceServer extends BM.Component
 
 		let sender = BM.Util.safeGet(options, "sender", this);
 
-		return this.skills.use("preference.apply", {"sender":sender, "items":changedItems});
+		return this.skills.use("preference.apply", {"sender":sender, "preferences":changedItems});
 
 	}
 
