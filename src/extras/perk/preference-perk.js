@@ -42,6 +42,45 @@ export default class PreferencePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
+
+	/**
+	 * Get preferences.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{String}		target				Preference name to get.
+	 * @param	{*}				defaultValue		Value returned when key is not found.
+	 */
+	static _getPreferences(component, key, defaultValue)
+	{
+
+		if (key)
+		{
+			return component.vault.get("preference.server").get(key, defaultValue);
+		}
+		else
+		{
+			return component.vault.get("preference.server").items;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Apply preferences.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{Object}		preferences 		Preferences to set.
+	 */
+	static _setPreferences(component, preferences)
+	{
+
+		return component.vault.get("preference.server").set(preferences, null, {"sender":component});
+
+	}
+
+
+	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -91,6 +130,8 @@ export default class PreferencePerk extends BM.Perk
 
 		// Add skills to component;
 		component.skills.set("preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
+		component.skills.set("preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
+		component.skills.set("preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
 
 		// Add vault items to component
 		component.vault.set("preference.server");
