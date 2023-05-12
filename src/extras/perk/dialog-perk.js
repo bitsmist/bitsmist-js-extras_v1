@@ -183,7 +183,7 @@ export default class DialogPerk extends BM.Perk
 
 		// Add stats to component
 		component.stats.set("dialog.isModal", false);
-		component.inventory.set("dialog.modalResult", {});
+		component.stats.set("dialog.modalResult", {});
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "afterReady", DialogPerk.DialogPerk_onAfterReady);
