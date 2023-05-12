@@ -128,7 +128,7 @@ export default class ListPerk extends BM.Perk
 		component.vault.set("list.lastItems", {});
 
 		// Add stats to component
-		component.stats.set("list.activeRowName", "");
+		component.stats.set("list.activeRowSkinName", "");
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "afterTransform", ListPerk.ListPerk_onAfterTransform);
