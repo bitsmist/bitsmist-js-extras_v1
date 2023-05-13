@@ -117,107 +117,6 @@ export default class RoutePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Create options array from the current url.
-	 *
-	 * @return  {Array}			Options array.
-	 */
-	static _loadParameters(component, url)
-	{
-
-		url = url || window.location.href;
-		let vars = {}
-		let hash;
-		let value;
-
-		if (window.location.href.indexOf("?") > -1)
-		{
-			let hashes = url.slice(url.indexOf('?') + 1).split('&');
-
-			for(let i = 0; i < hashes.length; i++) {
-				hash = hashes[i].split('=');
-				if (hash[1]){
-					value = hash[1].split('#')[0];
-				} else {
-					value = hash[1];
-				}
-				vars[hash[0]] = decodeURIComponent(value);
-			}
-		}
-
-		return vars;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Build url from route info.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		routeInfo			Route information.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {String}		Url.
-	 */
-	static _buildUrl(component, routeInfo, options)
-	{
-
-		let url = "";
-
-		url += ( routeInfo["url"] ? routeInfo["url"] : "" );
-		url += ( routeInfo["path"] ? routeInfo["path"] : "" );
-		url += ( routeInfo["query"] ? `?{routeInfo["query"]}` : "" );
-
-		if (routeInfo["queryParameters"])
-		{
-			let params = {};
-			if (options && options["mergeParameters"])
-			{
-				params = Object.assign(params, component.stats.get("routing.routeInfo.queryParameters"));
-			}
-			params = Object.assign(params, routeInfo["queryParameters"]);
-			url += RoutePerk._buildQuery(component, params);
-		}
-
-		return ( url ? url : "/" );
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Build query string from the options object.
-	 *
-	 * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Query options.
-	 *
-	 * @return	{String}		Query string.
-	 */
-	static _buildQuery(component, options)
-	{
-
-		let query = "";
-
-		if (options)
-		{
-			query = Object.keys(options).reduce((result, current) => {
-				if (Array.isArray(options[current]))
-				{
-					result += `${encodeURIComponent(current)}=${encodeURIComponent(options[current].join())}&`;
-				}
-				else if (options[current])
-				{
-					result += `${encodeURIComponent(current)}=${encodeURIComponent(options[current])}&`;
-				}
-
-				return result;
-			}, "");
-		}
-
-		return ( query ? `?${query.slice(0, -1)}` : "");
-
-	}
 
 	// -------------------------------------------------------------------------
 
@@ -264,21 +163,20 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		options = Object.assign({}, options);
-		let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
 
 		// Current route info
 		let curRouteInfo = component.stats.get("routing.routeInfo");
 
-		let newUrl;
+		let newURL;
 		let newRouteInfo;
 		if (routeInfo)
 		{
-			newUrl = RoutePerk._buildUrl(component, routeInfo, options);
-			newRouteInfo = RoutePerk.__loadRouteInfo(component, newUrl);
+			newURL = BM.URLUtil.buildURL(routeInfo, options);
+			newRouteInfo = RoutePerk.__loadRouteInfo(component, newURL);
 		}
 		else
 		{
-			newUrl = window.location.href;
+			newURL = window.location.href;
 			newRouteInfo = curRouteInfo;
 		}
 
@@ -287,15 +185,16 @@ export default class RoutePerk extends BM.Perk
 				|| ( curRouteInfo["name"] != newRouteInfo["name"]) // <--- remove this when _update() is ready.
 		)
 		{
-			RoutePerk._jumpRoute(component, {"url":newUrl});
+			RoutePerk._jumpRoute(component, {"url":newURL});
 			return;
 		}
 
 		return Promise.resolve().then(() => {
 			// Replace URL
+			let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
 			if (pushState)
 			{
-				history.pushState(RoutePerk.__getState("_open.pushState"), null, newUrl);
+				history.pushState(RoutePerk.__getState("_open.pushState"), null, newURL);
 			}
 			component.stats.set("routing.routeInfo", newRouteInfo);
 			/*
@@ -312,8 +211,8 @@ export default class RoutePerk extends BM.Perk
 			{
 				let validateOptions = {
 					"validatorName":	component.settings.get("routing.options.validatorName"),
-					"items":			RoutePerk._loadParameters(component, newUrl),
-					"url":				newUrl,
+					"items":			BM.URLUtil.loadParameters(newURL),
+					"url":				newURL,
 				};
 				return component.skills.use("validation.validate", validateOptions);
 			}
@@ -339,7 +238,7 @@ export default class RoutePerk extends BM.Perk
 	static _jumpRoute(component, routeInfo, options)
 	{
 
-		let url = RoutePerk._buildUrl(component, routeInfo, options);
+		let url = BM.URLUtil.buildURL(routeInfo, options)
 		window.location.href = url;
 
 	}
@@ -392,7 +291,7 @@ export default class RoutePerk extends BM.Perk
 	static _replaceRoute(component, routeInfo, options)
 	{
 
-		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, RoutePerk._buildUrl(component, routeInfo, options));
+		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
 		component.stats.set("routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
 
 	}
@@ -439,31 +338,26 @@ export default class RoutePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static RoutePerk_onDoStart(sender, e, ex)
+	static RoutePerk_onAfterStart(sender, e, ex)
 	{
 
-		let routeName = this.stats.get("routing.routeInfo.name");
-		if (routeName)
-		{
-			let options = {
-				"query": this.settings.get("setting.query")
-			};
+		Promise.resolve().then(() => {
+			let routeName = this.stats.get("routing.routeInfo.name");
+			if (routeName)
+			{
+				let options = {
+					"query": this.settings.get("setting.query")
+				};
 
-			return this.skills.use("routing.switch", routeName, options);
-		}
-		else
-		{
-			console.error("route not found");
-		}
-
-	};
-
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onAfterReady(sender, e, ex)
-	{
-
-		return this.skills.use("routing.openRoute");
+				return this.skills.use("routing.switch", routeName, options);
+			}
+			else
+			{
+				console.error("route not found");
+			}
+		}).then(() => {
+			return this.skills.use("routing.openRoute");
+		});
 
 	}
 
@@ -529,9 +423,6 @@ export default class RoutePerk extends BM.Perk
 
 		// Add skills to component;
 		component.skills.set("routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		component.skills.set("routing.loadParameters", function(...args) { return RoutePerk._loadParameters(...args); });
-		component.skills.set("routing.buildURL", function(...args) { return RoutePerk._buildURL(...args); });
-		component.skills.set("routing.buildQuery", function(...args) { return RoutePerk._buildQuery(...args); });
 		component.skills.set("routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
 		component.skills.set("routing.openRoute", function(...args) { return RoutePerk._open(...args); });
 		component.skills.set("routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
@@ -548,8 +439,7 @@ export default class RoutePerk extends BM.Perk
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this._addPerkHandler(component, "doStart", RoutePerk.RoutePerk_onDoStart);
-		this._addPerkHandler(component, "afterReady", RoutePerk.RoutePerk_onAfterReady);
+		this._addPerkHandler(component, "afterStart", RoutePerk.RoutePerk_onAfterStart);
 		this._addPerkHandler(component, "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
 		this._addPerkHandler(component, "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
 
@@ -714,7 +604,7 @@ export default class RoutePerk extends BM.Perk
 			"path":				parsedURL.pathname,
 			"query":			parsedURL.search,
 			"parsedURL":		parsedURL,
-			"queryParameters":	RoutePerk._loadParameters(component, url),
+			"queryParameters":	BM.URLUtil.loadParameters(url),
 		};
 
 		// Find the matching route
@@ -845,7 +735,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		let isOk = true;
-		let newParams = RoutePerk._loadParameters(component, url);
+		let newParams = BM.URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
 		Object.keys(component.stats.get("validation.validationResult.invalids")).forEach((key) => {
