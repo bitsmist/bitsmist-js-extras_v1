@@ -141,6 +141,5 @@ window.BITSMIST.v1.PreferenceServer = PreferenceServer;
 import LocaleServer from "./component/bm-locale.js";
 window.BITSMIST.v1.LocaleServer = LocaleServer;
 
-import TagLoader from "./component/bm-tagloader.js";
-import SettingServer from "./component/bm-setting.js";
 import ErrorServer from "./component/bm-error.js";
+window.BITSMIST.v1.ErrorServer = ErrorServer;
