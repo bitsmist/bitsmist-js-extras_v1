@@ -117,9 +117,6 @@ export default class RoutePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-
-	// -------------------------------------------------------------------------
-
 	/**
 	 * Load the route speicific settings file and init.
 	 *
@@ -338,26 +335,31 @@ export default class RoutePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static RoutePerk_onAfterStart(sender, e, ex)
+	static RoutePerk_onDoStart(sender, e, ex)
 	{
 
-		Promise.resolve().then(() => {
-			let routeName = this.stats.get("routing.routeInfo.name");
-			if (routeName)
-			{
-				let options = {
-					"query": this.settings.get("setting.query")
-				};
+		let routeName = this.stats.get("routing.routeInfo.name");
+		if (routeName)
+		{
+			let options = {
+				"query": this.settings.get("setting.query")
+			};
 
-				return this.skills.use("routing.switch", routeName, options);
-			}
-			else
-			{
-				console.error("route not found");
-			}
-		}).then(() => {
-			return this.skills.use("routing.openRoute");
-		});
+			return this.skills.use("routing.switch", routeName, options);
+		}
+		else
+		{
+			console.error("route not found");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onAfterReady(sender, e, ex)
+	{
+
+		return this.skills.use("routing.openRoute");
 
 	}
 
@@ -439,7 +441,8 @@ export default class RoutePerk extends BM.Perk
 
 		// Add event handlers to component
 		this._addPerkHandler(component, "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this._addPerkHandler(component, "afterStart", RoutePerk.RoutePerk_onAfterStart);
+		this._addPerkHandler(component, "doStart", RoutePerk.RoutePerk_onDoStart);
+		this._addPerkHandler(component, "afterReady", RoutePerk.RoutePerk_onAfterReady);
 		this._addPerkHandler(component, "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
 		this._addPerkHandler(component, "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
 
