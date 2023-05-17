@@ -108,7 +108,7 @@ export default class PreferenceServer extends BM.Component
 
 		let msg = `Invalid preference value. name=${this.tagName}`;
 		Object.keys(this.stats.get("validation.validationResult.invalids")).forEach((key) => {
-			msg += "\n\tkey=" + this.stats.get(`validation.validationResult.invalids.${key}.key`) + ", value=" + this.stats.get(`validation.validationResult.invalids.${key}.value}`);
+			msg += "\n\tkey=" + this.stats.get(`validation.validationResult.invalids.${key}.key`) + ", value=" + this.stats.get(`validation.validationResult.invalids.${key}.value`);
 		});
 		console.error(msg);
 
