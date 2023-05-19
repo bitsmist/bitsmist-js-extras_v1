@@ -71,11 +71,12 @@ export default class PreferencePerk extends BM.Perk
 	 *
      * @param	{Component}		component			Component.
 	 * @param	{Object}		preferences 		Preferences to set.
+	 * @param	{Object}		options				Options.
 	 */
-	static _setPreferences(component, preferences)
+	static _setPreferences(component, preferences, options)
 	{
 
-		return component.vault.get("preference.server").set(preferences, null, {"sender":component});
+		return component.vault.get("preference.server").set(preferences, options, {"sender":component});
 
 	}
 
