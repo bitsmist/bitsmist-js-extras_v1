@@ -34,7 +34,7 @@ export default class LocaleServer extends BM.Component
 					"this": {
 						"handlers": {
 							"beforeStart":		["LocaleServer_onBeforeStart"],
-							"doChangeLocale":	["LocaleServer_onDoChangeLocale"],
+							"doApplyLocale":	["LocaleServer_onDoApplyLocale"],
 						}
 					}
 				}
@@ -70,7 +70,7 @@ export default class LocaleServer extends BM.Component
 
 	// -------------------------------------------------------------------------
 
-	LocaleServer_onDoChangeLocale(sender, e, ex)
+	LocaleServer_onDoApplyLocale(sender, e, ex)
 	{
 
 		// Set locale attribute
@@ -123,7 +123,7 @@ export default class LocaleServer extends BM.Component
 	__triggerEvent(conditions, options)
 	{
 
-		return this.skills.use("locale.change", {"localeName":options.localeName});
+		return this.skills.use("locale.apply", {"localeName":options.localeName});
 
 	}
 

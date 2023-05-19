@@ -55,21 +55,21 @@ export default class LocalePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Change locale.
+	 * Apply locale.
 	 *
      * @param	{Component}		component			Component.
 	 * @param	{Object}		options				Options.
 	 */
-	static _changeLocale(component, options)
+	static _applyLocale(component, options)
 	{
 
 		return Promise.resolve().then(() => {
-			return component.skills.use("event.trigger", "beforeChangeLocale", options);
+			return component.skills.use("event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
 			component.stats.set("locale.localeName", options["localeName"]);
-			return component.skills.use("event.trigger", "doChangeLocale", options);
+			return component.skills.use("event.trigger", "doApplyLocale", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "afterChangeLocale", options);
+			return component.skills.use("event.trigger", "afterApplyLocale", options);
 		});
 
 	}
@@ -187,13 +187,13 @@ export default class LocalePerk extends BM.Perk
 	static LocalePerk_onDoSetup(sender, e, ex)
 	{
 
-		return LocalePerk._changeLocale(this, {"localeName":this.stats.get("locale.localeName")});
+		return LocalePerk._applyLocale(this, {"localeName":this.stats.get("locale.localeName")});
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onBeforeChangeLocale(sender, e, ex)
+	static LocalePerk_onBeforeApplyLocale(sender, e, ex)
 	{
 
 		let promises = [];
@@ -212,7 +212,7 @@ export default class LocalePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onDoChangeLocale(sender, e, ex)
+	static LocalePerk_onDoApplyLocale(sender, e, ex)
 	{
 
 		// Localize
@@ -258,7 +258,7 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		// Add skills to component;
-		component.skills.set("locale.change", function(...args) { return LocalePerk._changeLocale(...args); });
+		component.skills.set("locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
 		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
 		component.skills.set("locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
 		component.skills.set("locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
@@ -278,8 +278,8 @@ export default class LocalePerk extends BM.Perk
 		// Add event handlers to component
 		this._addPerkHandler(component, "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
 		this._addPerkHandler(component, "doSetup", LocalePerk.LocalePerk_onDoSetup);
-		this._addPerkHandler(component, "beforeChangeLocale", LocalePerk.LocalePerk_onBeforeChangeLocale);
-		this._addPerkHandler(component, "doChangeLocale", LocalePerk.LocalePerk_onDoChangeLocale);
+		this._addPerkHandler(component, "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
+		this._addPerkHandler(component, "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
 		if (component.settings.get("locale.options.autoLocalizeRows"))
 		{
 			this._addPerkHandler(component, "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
