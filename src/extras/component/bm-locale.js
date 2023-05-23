@@ -46,13 +46,15 @@ export default class LocaleServer extends BM.Component
 					}
 				}
 			},
-			"attendance": {
-				"targets": {
-					"locale": {
-						"name": 				"LocaleServer",
-					}
+			/*
+			"rollcall": {
+				"members": {
+					"LocaleServer": {
+						"rootNode":				this.tagName,
+					},
 				}
 			}
+			*/
 		}
 
 	}

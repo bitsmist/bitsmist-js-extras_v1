@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 
 // =============================================================================
@@ -80,21 +79,35 @@ export default class PreferencePerk extends BM.Perk
 
 	}
 
-
 	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
+	/*
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		return AttendancePerk.call("PreferenceServer", {"waitForAttendance":true}).then((server) => {
+		return this.skills.use("rollcall.call", "PreferenceServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoApplySettings(): PreferenceServer doesn't exist. name=${this.tagName}`);
 
 			return this.skills.use("state.wait", [{"object":server, "state":"started"}]).then(() => {
 				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 				this.vault.set("preference.server", server);
 			});
+		});
+
+	}
+	*/
+
+	static PreferencePerk_onDoApplySettings(sender, e, ex)
+	{
+
+		let rootNode = this.skills.use("alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
+
+		return this.skills.use("state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
+			let server = document.querySelector(rootNode);
+			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
+			this.vault.set("preference.server", server);
 		});
 
 	}
@@ -118,6 +131,8 @@ export default class PreferencePerk extends BM.Perk
 		return {
 			"section":		"preference",
 			"order":		900,
+			"depends":		"AliasPerk",
+			//"depends":		"RollCallPerk",
 		};
 
 	}

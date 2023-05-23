@@ -71,8 +71,11 @@ BM.PerkPerk.register(PreferencePerk);
 import RoutePerk from "./perk/route-perk.js";
 BM.PerkPerk.register(RoutePerk);
 
-import AttendancePerk from "./perk/attendance-perk.js";
-BM.PerkPerk.register(AttendancePerk);
+import AliasPerk from "./perk/alias-perk.js";
+BM.PerkPerk.register(AliasPerk);
+
+import RollCallPerk from "./perk/rollcall-perk.js";
+BM.PerkPerk.register(RollCallPerk);
 
 // Resource handler
 

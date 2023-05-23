@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 import LocaleHandler from "./locale-handler";
 
@@ -23,12 +22,26 @@ export default class LocaleServerHandler extends LocaleHandler
 	//  Methods
 	// -------------------------------------------------------------------------
 
+	/*
 	init(options)
 	{
 
-		return AttendancePerk.call("LocaleServer", {"waitForAttendance":true}).then((server) => {
+		return this._component.skills.use("rollcall.call", "LocaleServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.tagName}`);
 
+			this._messages.chain(server.inventory.get("locale.messages"));
+		});
+
+	}
+	*/
+
+	init(options)
+	{
+
+		let rootNode = this._component.skills.use("alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
+
+		return this._component.skills.use("state.wait", [{"rootNode":rootNode, "state":"starting"}]).then(() => {
+			let server = document.querySelector(rootNode);
 			this._messages.chain(server.inventory.get("locale.messages"));
 		});
 

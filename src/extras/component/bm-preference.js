@@ -46,13 +46,15 @@ export default class PreferenceServer extends BM.Component
 					"autoCrop":					false,
 				}
 			},
-			"attendance": {
-				"targets": {
-					"locale": {
-						"name": 				"PreferenceServer",
-					}
+			/*
+			"rollcall": {
+				"members": {
+					"PreferenceServer": {
+						"rootNode":				this.tagName,
+					},
 				}
 			}
+			*/
 		}
 
 	}

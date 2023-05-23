@@ -38,13 +38,15 @@ export default class ErrorServer extends BM.Component
 					}
 				}
 			},
-			"attendance": {
-				"targets": {
-					"error": {
-						"name": 				"ErrorServer",
-					}
+			/*
+			"rollcall": {
+				"members": {
+					"ErrorServer": {
+						"rootNode":				this.tagName,
+					},
 				}
-			}
+			},
+			*/
 		}
 
 	}

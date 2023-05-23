@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import AttendancePerk from "../perk/attendance-perk.js";
 import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
 import LocaleServer from "../component/bm-locale.js";
@@ -148,6 +147,7 @@ export default class LocalePerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
+	/*
 	static LocalePerk_onDoApplySettings(sender, e, ex)
 	{
 
@@ -161,7 +161,44 @@ export default class LocalePerk extends BM.Perk
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(AttendancePerk.call("LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
+			promises.push(this.skills.use("rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
+				if (server)
+				{
+					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
+						server.subscribe(this);
+						this.vault.set("locale.server", server);
+
+						// Synchronize to the server's locales
+						let localeSettings = server.stats.get("locale");
+						this.stats.set("locale.localeName", localeSettings["localeName"]);
+						this.stats.set("locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+						this.stats.set("locale.currencyName", localeSettings["currencyName"]);
+					});
+				}
+			}));
+		}
+
+		return Promise.all(promises);
+
+	}
+	*/
+
+	static LocalePerk_onDoApplySettings(sender, e, ex)
+	{
+
+		let promises = [];
+
+		// Add locale handlers
+		Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
+			promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
+		});
+
+		// Subscribe to the Locale Server if exists
+		if (!(this instanceof LocaleServer))
+		{
+			promises.push(BITSMIST.v1.Origin.promises.documentReady.then(() => {
+				let rootNode = this.skills.use("alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
+				let server = document.querySelector(rootNode);
 				if (server)
 				{
 					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
@@ -246,6 +283,8 @@ export default class LocalePerk extends BM.Perk
 		return {
 			"section":		"locale",
 			"order":		330,
+			"depends":		"AliasPerk",
+			//"depends":		"RollCallPerk",
 		};
 
 	}
