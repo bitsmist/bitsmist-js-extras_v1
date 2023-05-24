@@ -152,11 +152,9 @@ export default class KeyPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Init component vars
-		component.inventory.set("key.isComposing", false);
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
+		// Upgrade component
+		this.upgrade(component, "inventory", "key.isComposing", false);
+		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
 

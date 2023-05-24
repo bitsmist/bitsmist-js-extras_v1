@@ -165,20 +165,15 @@ export default class ValidationPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		component.skills.set("validation.validate", function(...args) { return ValidationPerk._validate(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("validation.validators", {});
-
-		// Add stats to component
-		component.stats.set("validation.validationResult", {});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
-		this._addPerkHandler(component, "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
-		this._addPerkHandler(component, "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
+		// Upgrade component
+		this.upgrade(component, "skill", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
+		this.upgrade(component, "skill", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
+		this.upgrade(component, "inventory", "validation.validators", {});
+		this.upgrade(component, "stat", "validation.validationResult", {});
+		this.upgrade(component, "stat", "validation.validationResult", {});
+		this.upgrade(component, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
+		this.upgrade(component, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
+		this.upgrade(component, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
 
 	}
 

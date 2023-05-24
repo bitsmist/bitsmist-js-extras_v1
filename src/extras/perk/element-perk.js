@@ -74,12 +74,10 @@ export default class ElementPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add vault items to component
-		component.vault.set("element.overlay", );
-		component.vault.set("element.overlayPromise", Promise.resolve());
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
+		// Upgrade component
+		this.upgrade(component, "vault", "element.overlay", );
+		this.upgrade(component, "vault", "element.overlayPromise", Promise.resolve());
+		this.upgrade(component, "event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
 
 	}
 

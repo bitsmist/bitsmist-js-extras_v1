@@ -93,8 +93,8 @@ export default class ChainPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", ChainPerk.onDoApplySettings);
+		// Upgrade component
+		this.upgrade(component, "event", "doApplySettings", ChainPerk.onDoApplySettings);
 
 	}
 

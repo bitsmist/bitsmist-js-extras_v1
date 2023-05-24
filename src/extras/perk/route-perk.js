@@ -423,28 +423,22 @@ export default class RoutePerk extends BM.Perk
 		component._routeSettings = new BM.ChainableStore({"chain":component.settings, "writeThrough":true});
 		Object.defineProperty(component, "settings", { get() { return this._routeSettings; }, }); // Tweak to see settings through routeSettings
 
-		// Add skills to component;
-		component.skills.set("routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		component.skills.set("routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-		component.skills.set("routing.openRoute", function(...args) { return RoutePerk._open(...args); });
-		component.skills.set("routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-		component.skills.set("routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
-		component.skills.set("routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		component.skills.set("routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-		component.skills.set("routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-
-		// Add vault items to component
-		component.vault.set("routing.routes", []);
-
-		// Add stats to Component
-		component.stats.set("routing.routeInfo", {});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this._addPerkHandler(component, "doStart", RoutePerk.RoutePerk_onDoStart);
-		this._addPerkHandler(component, "afterReady", RoutePerk.RoutePerk_onAfterReady);
-		this._addPerkHandler(component, "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
-		this._addPerkHandler(component, "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
+		// Upgrade component
+		this.upgrade(component, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
+		this.upgrade(component, "skill", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
+		this.upgrade(component, "skill", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		this.upgrade(component, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
+		this.upgrade(component, "skill", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		this.upgrade(component, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
+		this.upgrade(component, "skill", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
+		this.upgrade(component, "vault", "routing.routes", []);
+		this.upgrade(component, "stat", "routing.routeInfo", {});
+		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
+		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
+		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
+		this.upgrade(component, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
+		this.upgrade(component, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
 
 		// Init popstate handler
 		RoutePerk.__initPopState(component);

@@ -121,19 +121,13 @@ export default class ListPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
-
-		// Add valut items to component
-		component.vault.set("list.lastItems", {});
-
-		// Add stats to component
-		component.stats.set("list.activeRowSkinName", "");
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "afterTransform", ListPerk.ListPerk_onAfterTransform);
-		this._addPerkHandler(component, "beforeFill", ListPerk.ListPerk_onBeforeFill);
-		this._addPerkHandler(component, "doFill", ListPerk.ListPerk_onDoFill);
+		// Upgrade component
+		this.upgrade(component, "skill", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
+		this.upgrade(component, "vault", "list.lastItems", {});
+		this.upgrade(component, "stat", "list.activeRowSkinName", "");
+		this.upgrade(component, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
+		this.upgrade(component, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
+		this.upgrade(component, "event", "doFill", ListPerk.ListPerk_onDoFill);
 
 	}
 

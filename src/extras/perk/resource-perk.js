@@ -142,16 +142,12 @@ export default class ResourcePerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("resource.resources", {});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
-		this._addPerkHandler(component, "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
-		this._addPerkHandler(component, "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
+		// Upgrade component
+		this.upgrade(component, "skill", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		this.upgrade(component, "inventory", "resource.resources", {});
+		this.upgrade(component, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
+		this.upgrade(component, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
+		this.upgrade(component, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
 
 	}
 

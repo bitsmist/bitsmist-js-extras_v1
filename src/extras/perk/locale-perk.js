@@ -196,7 +196,7 @@ export default class LocalePerk extends BM.Perk
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(BITSMIST.v1.Origin.promises.documentReady.then(() => {
+			promises.push(BITSMIST.v1.Component.promises.documentReady.then(() => {
 				let rootNode = this.skills.use("alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
 				let server = document.querySelector(rootNode);
 				if (server)
@@ -296,32 +296,26 @@ export default class LocalePerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
-		component.skills.set("locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		component.skills.set("locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
-		component.skills.set("locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-		component.skills.set("locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("locale.localizers", {});
-		component.inventory.set("locale.messages", new MultiStore());
-
-		// Add stats to component
-		component.stats.set("locale", {
+		// Upgrade component
+		this.upgrade(component, "skill", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
+		this.upgrade(component, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
+		this.upgrade(component, "skill", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
+		this.upgrade(component, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
+		this.upgrade(component, "skill", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
+		this.upgrade(component, "inventory", "locale.localizers", {});
+		this.upgrade(component, "inventory", "locale.messages", new MultiStore());
+		this.upgrade(component, "stat", "locale", {
 			"localeName":			component.settings.get("locale.options.localeName", component.settings.get("system.localeName", navigator.language)),
 			"fallbackLocaleName":	component.settings.get("locale.options.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
 			"currencyName":			component.settings.get("locale.options.currencyName", component.settings.get("system.currencyName", "USD")),
 		});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this._addPerkHandler(component, "doSetup", LocalePerk.LocalePerk_onDoSetup);
-		this._addPerkHandler(component, "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
-		this._addPerkHandler(component, "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
+		this.upgrade(component, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
+		this.upgrade(component, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
+		this.upgrade(component, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
+		this.upgrade(component, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
 		if (component.settings.get("locale.options.autoLocalizeRows"))
 		{
-			this._addPerkHandler(component, "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
+			this.upgrade(component, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}
 
 	}

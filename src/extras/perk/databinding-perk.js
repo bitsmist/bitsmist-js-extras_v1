@@ -161,37 +161,29 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (component.settings.get("databinding.options.dataType", "single") === "single")
 		{
-			// Add skills to component;
-			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
-
-			// Add vault items to component
-			component.vault.set("databinding.store", new BindableStore({
+			// Upgrade component
+			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+			this.upgrade(component, "vault", "databinding.store", new BindableStore({
 				"resources":	component.inventory.get("resource.resources"),
 				"direction":	component.settings.get("databinding.options.direction", "two-way"),
 			}));
-
-			// Add event handlers to component
-			this._addPerkHandler(component, "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
-			this._addPerkHandler(component, "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+			this.upgrade(component, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
+			this.upgrade(component, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
 		}
 		else
 		{
-			// Add skills to component;
-			component.skills.set("databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
-
-			// Add vault items to component
-			component.vault.set("databinding.store", new BindableArrayStore({
+			// Upgrade component
+			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+			this.upgrade(component, "vault", "databinding.store", new BindableArrayStore({
 				"resources":	component.resources,
 				"direction":	component.settings.get("databinding.options.direction", "two-way"),
 			}));
-
-			// Add event handlers to component
-			this._addPerkHandler(component, "beforeFill", DatabindingPerk.DatabindingPerk_onBeforeFill);
-			this._addPerkHandler(component, "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+			this.upgrade(component, "event", "beforeFill", DatabindingPerk.DatabindingPerk_onBeforeFill);
+			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
 		}
 
-		// Add event handlers to component
-		this._addPerkHandler(component, "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+		// Upgrade component
+		this.upgrade(component, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
 
 	}
 

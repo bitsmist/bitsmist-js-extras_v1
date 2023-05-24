@@ -144,17 +144,13 @@ export default class PreferencePerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
-		component.skills.set("preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
-		component.skills.set("preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
-
-		// Add vault items to component
-		component.vault.set("preference.server");
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
-		this._addPerkHandler(component, "beforeSetup", PreferencePerk.PreferencePerk_onBeforeSetup);
+		// Upgrade component
+		this.upgrade(component, "skill", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
+		this.upgrade(component, "skill", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
+		this.upgrade(component, "skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
+		this.upgrade(component, "vault", "preference.server");
+		this.upgrade(component, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
+		this.upgrade(component, "event", "beforeSetup", PreferencePerk.PreferencePerk_onBeforeSetup);
 
 	}
 

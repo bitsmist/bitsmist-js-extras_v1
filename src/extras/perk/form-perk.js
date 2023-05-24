@@ -180,23 +180,17 @@ export default class FormPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("form.build", function(...args) { return FormPerk._build(...args); });
-		component.skills.set("form.submit", function(...args) { return FormPerk._submit(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("form.cancelSubmit", false);
-
-		// Add vault items to component
-		component.vault.set("form.lastItems", {});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "afterTransform", FormPerk.FormPerk_onAfterTransform);
-		this._addPerkHandler(component, "doClear", FormPerk.FormPerk_onDoClear);
-		this._addPerkHandler(component, "beforeFill", FormPerk.FormPerk_onBeforeFill);
-		this._addPerkHandler(component, "doFill", FormPerk.FormPerk_onDoFill);
-		this._addPerkHandler(component, "doCollect", FormPerk.FormPerk_onDoCollect);
-		this._addPerkHandler(component, "afterCollect", FormPerk.FormPerk_onAfterCollect);
+		// Upgrade component
+		this.upgrade(component, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
+		this.upgrade(component, "skill", "form.submit", function(...args) { return FormPerk._submit(...args); });
+		this.upgrade(component, "inventory", "form.cancelSubmit", false);
+		this.upgrade(component, "vault", "form.lastItems", {});
+		this.upgrade(component, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
+		this.upgrade(component, "event", "doClear", FormPerk.FormPerk_onDoClear);
+		this.upgrade(component, "event", "beforeFill", FormPerk.FormPerk_onBeforeFill);
+		this.upgrade(component, "event", "doFill", FormPerk.FormPerk_onDoFill);
+		this.upgrade(component, "event", "doCollect", FormPerk.FormPerk_onDoCollect);
+		this.upgrade(component, "event", "afterCollect", FormPerk.FormPerk_onAfterCollect);
 
 	}
 

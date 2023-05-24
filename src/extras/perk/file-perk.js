@@ -55,8 +55,8 @@ export default class FilePerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
+		// Upgrade component
+		this.upgrade(component, "event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
 
 	}
 

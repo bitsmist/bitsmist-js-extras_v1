@@ -168,25 +168,17 @@ export default class DialogPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("dialog.open", function(...args) { return DialogPerk._open(...args); });
-		component.skills.set("dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-		component.skills.set("dialog.close", function(...args) { return DialogPerk._close(...args); });
-
-		// Add inventory items to component
-		component.inventory.set("dialog.cancelClose");
-
-		// Add vault items to component
-		component.vault.set("dialog.modalPromise");
-		component.vault.set("dialog.backdrop");
-		component.vault.set("dialog.backdropPromise", Promise.resolve());
-
-		// Add stats to component
-		component.stats.set("dialog.isModal", false);
-		component.stats.set("dialog.modalResult", {});
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "afterReady", DialogPerk.DialogPerk_onAfterReady);
+		// Upgrade component
+		this.upgrade(component, "skill", "dialog.open", function(...args) { return DialogPerk._open(...args); });
+		this.upgrade(component, "skill", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
+		this.upgrade(component, "skill", "dialog.close", function(...args) { return DialogPerk._close(...args); });
+		this.upgrade(component, "inventory", "dialog.cancelClose");
+		this.upgrade(component, "vault", "dialog.modalPromise");
+		this.upgrade(component, "vault", "dialog.backdrop");
+		this.upgrade(component, "vault", "dialog.backdropPromise", Promise.resolve());
+		this.upgrade(component, "stat", "dialog.isModal", false);
+		this.upgrade(component, "stat", "dialog.modalResult", {});
+		this.upgrade(component, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
 
 	}
 

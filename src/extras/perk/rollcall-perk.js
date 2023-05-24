@@ -135,12 +135,10 @@ export default class RollCallPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		// Add skills to component;
-		component.skills.set("rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-		component.skills.set("rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-
-		// Add event handlers to component
-		this._addPerkHandler(component, "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
+		// Upgrade component
+		this.upgrade(component, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
+		this.upgrade(component, "skill", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
+		this.upgrade(component, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
 
 	}
 
