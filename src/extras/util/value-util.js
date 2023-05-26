@@ -237,8 +237,7 @@ export default class ValueUtil
 		// Trigger change event
 		if (options["triggerEvent"])
 		{
-			let e = document.createEvent("HTMLEvents");
-			e.initEvent("change", true, true);
+			let e = new CustomEvent("change", {"detail":options["triggerOptions"]});
 			element.dispatchEvent(e);
 		}
 
@@ -262,6 +261,10 @@ export default class ValueUtil
 		if (target)
 		{
 			ret = this._getValue_target(element, target);
+		}
+		else if (element.hasAttribute("value"))
+		{
+			ret = element.getAttribute("value");
 		}
 		else
 		{
@@ -308,8 +311,7 @@ export default class ValueUtil
 		// Trigger change event
 		if (options && options["triggerEvent"])
 		{
-			let e = document.createEvent("HTMLEvents");
-			e.initEvent(eventName, true, true);
+			let e = new CustomEvent("change", {"detail":options["triggerOptions"]});
 			element.dispatchEvent(e);
 		}
 
@@ -503,6 +505,10 @@ export default class ValueUtil
 			if (element.hasAttribute("selected"))
 			{
 				ret = element.getAttribute("value");
+			}
+			else
+			{
+				ret = element.textContent;
 			}
 			break;
 		}
