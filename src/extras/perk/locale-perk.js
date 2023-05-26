@@ -201,7 +201,7 @@ export default class LocalePerk extends BM.Perk
 				let server = document.querySelector(rootNode);
 				if (server)
 				{
-					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
+					return this.skills.use("state.wait", [{"object":server, "state":"ready"}]).then(() => {
 						server.subscribe(this);
 						this.vault.set("locale.server", server);
 
@@ -224,7 +224,10 @@ export default class LocalePerk extends BM.Perk
 	static LocalePerk_onDoSetup(sender, e, ex)
 	{
 
-		return LocalePerk._applyLocale(this, {"localeName":this.stats.get("locale.localeName")});
+		if (!(this instanceof LocaleServer))
+		{
+			return LocalePerk._applyLocale(this, {"localeName":this.stats.get("locale.localeName")});
+		}
 
 	}
 
@@ -258,7 +261,7 @@ export default class LocalePerk extends BM.Perk
 		// Refill (Do not refill when starting)
 		if (this.stats.get("state.state") === "ready")
 		{
-			this.skills.use("basic.fill");
+			return this.skills.use("basic.fill");
 		}
 
 	}
