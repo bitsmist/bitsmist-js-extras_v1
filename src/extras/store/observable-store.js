@@ -14,7 +14,7 @@ import BM from "../bm";
 //	Observable store class
 // =============================================================================
 
-export default class ObservableStore extends BM.ChainableStore
+export default class ObservableStore extends BM.Store
 {
 
 	// -------------------------------------------------------------------------
@@ -83,6 +83,7 @@ export default class ObservableStore extends BM.ChainableStore
 		{
 			if (this.get(key) !== value)
 			{
+				console.log("@@@set", key, this.get(key), "--->", `'${value}'`);
 				BM.Util.safeSet(this._items, key, value);
 				changedItem[key] = value;
 			}
@@ -93,6 +94,17 @@ export default class ObservableStore extends BM.ChainableStore
 		{
 			return this.notify(changedItem, ...args);
 		}
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	clear(options, ...args)
+	{
+
+		super.clear();
+
+		return this.notify("*", ...args);
 
 	}
 
@@ -202,7 +214,7 @@ export default class ObservableStore extends BM.ChainableStore
 				if (this._filter(conditions, this._observers[i], ...args))
 				{
 					console.debug(`ObservableStore.notifySync(): Notifying. conditions=${conditions}, observer=${this._observers[i].id}`);
-					return this._observers[i]["handler"](conditions, ...args);
+					return this._observers[i]["handler"](conditions, this._observers[i], ...args);
 				}
 			});
 		}
@@ -229,7 +241,7 @@ export default class ObservableStore extends BM.ChainableStore
 			if (this._filter(conditions, this._observers[i], ...args))
 			{
 				console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this._observers[i].id}`);
-				this._observers[i]["handler"](conditions, ...args);
+				this._observers[i]["handler"](conditions, this._observers[i], ...args);
 			}
 		}
 

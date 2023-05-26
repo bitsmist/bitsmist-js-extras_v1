@@ -182,7 +182,7 @@ export default class PreferenceServer extends BM.Component
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_triggerEvent(changedItems, options)
+	_triggerEvent(changedItems, observerInfo, options)
 	{
 
 		let sender = BM.Util.safeGet(options, "sender", this);

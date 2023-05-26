@@ -122,7 +122,7 @@ export default class LocaleServer extends BM.Component
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	__triggerEvent(conditions, options)
+	__triggerEvent(conditions, observerInfo, options)
 	{
 
 		return this.skills.use("locale.apply", {"localeName":options.localeName});
