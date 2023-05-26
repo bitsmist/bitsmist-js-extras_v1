@@ -101,10 +101,13 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoClear(sender, e, ex)
 	{
 
-		let target = BM.Util.safeGet(e.detail, "target", "");
-		let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
+		if (this.settings.get("form.options.autoClear"))
+		{
+			let target = BM.Util.safeGet(e.detail, "target", "");
+			let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
 
-		ValueUtil.clearFields(this, options);
+			ValueUtil.clearFields(this, options);
+		}
 
 	}
 
