@@ -271,7 +271,7 @@ export default class KeyPerk extends BM.Perk
 		if (options && options["rootNode"])
 		{
 			let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
-			let elements = component.querySelectorAll(options["rootNode"]);
+			let elements = BM.Util.scopedSelectorAll(component._root, options["rootNode"]);
 			elements = Array.prototype.slice.call(elements, 0);
 
 			elements.forEach((element) => {

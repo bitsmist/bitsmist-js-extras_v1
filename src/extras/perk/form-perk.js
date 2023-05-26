@@ -127,7 +127,7 @@ export default class FormPerk extends BM.Perk
 
 		if (this.settings.get("form.options.autoFill", true))
 		{
-			let rootNode = ( e.detail && "rootNode" in e.detail ? this.querySelector(e.detail.rootNode) : this );
+			let rootNode = ( e.detail && "rootNode" in e.detail ? BM.Util.scopedSelectorAll(this._root, e.detail.rootNode)[0] : this );
 			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.inventory.get("resource.resources"), "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
@@ -238,7 +238,7 @@ export default class FormPerk extends BM.Perk
 		let submitItem = {};
 
 		// Collect values only from nodes that has [bm-submit] attribute.
-		let nodes = component.querySelectorAll("[bm-submit]");
+		let nodes = BM.Util.scopedSelectorAll(component._root, "[bm-submit]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		nodes.forEach((elem) => {
 			let key = elem.getAttribute("bm-bind");

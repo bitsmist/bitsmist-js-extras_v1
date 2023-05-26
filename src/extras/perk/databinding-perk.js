@@ -33,7 +33,7 @@ export default class DatabindingPerk extends BM.Perk
 	static _bindData(component, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : component );
+		rootNode = ( rootNode ? rootNode : component._root );
 
 		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
@@ -64,9 +64,9 @@ export default class DatabindingPerk extends BM.Perk
 	static _bindDataArray(component, index, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : component );
+		rootNode = ( rootNode ? rootNode : component._root );
 
-		let nodes = rootNode.querySelectorAll("[bm-bind]");
+		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{
@@ -91,15 +91,6 @@ export default class DatabindingPerk extends BM.Perk
 	{
 
 		DatabindingPerk._bindData(this);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onBeforeFill(sender, e, ex)
-	{
-
-		this.vault.get("databinding.store").clear();
 
 	}
 
@@ -178,11 +169,11 @@ export default class DatabindingPerk extends BM.Perk
 				"resources":	component.resources,
 				"direction":	component.settings.get("databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(component, "event", "beforeFill", DatabindingPerk.DatabindingPerk_onBeforeFill);
 			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
 		}
 
 		// Upgrade component
+		this.upgrade(component, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
 		this.upgrade(component, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
 
 	}

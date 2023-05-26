@@ -107,7 +107,7 @@ export default class ElementPerk extends BM.Perk
 			}
 			else
 			{
-				elements = component.querySelectorAll(elementInfo["rootNode"]);
+				elements = BM.Util.scopedSelectorAll(component._root, elementInfo["rootNode"]);
 			}
 		}
 		else if (elementName === "this" || elementName === component.tagName.toLowerCase())
@@ -116,7 +116,7 @@ export default class ElementPerk extends BM.Perk
 		}
 		else
 		{
-			elements = component.querySelectorAll(`#${elementName}`);
+			elements = BM.Util.scopedSelectorAll(component._root, `#${elementName}`);
 		}
 
 		return elements;
