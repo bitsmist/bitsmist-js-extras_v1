@@ -113,7 +113,6 @@ FormUtil._build_select = function(element, items, options)
 		let option = document.createElement("option");
 		option.text = text;
 		option.value = value;
-		option.setAttribute("selected", "");
 		element.appendChild(option);
 	}
 
@@ -126,6 +125,7 @@ FormUtil._build_select = function(element, items, options)
 		element.appendChild(option);
 	});
 
+	element.selectedIndex = -1;
 	if ("defaultValue" in options)
 	{
 		element.value = options["defaultValue"];
