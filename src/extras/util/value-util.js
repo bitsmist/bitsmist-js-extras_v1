@@ -262,10 +262,6 @@ export default class ValueUtil
 		{
 			ret = this._getValue_target(element, target);
 		}
-		else if (element.hasAttribute("value"))
-		{
-			ret = element.getAttribute("value");
-		}
 		else
 		{
 			ret = this._getValue_element(element);
