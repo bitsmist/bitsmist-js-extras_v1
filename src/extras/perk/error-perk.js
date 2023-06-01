@@ -18,6 +18,22 @@ export default class ErrorPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"error",
+			"order":		120,
+			"depends":		"AliasPerk",
+			//"depends":		"RollCallPerk",
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -47,22 +63,6 @@ export default class ErrorPerk extends BM.Perk
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 			this.set("vault", "error.server", server);
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"error",
-			"order":		120,
-			"depends":		"AliasPerk",
-			//"depends":		"RollCallPerk",
-		};
 
 	}
 

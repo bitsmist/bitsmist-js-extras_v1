@@ -19,6 +19,131 @@ export default class RoutePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"routing",
+			"order":		900,
+			"depends":		"ValidationPerk",
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static globalInit()
+	{
+
+		// Set state on the first page
+		history.replaceState(RoutePerk.__getState("connect"), null, null);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
+		this.upgrade(component, "skill", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
+		this.upgrade(component, "skill", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		this.upgrade(component, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
+		this.upgrade(component, "skill", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		this.upgrade(component, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
+		this.upgrade(component, "skill", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
+		this.upgrade(component, "vault", "routing.routes", []);
+		this.upgrade(component, "stat", "routing.routeInfo", {});
+		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
+		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
+		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
+		this.upgrade(component, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
+		this.upgrade(component, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
+
+		// Init popstate handler
+		RoutePerk.__initPopState(component);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event handlers
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onDoApplySettings(sender, e, ex)
+	{
+
+		// Routings
+		Object.entries(BM.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
+			RoutePerk._addRoute(this, sectionName, sectionValue);
+		});
+
+		// Set current route info.
+		this.set("stat", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onDoStart(sender, e, ex)
+	{
+
+		let routeName = this.get("stat", "routing.routeInfo.name");
+		if (routeName)
+		{
+			let options = {
+				"query": this.get("setting", "setting.query")
+			};
+
+			return this.use("skill", "routing.switch", routeName, options);
+		}
+		else
+		{
+			console.error("route not found");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onAfterReady(sender, e, ex)
+	{
+
+		return this.use("skill", "routing.openRoute");
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onDoValidateFail(sender, e, ex)
+	{
+
+		// Try to fix URL when validation failed
+		if (this.get("setting", "routing.options.autoFix"))
+		{
+			RoutePerk.__fixRoute(this, e.detail.url);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static RoutePerk_onDoReportValidity(sender, e, ex)
+	{
+
+		// Dump errors when validation failed
+		RoutePerk.__dumpValidationErrors(this);
+		throw new URIError("URL validation failed.");
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Skills
 	// -------------------------------------------------------------------------
 
@@ -313,131 +438,6 @@ export default class RoutePerk extends BM.Perk
 		}).then(() => {
 			return component.use("skill", "event.trigger", "afterNormalizeURL");
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Event handlers
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onDoApplySettings(sender, e, ex)
-	{
-
-		// Routings
-		Object.entries(BM.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
-			RoutePerk._addRoute(this, sectionName, sectionValue);
-		});
-
-		// Set current route info.
-		this.set("stat", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onDoStart(sender, e, ex)
-	{
-
-		let routeName = this.get("stat", "routing.routeInfo.name");
-		if (routeName)
-		{
-			let options = {
-				"query": this.get("setting", "setting.query")
-			};
-
-			return this.use("skill", "routing.switch", routeName, options);
-		}
-		else
-		{
-			console.error("route not found");
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onAfterReady(sender, e, ex)
-	{
-
-		return this.use("skill", "routing.openRoute");
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onDoValidateFail(sender, e, ex)
-	{
-
-		// Try to fix URL when validation failed
-		if (this.get("setting", "routing.options.autoFix"))
-		{
-			RoutePerk.__fixRoute(this, e.detail.url);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static RoutePerk_onDoReportValidity(sender, e, ex)
-	{
-
-		// Dump errors when validation failed
-		RoutePerk.__dumpValidationErrors(this);
-		throw new URIError("URL validation failed.");
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"routing",
-			"order":		900,
-			"depends":		"ValidationPerk",
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static globalInit()
-	{
-
-		// Set state on the first page
-		history.replaceState(RoutePerk.__getState("connect"), null, null);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		this.upgrade(component, "skill", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-		this.upgrade(component, "skill", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
-		this.upgrade(component, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-		this.upgrade(component, "skill", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
-		this.upgrade(component, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-		this.upgrade(component, "skill", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-		this.upgrade(component, "vault", "routing.routes", []);
-		this.upgrade(component, "stat", "routing.routeInfo", {});
-		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
-		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
-		this.upgrade(component, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
-		this.upgrade(component, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
-
-		// Init popstate handler
-		RoutePerk.__initPopState(component);
 
 	}
 

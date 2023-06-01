@@ -18,6 +18,58 @@ export default class DialogPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"dialog",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "skill", "dialog.open", function(...args) { return DialogPerk._open(...args); });
+		this.upgrade(component, "skill", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
+		this.upgrade(component, "skill", "dialog.close", function(...args) { return DialogPerk._close(...args); });
+		this.upgrade(component, "inventory", "dialog.cancelClose");
+		this.upgrade(component, "vault", "dialog.modalPromise");
+		this.upgrade(component, "vault", "dialog.backdrop");
+		this.upgrade(component, "vault", "dialog.backdropPromise", Promise.resolve());
+		this.upgrade(component, "stat", "dialog.isModal", false);
+		this.upgrade(component, "stat", "dialog.modalResult", {});
+		this.upgrade(component, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Event Handlers
+	// -------------------------------------------------------------------------
+
+	static DialogPerk_onAfterReady(sender, e, ex)
+	{
+
+		if (this.get("setting", "dialog.options.autoOpen"))
+		{
+			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.tagName}, id=${this.id}`);
+
+			//return this.open();
+			return this.use("skill", "dialog.open");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Skills
 	// -------------------------------------------------------------------------
 
@@ -126,58 +178,6 @@ export default class DialogPerk extends BM.Perk
 				});
 			}
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Event Handlers
-	// -------------------------------------------------------------------------
-
-	static DialogPerk_onAfterReady(sender, e, ex)
-	{
-
-		if (this.get("setting", "dialog.options.autoOpen"))
-		{
-			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.tagName}, id=${this.id}`);
-
-			//return this.open();
-			return this.use("skill", "dialog.open");
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"dialog",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "skill", "dialog.open", function(...args) { return DialogPerk._open(...args); });
-		this.upgrade(component, "skill", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-		this.upgrade(component, "skill", "dialog.close", function(...args) { return DialogPerk._close(...args); });
-		this.upgrade(component, "inventory", "dialog.cancelClose");
-		this.upgrade(component, "vault", "dialog.modalPromise");
-		this.upgrade(component, "vault", "dialog.backdrop");
-		this.upgrade(component, "vault", "dialog.backdropPromise", Promise.resolve());
-		this.upgrade(component, "stat", "dialog.isModal", false);
-		this.upgrade(component, "stat", "dialog.modalResult", {});
-		this.upgrade(component, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
 
 	}
 

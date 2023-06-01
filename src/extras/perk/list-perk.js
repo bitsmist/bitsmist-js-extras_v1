@@ -20,38 +20,33 @@ export default class ListPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Properties
 	// -------------------------------------------------------------------------
 
-	/**
-	 * Change the row skin.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{String}		skinName			Skin name.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _transformRow(component, skinName, options)
+	static get info()
 	{
 
-		options = options || {};
+		return {
+			"section":		"list",
+			"order":		310,
+		};
 
-		if (component.get("stat", "list.activeRowSkinName") === skinName)
-		{
-			return Promise.resolve();
-		}
+	}
 
-		return Promise.resolve().then(() => {
-			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.use("skill", "skin.summon", skinName);
-		}).then(() => {
-			component.set("stat", "list.activeRowSkinName", skinName);
-		}).then(() => {
-			return component.use("skill", "event.trigger", "afterTransformRow", options);
-		}).then(() => {
-			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-		});
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "skill", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
+		this.upgrade(component, "vault", "list.lastItems", {});
+		this.upgrade(component, "stat", "list.activeRowSkinName", "");
+		this.upgrade(component, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
+		this.upgrade(component, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
+		this.upgrade(component, "event", "doFill", ListPerk.ListPerk_onDoFill);
 
 	}
 
@@ -101,33 +96,38 @@ export default class ListPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Skills
 	// -------------------------------------------------------------------------
 
-	static get info()
+	/**
+	 * Change the row skin.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{String}		skinName			Skin name.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _transformRow(component, skinName, options)
 	{
 
-		return {
-			"section":		"list",
-			"order":		310,
-		};
+		options = options || {};
 
-	}
+		if (component.get("stat", "list.activeRowSkinName") === skinName)
+		{
+			return Promise.resolve();
+		}
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "skill", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
-		this.upgrade(component, "vault", "list.lastItems", {});
-		this.upgrade(component, "stat", "list.activeRowSkinName", "");
-		this.upgrade(component, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
-		this.upgrade(component, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
-		this.upgrade(component, "event", "doFill", ListPerk.ListPerk_onDoFill);
+		return Promise.resolve().then(() => {
+			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+			return component.use("skill", "skin.summon", skinName);
+		}).then(() => {
+			component.set("stat", "list.activeRowSkinName", skinName);
+		}).then(() => {
+			return component.use("skill", "event.trigger", "afterTransformRow", options);
+		}).then(() => {
+			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
+		});
 
 	}
 

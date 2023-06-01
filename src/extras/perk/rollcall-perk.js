@@ -18,6 +18,58 @@ export default class RollCallPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"rollcall",
+			"order":		330,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static globalInit()
+	{
+
+		// Init vars
+		RollCallPerk._records = {};
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
+		this.upgrade(component, "skill", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
+		this.upgrade(component, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static RollCallPerk_onDoApplySettings(sender, e, ex)
+	{
+
+		Object.entries(BM.Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
+			let name = sectionValue["name"] || sectionName;
+			RollCallPerk._register(this, name, sectionValue);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Skills
 	// -------------------------------------------------------------------------
 
@@ -87,58 +139,6 @@ export default class RollCallPerk extends BM.Perk
 		{
 			clearTimeout(entry.waitInfo["timer"]);
 		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static RollCallPerk_onDoApplySettings(sender, e, ex)
-	{
-
-		Object.entries(BM.Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
-			let name = sectionValue["name"] || sectionName;
-			RollCallPerk._register(this, name, sectionValue);
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"rollcall",
-			"order":		330,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static globalInit()
-	{
-
-		// Init vars
-		RollCallPerk._records = {};
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-		this.upgrade(component, "skill", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-		this.upgrade(component, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
 
 	}
 

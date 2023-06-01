@@ -18,6 +18,47 @@ export default class ChainPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"chain",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "event", "doApplySettings", ChainPerk.onDoApplySettings);
+
+	}
+
+	// -----------------------------------------------------------------------------
+
+	static deinit(component, options)
+	{
+
+		let chains = e.details.setting["chains"];
+		if (chains)
+		{
+			Object.keys(chains).forEach((eventName) => {
+				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
+			});
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
@@ -69,47 +110,6 @@ export default class ChainPerk extends BM.Perk
 		}
 
 		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"chain",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "event", "doApplySettings", ChainPerk.onDoApplySettings);
-
-	}
-
-	// -----------------------------------------------------------------------------
-
-	static deinit(component, options)
-	{
-
-		let chains = e.details.setting["chains"];
-		if (chains)
-		{
-			Object.keys(chains).forEach((eventName) => {
-				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
-			});
-		}
 
 	}
 

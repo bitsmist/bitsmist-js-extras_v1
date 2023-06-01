@@ -21,6 +21,112 @@ export default class DatabindingPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"databinding",
+			"order":		320,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		if (component.get("setting", "databinding.options.dataType", "single") === "single")
+		{
+			// Upgrade component (single)
+			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+			this.upgrade(component, "vault", "databinding.store", new BindableStore({
+				"resources":	component.get("inventory", "resource.resources"),
+				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
+			}));
+			this.upgrade(component, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
+			this.upgrade(component, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+		}
+		else
+		{
+			// Upgrade component (multiple)
+			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+			this.upgrade(component, "vault", "databinding.store", new BindableArrayStore({
+				"resources":	component.resources,
+				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
+			}));
+			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+		}
+
+		// Upgrade component
+		this.upgrade(component, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
+		this.upgrade(component, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onAfterTransform(sender, e, ex)
+	{
+
+		DatabindingPerk._bindData(this);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoClear(sender, e, ex)
+	{
+
+		this.get("vault", "databinding.store").clear();
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoFill(sender, e, ex)
+	{
+
+		if (e.detail.items)
+		{
+			this.get("vault", "databinding.store").replace(e.detail.items);
+			FormUtil.showConditionalElements(this, e.detail.items);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoFillRow(sender, e, ex)
+	{
+
+		console.log("%c@@@DatabindingPerk_onDoFillRow", "color:white;background-color:green", this.tagName, e.detail.no);
+
+		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
+		this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static DatabindingPerk_onDoCollect(sender, e, ex)
+	{
+
+		if (this.get("setting", "databinding.options.autoCollect", true))
+		{
+			e.detail.items = this.get("vault", "databinding.store").items;
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Skills
 	// -------------------------------------------------------------------------
 
@@ -82,110 +188,6 @@ export default class DatabindingPerk extends BM.Perk
 			// Bind
 			component.get("vault", "databinding.store").bindTo(index, key, elem, callback);
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onAfterTransform(sender, e, ex)
-	{
-
-		DatabindingPerk._bindData(this);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onDoClear(sender, e, ex)
-	{
-
-		this.get("vault", "databinding.store").clear();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onDoFill(sender, e, ex)
-	{
-
-		if (e.detail.items)
-		{
-			this.get("vault", "databinding.store").replace(e.detail.items);
-			FormUtil.showConditionalElements(this, e.detail.items);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onDoFillRow(sender, e, ex)
-	{
-
-		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-		this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static DatabindingPerk_onDoCollect(sender, e, ex)
-	{
-
-		if (this.get("setting", "databinding.options.autoCollect", true))
-		{
-			e.detail.items = this.get("vault", "databinding.store").items;
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"databinding",
-			"order":		320,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		if (component.get("setting", "databinding.options.dataType", "single") === "single")
-		{
-			// Upgrade component (single)
-			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
-			this.upgrade(component, "vault", "databinding.store", new BindableStore({
-				"resources":	component.get("inventory", "resource.resources"),
-				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
-			}));
-			this.upgrade(component, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
-			this.upgrade(component, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
-		}
-		else
-		{
-			// Upgrade component (multiple)
-			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
-			this.upgrade(component, "vault", "databinding.store", new BindableArrayStore({
-				"resources":	component.resources,
-				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
-			}));
-			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
-		}
-
-		// Upgrade component
-		this.upgrade(component, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
-		this.upgrade(component, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
 
 	}
 

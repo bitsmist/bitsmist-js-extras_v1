@@ -18,35 +18,32 @@ export default class ResourcePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Properties
 	// -------------------------------------------------------------------------
 
-	/**
-     * Add resource. Load data if "autoLoad" option is true using added resource.
-     *
-     * @param	{Component}		component			Component.
-     * @param	{string}		handlerName			Resource handler name.
-     * @param	{array}			options				Options.
-	 *
-	 * @return 	{Promise}		Promise.
-     */
-	static _addHandler(component, handlerName, options)
+	static get info()
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
+		return {
+			"section":		"resource",
+			"order":		300,
+		};
 
-		let promise = Promise.resolve();
-		let handler = component.get("inventory", `resource.resources.${handlerName}`);
+	}
 
-		if (!handler)
-		{
-			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
-			component.set("inventory", `resource.resources.${handlerName}`, handler);
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
 
-			promise = handler.init(options);
-		}
+	static init(component, options)
+	{
 
-		return promise;
+		// Upgrade component
+		this.upgrade(component, "skill", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		this.upgrade(component, "inventory", "resource.resources", {});
+		this.upgrade(component, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
+		this.upgrade(component, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
+		this.upgrade(component, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
 
 	}
 
@@ -122,32 +119,35 @@ export default class ResourcePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Skills
 	// -------------------------------------------------------------------------
 
-	static get info()
+	/**
+     * Add resource. Load data if "autoLoad" option is true using added resource.
+     *
+     * @param	{Component}		component			Component.
+     * @param	{string}		handlerName			Resource handler name.
+     * @param	{array}			options				Options.
+	 *
+	 * @return 	{Promise}		Promise.
+     */
+	static _addHandler(component, handlerName, options)
 	{
 
-		return {
-			"section":		"resource",
-			"order":		300,
-		};
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
 
-	}
+		let promise = Promise.resolve();
+		let handler = component.get("inventory", `resource.resources.${handlerName}`);
 
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
+		if (!handler)
+		{
+			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
+			component.set("inventory", `resource.resources.${handlerName}`, handler);
 
-	static init(component, options)
-	{
+			promise = handler.init(options);
+		}
 
-		// Upgrade component
-		this.upgrade(component, "skill", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
-		this.upgrade(component, "inventory", "resource.resources", {});
-		this.upgrade(component, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
-		this.upgrade(component, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
-		this.upgrade(component, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
+		return promise;
 
 	}
 

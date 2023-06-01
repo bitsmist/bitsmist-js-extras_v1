@@ -20,68 +20,17 @@ export default class FormPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Properties
 	// -------------------------------------------------------------------------
 
-	/**
-	 *
-	 * Build the element.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{HTMLElement}	element				HTMLElement to build.
-	 * @param	{Object}		items				Items to fill elements.
-	 * @param	{Object}		options				Options.
-	 */
-	static _build(component, element, items, options)
+	static get info()
 	{
 
-		FormUtil.build(element, items, options);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Submit the form.
-	 *
-     * @param	{Component}		component			Component.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static _submit(component, options)
-	{
-
-		options = options || {};
-		component.set("stat", "form.cancelSubmit", false);
-
-		return FormPerk.__collect(component, options).then(() => {
-			// Validate values
-			if (component.get("setting", "form.options.autoValidate", true))
-			{
-				options["validatorName"] = options["validatorName"] || component.get("setting", "form.options.validatorName");
-				return component.use("skill", "validation.validate", options).then(() => {
-					if (!component.get("stat", "validation.validationResult.result"))
-					{
-						component.set("stat", "form.cancelSubmit", true);
-					}
-				});
-			}
-		}).then(() => {
-			// Submit values
-			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
-			return component.use("skill", "event.trigger", "beforeSubmit", options).then(() => {
-				if (!component.get("stat", "form.cancelSubmit"))
-				{
-					return Promise.resolve().then(() => {
-						return component.use("skill", "event.trigger", "doSubmit", options);
-					}).then(() => {
-						console.debug(`FormPerk._submit(): Submitted component. name=${component.tagName}, id=${component.id}`);
-						return component.use("skill", "event.trigger", "afterSubmit", options);
-					});
-				}
-			});
-		});
+		return {
+			"section":		"form",
+			"order":		310,
+			"depends":		"ValidationPerk",
+		};
 
 	}
 
@@ -162,21 +111,6 @@ export default class FormPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"form",
-			"order":		310,
-			"depends":		"ValidationPerk",
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -194,6 +128,72 @@ export default class FormPerk extends BM.Perk
 		this.upgrade(component, "event", "doFill", FormPerk.FormPerk_onDoFill);
 		this.upgrade(component, "event", "doCollect", FormPerk.FormPerk_onDoCollect);
 		this.upgrade(component, "event", "afterCollect", FormPerk.FormPerk_onAfterCollect);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Skills
+	// -------------------------------------------------------------------------
+
+	/**
+	 *
+	 * Build the element.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{HTMLElement}	element				HTMLElement to build.
+	 * @param	{Object}		items				Items to fill elements.
+	 * @param	{Object}		options				Options.
+	 */
+	static _build(component, element, items, options)
+	{
+
+		FormUtil.build(element, items, options);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Submit the form.
+	 *
+     * @param	{Component}		component			Component.
+	 * @param	{Object}		options				Options.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static _submit(component, options)
+	{
+
+		options = options || {};
+		component.set("stat", "form.cancelSubmit", false);
+
+		return FormPerk.__collect(component, options).then(() => {
+			// Validate values
+			if (component.get("setting", "form.options.autoValidate", true))
+			{
+				options["validatorName"] = options["validatorName"] || component.get("setting", "form.options.validatorName");
+				return component.use("skill", "validation.validate", options).then(() => {
+					if (!component.get("stat", "validation.validationResult.result"))
+					{
+						component.set("stat", "form.cancelSubmit", true);
+					}
+				});
+			}
+		}).then(() => {
+			// Submit values
+			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
+			return component.use("skill", "event.trigger", "beforeSubmit", options).then(() => {
+				if (!component.get("stat", "form.cancelSubmit"))
+				{
+					return Promise.resolve().then(() => {
+						return component.use("skill", "event.trigger", "doSubmit", options);
+					}).then(() => {
+						console.debug(`FormPerk._submit(): Submitted component. name=${component.tagName}, id=${component.id}`);
+						return component.use("skill", "event.trigger", "afterSubmit", options);
+					});
+				}
+			});
+		});
 
 	}
 

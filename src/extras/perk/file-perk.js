@@ -17,25 +17,8 @@ import BM from "../bm";
 export default class FilePerk extends BM.Perk
 {
 
-	// -----------------------------------------------------------------------------
-	//	Event handlers
-	// -----------------------------------------------------------------------------
-
-	static FilePerk_onDoApplySettings(sender, e, ex)
-	{
-
-		let promises = [];
-
-		Object.entries(BM.Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
-		});
-
-		return Promise.all(promises);
-
-	}
-
 	// -------------------------------------------------------------------------
-	//  Setter/Getter
+	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
@@ -57,6 +40,23 @@ export default class FilePerk extends BM.Perk
 
 		// Upgrade component
 		this.upgrade(component, "event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
+
+	}
+
+	// -----------------------------------------------------------------------------
+	//	Event handlers
+	// -----------------------------------------------------------------------------
+
+	static FilePerk_onDoApplySettings(sender, e, ex)
+	{
+
+		let promises = [];
+
+		Object.entries(BM.Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
+			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+		});
+
+		return Promise.all(promises);
 
 	}
 

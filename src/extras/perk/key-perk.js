@@ -18,6 +18,33 @@ export default class KeyPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"key",
+			"order":		800,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "stat", "key.isComposing", false);
+		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
@@ -130,33 +157,6 @@ export default class KeyPerk extends BM.Perk
 
 	}
 	*/
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"key",
-			"order":		800,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "stat", "key.isComposing", false);
-		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
-
-	}
 
 	// -------------------------------------------------------------------------
 	//  Privates

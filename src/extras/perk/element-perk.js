@@ -18,6 +18,34 @@ import FormUtil from "../util/form-util.js";
 export default class ElementPerk extends BM.Perk
 {
 
+	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"element",
+			"order":		220,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "vault", "element.overlay", );
+		this.upgrade(component, "vault", "element.overlayPromise", Promise.resolve());
+		this.upgrade(component, "event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
+
+	}
+
 	// -----------------------------------------------------------------------------
 	//	Event handlers
 	// -----------------------------------------------------------------------------
@@ -50,34 +78,6 @@ export default class ElementPerk extends BM.Perk
 		});
 
 		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"element",
-			"order":		220,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "vault", "element.overlay", );
-		this.upgrade(component, "vault", "element.overlayPromise", Promise.resolve());
-		this.upgrade(component, "event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
 
 	}
 

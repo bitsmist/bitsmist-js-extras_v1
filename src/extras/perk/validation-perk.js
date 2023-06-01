@@ -18,6 +18,94 @@ export default class ValidationPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Properties
+	// -------------------------------------------------------------------------
+
+	static get info()
+	{
+
+		return {
+			"section":		"validation",
+			"order":		310,
+		};
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(component, options)
+	{
+
+		// Upgrade component
+		this.upgrade(component, "skill", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
+		this.upgrade(component, "skill", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
+		this.upgrade(component, "inventory", "validation.validators", {});
+		this.upgrade(component, "stat", "validation.validationResult", {});
+		this.upgrade(component, "stat", "validation.validationResult", {});
+		this.upgrade(component, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
+		this.upgrade(component, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
+		this.upgrade(component, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
+
+	}
+
+	// -------------------------------------------------------------------------
+	//	Event handlers
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoApplySettings(sender, e, ex)
+	{
+
+		let promises = [];
+
+		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
+			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
+		});
+
+		return Promise.all(promises);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoValidate(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail, "items");
+			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
+			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
+
+			this.get("inventory", `validation.validators.${validatorName}`).checkValidity(items, rules, options);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static ValidationPerk_onDoReportValidity(sender, e, ex)
+	{
+
+		let validatorName = e.detail.validatorName;
+		if (validatorName)
+		{
+			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+
+			let items = BM.Util.safeGet(e.detail, "items");
+			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
+			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
+
+			this.get("inventory", `validation.validators.${validatorName}`).reportValidity(items, rules, options);
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Skills
 	// -------------------------------------------------------------------------
 
@@ -86,94 +174,6 @@ export default class ValidationPerk extends BM.Perk
 		}).then(() => {
 			return component.use("skill", "event.trigger", "afterValidate", options);
 		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event handlers
-	// -------------------------------------------------------------------------
-
-	static ValidationPerk_onDoApplySettings(sender, e, ex)
-	{
-
-		let promises = [];
-
-		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
-		});
-
-		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static ValidationPerk_onDoValidate(sender, e, ex)
-	{
-
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
-			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
-
-			this.get("inventory", `validation.validators.${validatorName}`).checkValidity(items, rules, options);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static ValidationPerk_onDoReportValidity(sender, e, ex)
-	{
-
-		let validatorName = e.detail.validatorName;
-		if (validatorName)
-		{
-			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
-
-			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
-			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
-
-			this.get("inventory", `validation.validators.${validatorName}`).reportValidity(items, rules, options);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return {
-			"section":		"validation",
-			"order":		310,
-		};
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(component, options)
-	{
-
-		// Upgrade component
-		this.upgrade(component, "skill", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		this.upgrade(component, "skill", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
-		this.upgrade(component, "inventory", "validation.validators", {});
-		this.upgrade(component, "stat", "validation.validationResult", {});
-		this.upgrade(component, "stat", "validation.validationResult", {});
-		this.upgrade(component, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
-		this.upgrade(component, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
-		this.upgrade(component, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
 
 	}
 
