@@ -28,7 +28,7 @@ export default class ElementPerk extends BM.Perk
 		let order = ElementPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
-			this.skills.use("event.add", sectionName, {
+			this.use("skill", "event.add", sectionName, {
 				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,
 				"options":	{"attrs":sectionValue}
@@ -151,15 +151,15 @@ export default class ElementPerk extends BM.Perk
 					break;
 				case "showLoader":
 					ElementPerk.__showOverlay(component, elementInfo[key]);
-					waitForElement = component.vault.get("element.overlay");
+					waitForElement = component.get("vault", "element.overlay");
 					break;
 				case "hideLoader":
 					ElementPerk.__hideOverlay(component, elementInfo[key]);
-					waitForElement = component.vault.get("element.overlay");
+					waitForElement = component.get("vault", "element.overlay");
 					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
-					FormUtil.build(elements[i], component.inventory.get(`resource.resources.${resourceName}`).items, elementInfo[key]);
+					FormUtil.build(elements[i], component.get("inventory", `resource.resources.${resourceName}`).items, elementInfo[key]);
 					break;
 				case "attribute":
 					ElementPerk.__setAttributes(elements[i], elementInfo[key]);
@@ -237,7 +237,7 @@ export default class ElementPerk extends BM.Perk
 			// Timeout timer
 			let timer = setTimeout(() => {
 				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
-			}, BM.settings.get("system.waitForTimeout", 10000));
+			}, BM.Component.get("setting", "system.waitForTimeout", 10000));
 
 			// Resolve when finished
 			element.addEventListener(`${elementInfo["waitFor"]}end`, () => {
@@ -324,14 +324,14 @@ export default class ElementPerk extends BM.Perk
 	static __createOverlay(component, options)
 	{
 
-		if (!component.vault.get("element.overlay"))
+		if (!component.get("vault", "element.overlay"))
 		{
 			component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
 			let overlay = component.firstElementChild;
-			component.vault.set("element.overlay", component.firstElementChild);
+			component.set("vault", "element.overlay", component.firstElementChild);
 		}
 
-		return component.vault.get("element.overlay");
+		return component.get("vault", "element.overlay");
 
 	}
 
@@ -346,7 +346,7 @@ export default class ElementPerk extends BM.Perk
 	static __closeOnClick(component, options)
 	{
 
-		component.vault.get("element.overlay").addEventListener("click", (e) => {
+		component.get("vault", "element.overlay").addEventListener("click", (e) => {
 			if (e.target === e.currentTarget && typeof component.close === "function")
 			{
 				component.close({"reason":"cancel"});
@@ -410,8 +410,8 @@ export default class ElementPerk extends BM.Perk
 		let effect = ElementPerk.__getEffect(overlay);
 		if (effect)
 		{
-			component.vault.get("element.overlayPromise").then(() => {
-				component.vault.set("element.overlayPromise", new Promise((resolve, reject) => {
+			component.get("vault", "element.overlayPromise").then(() => {
+				component.set("vault", "element.overlayPromise", new Promise((resolve, reject) => {
 					overlay.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
@@ -436,9 +436,9 @@ export default class ElementPerk extends BM.Perk
 	static __hideOverlay(component, options)
 	{
 
-		let overlay = component.vault.get("element.overlay");
+		let overlay = component.get("vault", "element.overlay");
 
-		component.vault.get("element.overlayPromise").then(() => {
+		component.get("vault", "element.overlayPromise").then(() => {
 			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
 			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));

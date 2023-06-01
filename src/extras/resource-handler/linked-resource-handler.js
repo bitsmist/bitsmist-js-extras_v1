@@ -90,8 +90,8 @@ export default class LinkedResourceHandler extends ResourceHandler
 		let rootNode = this._options.get("rootNode");
 		let resourceName = this._options.get("resourceName") || this._resourceName;
 
-		return this._component.skills.use("state.wait", [{"rootNode":rootNode}]).then(() => {
-			this._ref = document.querySelector(rootNode).inventory.get("resource.resources")[resourceName];
+		return this._component.use("skill", "state.wait", [{"rootNode":rootNode}]).then(() => {
+			this._ref = document.querySelector(rootNode).get("inventory", "resource.resources")[resourceName];
 			return this._ref;
 		});
 

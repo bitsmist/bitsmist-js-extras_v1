@@ -82,11 +82,11 @@ export default class PreferenceServer extends BM.Component
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._defaults = new BM.ChainableStore({"items":this.settings.get("setting.defaults")});
+		this._defaults = new BM.ChainableStore({"items":this.get("setting", "setting.defaults")});
 		this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
 
-		Object.keys(this.inventory.get("resource.resources", {})).forEach((key) => {
-			this._store.merge(this.inventory.get(`resource.resources.${key}`).items);
+		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
+			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
 		});
 
 	}
@@ -109,8 +109,8 @@ export default class PreferenceServer extends BM.Component
 	{
 
 		let msg = `Invalid preference value. name=${this.tagName}`;
-		Object.keys(this.stats.get("validation.validationResult.invalids")).forEach((key) => {
-			msg += "\n\tkey=" + this.stats.get(`validation.validationResult.invalids.${key}.key`) + ", value=" + this.stats.get(`validation.validationResult.invalids.${key}.value`);
+		Object.keys(this.get("stat", "validation.validationResult.invalids")).forEach((key) => {
+			msg += "\n\tkey=" + this.get("stat", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("stat", `validation.validationResult.invalids.${key}.value`);
 		});
 		console.error(msg);
 
@@ -147,7 +147,7 @@ export default class PreferenceServer extends BM.Component
 	 *
 	 * @return  {*}				Value.
 	 */
-	get(key, defaultValue)
+	getPreference(key, defaultValue)
 	{
 
 		return this._store.get(key, defaultValue);
@@ -162,12 +162,12 @@ export default class PreferenceServer extends BM.Component
 	 * @param	{Object}		values				Values to store.
 	 * @param	{Object}		options				Options.
 	 */
-	set(values, options, ...args)
+	setPreference(values, options, ...args)
 	{
 
-		let validatorName = this.settings.get("setting.validatorName");
+		let validatorName = this.get("setting", "setting.validatorName");
 
-		return this.skills.use("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
+		return this.use("skill", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 
 	}
 
@@ -187,7 +187,7 @@ export default class PreferenceServer extends BM.Component
 
 		let sender = BM.Util.safeGet(options, "sender", this);
 
-		return this.skills.use("preference.apply", {"sender":sender, "preferences":changedItems});
+		return this.use("skill", "preference.apply", {"sender":sender, "preferences":changedItems});
 
 	}
 

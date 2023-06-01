@@ -36,12 +36,12 @@ export default class ResourcePerk extends BM.Perk
 		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
-		let handler = component.inventory.get(`resource.resources.${handlerName}`);
+		let handler = component.get("inventory", `resource.resources.${handlerName}`);
 
 		if (!handler)
 		{
 			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
-			component.inventory.set(`resource.resources.${handlerName}`, handler);
+			component.set("inventory", `resource.resources.${handlerName}`, handler);
 
 			promise = handler.init(options);
 		}
@@ -74,8 +74,8 @@ export default class ResourcePerk extends BM.Perk
 
 		let promises = [];
 
-		Object.keys(this.inventory.get("resource.resources")).forEach((resourceName) => {
-			let resource = this.inventory.get(`resource.resources.${resourceName}`);
+		Object.keys(this.get("inventory", "resource.resources")).forEach((resourceName) => {
+			let resource = this.get("inventory", `resource.resources.${resourceName}`);
 			if (resource.options.get("autoFetch", true))
 			{
 				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
@@ -85,7 +85,7 @@ export default class ResourcePerk extends BM.Perk
 					e.detail.items = resource.items;
 
 					// Set the property automatically after resource is fetched
-					let autoSet = this.settings.get(`resource.${resourceName}.autoSetProperty`);
+					let autoSet = this.get("setting", `resource.${resourceName}.autoSetProperty`);
 					if (autoSet)
 					{
 						this[autoSet] = resource.items;
@@ -106,14 +106,14 @@ export default class ResourcePerk extends BM.Perk
 		let promises = [];
 		let submitItem = BM.Util.safeGet(e.detail, "items");
 
-		Object.keys(this.inventory.get("resource.resources")).forEach((resourceName) => {
-			let resource = this.inventory.get(`resource.resources.${resourceName}`);
+		Object.keys(this.get("inventory", "resource.resources")).forEach((resourceName) => {
+			let resource = this.get("inventory", `resource.resources.${resourceName}`);
 			if (resource.options.get("autoSubmit", true)) {
 				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
 				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
 				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
-				promises.push(this.inventory.get(`resource.resources.${resourceName}`)[method](id, submitItem, parameters));
+				promises.push(this.get("inventory", `resource.resources.${resourceName}`)[method](id, submitItem, parameters));
 			}
 		});
 

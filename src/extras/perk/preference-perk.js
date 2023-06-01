@@ -31,11 +31,11 @@ export default class PreferencePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.skills.use("event.trigger", "beforeApplyPreferences", options);
+			return component.use("skill", "event.trigger", "beforeApplyPreferences", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "doApplyPreferences", options);
+			return component.use("skill", "event.trigger", "doApplyPreferences", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "afterApplyPreferences", options);
+			return component.use("skill", "event.trigger", "afterApplyPreferences", options);
 		});
 
 	}
@@ -54,11 +54,11 @@ export default class PreferencePerk extends BM.Perk
 
 		if (key)
 		{
-			return component.vault.get("preference.server").get(key, defaultValue);
+			return component.get("vault", "preference.server").getPreference(key, defaultValue);
 		}
 		else
 		{
-			return component.vault.get("preference.server").items;
+			return component.get("vault", "preference.server").items;
 		}
 
 	}
@@ -75,7 +75,7 @@ export default class PreferencePerk extends BM.Perk
 	static _setPreferences(component, preferences, options)
 	{
 
-		return component.vault.get("preference.server").set(preferences, options, {"sender":component});
+		return component.get("vault", "preference.server").setPreference(preferences, options, {"sender":component});
 
 	}
 
@@ -87,12 +87,12 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		return this.skills.use("rollcall.call", "PreferenceServer", {"waitForAttendance":true}).then((server) => {
+		return this.use("skill", "rollcall.call", "PreferenceServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoApplySettings(): PreferenceServer doesn't exist. name=${this.tagName}`);
 
-			return this.skills.use("state.wait", [{"object":server, "state":"started"}]).then(() => {
+			return this.use("skill", "state.wait", [{"object":server, "state":"started"}]).then(() => {
 				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-				this.vault.set("preference.server", server);
+				this.set("vault", "preference.server", server);
 			});
 		});
 
@@ -102,12 +102,12 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		let rootNode = this.skills.use("alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
+		let rootNode = this.use("skill", "alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
 
-		return this.skills.use("state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
+		return this.use("skill", "state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
 			let server = document.querySelector(rootNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-			this.vault.set("preference.server", server);
+			this.set("vault", "preference.server", server);
 		});
 
 	}
@@ -117,7 +117,7 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onBeforeSetup(sender, e, ex)
 	{
 
-		e.detail.preferences = this.vault.get("preference.server").items;
+		e.detail.preferences = this.get("vault", "preference.server").items;
 
 	}
 

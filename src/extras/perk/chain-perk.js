@@ -27,7 +27,7 @@ export default class ChainPerk extends BM.Perk
 		let order = ChainPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
-			this.skills.use("event.add", sectionName, {
+			this.use("skill", "event.add", sectionName, {
 				"handler":ChainPerk.onDoProcess,
 				"order":	order,
 				"options":sectionValue
@@ -133,8 +133,8 @@ export default class ChainPerk extends BM.Perk
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.skills.use("state.wait", [{"object":element, "state":state}]).then(() => {
-				return element.skills.use(skillName, {"sender":component});
+			let promise = component.use("skill", "state.wait", [{"object":element, "state":state}]).then(() => {
+				return element.use("skill", skillName, {"sender":component});
 			});
 			promises.push(promise);
 		});

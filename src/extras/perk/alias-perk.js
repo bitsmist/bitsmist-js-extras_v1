@@ -24,7 +24,7 @@ export default class AliasPerk extends BM.Perk
 	static _resolve(component, target)
 	{
 
-		return component.settings.get(`alias.${target}`, {});
+		return component.get("setting", `alias.${target}`, {});
 
 	}
 

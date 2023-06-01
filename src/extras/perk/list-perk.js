@@ -37,18 +37,18 @@ export default class ListPerk extends BM.Perk
 
 		options = options || {};
 
-		if (component.stats.get("list.activeRowSkinName") === skinName)
+		if (component.get("stat", "list.activeRowSkinName") === skinName)
 		{
 			return Promise.resolve();
 		}
 
 		return Promise.resolve().then(() => {
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.skills.use("skin.summon", skinName);
+			return component.use("skill", "skin.summon", skinName);
 		}).then(() => {
-			component.stats.set("list.activeRowSkinName", skinName);
+			component.set("stat", "list.activeRowSkinName", skinName);
 		}).then(() => {
-			return component.skills.use("event.trigger", "afterTransformRow", options);
+			return component.use("skill", "event.trigger", "afterTransformRow", options);
 		}).then(() => {
 			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
@@ -62,11 +62,11 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let rootNode = this.settings.get("list.options.listRootNode");
+		let rootNode = this.get("setting", "list.options.listRootNode");
 		this._listRootNode = ( rootNode ? BM.Util.scopedSelectorAll(this._root, rootNode)[0] : this._root );
-		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.settings.get("setting.listRootNode")}`);
+		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.get("setting", "setting.listRootNode")}`);
 
-		return ListPerk._transformRow(this, this.settings.get("list.options.rowSkinName", "row"));
+		return ListPerk._transformRow(this, this.get("setting", "list.options.rowSkinName", "row"));
 
 	}
 
@@ -75,7 +75,7 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.vault.get("list.lastItems");
+		e.detail.items = e.detail.items || this.get("vault", "list.lastItems");
 
 	}
 
@@ -84,18 +84,18 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onDoFill(sender, e, ex)
 	{
 
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.settings.get("list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.get("setting", "list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
-			return this.skills.use("event.trigger", "beforeBuildRows");
+			return this.use("skill", "event.trigger", "beforeBuildRows");
 		}).then(() => {
 			return builder(this, fragment, e.detail.items, e.detail);
 		}).then(() => {
 			this._listRootNode.replaceChildren(fragment);
-			this.vault.set("list.lastItems", e.detail.items);
+			this.set("vault", "list.lastItems", e.detail.items);
 
-			return this.skills.use("event.trigger", "afterBuildRows");
+			return this.use("skill", "event.trigger", "afterBuildRows");
 		});
 
 	}
@@ -148,12 +148,12 @@ export default class ListPerk extends BM.Perk
 	static __buildSync(component, fragment, items, options)
 	{
 
-		let skinInfo = component.inventory.get("skin.skins");
-		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
+		let skinInfo = component.get("inventory", "inventory", "skin.skins");
+		let activeRowSkinName = component.get("stat", "list.activeRowSkinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
-		let rowEvents = component.settings.get("list.rowevents");
+		let rowEvents = component.get("setting", "list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
 
 		let chain = Promise.resolve();
@@ -172,20 +172,20 @@ export default class ListPerk extends BM.Perk
 				if (rowEvents)
 				{
 					Object.keys(rowEvents).forEach((elementName) => {
-						component.skills.use("event.init", elementName, rowEvents[elementName], element);
+						component.use("skill", "event.init", elementName, rowEvents[elementName], element);
 					});
 				}
 
-				return component.skills.use("event.trigger", "beforeFillRow", options).then(() => {
-					if (component.settings.get("list.options.autoFill", true))
+				return component.use("skill", "event.trigger", "beforeFillRow", options).then(() => {
+					if (component.get("setting", "list.options.autoFill", true))
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
-						ValueUtil.setFields(element, options["item"], {"resources":component.inventory.get("resource.resources")});
+						ValueUtil.setFields(element, options["item"], {"resources":component.get("inventory", "inventory", "resource.resources")});
 					}
-					return component.skills.use("event.trigger", "doFillRow", options);
+					return component.use("skill", "event.trigger", "doFillRow", options);
 				}).then(() => {
-					return component.skills.use("event.trigger", "afterFillRow", options);
+					return component.use("skill", "event.trigger", "afterFillRow", options);
 				});
 			});
 		}
@@ -208,12 +208,12 @@ export default class ListPerk extends BM.Perk
 	static __buildAsync(component, fragment, items, options)
 	{
 
-		let skinInfo = component.inventory.get("skin.skins");
-		let activeRowSkinName = component.stats.get("list.activeRowSkinName");
+		let skinInfo = component.get("inventory", "skin.skins");
+		let activeRowSkinName = component.get("stat", "list.activeRowSkinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
-		let rowEvents = component.settings.get("list.rowevents");
+		let rowEvents = component.get("setting", "list.rowevents");
 		let skin = skinInfo[activeRowSkinName].html;
 
 		for (let i = 0; i < items.length; i++)
@@ -230,19 +230,19 @@ export default class ListPerk extends BM.Perk
 			if (rowEvents)
 			{
 				Object.keys(rowEvents).forEach((elementName) => {
-					component.skills.use("event.init", elementName, rowEvents[elementName], element);
+					component.use("skill", "event.init", elementName, rowEvents[elementName], element);
 				});
 			}
 
 			// Call event handlers
-			component.skills.use("event.triggerAsync", "beforeFillRow", options);
+			component.use("skill", "event.triggerAsync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
-			if (component.settings.get("list.options.autoFill", true))
+			if (component.get("setting", "list.options.autoFill", true))
 			{
-				ValueUtil.setFields(element, options["item"], {"resources":component.inventory.get("resource.resources")});
+				ValueUtil.setFields(element, options["item"], {"resources":component.get("inventory", "resource.resources")});
 			}
-			component.skills.use("event.triggerAsync", "doFillRow", options);
-			component.skills.use("event.triggerAsync", "afterFillRow", options);
+			component.use("skill", "event.triggerAsync", "doFillRow", options);
+			component.use("skill", "event.triggerAsync", "afterFillRow", options);
 		}
 
 		delete options["no"];

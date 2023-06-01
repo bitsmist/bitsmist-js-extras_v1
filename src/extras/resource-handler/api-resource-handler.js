@@ -186,7 +186,7 @@ export default class ApiResourceHandler extends ResourceHandler
 	_buildApiUrl(resourceName, id, parameters, options)
 	{
 
-		let baseUrl = options["baseUrl"] || this._component.settings.get("system.apiBaseUrl", "");
+		let baseUrl = options["baseUrl"] || this._component.get("setting", "system.apiBaseUrl", "");
 		let scheme = options["scheme"] || "";
 		let host = options["host"] || "";
 		let dataType = options["dataType"] || "";

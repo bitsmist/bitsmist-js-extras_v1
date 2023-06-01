@@ -24,7 +24,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let keys = this.settings.get("key.keys");
+		let keys = this.get("setting", "key.keys");
 		if (keys)
 		{
 			// Init keys
@@ -53,7 +53,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onKeyDown(e, component)
 	{
 
-		component.inventory.set("key.isComposing", ( e.keyCode === 229 ? true : false ));
+		component.set("stat", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -71,7 +71,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Ignore all key input when composing.
-		if (component.inventory.get("key.isComposing"))
+		if (component.get("stat", "key.isComposing"))
 		{
 			return;
 		}
@@ -153,7 +153,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "inventory", "key.isComposing", false);
+		this.upgrade(component, "stat", "key.isComposing", false);
 		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
@@ -172,19 +172,19 @@ export default class KeyPerk extends BM.Perk
 	static __defaultSubmit(e, component, options)
 	{
 
-		return component.skills.use("form.submit").then(() => {
-			if (!component.inventory.get("form.cancelSubmit"))
+		return component.use("skill", "form.submit").then(() => {
+			if (!component.get("stat", "form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.stats.get("dialog.isModal"))
+				if (component.get("stat", "dialog.isModal"))
 				{
-					component.stats.set("dialog.modalResult.result", true);
+					component.set("stat", "dialog.modalResult.result", true);
 				}
 
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					return component.skills.use("dialog.close", {"reason":"submit"});
+					return component.use("skill", "dialog.close", {"reason":"submit"});
 				}
 			}
 		});
@@ -203,7 +203,7 @@ export default class KeyPerk extends BM.Perk
 	static __defaultCancel(e, component, options)
 	{
 
-		return component.skills.use("dialog.close", {"reason":"cancel"});
+		return component.use("skill", "dialog.close", {"reason":"cancel"});
 
 	}
 
@@ -226,7 +226,7 @@ export default class KeyPerk extends BM.Perk
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return component.skills.use("basic.clear", {"target":target, "options":options["options"]});
+		return component.use("skill", "basic.clear", {"target":target, "options":options["options"]});
 
 	}
 

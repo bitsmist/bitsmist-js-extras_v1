@@ -34,33 +34,32 @@ export default class DialogPerk extends BM.Perk
 		options = options || {};
 
 		console.debug(`DialogPerk._open(): Opening component. name=${component.tagName}, id=${component.id}`);
-		return component.skills.use("event.trigger", "beforeOpen", options).then(() => {
-			//if (!component._cancelOpen)
-			if (!component.inventory.get("dialog.cancelOpen"))
+		return component.use("skill", "event.trigger", "beforeOpen", options).then(() => {
+			if (!component.get("inventory", "dialog.cancelOpen"))
 			{
 				return Promise.resolve().then(() => {
 					// Show backdrop
-					if (component.settings.get("dialog.backdropOptions.show"))
+					if (component.get("setting", "dialog.backdropOptions.show"))
 					{
-						return DialogPerk.__showBackdrop(component, component.settings.get("dialog.backdropOptions"));
+						return DialogPerk.__showBackdrop(component, component.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
 					// Setup
-					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.settings.get("dialog.options.autoSetupOnOpen", true)))
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.get("setting", "dialog.options.autoSetupOnOpen", true)))
 					{
-						return component.skills.use("basic.setup", options);
+						return component.use("skill", "basic.setup", options);
 					}
 				}).then(() => {
 					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.settings.get("dialog.options.autoRefreshOnOpen", true)))
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.get("setting", "dialog.options.autoRefreshOnOpen", true)))
 					{
-						return component.skills.use("basic.refresh", options);
+						return component.use("skill", "basic.refresh", options);
 					}
 				}).then(() => {
-					return component.skills.use("event.trigger", "doOpen", options);
+					return component.use("skill", "event.trigger", "doOpen", options);
 				}).then(() => {
 					console.debug(`DialogPerk._open(): Opened component. name=${component.tagName}, id=${component.id}`);
-					return component.skills.use("event.trigger", "afterOpen", options);
+					return component.use("skill", "event.trigger", "afterOpen", options);
 				});
 			}
 		});
@@ -82,9 +81,9 @@ export default class DialogPerk extends BM.Perk
 		console.debug(`DialogPerk._openModal(): Opening component modal. name=${component.tagName}, id=${component.id}`);
 
 		return new Promise((resolve, reject) => {
-			component.stats.set("dialog.isModal", true);
-			component.stats.set("dialog.modalResult", {"result":false});
-			component.vault.set("dialog.modalPromise", {"resolve":resolve,"reject":reject});
+			component.set("stat", "dialog.isModal", true);
+			component.set("stat", "dialog.modalResult", {"result":false});
+			component.set("vault", "dialog.modalPromise", {"resolve":resolve,"reject":reject});
 			return DialogPerk._open(component, options);
 		});
 
@@ -103,27 +102,27 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		options = options || {};
-		component.inventory.set("dialog.cancelClose", false);
+		component.set("inventory", "dialog.cancelClose", false);
 
 		console.debug(`DialogPerk._close(): Closing component. name=${component.tagName}, id=${component.id}`);
-		return component.skills.use("event.trigger", "beforeClose", options).then(() => {
-			if (!component.inventory.get("dialog.cancelClose"))
+		return component.use("skill", "event.trigger", "beforeClose", options).then(() => {
+			if (!component.get("inventory", "dialog.cancelClose"))
 			{
-				return component.skills.use("event.trigger", "doClose", options).then(() => {
+				return component.use("skill", "event.trigger", "doClose", options).then(() => {
 					// Hide backdrop
-					if (component.settings.get("dialog.backdropOptions.show"))
+					if (component.get("setting", "dialog.backdropOptions.show"))
 					{
 						DialogPerk.__removeCloseOnClickHandlers();
-						return DialogPerk.__hideBackdrop(component, component.settings.get("dialog.backdropOptions"));
+						return DialogPerk.__hideBackdrop(component, component.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
-					if (component.stats.get("dialog.isModal"))
+					if (component.get("stat", "dialog.isModal"))
 					{
-						component.vault.get("dialog.modalPromise").resolve(component.stats.get("dialog.modalResult"));
+						component.get("vault", "dialog.modalPromise").resolve(component.get("stat", "dialog.modalResult"));
 					}
 					console.debug(`DialogPerk._close(): Closed component. name=${component.tagName}, id=${component.id}`);
 
-					return component.skills.use("event.trigger", "afterClose", options);
+					return component.use("skill", "event.trigger", "afterClose", options);
 				});
 			}
 		});
@@ -137,12 +136,12 @@ export default class DialogPerk extends BM.Perk
 	static DialogPerk_onAfterReady(sender, e, ex)
 	{
 
-		if (this.settings.get("dialog.options.autoOpen"))
+		if (this.get("setting", "dialog.options.autoOpen"))
 		{
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.tagName}, id=${this.id}`);
 
 			//return this.open();
-			return this.skills.use("dialog.open");
+			return this.use("skill", "dialog.open");
 		}
 
 	}
@@ -217,13 +216,13 @@ export default class DialogPerk extends BM.Perk
 
 		DialogPerk.__createBackdrop(component);
 
-		return component.vault.get("dialog.backdropPromise").then(() => {
-			component.vault.set("dialog.backdropPromise", new Promise((resolve, reject) => {
+		return component.get("vault", "dialog.backdropPromise").then(() => {
+			component.set("vault", "dialog.backdropPromise", new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let addClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.showOptions.addClasses", []));
+				let addClasses = ["show"].concat(component.get("setting", "dialog.backdropOptions.showOptions.addClasses", []));
 				DialogPerk._backdrop.classList.add(...addClasses);
-				DialogPerk._backdrop.classList.remove(...component.settings.get("dialog.backdropOptions.showOptions.removeClasses", []));
+				DialogPerk._backdrop.classList.remove(...component.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
 
 				let effect = DialogPerk.__getEffect();
 				if (effect)
@@ -252,7 +251,7 @@ export default class DialogPerk extends BM.Perk
 			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return component.vault.get("dialog.backdropPromise");
+				return component.get("vault", "dialog.backdropPromise");
 			}
 		});
 
@@ -269,13 +268,13 @@ export default class DialogPerk extends BM.Perk
 	static __hideBackdrop(component, options)
 	{
 
-		return component.vault.get("dialog.backdropPromise").then(() => {
-			component.vault.set("dialog.backdropPromise",  new Promise((resolve, reject) => {
+		return component.get("vault", "dialog.backdropPromise").then(() => {
+			component.set("vault", "dialog.backdropPromise",  new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let removeClasses = ["show"].concat(component.settings.get("dialog.backdropOptions.hideOptions.removeClasses", []));
+				let removeClasses = ["show"].concat(component.get("setting", "dialog.backdropOptions.hideOptions.removeClasses", []));
 				DialogPerk._backdrop.classList.remove(...removeClasses);
-				DialogPerk._backdrop.classList.add(...component.settings.get("dialog.backdropOptions.hideOptions.addClasses", []));
+				DialogPerk._backdrop.classList.add(...component.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
 
 				let effect = DialogPerk.__getEffect();
 				if (effect)
@@ -293,7 +292,7 @@ export default class DialogPerk extends BM.Perk
 			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return component.vault.get("dialog.backdropPromise");
+				return component.get("vault", "dialog.backdropPromise");
 			}
 		});
 

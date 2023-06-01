@@ -111,16 +111,16 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onBeforeStart(sender, e, ex)
 	{
 
-		this.rootNodes = this.settings.get("setting.rootNodes");
+		this.rootNodes = this.get("setting", "setting.rootNodes");
 
-		if (this.settings.get("setting.useDefaultInput", true))
+		if (this.get("setting", "setting.useDefaultInput", true))
 		{
-			this.skills.use("event.add", "beforeAdd", "ChainedSelect_onBeforeAdd");
-			this.skills.use("event.add", "doAdd", "ChainedSelect_onDoAdd");
-			this.skills.use("event.add", "beforeEdit", "ChainedSelect_onBeforeEdit");
-			this.skills.use("event.add", "doEdit", "ChainedSelect_onDoEdit");
-			this.skills.use("event.add", "beforeRemove", "ChainedSelect_onBeforeRemove");
-			this.skills.use("event.add", "doRemove", "ChainedSelect_onDoRemove");
+			this.use("skills", "event.add", "beforeAdd", "ChainedSelect_onBeforeAdd");
+			this.use("skills", "event.add", "doAdd", "ChainedSelect_onDoAdd");
+			this.use("skills", "event.add", "beforeEdit", "ChainedSelect_onBeforeEdit");
+			this.use("skills", "event.add", "doEdit", "ChainedSelect_onDoEdit");
+			this.use("skills", "event.add", "beforeRemove", "ChainedSelect_onBeforeRemove");
+			this.use("skills", "event.add", "doRemove", "ChainedSelect_onDoRemove");
 		}
 
 	}
@@ -131,23 +131,23 @@ export default class ChainedSelect extends BM.Component
 	{
 
 		// Init select elements (disable all)
-		this.skills.use("basic.clear", {"fromLevel":1, "toLevel":this.length});
+		this.use("skills", "basic.clear", {"fromLevel":1, "toLevel":this.length});
 
-		if (!this.settings.get("setting.isAddable", true))
+		if (!this.get("setting", "setting.isAddable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
 				element.style.display = "none";
 			});
 		}
 
-		if (!this.settings.get("setting.isEditable", true))
+		if (!this.get("setting", "setting.isEditable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
 				element.style.display = "none";
 			});
 		}
 
-		if (!this.settings.get("setting.isRemovable", true))
+		if (!this.get("setting", "setting.isRemovable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
 				element.style.display = "none";
@@ -166,7 +166,7 @@ export default class ChainedSelect extends BM.Component
 
 		for (let i = fromLevel; i <= toLevel; i++)
 		{
-			if (this.settings.get("setting.autoClear")) {
+			if (this.get("setting", "setting.autoClear")) {
 				this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
 			}
 			this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
@@ -207,26 +207,26 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.stats.set("dialog.modalResult.result", false);
+		this.set("stat", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
-		return this.skills.use("event.trigger", "beforeAdd", options).then(() => {
-			if (this.stats.get("dialog.modalResult.result"))
+		return this.use("skills", "event.trigger", "beforeAdd", options).then(() => {
+			if (this.get("stat", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.stats.get("validation.validationResult.result"))
+					if(this.get("stat", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
-							return this.skills.use("event.trigger", "doAdd", options);
+							return this.use("skills", "event.trigger", "doAdd", options);
 						}).then(() => {
-							return this.skills.use("event.trigger", "afterAdd", options);
+							return this.use("skills", "event.trigger", "afterAdd", options);
 						}).then(() => {
-							if (this.settings.get("setting.autoSubmit", true))
+							if (this.get("setting", "setting.autoSubmit", true))
 							{
-								return this.skills.use("form.submit", options);
+								return this.use("skills", "form.submit", options);
 							}
 						});
 					}
@@ -246,26 +246,26 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.stats.set("dialog.modalResult.result", false);
+		this.set("stat", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
-		return this.skills.use("event.trigger", "beforeEdit", options).then(() => {
-			if (this.stats.get("dialog.modalResult.result"))
+		return this.use("skills", "event.trigger", "beforeEdit", options).then(() => {
+			if (this.get("stat", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.stats.get("validation.validationResult.result"))
+					if(this.get("stat", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
-							return this.skills.use("event.trigger", "doEdit", options);
+							return this.use("skills", "event.trigger", "doEdit", options);
 						}).then(() => {
-							return this.skills.use("event.trigger", "afterEdit", options);
+							return this.use("skills", "event.trigger", "afterEdit", options);
 						}).then(() => {
-							if (this.settings.get("setting.autoSubmit", true))
+							if (this.get("setting", "setting.autoSubmit", true))
 							{
-								return this.skills.use("form.submit", options);
+								return this.use("skills", "form.submit", options);
 							}
 						});
 					}
@@ -285,26 +285,26 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.stats.set("dialog.modalResult.result", false);
+		this.set("stat", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
-		return this.skills.use("event.trigger", "beforeRemove", options).then(() => {
-			if (this.stats.get("dialog.modalResult.result"))
+		return this.use("skill", "event.trigger", "beforeRemove", options).then(() => {
+			if (this.get("stat", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.stats.get("validation.validationResult.result"))
+					if(this.get("stat", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
-							return this.skills.use("event.trigger", "doRemove", options);
+							return this.use("skill", "event.trigger", "doRemove", options);
 						}).then(() => {
-							return this.skills.use("event.trigger", "afterRemove", options);
+							return this.use("skill", "event.trigger", "afterRemove", options);
 						}).then(() => {
-							if (this.settings.get("setting.autoSubmit", true))
+							if (this.get("setting", "setting.autoSubmit", true))
 							{
-								return this.skills.use("form.submit", options);
+								return this.use("skill", "form.submit", options);
 							}
 						});
 					}
@@ -323,9 +323,9 @@ export default class ChainedSelect extends BM.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.stats.set("dialog.modalResult.text", text);
-				this.stats.set("dialog.modalResult.value", text);
-				this.stats.set("dialog.modalResult.result", true);
+				this.set("stat", "dialog.modalResult.text", text);
+				this.set("stat", "dialog.modalResult.value", text);
+				this.set("stat", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});
@@ -337,7 +337,7 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onDoAdd(sender, e, ex)
 	{
 
-		return this.newItem(e.detail.level, this.stats.get("dialog.modalResult.text"), this.stats.get("dialog.modalResult.value"));
+		return this.newItem(e.detail.level, this.get("stat", "dialog.modalResult.text"), this.get("stat", "dialog.modalResult.value"));
 
 	}
 
@@ -353,15 +353,15 @@ export default class ChainedSelect extends BM.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.stats.set("dialog.modalResult.old", {
+				this.set("stat", "dialog.modalResult.old", {
 					"text": selectBox.options[selectBox.selectedIndex].text,
 					"value": selectBox.value
 				});
-				this.stats.set("dialog.modalResult.new", {
+				this.set("stat", "dialog.modalResult.new", {
 					"text": text,
 					"value": text
 				});
-				this.stats.set("dialog.modalResult.result", true);
+				this.set("stat", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});
@@ -373,7 +373,7 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onDoEdit(sender, e, ex)
 	{
 
-		return this.editItem(e.detail.level, this.stats.get("dialog.modalResult.new.text"), this.stats.get("dialog.modalResult.new.value"));
+		return this.editItem(e.detail.level, this.get("stat", "dialog.modalResult.new.text"), this.get("stat", "dialog.modalResult.new.value"));
 
 	}
 
@@ -388,9 +388,9 @@ export default class ChainedSelect extends BM.Component
 				let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
 				let selectBox = this.getSelect(level);
 
-				this.stats.set("dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
-				this.stats.set("dialog.modalResult.value", selectBox.value);
-				this.stats.set("dialog.modalResult.result", true);
+				this.set("stat", "dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
+				this.set("stat", "dialog.modalResult.value", selectBox.value);
+				this.set("stat", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});
@@ -509,7 +509,7 @@ export default class ChainedSelect extends BM.Component
 		this._initElement("removeitem", level, true);
 
 		// Clear children
-		this.skills.use("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+		this.use("skill", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 		// Refresh the child select element
 		return Promise.resolve().then(() => {
@@ -517,7 +517,7 @@ export default class ChainedSelect extends BM.Component
 			let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 			if (nextSelectBox) {
 				this._initElement("newitem", level);
-				return this.skills.use("basic.refresh", {"level":level, "value":itemId});
+				return this.use("skill", "basic.refresh", {"level":level, "value":itemId});
 			}
 		});
 
@@ -595,7 +595,7 @@ export default class ChainedSelect extends BM.Component
 		this._initElement("removeitem", level);
 
 		// Reset children select elements
-		this.skills.use("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+		this.use("skill", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 	}
 

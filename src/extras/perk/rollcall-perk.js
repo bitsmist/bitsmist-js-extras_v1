@@ -33,7 +33,7 @@ export default class RollCallPerk extends BM.Perk
 		if (!RollCallPerk._records[name])
 		{
 			let waitInfo = {};
-			let timeout = BITSMIST.v1.settings.get("system.waitForTimeout", 10000);
+			let timeout = BITSMIST.v1.Component.get("setting", "system.waitForTimeout", 10000);
 			let promise = new Promise((resolve, reject) => {
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;

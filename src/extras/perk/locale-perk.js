@@ -36,13 +36,13 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		let promise = Promise.resolve();
-		let handler = component.inventory.get(`locale.localizers.${handlerName}`);
+		let handler = component.get("inventory", `locale.localizers.${handlerName}`);
 
 		if (!handler)
 		{
 			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
 			handler = BM.ClassUtil.createObject(handlerClassName, component, options);
-			component.inventory.set(`locale.localizers.${handlerName}`, handler);
+			component.set("inventory", `locale.localizers.${handlerName}`, handler);
 
 			promise = handler.init(options);
 		}
@@ -63,12 +63,12 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.skills.use("event.trigger", "beforeApplyLocale", options);
+			return component.use("skill", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
-			component.stats.set("locale.localeName", options["localeName"]);
-			return component.skills.use("event.trigger", "doApplyLocale", options);
+			component.set("stat", "locale.localeName", options["localeName"]);
+			return component.use("skill", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "afterApplyLocale", options);
+			return component.use("skill", "event.trigger", "afterApplyLocale", options);
 		});
 
 	}
@@ -87,10 +87,10 @@ export default class LocalePerk extends BM.Perk
 
 		rootNode = rootNode || component;
 
-		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
-			component.inventory.get(`locale.localizers.${handlerName}`).localize(
+		Object.keys(component.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			component.get("inventory", `locale.localizers.${handlerName}`).localize(
 				rootNode,
-				Object.assign({"interpolation":interpolation}, component.stats.get("locale"))
+				Object.assign({"interpolation":interpolation}, component.get("stat", "locale"))
 			);
 		});
 
@@ -110,8 +110,8 @@ export default class LocalePerk extends BM.Perk
 	static _loadMessages(component, localeName, options)
 	{
 
-		Object.keys(component.inventory.get("locale.localizers")).forEach((handlerName) => {
-			component.inventory.get(`locale.localizers.${handlerName}`).loadMessages(localeName, options);
+		Object.keys(component.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			component.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options);
 		});
 
 	}
@@ -130,12 +130,12 @@ export default class LocalePerk extends BM.Perk
 	static _getLocaleMessage(component, key, localeName)
 	{
 
-		localeName = localeName || component.stats.get("locale.localeName");
+		localeName = localeName || component.get("stat", "locale.localeName");
 
-		let value = component.inventory.get("locale.messages").get(`${localeName}.${key}`);
+		let value = component.get("inventory", "locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
-			value = component.inventory.get("locale.messages").get(`${component.stats.get("locale.fallbackLocaleName")}.${key}`);
+			value = component.get("inventory", "locale.messages").get(`${component.get("stat", "locale.fallbackLocaleName")}.${key}`);
 		}
 
 		return value;
@@ -161,18 +161,18 @@ export default class LocalePerk extends BM.Perk
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(this.skills.use("rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
+			promises.push(this.use("skill", "rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.skills.use("state.wait", [{"object":server, "state":"starting"}]).then(() => {
+					return this.use("skill", "state.wait", [{"object":server, "state":"starting"}]).then(() => {
 						server.subscribe(this);
-						this.vault.set("locale.server", server);
+						this.set("vault", "locale.server", server);
 
 						// Synchronize to the server's locales
-						let localeSettings = server.stats.get("locale");
-						this.stats.set("locale.localeName", localeSettings["localeName"]);
-						this.stats.set("locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-						this.stats.set("locale.currencyName", localeSettings["currencyName"]);
+						let localeSettings = server.get("stat", "locale");
+						this.set("stat", "locale.localeName", localeSettings["localeName"]);
+						this.set("stat", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+						this.set("stat", "locale.currencyName", localeSettings["currencyName"]);
 					});
 				}
 			}));
@@ -197,19 +197,19 @@ export default class LocalePerk extends BM.Perk
 		if (!(this instanceof LocaleServer))
 		{
 			promises.push(BITSMIST.v1.Component.promises.documentReady.then(() => {
-				let rootNode = this.skills.use("alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
+				let rootNode = this.use("skill", "alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
 				let server = document.querySelector(rootNode);
 				if (server)
 				{
-					return this.skills.use("state.wait", [{"object":server, "state":"ready"}]).then(() => {
+					return this.use("skill", "state.wait", [{"object":server, "state":"ready"}]).then(() => {
 						server.subscribe(this);
-						this.vault.set("locale.server", server);
+						this.set("vault", "locale.server", server);
 
 						// Synchronize to the server's locales
-						let localeSettings = server.stats.get("locale");
-						this.stats.set("locale.localeName", localeSettings["localeName"]);
-						this.stats.set("locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-						this.stats.set("locale.currencyName", localeSettings["currencyName"]);
+						let localeSettings = server.get("stat", "locale");
+						this.set("stat", "locale.localeName", localeSettings["localeName"]);
+						this.set("stat", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+						this.set("stat", "locale.currencyName", localeSettings["currencyName"]);
 					});
 				}
 			}));
@@ -226,7 +226,7 @@ export default class LocalePerk extends BM.Perk
 
 		if (!(this instanceof LocaleServer))
 		{
-			return LocalePerk._applyLocale(this, {"localeName":this.stats.get("locale.localeName")});
+			return LocalePerk._applyLocale(this, {"localeName":this.get("stat", "locale.localeName")});
 		}
 
 	}
@@ -238,11 +238,11 @@ export default class LocalePerk extends BM.Perk
 
 		let promises = [];
 
-		Object.keys(this.inventory.get("locale.localizers")).forEach((handlerName) => {
-			if (this.inventory.get(`locale.localizers.${handlerName}`).options.get("autoLoad") &&
-				!this.inventory.get(`locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
+		Object.keys(this.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			if (this.get("inventory", `locale.localizers.${handlerName}`).options.get("autoLoad") &&
+				!this.get("inventory", `locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
 			{
-				promises.push(this.inventory.get(`locale.localizers.${handlerName}`).loadMessages(e.detail.localeName));
+				promises.push(this.get("inventory", `locale.localizers.${handlerName}`).loadMessages(e.detail.localeName));
 			}
 		});
 
@@ -259,9 +259,9 @@ export default class LocalePerk extends BM.Perk
 		LocalePerk._localize(this, this);
 
 		// Refill (Do not refill when starting)
-		if (this.stats.get("state.state") === "ready")
+		if (this.get("stat", "state.state") === "ready")
 		{
-			return this.skills.use("basic.fill");
+			return this.use("skill", "basic.fill");
 		}
 
 	}
@@ -308,15 +308,15 @@ export default class LocalePerk extends BM.Perk
 		this.upgrade(component, "inventory", "locale.localizers", {});
 		this.upgrade(component, "inventory", "locale.messages", new MultiStore());
 		this.upgrade(component, "stat", "locale", {
-			"localeName":			component.settings.get("locale.options.localeName", component.settings.get("system.localeName", navigator.language)),
-			"fallbackLocaleName":	component.settings.get("locale.options.fallbackLocaleName", component.settings.get("system.fallbackLocaleName", "en")),
-			"currencyName":			component.settings.get("locale.options.currencyName", component.settings.get("system.currencyName", "USD")),
+			"localeName":			component.get("setting", "locale.options.localeName", component.get("setting", "system.localeName", navigator.language)),
+			"fallbackLocaleName":	component.get("setting", "locale.options.fallbackLocaleName", component.get("setting", "system.fallbackLocaleName", "en")),
+			"currencyName":			component.get("setting", "locale.options.currencyName", component.get("setting", "system.currencyName", "USD")),
 		});
 		this.upgrade(component, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
 		this.upgrade(component, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
 		this.upgrade(component, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
 		this.upgrade(component, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
-		if (component.settings.get("locale.options.autoLocalizeRows"))
+		if (component.get("setting", "locale.options.autoLocalizeRows"))
 		{
 			this.upgrade(component, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}

@@ -53,31 +53,31 @@ export default class FormPerk extends BM.Perk
 	{
 
 		options = options || {};
-		component.inventory.set("form.cancelSubmit", false);
+		component.set("stat", "form.cancelSubmit", false);
 
 		return FormPerk.__collect(component, options).then(() => {
 			// Validate values
-			if (component.settings.get("form.options.autoValidate", true))
+			if (component.get("setting", "form.options.autoValidate", true))
 			{
-				options["validatorName"] = options["validatorName"] || component.settings.get("form.options.validatorName");
-				return component.skills.use("validation.validate", options).then(() => {
-					if (!component.stats.get("validation.validationResult.result"))
+				options["validatorName"] = options["validatorName"] || component.get("setting", "form.options.validatorName");
+				return component.use("skill", "validation.validate", options).then(() => {
+					if (!component.get("stat", "validation.validationResult.result"))
 					{
-						component.inventory.set("form.cancelSubmit", true);
+						component.set("stat", "form.cancelSubmit", true);
 					}
 				});
 			}
 		}).then(() => {
 			// Submit values
 			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
-			return component.skills.use("event.trigger", "beforeSubmit", options).then(() => {
-				if (!component.inventory.get("form.cancelSubmit"))
+			return component.use("skill", "event.trigger", "beforeSubmit", options).then(() => {
+				if (!component.get("stat", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
-						return component.skills.use("event.trigger", "doSubmit", options);
+						return component.use("skill", "event.trigger", "doSubmit", options);
 					}).then(() => {
 						console.debug(`FormPerk._submit(): Submitted component. name=${component.tagName}, id=${component.id}`);
-						return component.skills.use("event.trigger", "afterSubmit", options);
+						return component.use("skill", "event.trigger", "afterSubmit", options);
 					});
 				}
 			});
@@ -101,7 +101,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoClear(sender, e, ex)
 	{
 
-		if (this.settings.get("form.options.autoClear", true))
+		if (this.get("setting", "form.options.autoClear", true))
 		{
 			let target = BM.Util.safeGet(e.detail, "target", "");
 			let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
@@ -116,7 +116,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.vault.get("form.lastItems");
+		e.detail.items = e.detail.items || this.get("vault", "form.lastItems");
 
 	}
 
@@ -125,14 +125,14 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoFill(sender, e, ex)
 	{
 
-		if (this.settings.get("form.options.autoFill", true))
+		if (this.get("setting", "form.options.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? BM.Util.scopedSelectorAll(this._root, e.detail.rootNode)[0] : this );
-			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.inventory.get("resource.resources"), "triggerEvent":true});
+			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.get("inventory", "resource.resources"), "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
-		this.vault.set("form.lastItems", e.detail.items);
+		this.set("vault", "form.lastItems", e.detail.items);
 
 	}
 
@@ -141,7 +141,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.settings.get("form.options.autoCollect", true))
+		if (this.get("setting", "form.options.autoCollect", true))
 		{
 			e.detail.items = ValueUtil.getFields(this);
 		}
@@ -154,7 +154,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		// Collect only submittable data
-		if (this.settings.get("form.options.autoCrop", true))
+		if (this.get("setting", "form.options.autoCrop", true))
 		{
 			e.detail.items = FormPerk.__collectData(this, e.detail.items);
 		}
@@ -186,7 +186,7 @@ export default class FormPerk extends BM.Perk
 		// Upgrade component
 		this.upgrade(component, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
 		this.upgrade(component, "skill", "form.submit", function(...args) { return FormPerk._submit(...args); });
-		this.upgrade(component, "inventory", "form.cancelSubmit", false);
+		this.upgrade(component, "stat", "form.cancelSubmit", false);
 		this.upgrade(component, "vault", "form.lastItems", {});
 		this.upgrade(component, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
 		this.upgrade(component, "event", "doClear", FormPerk.FormPerk_onDoClear);
@@ -213,11 +213,11 @@ export default class FormPerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.skills.use("event.trigger", "beforeCollect", options);
+			return component.use("skill", "event.trigger", "beforeCollect", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "doCollect", options);
+			return component.use("skill", "event.trigger", "doCollect", options);
 		}).then(() => {
-			return component.skills.use("event.trigger", "afterCollect", options);
+			return component.use("skill", "event.trigger", "afterCollect", options);
 		});
 
 	}

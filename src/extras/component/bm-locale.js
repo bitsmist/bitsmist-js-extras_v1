@@ -76,13 +76,13 @@ export default class LocaleServer extends BM.Component
 	{
 
 		// Set locale attribute
-		if (this.settings.get("setting.autoAttribute"))
+		if (this.get("setting", "setting.autoAttribute"))
 		{
-			let rootNode = this.settings.get("setting.autoAttribute.rootNode");
+			let rootNode = this.get("setting", "setting.autoAttribute.rootNode");
 			let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
-			let attribName = this.settings.get("setting.autoAttribute.attributeName", "data-locale");
+			let attribName = this.get("setting", "setting.autoAttribute.attributeName", "data-locale");
 
-			targetElement.setAttribute(attribName, this.stats.get("locale.localeName"));
+			targetElement.setAttribute(attribName, this.get("stat", "locale.localeName"));
 		}
 
 		// Notify locale change to clients
@@ -125,7 +125,7 @@ export default class LocaleServer extends BM.Component
 	__triggerEvent(conditions, observerInfo, options)
 	{
 
-		return this.skills.use("locale.apply", {"localeName":options.localeName});
+		return this.use("skill", "locale.apply", {"localeName":options.localeName});
 
 	}
 

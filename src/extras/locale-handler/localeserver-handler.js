@@ -26,10 +26,10 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		return this._component.skills.use("rollcall.call", "LocaleServer", {"waitForAttendance":true}).then((server) => {
+		return this._component.use("skill", "rollcall.call", "LocaleServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `Locale server doesn't exist. name=${this._component.tagName}`);
 
-			this._messages.chain(server.inventory.get("locale.messages"));
+			this._messages.chain(server.get("inventory", "locale.messages"));
 		});
 
 	}
@@ -38,11 +38,11 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		let rootNode = this._component.skills.use("alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
+		let rootNode = this._component.use("skill", "alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
 
-		return this._component.skills.use("state.wait", [{"rootNode":rootNode, "state":"starting"}]).then(() => {
+		return this._component.use("skill", "state.wait", [{"rootNode":rootNode, "state":"starting"}]).then(() => {
 			let server = document.querySelector(rootNode);
-			this._messages.chain(server.inventory.get("locale.messages"));
+			this._messages.chain(server.get("inventory", "locale.messages"));
 		});
 
 	}

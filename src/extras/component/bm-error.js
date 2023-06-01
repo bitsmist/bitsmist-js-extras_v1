@@ -79,7 +79,7 @@ export default class ErrorServer extends BM.Component
 	{
 
 		let result = false;
-		let targets = observerInfo["options"]["component"].settings.get("errors.targets");
+		let targets = observerInfo["options"]["component"].get("setting", "errors.targets");
 		let e = args[0]["error"];
 
 		for (let i = 0; i < targets.length; i++)
@@ -257,7 +257,7 @@ export default class ErrorServer extends BM.Component
 		//window.stop();
 
 		let statusCode = e.object.status;
-		let handlers = this.settings.get("handlers");
+		let handlers = this.get("setting", "handlers");
 		Object.keys(handlers["statusCode"]).forEach((code) => {
 			if (statusCode == code)
 			{
@@ -273,7 +273,7 @@ export default class ErrorServer extends BM.Component
 						window.location.href = BM.URLUtil.buildURL(routeInfo, {"jump":true});
 						/*
 						let tagName = options["rootNode"] || "bm-router";
-						document.querySelector(tagName).skills.use("routing.openRoute", routeInfo, {"jump":true});
+						document.querySelector(tagName).use("skill", "routing.openRoute", routeInfo, {"jump":true});
 						*/
 						break;
 					}

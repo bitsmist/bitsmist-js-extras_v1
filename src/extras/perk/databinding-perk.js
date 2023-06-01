@@ -41,13 +41,14 @@ export default class DatabindingPerk extends BM.Perk
 		{
 			nodes.push(rootNode);
 		}
+
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
 			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component.vault.get("databinding.store").bindTo(key, elem, callback);
+			component.get("vault", "databinding.store").bindTo(key, elem, callback);
 		});
 
 	}
@@ -72,13 +73,14 @@ export default class DatabindingPerk extends BM.Perk
 		{
 			nodes.push(rootNode);
 		}
+
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
 			let callback = DatabindingPerk.__getCallback(component, key);
 
 			// Bind
-			component.vault.get("databinding.store").bindTo(index, key, elem, callback);
+			component.get("vault", "databinding.store").bindTo(index, key, elem, callback);
 		});
 
 	}
@@ -96,12 +98,21 @@ export default class DatabindingPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
+	static DatabindingPerk_onDoClear(sender, e, ex)
+	{
+
+		this.get("vault", "databinding.store").clear();
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	static DatabindingPerk_onDoFill(sender, e, ex)
 	{
 
 		if (e.detail.items)
 		{
-			this.vault.get("databinding.store").replace(e.detail.items);
+			this.get("vault", "databinding.store").replace(e.detail.items);
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
@@ -113,7 +124,7 @@ export default class DatabindingPerk extends BM.Perk
 	{
 
 		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-		this.vault.get("databinding.store").replace(e.detail.no, e.detail.item);
+		this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
 
 	}
 
@@ -122,9 +133,9 @@ export default class DatabindingPerk extends BM.Perk
 	static DatabindingPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.settings.get("databinding.options.autoCollect", true))
+		if (this.get("setting", "databinding.options.autoCollect", true))
 		{
-			e.detail.items = this.vault.get("databinding.store").items;
+			e.detail.items = this.get("vault", "databinding.store").items;
 		}
 
 	}
@@ -150,24 +161,24 @@ export default class DatabindingPerk extends BM.Perk
 	static init(component, options)
 	{
 
-		if (component.settings.get("databinding.options.dataType", "single") === "single")
+		if (component.get("setting", "databinding.options.dataType", "single") === "single")
 		{
-			// Upgrade component
+			// Upgrade component (single)
 			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
 			this.upgrade(component, "vault", "databinding.store", new BindableStore({
-				"resources":	component.inventory.get("resource.resources"),
-				"direction":	component.settings.get("databinding.options.direction", "two-way"),
+				"resources":	component.get("inventory", "resource.resources"),
+				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
 			}));
 			this.upgrade(component, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
 			this.upgrade(component, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
 		}
 		else
 		{
-			// Upgrade component
+			// Upgrade component (multiple)
 			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
 			this.upgrade(component, "vault", "databinding.store", new BindableArrayStore({
 				"resources":	component.resources,
-				"direction":	component.settings.get("databinding.options.direction", "two-way"),
+				"direction":	component.get("setting", "databinding.options.direction", "two-way"),
 			}));
 			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
 		}
@@ -193,7 +204,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		let callback;
 
-		Object.entries(component.settings.get("databinding", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(component.get("setting", "databinding", {})).forEach(([sectionName, sectionValue]) => {
 			if (sectionValue["callback"])
 			{
 				const pattern = sectionValue["key"] || sectionName;
