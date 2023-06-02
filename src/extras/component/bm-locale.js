@@ -46,6 +46,12 @@ export default class LocaleServer extends BM.Component
 					}
 				}
 			},
+			"skin": {
+				"options": {
+					"hasSkin":					false,
+					"hasCSS":					false,
+				}
+			}
 			/*
 			"rollcall": {
 				"members": {

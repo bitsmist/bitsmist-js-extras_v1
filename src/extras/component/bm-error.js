@@ -38,6 +38,12 @@ export default class ErrorServer extends BM.Component
 					}
 				}
 			},
+			"skin": {
+				"options": {
+					"hasSkin":					false,
+					"hasCSS":					false,
+				}
+			}
 			/*
 			"rollcall": {
 				"members": {

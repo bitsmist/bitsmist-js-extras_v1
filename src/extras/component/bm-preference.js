@@ -46,6 +46,12 @@ export default class PreferenceServer extends BM.Component
 					"autoCrop":					false,
 				}
 			},
+			"skin": {
+				"options": {
+					"hasSkin":					false,
+					"hasCSS":					false,
+				}
+			}
 			/*
 			"rollcall": {
 				"members": {
