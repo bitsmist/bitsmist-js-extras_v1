@@ -324,14 +324,17 @@ export default class ElementPerk extends BM.Perk
 	static __createOverlay(component, options)
 	{
 
-		if (!component.get("vault", "element.overlay"))
+		let overlay = component.get("vault", "element.overlay");
+
+		if (!overlay)
 		{
-			component.insertAdjacentHTML('afterbegin', '<div class="overlay"></div>');
-			let overlay = component.firstElementChild;
-			component.set("vault", "element.overlay", component.firstElementChild);
+			overlay = document.createElement("div");
+			overlay.classList.add("overlay");
+			component._root.appendChild(overlay);
+			component.set("vault", "element.overlay", overlay);
 		}
 
-		return component.get("vault", "element.overlay");
+		return overlay
 
 	}
 
