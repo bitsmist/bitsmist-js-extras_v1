@@ -31,7 +31,8 @@ FormUtil.showConditionalElements = function(rootNode, item)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let targetNode = ( rootNode.shadowRoot ? rootNode.shadowRoot : rootNode);
+	let elements = BM.Util.scopedSelectorAll(targetNode, "[bm-visible]");
 
 	// Show elements
 	elements.forEach((element) => {
@@ -59,7 +60,8 @@ FormUtil.hideConditionalElements = function(rootNode)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let targetNode = ( rootNode.shadowRoot ? rootNode.shadowRoot : rootNode);
+	let elements = BM.Util.scopedSelectorAll(targetNode, "[bm-visible]");
 
 	// Hide elements
 	elements.forEach((element) => {
