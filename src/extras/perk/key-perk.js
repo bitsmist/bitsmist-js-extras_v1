@@ -272,7 +272,6 @@ export default class KeyPerk extends BM.Perk
 		{
 			let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
 			let elements = BM.Util.scopedSelectorAll(component._root, options["rootNode"]);
-			elements = Array.prototype.slice.call(elements, 0);
 
 			elements.forEach((element) => {
 				element.addEventListener("click", function(e){handler.call(this, e, component, options);});
