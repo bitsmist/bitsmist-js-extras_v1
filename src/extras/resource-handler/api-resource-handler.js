@@ -28,12 +28,12 @@ export default class ApiResourceHandler extends ResourceHandler
 		let method = "GET";
 		let headers = this._getOption("headers", method);
 		let options = this._getOption("options", method);
-		let urlOptions = this._getOption("url", method);
+		let urlOptions = this._getOption("URL", method);
 		let dataType = urlOptions["dataType"];
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options}).then((xhr) => {
+		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options}).then((xhr) => {
 			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
@@ -47,12 +47,12 @@ export default class ApiResourceHandler extends ResourceHandler
 		let method = "DELETE";
 		let headers = this._getOption("headers", method);
 		let options = this._getOption("options", method);
-		let urlOptions = this._getOption("url", method);
+		let urlOptions = this._getOption("URL", method);
 		let dataType = urlOptions["dataType"];
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options});
+		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options});
 
 	}
 
@@ -64,7 +64,7 @@ export default class ApiResourceHandler extends ResourceHandler
 		let method = "POST";
 		let headers = this._getOption("headers", method);
 		let options = this._getOption("options", method);
-		let urlOptions = this._getOption("url", method);
+		let urlOptions = this._getOption("URL", method);
 		let dataType = urlOptions["dataType"];
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
@@ -81,12 +81,12 @@ export default class ApiResourceHandler extends ResourceHandler
 		let method = "PUT";
 		let headers = this._getOption("headers", method);
 		let options = this._getOption("options", method);
-		let urlOptions = this._getOption("url", method);
+		let urlOptions = this._getOption("URL", method);
 		let dataType = urlOptions["dataType"];
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
