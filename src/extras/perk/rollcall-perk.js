@@ -103,7 +103,7 @@ export default class RollCallPerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
 			{
-				return BM.Origin.promises.documentReady;
+				return this.get("inventory", "promise.documentReady");
 			}
 		}).then(() => {
 			if (BM.Util.safeGet(options, "waitForAttendance"))

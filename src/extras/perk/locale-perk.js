@@ -119,7 +119,7 @@ export default class LocalePerk extends BM.Perk
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(BITSMIST.v1.Component.promises.documentReady.then(() => {
+			promises.push(this.get("inventory", "promise.documentReady").then(() => {
 				let rootNode = this.use("skill", "alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
 				let server = document.querySelector(rootNode);
 				if (server)
