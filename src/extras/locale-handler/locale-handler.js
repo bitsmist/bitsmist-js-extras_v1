@@ -247,7 +247,7 @@ export default class LocaleHandler
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					component.get("setting", "system.appBaseUrl", ""),
+					component.get("setting", "system.appBaseURL", ""),
 					component.get("setting", "system.localePath", component.get("setting", "system.componentPath", "")),
 					component.get("setting", "setting.path", ""),
 				]);
