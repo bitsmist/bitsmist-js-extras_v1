@@ -195,48 +195,14 @@ export default class ApiResourceHandler extends ResourceHandler
 		let url = format.
 					replace("@scheme@", scheme).
 					replace("@host@", host).
-					replace("@baseUrl@", baseUrl).
+					replace("@baseURL@", baseUrl).
 					replace("@resource@", resourceName).
 					replace("@id@", id).
 					replace("@dataType@", dataType).
-					replace("@query@", this._buildUrlQuery(parameters)).
+					replace("@query@", BM.URLUtil.buildQuery(parameters)).
 					replace("@version@", version);
 
 		return url
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Build query string from parameters object.
-	 *
-	 * @param	{Object}		paratemers			Query parameters.
-	 *
-	 * @return  {String}		Query string.
-	 */
-	_buildUrlQuery(parameters)
-	{
-
-		let query = "";
-
-		if (parameters)
-		{
-			query = Object.keys(parameters).reduce((result, current) => {
-				if (Array.isArray(parameters[current]))
-				{
-					result += `${encodeURIComponent(current)}=${encodeURIComponent(parameters[current].join())}&`;
-				}
-				else if (parameters[current])
-				{
-					result += `${encodeURIComponent(current)}=${encodeURIComponent(parameters[current])}&`;
-				}
-
-				return result;
-			}, "");
-		}
-
-		return ( query ? `?${query.slice(0, -1)}` : "");
 
 	}
 
