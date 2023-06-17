@@ -105,7 +105,7 @@ export default class RoutePerk extends BM.Perk
 		}
 		else
 		{
-			console.error("route not found");
+			throw new Error("route not found");
 		}
 
 	}
@@ -173,14 +173,16 @@ export default class RoutePerk extends BM.Perk
 			"_keys":		keys,
 		};
 
+		let routes = component.get("vault", "routing.routes");
 		if (first)
 		{
-			component.get("vault", "routing.routes").unshift(route);
+			routes.unshift(route);
 		}
 		else
 		{
-			component.get("vault", "routing.routes").push(route);
+			routes.push(route);
 		}
+		component.set("vault", "routing.routes", routes);
 
 	}
 
@@ -593,7 +595,7 @@ export default class RoutePerk extends BM.Perk
 
 		let parsedURL = new URL(url, window.location.href);
 		let routeInfo = {
-			"url":				url,
+			"URL":				url,
 			"path":				parsedURL.pathname,
 			"query":			parsedURL.search,
 			"parsedURL":		parsedURL,
