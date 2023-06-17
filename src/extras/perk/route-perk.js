@@ -200,13 +200,8 @@ export default class RoutePerk extends BM.Perk
 	static _loadSettings(component, routeName, options)
 	{
 
-		return Promise.resolve().then(() => {
-			if (RoutePerk.__hasExternalSettings(component, routeName))
-			{
-				return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
-					component.set("stat", "routing.routeInfo.setting", settings);
-				});
-			}
+		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
+			component.set("stat", "routing.routeInfo.setting", settings);
 		});
 
 	}
@@ -225,8 +220,8 @@ export default class RoutePerk extends BM.Perk
 	static _loadExtender(component, routeName, options)
 	{
 
-		Promise.resolve().then(() => {
-			if (RoutePerk.__hasExternalExtender(component, routeName))
+		return Promise.resolve().then(() => {
+			if (!component.get("stat", "routing.routeInfo.extender"))
 			{
 				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(component, routeName)).then((extender) => {
 					component.set("stat", "routing.routeInfo.extender", extender);
@@ -260,9 +255,15 @@ export default class RoutePerk extends BM.Perk
 
 		let newSettings;
 		return Promise.resolve().then(() => {
-			return RoutePerk._loadSettings(component, routeName);
+			if (RoutePerk.__hasExternalSettings(component, routeName))
+			{
+				return RoutePerk._loadSettings(component, routeName);
+			}
 		}).then(() => {
-			return RoutePerk._loadExtender(component);
+			if (RoutePerk.__hasExternalExtender(component, routeName))
+			{
+				return RoutePerk._loadExtender(component);
+			}
 		}).then(() => {
 			newSettings = component.get("stat", "routing.routeInfo.setting");
 			component.use("skill", "setting.merge", newSettings);
@@ -529,7 +530,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (component.get("stat", "routing.routeInfo.extenderRef"))
+		if (component.get("stat", "routing.routeInfo.extenderRef") || component.get("stat", "routing.routeInfo.extender"))
 		{
 			ret = true;
 		}

@@ -95,7 +95,10 @@ export default class LocaleHandler
 
 		// Load external messages
 		return Promise.resolve().then(() => {
-			return this.loadMessages();
+			if (this.__hasExternalMessages(this._component))
+			{
+				return this.loadMessages();
+			}
 		}).then(() => {
 			this._component.get("inventory", "locale.messages").add(this.messages);
 		});
@@ -183,12 +186,9 @@ export default class LocaleHandler
 	loadMessages(localeName, options)
 	{
 
-		if (this.__hasExternalMessages(this._component, localeName))
-		{
-			return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._component, localeName), options).then((messages) => {
-				this._messages.merge(messages);
-			});
-		}
+		return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._component, localeName), options).then((messages) => {
+			this._messages.merge(messages);
+		});
 
 	}
 
