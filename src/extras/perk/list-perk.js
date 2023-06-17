@@ -154,7 +154,7 @@ export default class ListPerk extends BM.Perk
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.get("setting", "list.rowevents");
-		let skin = skinInfo[activeRowSkinName].html;
+		let skin = skinInfo[activeRowSkinName].HTML;
 
 		let chain = Promise.resolve();
 		for (let i = 0; i < items.length; i++)
@@ -214,7 +214,7 @@ export default class ListPerk extends BM.Perk
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
 		let rowEvents = component.get("setting", "list.rowevents");
-		let skin = skinInfo[activeRowSkinName].html;
+		let skin = skinInfo[activeRowSkinName].HTML;
 
 		for (let i = 0; i < items.length; i++)
 		{
