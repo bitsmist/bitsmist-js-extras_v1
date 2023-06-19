@@ -83,7 +83,6 @@ export default class ObservableStore extends BM.Store
 		{
 			if (this.get(key) !== value)
 			{
-				console.log("@@@set", key, this.get(key), "--->", `'${value}'`);
 				BM.Util.safeSet(this._items, key, value);
 				changedItem[key] = value;
 			}
