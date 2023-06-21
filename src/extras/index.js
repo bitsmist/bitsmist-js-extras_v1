@@ -82,8 +82,8 @@ BM.PerkPerk.register(RollCallPerk);
 import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
 window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
 
-import ApiResourceHandler from "./resource-handler/api-resource-handler.js";
-window.BITSMIST.v1.ApiResourceHandler = ApiResourceHandler;
+import APIResourceHandler from "./resource-handler/api-resource-handler.js";
+window.BITSMIST.v1.APIResourceHandler = APIResourceHandler;
 
 import ObjectResourceHandler from "./resource-handler/object-resource-handler.js";
 window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
@@ -91,8 +91,8 @@ window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
 import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
 window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
 
-import WebstorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
-window.BITSMIST.v1.WebstorageResourceHandler = WebstorageResourceHandler;
+import WebStorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
+window.BITSMIST.v1.WebStorageResourceHandler = WebStorageResourceHandler;
 
 // Locale Handler
 

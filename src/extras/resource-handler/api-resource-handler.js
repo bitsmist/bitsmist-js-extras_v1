@@ -15,7 +15,7 @@ import ResourceHandler from "./resource-handler.js";
 //	API Resource Handler class
 // =============================================================================
 
-export default class ApiResourceHandler extends ResourceHandler
+export default class APIResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------

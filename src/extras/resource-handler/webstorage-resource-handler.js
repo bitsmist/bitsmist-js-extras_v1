@@ -15,7 +15,7 @@ import ResourceHandler from "./resource-handler.js";
 //	Web Storage handler class
 // =============================================================================
 
-export default class WebstorageResourceHandler extends ResourceHandler
+export default class WebStorageResourceHandler extends ResourceHandler
 {
 
 	// -------------------------------------------------------------------------
