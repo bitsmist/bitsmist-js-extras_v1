@@ -491,7 +491,7 @@ export default class RoutePerk extends BM.Perk
 		if (settingRef && settingRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.Util.parseURL(settingRef);
+			let url = BM.URLUtil.parseURL(settingRef);
 			fileName = url.filename;
 			path = url.path;
 			query = url.query;
@@ -560,7 +560,7 @@ export default class RoutePerk extends BM.Perk
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.Util.parseURL(extenderRef);
+			let url = BM.URLUtil.parseURL(extenderRef);
 			path = url.path;
 			fileName = url.filename;
 			query = url.query;

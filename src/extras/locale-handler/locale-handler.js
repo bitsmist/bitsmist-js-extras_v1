@@ -238,7 +238,7 @@ export default class LocaleHandler
 		if (localeRef && localeRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.Util.parseURL(localeRef);
+			let url = BM.URLUtil.parseURL(localeRef);
 			fileName = url.filename;
 			path = url.path;
 			query = url.query;
