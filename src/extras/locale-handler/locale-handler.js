@@ -249,11 +249,11 @@ export default class LocaleHandler
 			path = BM.Util.concatPath([
 					component.get("setting", "system.appBaseURL", ""),
 					component.get("setting", "system.localePath", component.get("setting", "system.componentPath", "")),
-					component.get("setting", "setting.path", ""),
+					component.get("setting", "unit.options.path", ""),
 				]);
-			fileName = this._options.get("fileName", component.get("setting", "setting.fileName", component.tagName.toLowerCase()));
+			fileName = this._options.get("fileName", component.get("setting", "unit.options.fileName", component.tagName.toLowerCase()));
 			let ext = this.__getMessageFormat(component);
-			query = component.get("setting", "setting.query");
+			query = component.get("setting", "unit.options.query");
 
 			// Split Locale
 			let splitLocale = this._options.get("splitLocale", component.get("setting", "system.splitLocale", false));

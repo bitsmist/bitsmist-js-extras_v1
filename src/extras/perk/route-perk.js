@@ -571,10 +571,10 @@ export default class RoutePerk extends BM.Perk
 			path = path || BM.Util.concatPath([
 					component.get("setting", "system.appBaseURL", ""),
 					component.get("setting", "system.componentPath", ""),
-					component.get("setting", "setting.path", ""),
+					component.get("setting", "unit.options.path", ""),
 				]);
-			fileName = fileName || component.get("setting", "setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = component.get("setting", "setting.query");
+			fileName = fileName || component.get("setting", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
+			query = component.get("setting", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
