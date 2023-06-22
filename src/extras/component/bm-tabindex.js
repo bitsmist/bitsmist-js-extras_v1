@@ -25,8 +25,10 @@ export default class TabIndex extends BM.Component
 	{
 
 		return {
-			"setting": {
-				"autoTransform":				false,
+			"basic": {
+				"options": {
+					"autoTransform":			false,
+				}
 			},
 			"event": {
 				"events": {

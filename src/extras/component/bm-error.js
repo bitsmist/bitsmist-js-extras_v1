@@ -26,8 +26,10 @@ export default class ErrorServer extends BM.Component
 	{
 
 		return {
-			"setting": {
-				"autoTransform":				false,
+			"basic": {
+				"options": {
+					"autoTransform":			false,
+				}
 			},
 			"event": {
 				"events": {
@@ -40,8 +42,8 @@ export default class ErrorServer extends BM.Component
 			},
 			"skin": {
 				"options": {
-					"hasSkin":					false,
-					"hasCSS":					false,
+					"skinRef":					false,
+					"styleRef":					false,
 				}
 			}
 			/*

@@ -26,7 +26,6 @@ export default class ChainedSelect extends BM.Component
 
 		return {
 			"setting": {
-				"name":							"ChainedSelect",
 				"autoClear":					true,
 				"autoSubmit":					true,
 				"useDefaultInput":				true,
