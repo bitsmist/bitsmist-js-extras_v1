@@ -90,8 +90,7 @@ export default class PreferenceServer extends BM.Component
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._defaults = new BM.ChainableStore({"items":this.get("setting", "setting.defaults")});
-		this._store = new ObservableStore({"chain":this._defaults, "filter":this._filter, "async":true});
+		this._store = new ObservableStore({"items":this.get("setting", "setting.defaults"), "filter":this._filter, "async":true});
 
 		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
 			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
