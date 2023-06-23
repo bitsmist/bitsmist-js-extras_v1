@@ -87,7 +87,7 @@ export default class ErrorServer extends BM.Component
 	{
 
 		let result = false;
-		let targets = observerInfo["options"]["component"].get("setting", "errors.targets");
+		let targets = observerInfo["options"]["component"].get("settings", "errors.targets");
 		let e = args[0]["error"];
 
 		for (let i = 0; i < targets.length; i++)
@@ -265,7 +265,7 @@ export default class ErrorServer extends BM.Component
 		//window.stop();
 
 		let statusCode = e.object.status;
-		let handlers = this.get("setting", "handlers");
+		let handlers = this.get("settings", "handlers");
 		Object.keys(handlers["statusCode"]).forEach((code) => {
 			if (statusCode == code)
 			{

@@ -237,7 +237,7 @@ export default class ElementPerk extends BM.Perk
 			// Timeout timer
 			let timer = setTimeout(() => {
 				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${component.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
-			}, BM.Component.get("setting", "system.waitForTimeout", 10000));
+			}, BM.Component.get("settings", "system.waitForTimeout", 10000));
 
 			// Resolve when finished
 			element.addEventListener(`${elementInfo["waitFor"]}end`, () => {

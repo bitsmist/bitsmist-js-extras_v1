@@ -42,8 +42,8 @@ export default class ValidationPerk extends BM.Perk
 		this.upgrade(component, "skill", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
 		this.upgrade(component, "skill", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 		this.upgrade(component, "inventory", "validation.validators", {});
-		this.upgrade(component, "stat", "validation.validationResult", {});
-		this.upgrade(component, "stat", "validation.validationResult", {});
+		this.upgrade(component, "stats", "validation.validationResult", {});
+		this.upgrade(component, "stats", "validation.validationResult", {});
 		this.upgrade(component, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
 		this.upgrade(component, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
 		this.upgrade(component, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
@@ -78,8 +78,8 @@ export default class ValidationPerk extends BM.Perk
 			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
-			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
+			let rules = this.get("settings", `validation.handlers.${validatorName}.rules`);
+			let options = this.get("settings", `validation.handlers.${validatorName}.handlerOptions`);
 
 			this.get("inventory", `validation.validators.${validatorName}`).checkValidity(items, rules, options);
 		}
@@ -97,8 +97,8 @@ export default class ValidationPerk extends BM.Perk
 			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
-			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
-			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
+			let rules = this.get("settings", `validation.handlers.${validatorName}.rules`);
+			let options = this.get("settings", `validation.handlers.${validatorName}.handlerOptions`);
 
 			this.get("inventory", `validation.validators.${validatorName}`).reportValidity(items, rules, options);
 		}
@@ -148,7 +148,7 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		options = options || {};
-		component.set("stat", "validation.validationResult.result", true);
+		component.set("stats", "validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
 			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
@@ -156,7 +156,7 @@ export default class ValidationPerk extends BM.Perk
 		}).then(() => {
 			return component.use("skill", "event.trigger", "doValidate", options);
 		}).then(() => {
-			if (component.get("stat", "validation.validationResult.result"))
+			if (component.get("stats", "validation.validationResult.result"))
 			{
 				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
 				return component.use("skill", "event.trigger", "doValidateSuccess", options);
@@ -167,7 +167,7 @@ export default class ValidationPerk extends BM.Perk
 				return component.use("skill", "event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
-			if (!component.get("stat", "validation.validationResult.result"))
+			if (!component.get("stats", "validation.validationResult.result"))
 			{
 				return component.use("skill", "event.trigger", "doReportValidity", options);
 			}

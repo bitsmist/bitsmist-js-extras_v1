@@ -82,7 +82,7 @@ export default class ResourcePerk extends BM.Perk
 					e.detail.items = resource.items;
 
 					// Set the property automatically after resource is fetched
-					let autoSet = this.get("setting", `resource.${resourceName}.autoSetProperty`);
+					let autoSet = this.get("settings", `resource.${resourceName}.autoSetProperty`);
 					if (autoSet)
 					{
 						this[autoSet] = resource.items;

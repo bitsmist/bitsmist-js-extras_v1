@@ -247,16 +247,16 @@ export default class LocaleHandler
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					component.get("setting", "system.appBaseURL", ""),
-					component.get("setting", "system.localePath", component.get("setting", "system.componentPath", "")),
-					component.get("setting", "unit.options.path", ""),
+					component.get("settings", "system.appBaseURL", ""),
+					component.get("settings", "system.localePath", component.get("settings", "system.componentPath", "")),
+					component.get("settings", "unit.options.path", ""),
 				]);
-			fileName = this._options.get("fileName", component.get("setting", "unit.options.fileName", component.tagName.toLowerCase()));
+			fileName = this._options.get("fileName", component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()));
 			let ext = this.__getMessageFormat(component);
-			query = component.get("setting", "unit.options.query");
+			query = component.get("settings", "unit.options.query");
 
 			// Split Locale
-			let splitLocale = this._options.get("splitLocale", component.get("setting", "system.splitLocale", false));
+			let splitLocale = this._options.get("splitLocale", component.get("settings", "system.splitLocale", false));
 			if (splitLocale)
 			{
 				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
@@ -282,8 +282,8 @@ export default class LocaleHandler
 	{
 
 		return this._options.get("messageFormat",
-			component.get("setting", "locale.options.messageFormat",
-				component.get("setting", "system.messageFormat",
+			component.get("settings", "locale.options.messageFormat",
+				component.get("settings", "system.messageFormat",
 					"json")));
 
 	}

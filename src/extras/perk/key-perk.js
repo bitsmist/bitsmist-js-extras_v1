@@ -39,7 +39,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "stat", "key.isComposing", false);
+		this.upgrade(component, "stats", "key.isComposing", false);
 		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
@@ -51,7 +51,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let keys = this.get("setting", "key.keys");
+		let keys = this.get("settings", "key.keys");
 		if (keys)
 		{
 			// Init keys
@@ -80,7 +80,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onKeyDown(e, component)
 	{
 
-		component.set("stat", "key.isComposing", ( e.keyCode === 229 ? true : false ));
+		component.set("stats", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -98,7 +98,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Ignore all key input when composing.
-		if (component.get("stat", "key.isComposing"))
+		if (component.get("stats", "key.isComposing"))
 		{
 			return;
 		}
@@ -173,12 +173,12 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		return component.use("skill", "form.submit").then(() => {
-			if (!component.get("stat", "form.cancelSubmit"))
+			if (!component.get("stats", "form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.get("stat", "dialog.isModal"))
+				if (component.get("stats", "dialog.isModal"))
 				{
-					component.set("stat", "dialog.modalResult.result", true);
+					component.set("stats", "dialog.modalResult.result", true);
 				}
 
 				// Auto close

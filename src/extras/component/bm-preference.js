@@ -90,7 +90,7 @@ export default class PreferenceServer extends BM.Component
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._store = new ObservableStore({"items":this.get("setting", "setting.defaults"), "filter":this._filter, "async":true});
+		this._store = new ObservableStore({"items":this.get("settings", "setting.defaults"), "filter":this._filter, "async":true});
 
 		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
 			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
@@ -116,8 +116,8 @@ export default class PreferenceServer extends BM.Component
 	{
 
 		let msg = `Invalid preference value. name=${this.tagName}`;
-		Object.keys(this.get("stat", "validation.validationResult.invalids")).forEach((key) => {
-			msg += "\n\tkey=" + this.get("stat", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("stat", `validation.validationResult.invalids.${key}.value`);
+		Object.keys(this.get("stats", "validation.validationResult.invalids")).forEach((key) => {
+			msg += "\n\tkey=" + this.get("stats", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("stats", `validation.validationResult.invalids.${key}.value`);
 		});
 		console.error(msg);
 
@@ -172,7 +172,7 @@ export default class PreferenceServer extends BM.Component
 	setPreference(values, options, ...args)
 	{
 
-		let validatorName = this.get("setting", "setting.validatorName");
+		let validatorName = this.get("settings", "setting.validatorName");
 
 		return this.use("skill", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 

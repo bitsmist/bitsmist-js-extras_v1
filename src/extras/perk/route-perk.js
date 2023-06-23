@@ -60,7 +60,7 @@ export default class RoutePerk extends BM.Perk
 		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
 		this.upgrade(component, "skill", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
 		this.upgrade(component, "vault", "routing.routes", []);
-		this.upgrade(component, "stat", "routing.routeInfo", {});
+		this.upgrade(component, "stats", "routing.routeInfo", {});
 		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
 		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
 		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
@@ -85,7 +85,7 @@ export default class RoutePerk extends BM.Perk
 		});
 
 		// Set current route info.
-		this.set("stat", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
+		this.set("stats", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
 
 	}
 
@@ -94,11 +94,11 @@ export default class RoutePerk extends BM.Perk
 	static RoutePerk_onDoStart(sender, e, ex)
 	{
 
-		let routeName = this.get("stat", "routing.routeInfo.name");
+		let routeName = this.get("stats", "routing.routeInfo.name");
 		if (routeName)
 		{
 			let options = {
-				"query": this.get("setting", "setting.query")
+				"query": this.get("settings", "setting.query")
 			};
 
 			return this.use("skill", "routing.switch", routeName, options);
@@ -125,7 +125,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Try to fix URL when validation failed
-		if (this.get("setting", "routing.options.autoFix"))
+		if (this.get("settings", "routing.options.autoFix"))
 		{
 			RoutePerk.__fixRoute(this, e.detail.url);
 		}
@@ -201,7 +201,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
-			component.set("stat", "routing.routeInfo.setting", settings);
+			component.set("stats", "routing.routeInfo.setting", settings);
 		});
 
 	}
@@ -221,14 +221,14 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			if (!component.get("stat", "routing.routeInfo.extender"))
+			if (!component.get("stats", "routing.routeInfo.extender"))
 			{
 				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(component, routeName)).then((extender) => {
-					component.set("stat", "routing.routeInfo.extender", extender);
+					component.set("stats", "routing.routeInfo.extender", extender);
 				});
 			}
 		}).then(() => {
-			let extender = component.get("stat", "routing.routeInfo.extender");
+			let extender = component.get("stats", "routing.routeInfo.extender");
 			if (extender)
 			{
 				new Function(`"use strict";${extender}`)();
@@ -265,7 +265,7 @@ export default class RoutePerk extends BM.Perk
 				return RoutePerk._loadExtender(component);
 			}
 		}).then(() => {
-			newSettings = component.get("stat", "routing.routeInfo.setting");
+			newSettings = component.get("stats", "routing.routeInfo.setting");
 			component.use("skill", "setting.merge", newSettings);
 
 			return component.use("skill", "setting.apply", {"settings":newSettings});
@@ -290,7 +290,7 @@ export default class RoutePerk extends BM.Perk
 		options = Object.assign({}, options);
 
 		// Current route info
-		let curRouteInfo = component.get("stat", "routing.routeInfo");
+		let curRouteInfo = component.get("stats", "routing.routeInfo");
 
 		let newURL;
 		let newRouteInfo;
@@ -321,7 +321,7 @@ export default class RoutePerk extends BM.Perk
 			{
 				history.pushState(RoutePerk.__getState("_open.pushState"), null, newURL);
 			}
-			component.set("stat", "routing.routeInfo", newRouteInfo);
+			component.set("stats", "routing.routeInfo", newRouteInfo);
 			/*
 		}).then(() => {
 			// Load other component when new route name is different from the current route name.
@@ -332,10 +332,10 @@ export default class RoutePerk extends BM.Perk
 			*/
 		}).then(() => {
 			// Validate URL
-			if (component.get("setting", "routing.options.autoValidate"))
+			if (component.get("settings", "routing.options.autoValidate"))
 			{
 				let validateOptions = {
-					"validatorName":	component.get("setting", "routing.options.validatorName"),
+					"validatorName":	component.get("settings", "routing.options.validatorName"),
 					"items":			BM.URLUtil.loadParameters(newURL),
 					"url":				newURL,
 				};
@@ -417,7 +417,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
-		component.set("stat", "routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
+		component.set("stats", "routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
 
 	}
 
@@ -461,7 +461,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (!component.get("stat", "routing.routeInfo.setting"))
+		if (!component.get("stats", "routing.routeInfo.setting"))
 		{
 			ret = true;
 		}
@@ -487,7 +487,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let settingRef = component.get("stat", "routing.routeInfo.settingRef");
+		let settingRef = component.get("stats", "routing.routeInfo.settingRef");
 		if (settingRef && settingRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -500,15 +500,15 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					component.get("setting", "system.appBaseURL", ""),
-					component.get("setting", "system.componentPath", ""),
-					component.get("setting", "setting.path", ""),
+					component.get("settings", "system.appBaseURL", ""),
+					component.get("settings", "system.componentPath", ""),
+					component.get("settings", "setting.path", ""),
 				]);
-			let ext = component.get("setting", "routing.options.settingFormat",
-					component.get("setting", "system.settingFormat",
+			let ext = component.get("settings", "routing.options.settingFormat",
+					component.get("settings", "system.settingFormat",
 						"json"));
-			fileName = component.get("setting", "setting.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
-  			query = component.get("setting", "setting.query");
+			fileName = component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			query = component.get("settings", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -530,7 +530,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (component.get("stat", "routing.routeInfo.extenderRef") || component.get("stat", "routing.routeInfo.extender"))
+		if (component.get("stats", "routing.routeInfo.extenderRef") || component.get("stats", "routing.routeInfo.extender"))
 		{
 			ret = true;
 		}
@@ -556,7 +556,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let extenderRef = component.get("stat", "routing.routeInfo.extenderRef");
+		let extenderRef = component.get("stats", "routing.routeInfo.extenderRef");
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -569,12 +569,12 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = path || BM.Util.concatPath([
-					component.get("setting", "system.appBaseURL", ""),
-					component.get("setting", "system.componentPath", ""),
-					component.get("setting", "unit.options.path", ""),
+					component.get("settings", "system.appBaseURL", ""),
+					component.get("settings", "system.componentPath", ""),
+					component.get("settings", "unit.options.path", ""),
 				]);
-			fileName = fileName || component.get("setting", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = component.get("setting", "unit.options.query");
+			fileName = fileName || component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
+			query = component.get("settings", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -734,8 +734,8 @@ export default class RoutePerk extends BM.Perk
 		let newParams = BM.URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(component.get("stat", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("stat", `validation.validationResult.invalids.${key}`);
+		Object.keys(component.get("stats", "validation.validationResult.invalids")).forEach((key) => {
+			let item = component.get("stats", `validation.validationResult.invalids.${key}`);
 
 			if (item["fix"] !== undefined)
 			{
@@ -757,7 +757,7 @@ export default class RoutePerk extends BM.Perk
 			RoutePerk._replaceRoute(component, {"queryParameters":newParams});
 
 			// Fixed
-			component.set("stat", "validation.validationResult.result", true);
+			component.set("stats", "validation.validationResult.result", true);
 		}
 
 	}
@@ -772,8 +772,8 @@ export default class RoutePerk extends BM.Perk
 	static __dumpValidationErrors(component)
 	{
 
-		Object.keys(component.get("stat", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("stat", `validation.validationResult.invalids.${key}`);
+		Object.keys(component.get("stats", "validation.validationResult.invalids")).forEach((key) => {
+			let item = component.get("stats", `validation.validationResult.invalids.${key}`);
 
 			if (item.failed)
 			{
@@ -799,8 +799,8 @@ export default class RoutePerk extends BM.Perk
 	static __getSettingFormat(component)
 	{
 
-		return component.get("setting", "routing.options.settingFormat",
-				component.get("setting", "system.settingFormat",
+		return component.get("settings", "routing.options.settingFormat",
+				component.get("settings", "system.settingFormat",
 					"json"));
 
 	}
