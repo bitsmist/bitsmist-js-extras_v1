@@ -51,9 +51,13 @@ export default class PreferenceServer extends BM.Component
 			"skin": {
 				"options": {
 					"skinRef":					false,
+				}
+			},
+			"style": {
+				"options": {
 					"styleRef":					false,
 				}
-			}
+			},
 			/*
 			"rollcall": {
 				"members": {

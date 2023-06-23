@@ -43,9 +43,13 @@ export default class ErrorServer extends BM.Component
 			"skin": {
 				"options": {
 					"skinRef":					false,
+				}
+			},
+			"style": {
+				"options": {
 					"styleRef":					false,
 				}
-			}
+			},
 			/*
 			"rollcall": {
 				"members": {
