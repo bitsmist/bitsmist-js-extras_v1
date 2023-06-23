@@ -94,7 +94,7 @@ export default class PreferenceServer extends BM.Component
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._store = new ObservableStore({"items":this.get("settings", "setting.defaults"), "filter":this._filter, "async":true});
+		this._store = new ObservableStore({"items":this.get("settings", "options.defaults"), "filter":this._filter, "async":true});
 
 		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
 			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
@@ -176,7 +176,7 @@ export default class PreferenceServer extends BM.Component
 	setPreference(values, options, ...args)
 	{
 
-		let validatorName = this.get("settings", "setting.validatorName");
+		let validatorName = this.get("settings", "options.validatorName");
 
 		return this.use("skill", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 

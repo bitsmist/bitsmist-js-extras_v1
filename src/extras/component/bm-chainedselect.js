@@ -110,9 +110,9 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onBeforeStart(sender, e, ex)
 	{
 
-		this.rootNodes = this.get("settings", "setting.rootNodes");
+		this.rootNodes = this.get("settings", "options.rootNodes");
 
-		if (this.get("settings", "setting.useDefaultInput", true))
+		if (this.get("settings", "options.useDefaultInput", true))
 		{
 			this.use("skills", "event.add", "beforeAdd", "ChainedSelect_onBeforeAdd");
 			this.use("skills", "event.add", "doAdd", "ChainedSelect_onDoAdd");
@@ -132,21 +132,21 @@ export default class ChainedSelect extends BM.Component
 		// Init select elements (disable all)
 		this.use("skills", "basic.clear", {"fromLevel":1, "toLevel":this.length});
 
-		if (!this.get("settings", "setting.isAddable", true))
+		if (!this.get("settings", "options.isAddable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
 				element.style.display = "none";
 			});
 		}
 
-		if (!this.get("settings", "setting.isEditable", true))
+		if (!this.get("settings", "options.isEditable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
 				element.style.display = "none";
 			});
 		}
 
-		if (!this.get("settings", "setting.isRemovable", true))
+		if (!this.get("settings", "options.isRemovable", true))
 		{
 			this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
 				element.style.display = "none";
@@ -165,7 +165,7 @@ export default class ChainedSelect extends BM.Component
 
 		for (let i = fromLevel; i <= toLevel; i++)
 		{
-			if (this.get("settings", "setting.autoClear")) {
+			if (this.get("settings", "options.autoClear")) {
 				this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
 			}
 			this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
@@ -223,7 +223,7 @@ export default class ChainedSelect extends BM.Component
 						}).then(() => {
 							return this.use("skills", "event.trigger", "afterAdd", options);
 						}).then(() => {
-							if (this.get("settings", "setting.autoSubmit", true))
+							if (this.get("settings", "options.autoSubmit", true))
 							{
 								return this.use("skills", "form.submit", options);
 							}
@@ -262,7 +262,7 @@ export default class ChainedSelect extends BM.Component
 						}).then(() => {
 							return this.use("skills", "event.trigger", "afterEdit", options);
 						}).then(() => {
-							if (this.get("settings", "setting.autoSubmit", true))
+							if (this.get("settings", "options.autoSubmit", true))
 							{
 								return this.use("skills", "form.submit", options);
 							}
@@ -301,7 +301,7 @@ export default class ChainedSelect extends BM.Component
 						}).then(() => {
 							return this.use("skill", "event.trigger", "afterRemove", options);
 						}).then(() => {
-							if (this.get("settings", "setting.autoSubmit", true))
+							if (this.get("settings", "options.autoSubmit", true))
 							{
 								return this.use("skill", "form.submit", options);
 							}
