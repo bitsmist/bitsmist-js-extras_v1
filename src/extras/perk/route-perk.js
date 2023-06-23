@@ -98,7 +98,7 @@ export default class RoutePerk extends BM.Perk
 		if (routeName)
 		{
 			let options = {
-				"query": this.get("settings", "setting.query")
+				"query": this.get("settings", "unit.options.query")
 			};
 
 			return this.use("skill", "routing.switch", routeName, options);
@@ -165,7 +165,7 @@ export default class RoutePerk extends BM.Perk
 			"origin":		routeInfo["origin"],
 			"path":			routeInfo["path"],
 			"settingRef":	routeInfo["settingRef"],
-			"setting":		routeInfo["setting"],
+			"settings":		routeInfo["settings"],
 			"extenderRef":	routeInfo["extenderRef"],
 			"extender":		routeInfo["extender"],
 			"routeOptions":	routeInfo["routeOptions"],
@@ -201,7 +201,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
-			component.set("stats", "routing.routeInfo.setting", settings);
+			component.set("stats", "routing.routeInfo.settings", settings);
 		});
 
 	}
@@ -265,7 +265,7 @@ export default class RoutePerk extends BM.Perk
 				return RoutePerk._loadExtender(component);
 			}
 		}).then(() => {
-			newSettings = component.get("stats", "routing.routeInfo.setting");
+			newSettings = component.get("stats", "routing.routeInfo.settings");
 			component.use("skill", "setting.merge", newSettings);
 
 			return component.use("skill", "setting.apply", {"settings":newSettings});
@@ -461,7 +461,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (!component.get("stats", "routing.routeInfo.setting"))
+		if (!component.get("stats", "routing.routeInfo.settings"))
 		{
 			ret = true;
 		}
@@ -502,7 +502,7 @@ export default class RoutePerk extends BM.Perk
 			path = BM.Util.concatPath([
 					component.get("settings", "system.appBaseURL", ""),
 					component.get("settings", "system.componentPath", ""),
-					component.get("settings", "setting.path", ""),
+					component.get("settings", "unit.options..path", ""),
 				]);
 			let ext = component.get("settings", "routing.options.settingFormat",
 					component.get("settings", "system.settingFormat",
@@ -627,8 +627,8 @@ export default class RoutePerk extends BM.Perk
 				routeInfo["name"] = routeName;
 				let settingRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingRef`, routes[i].settingRef);
 				routeInfo["settingRef"] = RoutePerk.__interpolate(settingRef, params);
-				let setting = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.setting`, routes[i].setting);
-				routeInfo["setting"] = BM.Util.getObject(setting, {"format":RoutePerk.__getSettingFormat(component)});
+				let settings = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
+				routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.__getSettingFormat(component)});
 				let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
 				routeInfo["extenderRef"] = RoutePerk.__interpolate(extenderRef, params);
 				routeInfo["extender"] = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
@@ -790,7 +790,7 @@ export default class RoutePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Return default setting file format.
+	 * Return default settings file format.
 	 *
 	 * @param	{Component}		component			Component.
 	 *
