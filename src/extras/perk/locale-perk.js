@@ -28,7 +28,7 @@ export default class LocalePerk extends BM.Perk
 
 		return {
 			"section":		"locale",
-			"order":		330,
+			"order":		215,
 			"depends":		"AliasPerk",
 			//"depends":		"RollCallPerk",
 		};
