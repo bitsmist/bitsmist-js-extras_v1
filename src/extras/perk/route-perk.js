@@ -164,7 +164,7 @@ export default class RoutePerk extends BM.Perk
 			"name":			routeInfo["name"] || title,
 			"origin":		routeInfo["origin"],
 			"path":			routeInfo["path"],
-			"settingRef":	routeInfo["settingRef"],
+			"settingsRef":	routeInfo["settingsRef"],
 			"settings":		routeInfo["settings"],
 			"extenderRef":	routeInfo["extenderRef"],
 			"extender":		routeInfo["extender"],
@@ -487,11 +487,11 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let settingRef = component.get("stats", "routing.routeInfo.settingRef");
-		if (settingRef && settingRef !== true)
+		let settingsRef = component.get("stats", "routing.routeInfo.settingsRef");
+		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.URLUtil.parseURL(settingRef);
+			let url = BM.URLUtil.parseURL(settingsRef);
 			fileName = url.filename;
 			path = url.path;
 			query = url.query;
@@ -625,8 +625,8 @@ export default class RoutePerk extends BM.Perk
 				routeInfo["title"] = routes[i].title;
 				let routeName = RoutePerk.__interpolate(routes[i].name, params);
 				routeInfo["name"] = routeName;
-				let settingRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingRef`, routes[i].settingRef);
-				routeInfo["settingRef"] = RoutePerk.__interpolate(settingRef, params);
+				let settingsRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
+				routeInfo["settingsRef"] = RoutePerk.__interpolate(settingsRef, params);
 				let settings = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
 				routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.__getSettingFormat(component)});
 				let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
