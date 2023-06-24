@@ -216,12 +216,11 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		let promise = Promise.resolve();
-		let handler = component.get("inventory", `locale.localizers.${handlerName}`);
 
-		if (!handler)
+		if (!component.get("inventory", `locale.localizers.${handlerName}`))
 		{
 			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-			handler = BM.ClassUtil.createObject(handlerClassName, component, options);
+			let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
 			component.set("inventory", `locale.localizers.${handlerName}`, handler);
 
 			promise = handler.init(options);
@@ -290,9 +289,13 @@ export default class LocalePerk extends BM.Perk
 	static _loadMessages(component, localeName, options)
 	{
 
+		let promises = [];
+
 		Object.keys(component.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			component.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options);
+			promises.push(component.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options));
 		});
+
+		return promises;
 
 	}
 
