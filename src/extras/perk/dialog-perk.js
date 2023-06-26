@@ -39,9 +39,9 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "skill", "dialog.open", function(...args) { return DialogPerk._open(...args); });
-		this.upgrade(component, "skill", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-		this.upgrade(component, "skill", "dialog.close", function(...args) { return DialogPerk._close(...args); });
+		this.upgrade(component, "spell", "dialog.open", function(...args) { return DialogPerk._open(...args); });
+		this.upgrade(component, "spell", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
+		this.upgrade(component, "spell", "dialog.close", function(...args) { return DialogPerk._close(...args); });
 		this.upgrade(component, "inventory", "dialog.cancelClose");
 		this.upgrade(component, "vault", "dialog.modalPromise");
 		this.upgrade(component, "vault", "dialog.backdrop");
@@ -64,7 +64,7 @@ export default class DialogPerk extends BM.Perk
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening component. name=${this.tagName}, id=${this.id}`);
 
 			//return this.open();
-			return this.use("skill", "dialog.open");
+			return this.use("spell", "dialog.open");
 		}
 
 	}
@@ -86,7 +86,7 @@ export default class DialogPerk extends BM.Perk
 		options = options || {};
 
 		console.debug(`DialogPerk._open(): Opening component. name=${component.tagName}, id=${component.id}`);
-		return component.use("skill", "event.trigger", "beforeOpen", options).then(() => {
+		return component.use("spell", "event.trigger", "beforeOpen", options).then(() => {
 			if (!component.get("inventory", "dialog.cancelOpen"))
 			{
 				return Promise.resolve().then(() => {
@@ -99,19 +99,19 @@ export default class DialogPerk extends BM.Perk
 					// Setup
 					if (BM.Util.safeGet(options, "autoSetupOnOpen", component.get("settings", "dialog.options.autoSetupOnOpen", true)))
 					{
-						return component.use("skill", "basic.setup", options);
+						return component.use("spell", "basic.setup", options);
 					}
 				}).then(() => {
 					// Refresh
 					if (BM.Util.safeGet(options, "autoRefreshOnOpen", component.get("settings", "dialog.options.autoRefreshOnOpen", true)))
 					{
-						return component.use("skill", "basic.refresh", options);
+						return component.use("spell", "basic.refresh", options);
 					}
 				}).then(() => {
-					return component.use("skill", "event.trigger", "doOpen", options);
+					return component.use("spell", "event.trigger", "doOpen", options);
 				}).then(() => {
 					console.debug(`DialogPerk._open(): Opened component. name=${component.tagName}, id=${component.id}`);
-					return component.use("skill", "event.trigger", "afterOpen", options);
+					return component.use("spell", "event.trigger", "afterOpen", options);
 				});
 			}
 		});
@@ -157,10 +157,10 @@ export default class DialogPerk extends BM.Perk
 		component.set("inventory", "dialog.cancelClose", false);
 
 		console.debug(`DialogPerk._close(): Closing component. name=${component.tagName}, id=${component.id}`);
-		return component.use("skill", "event.trigger", "beforeClose", options).then(() => {
+		return component.use("spell", "event.trigger", "beforeClose", options).then(() => {
 			if (!component.get("inventory", "dialog.cancelClose"))
 			{
-				return component.use("skill", "event.trigger", "doClose", options).then(() => {
+				return component.use("spell", "event.trigger", "doClose", options).then(() => {
 					// Hide backdrop
 					if (component.get("settings", "dialog.backdropOptions.show"))
 					{
@@ -174,7 +174,7 @@ export default class DialogPerk extends BM.Perk
 					}
 					console.debug(`DialogPerk._close(): Closed component. name=${component.tagName}, id=${component.id}`);
 
-					return component.use("skill", "event.trigger", "afterClose", options);
+					return component.use("spell", "event.trigger", "afterClose", options);
 				});
 			}
 		});

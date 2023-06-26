@@ -41,7 +41,7 @@ export default class ListPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "skill", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
+		this.upgrade(component, "spell", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 		this.upgrade(component, "vault", "list.lastItems", {});
 		this.upgrade(component, "stats", "list.activeRowSkinName", "");
 		this.upgrade(component, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
@@ -83,14 +83,14 @@ export default class ListPerk extends BM.Perk
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
-			return this.use("skill", "event.trigger", "beforeBuildRows");
+			return this.use("spell", "event.trigger", "beforeBuildRows");
 		}).then(() => {
 			return builder(this, fragment, e.detail.items, e.detail);
 		}).then(() => {
 			this._listRootNode.replaceChildren(fragment);
 			this.set("vault", "list.lastItems", e.detail.items);
 
-			return this.use("skill", "event.trigger", "afterBuildRows");
+			return this.use("spell", "event.trigger", "afterBuildRows");
 		});
 
 	}
@@ -120,11 +120,11 @@ export default class ListPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
-			return component.use("skill", "skin.summon", skinName);
+			return component.use("spell", "skin.summon", skinName);
 		}).then(() => {
 			component.set("stats", "list.activeRowSkinName", skinName);
 		}).then(() => {
-			return component.use("skill", "event.trigger", "afterTransformRow", options);
+			return component.use("spell", "event.trigger", "afterTransformRow", options);
 		}).then(() => {
 			console.debug(`ListPerk._transformRow(): Switched the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 		});
@@ -176,16 +176,16 @@ export default class ListPerk extends BM.Perk
 					});
 				}
 
-				return component.use("skill", "event.trigger", "beforeFillRow", options).then(() => {
+				return component.use("spell", "event.trigger", "beforeFillRow", options).then(() => {
 					if (component.get("settings", "list.options.autoFill", true))
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
 						ValueUtil.setFields(element, options["item"], {"resources":component.get("inventory", "inventory", "resource.resources")});
 					}
-					return component.use("skill", "event.trigger", "doFillRow", options);
+					return component.use("spell", "event.trigger", "doFillRow", options);
 				}).then(() => {
-					return component.use("skill", "event.trigger", "afterFillRow", options);
+					return component.use("spell", "event.trigger", "afterFillRow", options);
 				});
 			});
 		}
@@ -235,14 +235,14 @@ export default class ListPerk extends BM.Perk
 			}
 
 			// Call event handlers
-			component.use("skill", "event.triggerAsync", "beforeFillRow", options);
+			component.use("spell", "event.triggerAsync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
 			if (component.get("settings", "list.options.autoFill", true))
 			{
 				ValueUtil.setFields(element, options["item"], {"resources":component.get("inventory", "resource.resources")});
 			}
-			component.use("skill", "event.triggerAsync", "doFillRow", options);
-			component.use("skill", "event.triggerAsync", "afterFillRow", options);
+			component.use("spell", "event.triggerAsync", "doFillRow", options);
+			component.use("spell", "event.triggerAsync", "afterFillRow", options);
 		}
 
 		delete options["no"];

@@ -137,7 +137,7 @@ export default class LocaleServer extends BM.Component
 	__triggerEvent(conditions, observerInfo, options)
 	{
 
-		return this.use("skill", "locale.apply", {"localeName":options.localeName});
+		return this.use("spell", "locale.apply", {"localeName":options.localeName});
 
 	}
 

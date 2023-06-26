@@ -52,13 +52,14 @@ export default class RoutePerk extends BM.Perk
 
 		// Upgrade component
 		this.upgrade(component, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		this.upgrade(component, "skill", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-		this.upgrade(component, "skill", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
 		this.upgrade(component, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-		this.upgrade(component, "skill", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
 		this.upgrade(component, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
 		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-		this.upgrade(component, "skill", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
+		this.upgrade(component, "spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
+		this.upgrade(component, "spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		this.upgrade(component, "spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		this.upgrade(component, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		this.upgrade(component, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
 		this.upgrade(component, "vault", "routing.routes", []);
 		this.upgrade(component, "stats", "routing.routeInfo", {});
 		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
@@ -101,7 +102,7 @@ export default class RoutePerk extends BM.Perk
 				"query": this.get("settings", "unit.options.query")
 			};
 
-			return this.use("skill", "routing.switch", routeName, options);
+			return this.use("spell", "routing.switch", routeName, options);
 		}
 		else
 		{
@@ -115,7 +116,7 @@ export default class RoutePerk extends BM.Perk
 	static RoutePerk_onAfterReady(sender, e, ex)
 	{
 
-		return this.use("skill", "routing.openRoute");
+		return this.use("spell", "routing.openRoute");
 
 	}
 
@@ -268,7 +269,7 @@ export default class RoutePerk extends BM.Perk
 			newSettings = component.get("stats", "routing.routeInfo.settings");
 			component.use("skill", "setting.merge", newSettings);
 
-			return component.use("skill", "setting.apply", {"settings":newSettings});
+			return component.use("spell", "setting.apply", {"settings":newSettings});
 		});
 
 	}
@@ -339,7 +340,7 @@ export default class RoutePerk extends BM.Perk
 					"items":			BM.URLUtil.loadParameters(newURL),
 					"url":				newURL,
 				};
-				return component.use("skill", "validation.validate", validateOptions);
+				return component.use("spell", "validation.validate", validateOptions);
 			}
 		}).then(() => {
 			// Refresh
@@ -400,7 +401,7 @@ export default class RoutePerk extends BM.Perk
 	static _refreshRoute(component, routeInfo, options)
 	{
 
-		return component.use("skill", "basic.refresh", options);
+		return component.use("spell", "basic.refresh", options);
 
 	}
 
@@ -435,11 +436,11 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("skill", "event.trigger", "beforeNormalizeURL");
+			return component.use("spell", "event.trigger", "beforeNormalizeURL");
 		}).then(() => {
-			return component.use("skill", "event.trigger", "doNormalizeURL");
+			return component.use("spell", "event.trigger", "doNormalizeURL");
 		}).then(() => {
-			return component.use("skill", "event.trigger", "afterNormalizeURL");
+			return component.use("spell", "event.trigger", "afterNormalizeURL");
 		});
 
 	}
@@ -681,11 +682,11 @@ export default class RoutePerk extends BM.Perk
 
 		window.addEventListener("popstate", (e) => {
 			return Promise.resolve().then(() => {
-				return component.use("skill", "event.trigger", "beforePopState");
+				return component.use("spell", "event.trigger", "beforePopState");
 			}).then(() => {
 				return RoutePerk._open(component, {"url":window.location.href}, {"pushState":false});
 			}).then(() => {
-				return component.use("skill", "event.trigger", "afterPopState");
+				return component.use("spell", "event.trigger", "afterPopState");
 			});
 		});
 

@@ -285,7 +285,7 @@ export default class ErrorServer extends BM.Component
 						window.location.href = BM.URLUtil.buildURL(routeInfo, {"jump":true});
 						/*
 						let tagName = options["rootNode"] || "bm-router";
-						document.querySelector(tagName).use("skill", "routing.openRoute", routeInfo, {"jump":true});
+						document.querySelector(tagName).use("spell", "routing.openRoute", routeInfo, {"jump":true});
 						*/
 						break;
 					}

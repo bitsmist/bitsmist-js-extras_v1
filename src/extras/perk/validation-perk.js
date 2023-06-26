@@ -39,8 +39,8 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "skill", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		this.upgrade(component, "skill", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
+		this.upgrade(component, "spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
+		this.upgrade(component, "spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 		this.upgrade(component, "inventory", "validation.validators", {});
 		this.upgrade(component, "stats", "validation.validationResult", {});
 		this.upgrade(component, "stats", "validation.validationResult", {});
@@ -152,27 +152,27 @@ export default class ValidationPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
-			return component.use("skill", "event.trigger", "beforeValidate", options);
+			return component.use("spell", "event.trigger", "beforeValidate", options);
 		}).then(() => {
-			return component.use("skill", "event.trigger", "doValidate", options);
+			return component.use("spell", "event.trigger", "doValidate", options);
 		}).then(() => {
 			if (component.get("stats", "validation.validationResult.result"))
 			{
 				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
-				return component.use("skill", "event.trigger", "doValidateSuccess", options);
+				return component.use("spell", "event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
 				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.tagName}, id=${component.id}`);
-				return component.use("skill", "event.trigger", "doValidateFail", options);
+				return component.use("spell", "event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
 			if (!component.get("stats", "validation.validationResult.result"))
 			{
-				return component.use("skill", "event.trigger", "doReportValidity", options);
+				return component.use("spell", "event.trigger", "doReportValidity", options);
 			}
 		}).then(() => {
-			return component.use("skill", "event.trigger", "afterValidate", options);
+			return component.use("spell", "event.trigger", "afterValidate", options);
 		});
 
 	}

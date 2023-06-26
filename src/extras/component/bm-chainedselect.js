@@ -290,20 +290,20 @@ export default class ChainedSelect extends BM.Component
 			"validatorName": "",
 		};
 
-		return this.use("skill", "event.trigger", "beforeRemove", options).then(() => {
+		return this.use("spell", "event.trigger", "beforeRemove", options).then(() => {
 			if (this.get("stats", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
 					if(this.get("stats", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
-							return this.use("skill", "event.trigger", "doRemove", options);
+							return this.use("spell", "event.trigger", "doRemove", options);
 						}).then(() => {
-							return this.use("skill", "event.trigger", "afterRemove", options);
+							return this.use("spell", "event.trigger", "afterRemove", options);
 						}).then(() => {
 							if (this.get("settings", "options.autoSubmit", true))
 							{
-								return this.use("skill", "form.submit", options);
+								return this.use("spell", "form.submit", options);
 							}
 						});
 					}
@@ -508,7 +508,7 @@ export default class ChainedSelect extends BM.Component
 		this._initElement("removeitem", level, true);
 
 		// Clear children
-		this.use("skill", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+		this.use("spell", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 		// Refresh the child select element
 		return Promise.resolve().then(() => {
@@ -516,7 +516,7 @@ export default class ChainedSelect extends BM.Component
 			let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
 			if (nextSelectBox) {
 				this._initElement("newitem", level);
-				return this.use("skill", "basic.refresh", {"level":level, "value":itemId});
+				return this.use("spell", "basic.refresh", {"level":level, "value":itemId});
 			}
 		});
 
@@ -594,7 +594,7 @@ export default class ChainedSelect extends BM.Component
 		this._initElement("removeitem", level);
 
 		// Reset children select elements
-		this.use("skill", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
+		this.use("spell", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
 
 	}
 

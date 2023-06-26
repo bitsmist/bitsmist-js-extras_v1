@@ -172,7 +172,7 @@ export default class KeyPerk extends BM.Perk
 	static __defaultSubmit(e, component, options)
 	{
 
-		return component.use("skill", "form.submit").then(() => {
+		return component.use("spell", "form.submit").then(() => {
 			if (!component.get("stats", "form.cancelSubmit"))
 			{
 				// Modal result
@@ -184,7 +184,7 @@ export default class KeyPerk extends BM.Perk
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					return component.use("skill", "dialog.close", {"reason":"submit"});
+					return component.use("spell", "dialog.close", {"reason":"submit"});
 				}
 			}
 		});
@@ -203,7 +203,7 @@ export default class KeyPerk extends BM.Perk
 	static __defaultCancel(e, component, options)
 	{
 
-		return component.use("skill", "dialog.close", {"reason":"cancel"});
+		return component.use("spell", "dialog.close", {"reason":"cancel"});
 
 	}
 
@@ -226,7 +226,7 @@ export default class KeyPerk extends BM.Perk
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return component.use("skill", "basic.clear", {"target":target, "options":options["options"]});
+		return component.use("spell", "basic.clear", {"target":target, "options":options["options"]});
 
 	}
 

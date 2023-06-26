@@ -43,11 +43,11 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "skill", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
 		this.upgrade(component, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		this.upgrade(component, "skill", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
 		this.upgrade(component, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-		this.upgrade(component, "skill", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
+		this.upgrade(component, "spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
+		this.upgrade(component, "spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
+		this.upgrade(component, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
 		this.upgrade(component, "inventory", "locale.localizers", {});
 		this.upgrade(component, "inventory", "locale.messages", new MultiStore());
 		this.upgrade(component, "stats", "locale", {
@@ -84,10 +84,10 @@ export default class LocalePerk extends BM.Perk
 		// Subscribe to the Locale Server if exists
 		if (!(this instanceof LocaleServer))
 		{
-			promises.push(this.use("skill", "rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
+			promises.push(this.use("spell", "rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.use("skill", "state.wait", [{"object":server, "state":"starting"}]).then(() => {
+					return this.use("spell", "state.wait", [{"object":server, "state":"starting"}]).then(() => {
 						server.subscribe(this);
 						this.set("vault", "locale.server", server);
 
@@ -124,7 +124,7 @@ export default class LocalePerk extends BM.Perk
 				let server = document.querySelector(rootNode);
 				if (server)
 				{
-					return this.use("skill", "state.wait", [{"object":server, "state":"ready"}]).then(() => {
+					return this.use("spell", "state.wait", [{"object":server, "state":"ready"}]).then(() => {
 						server.subscribe(this);
 						this.set("vault", "locale.server", server);
 
@@ -184,7 +184,7 @@ export default class LocalePerk extends BM.Perk
 		// Refill (Do not refill when starting)
 		if (this.get("stats", "state.state") === "ready")
 		{
-			return this.use("skill", "basic.fill");
+			return this.use("spell", "basic.fill");
 		}
 
 	}
@@ -242,12 +242,12 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("skill", "event.trigger", "beforeApplyLocale", options);
+			return component.use("spell", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
 			component.set("stats", "locale.localeName", options["localeName"]);
-			return component.use("skill", "event.trigger", "doApplyLocale", options);
+			return component.use("spell", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
-			return component.use("skill", "event.trigger", "afterApplyLocale", options);
+			return component.use("spell", "event.trigger", "afterApplyLocale", options);
 		});
 
 	}

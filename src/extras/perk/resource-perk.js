@@ -39,7 +39,7 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "skill", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		this.upgrade(component, "spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
 		this.upgrade(component, "inventory", "resource.resources", {});
 		this.upgrade(component, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
 		this.upgrade(component, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);

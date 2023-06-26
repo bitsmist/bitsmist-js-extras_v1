@@ -119,7 +119,7 @@ export default class FormPerk extends BM.Perk
 
 		// Upgrade component
 		this.upgrade(component, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
-		this.upgrade(component, "skill", "form.submit", function(...args) { return FormPerk._submit(...args); });
+		this.upgrade(component, "spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
 		this.upgrade(component, "stats", "form.cancelSubmit", false);
 		this.upgrade(component, "vault", "form.lastItems", {});
 		this.upgrade(component, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
@@ -172,7 +172,7 @@ export default class FormPerk extends BM.Perk
 			if (component.get("settings", "form.options.autoValidate", true))
 			{
 				options["validatorName"] = options["validatorName"] || component.get("settings", "form.options.validatorName");
-				return component.use("skill", "validation.validate", options).then(() => {
+				return component.use("spell", "validation.validate", options).then(() => {
 					if (!component.get("stats", "validation.validationResult.result"))
 					{
 						component.set("stats", "form.cancelSubmit", true);
@@ -182,14 +182,14 @@ export default class FormPerk extends BM.Perk
 		}).then(() => {
 			// Submit values
 			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
-			return component.use("skill", "event.trigger", "beforeSubmit", options).then(() => {
+			return component.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
 				if (!component.get("stats", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
-						return component.use("skill", "event.trigger", "doSubmit", options);
+						return component.use("spell", "event.trigger", "doSubmit", options);
 					}).then(() => {
 						console.debug(`FormPerk._submit(): Submitted component. name=${component.tagName}, id=${component.id}`);
-						return component.use("skill", "event.trigger", "afterSubmit", options);
+						return component.use("spell", "event.trigger", "afterSubmit", options);
 					});
 				}
 			});
@@ -213,11 +213,11 @@ export default class FormPerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("skill", "event.trigger", "beforeCollect", options);
+			return component.use("spell", "event.trigger", "beforeCollect", options);
 		}).then(() => {
-			return component.use("skill", "event.trigger", "doCollect", options);
+			return component.use("spell", "event.trigger", "doCollect", options);
 		}).then(() => {
-			return component.use("skill", "event.trigger", "afterCollect", options);
+			return component.use("spell", "event.trigger", "afterCollect", options);
 		});
 
 	}

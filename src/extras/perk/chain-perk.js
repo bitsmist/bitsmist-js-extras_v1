@@ -133,8 +133,8 @@ export default class ChainPerk extends BM.Perk
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.use("skill", "state.wait", [{"object":element, "state":state}]).then(() => {
-				return element.use("skill", skillName, {"sender":component});
+			let promise = component.use("spell", "state.wait", [{"object":element, "state":state}]).then(() => {
+				return element.use("spell", skillName, {"sender":component});
 			});
 			promises.push(promise);
 		});

@@ -41,10 +41,10 @@ export default class ErrorPerk extends BM.Perk
 	static ErrorPerk_onDoStart(sender, e, ex)
 	{
 
-		return this.use("skill", "rollcall.call", "ErrorServer", {"waitForAttendance":true}).then((server) => {
+		return this.use("spell", "rollcall.call", "ErrorServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `ErrorPerk.ErrorPerk_onDoStart(): ErrorServer doesn't exist. name=${this.tagName}`);
 
-			return this.use("skill", "state.wait", [{"object":server, "state":"started"}]).then(() => {
+			return this.use("spell", "state.wait", [{"object":server, "state":"started"}]).then(() => {
 				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 				this.set("vault", "error.server", server);
 			});
@@ -58,7 +58,7 @@ export default class ErrorPerk extends BM.Perk
 
 		let rootNode = this.use("skill", "alias.resolve", "ErrorServer")["rootNode"] || "bm-error";
 
-		return this.use("skill", "state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
+		return this.use("spell", "state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
 			let server = document.querySelector(rootNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 			this.set("vault", "error.server", server);
