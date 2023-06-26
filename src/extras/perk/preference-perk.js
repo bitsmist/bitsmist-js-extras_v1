@@ -61,7 +61,7 @@ export default class PreferencePerk extends BM.Perk
 		return this.use("spell", "rollcall.call", "PreferenceServer", {"waitForAttendance":true}).then((server) => {
 			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoApplySettings(): PreferenceServer doesn't exist. name=${this.tagName}`);
 
-			return this.use("spell", "state.wait", [{"object":server, "state":"started"}]).then(() => {
+			return this.use("spell", "status.wait", [{"object":server, "status":"started"}]).then(() => {
 				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 				this.set("vault", "preference.server", server);
 			});
@@ -75,7 +75,7 @@ export default class PreferencePerk extends BM.Perk
 
 		let rootNode = this.use("skill", "alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
 
-		return this.use("spell", "state.wait", [{"rootNode":rootNode, "state":"started"}]).then(() => {
+		return this.use("spell", "status.wait", [{"rootNode":rootNode, "status":"started"}]).then(() => {
 			let server = document.querySelector(rootNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 			this.set("vault", "preference.server", server);

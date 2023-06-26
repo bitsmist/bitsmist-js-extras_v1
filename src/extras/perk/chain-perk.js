@@ -89,7 +89,7 @@ export default class ChainPerk extends BM.Perk
 		for (let i = 0; i < targets.length; i++)
 		{
 			let method = targets[i]["skillName"] || "basic.refresh";
-			let state = targets[i]["state"] || "ready";
+			let status = targets[i]["status"] || "ready";
 			let sync = targets[i]["sync"];
 
 			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
@@ -99,12 +99,12 @@ export default class ChainPerk extends BM.Perk
 			if (sync)
 			{
 				chain = chain.then(() => {
-					return ChainPerk.__execTarget(this, nodes, method, state);
+					return ChainPerk.__execTarget(this, nodes, method, status);
 				});
 			}
 			else
 			{
-				chain = ChainPerk.__execTarget(this, nodes, method, state);
+				chain = ChainPerk.__execTarget(this, nodes, method, status);
 			}
 			promises.push(chain);
 		}
@@ -123,17 +123,17 @@ export default class ChainPerk extends BM.Perk
 	 * @param	{Component}		component			Component.
 	 * @param	{Array}			nodes				Nodes.
 	 * @param	{String}		skillName			Skill name to exec.
-	 * @param	{String}		state				State to wait.
+	 * @param	{String}		status				Status to wait.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __execTarget(component, nodes, skillName, state)
+	static __execTarget(component, nodes, skillName, status)
 	{
 
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.use("spell", "state.wait", [{"object":element, "state":state}]).then(() => {
+			let promise = component.use("spell", "status.wait", [{"object":element, "status":status}]).then(() => {
 				return element.use("spell", skillName, {"sender":component});
 			});
 			promises.push(promise);

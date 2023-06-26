@@ -40,7 +40,7 @@ export default class LocaleServerHandler extends LocaleHandler
 
 		let rootNode = this._component.use("skill", "alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
 
-		return this._component.use("spell", "state.wait", [{"rootNode":rootNode, "state":"starting"}]).then(() => {
+		return this._component.use("spell", "status.wait", [{"rootNode":rootNode, "status":"starting"}]).then(() => {
 			let server = document.querySelector(rootNode);
 			this._messages.chain(server.get("inventory", "locale.messages"));
 		});

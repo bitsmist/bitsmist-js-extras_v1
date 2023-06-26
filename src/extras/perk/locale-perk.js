@@ -87,7 +87,7 @@ export default class LocalePerk extends BM.Perk
 			promises.push(this.use("spell", "rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
 				if (server)
 				{
-					return this.use("spell", "state.wait", [{"object":server, "state":"starting"}]).then(() => {
+					return this.use("spell", "status.wait", [{"object":server, "status":"starting"}]).then(() => {
 						server.subscribe(this);
 						this.set("vault", "locale.server", server);
 
@@ -124,7 +124,7 @@ export default class LocalePerk extends BM.Perk
 				let server = document.querySelector(rootNode);
 				if (server)
 				{
-					return this.use("spell", "state.wait", [{"object":server, "state":"ready"}]).then(() => {
+					return this.use("spell", "status.wait", [{"object":server, "status":"ready"}]).then(() => {
 						server.subscribe(this);
 						this.set("vault", "locale.server", server);
 
@@ -182,7 +182,7 @@ export default class LocalePerk extends BM.Perk
 		LocalePerk._localize(this, this);
 
 		// Refill (Do not refill when starting)
-		if (this.get("state", "state.state") === "ready")
+		if (this.get("state", "status.status") === "ready")
 		{
 			return this.use("spell", "basic.fill");
 		}
