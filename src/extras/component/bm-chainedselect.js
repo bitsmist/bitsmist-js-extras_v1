@@ -206,17 +206,17 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.set("stats", "dialog.modalResult.result", false);
+		this.set("state", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
 		return this.use("skills", "event.trigger", "beforeAdd", options).then(() => {
-			if (this.get("stats", "dialog.modalResult.result"))
+			if (this.get("state", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.get("stats", "validation.validationResult.result"))
+					if(this.get("state", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
 							return this.use("skills", "event.trigger", "doAdd", options);
@@ -245,17 +245,17 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.set("stats", "dialog.modalResult.result", false);
+		this.set("state", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
 		return this.use("skills", "event.trigger", "beforeEdit", options).then(() => {
-			if (this.get("stats", "dialog.modalResult.result"))
+			if (this.get("state", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.get("stats", "validation.validationResult.result"))
+					if(this.get("state", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
 							return this.use("skills", "event.trigger", "doEdit", options);
@@ -284,17 +284,17 @@ export default class ChainedSelect extends BM.Component
 		}
 
 		let level = sender.parentNode.getAttribute("data-level")
-		this.set("stats", "dialog.modalResult.result", false);
+		this.set("state", "dialog.modalResult.result", false);
 		let options = {
 			"level":level,
 			"validatorName": "",
 		};
 
 		return this.use("spell", "event.trigger", "beforeRemove", options).then(() => {
-			if (this.get("stats", "dialog.modalResult.result"))
+			if (this.get("state", "dialog.modalResult.result"))
 			{
 				return this.validate(options).then(() => {
-					if(this.get("stats", "validation.validationResult.result"))
+					if(this.get("state", "validation.validationResult.result"))
 					{
 						return Promise.resolve().then(() => {
 							return this.use("spell", "event.trigger", "doRemove", options);
@@ -322,9 +322,9 @@ export default class ChainedSelect extends BM.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.set("stats", "dialog.modalResult.text", text);
-				this.set("stats", "dialog.modalResult.value", text);
-				this.set("stats", "dialog.modalResult.result", true);
+				this.set("state", "dialog.modalResult.text", text);
+				this.set("state", "dialog.modalResult.value", text);
+				this.set("state", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});
@@ -336,7 +336,7 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onDoAdd(sender, e, ex)
 	{
 
-		return this.newItem(e.detail.level, this.get("stats", "dialog.modalResult.text"), this.get("stats", "dialog.modalResult.value"));
+		return this.newItem(e.detail.level, this.get("state", "dialog.modalResult.text"), this.get("state", "dialog.modalResult.value"));
 
 	}
 
@@ -352,15 +352,15 @@ export default class ChainedSelect extends BM.Component
 			let text = window.prompt("アイテム名を入力してください", "");
 			if (text)
 			{
-				this.set("stats", "dialog.modalResult.old", {
+				this.set("state", "dialog.modalResult.old", {
 					"text": selectBox.options[selectBox.selectedIndex].text,
 					"value": selectBox.value
 				});
-				this.set("stats", "dialog.modalResult.new", {
+				this.set("state", "dialog.modalResult.new", {
 					"text": text,
 					"value": text
 				});
-				this.set("stats", "dialog.modalResult.result", true);
+				this.set("state", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});
@@ -372,7 +372,7 @@ export default class ChainedSelect extends BM.Component
 	ChainedSelect_onDoEdit(sender, e, ex)
 	{
 
-		return this.editItem(e.detail.level, this.get("stats", "dialog.modalResult.new.text"), this.get("stats", "dialog.modalResult.new.value"));
+		return this.editItem(e.detail.level, this.get("state", "dialog.modalResult.new.text"), this.get("state", "dialog.modalResult.new.value"));
 
 	}
 
@@ -387,9 +387,9 @@ export default class ChainedSelect extends BM.Component
 				let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
 				let selectBox = this.getSelect(level);
 
-				this.set("stats", "dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
-				this.set("stats", "dialog.modalResult.value", selectBox.value);
-				this.set("stats", "dialog.modalResult.result", true);
+				this.set("state", "dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
+				this.set("state", "dialog.modalResult.value", selectBox.value);
+				this.set("state", "dialog.modalResult.result", true);
 			}
 			resolve();
 		});

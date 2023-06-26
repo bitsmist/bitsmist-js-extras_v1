@@ -46,8 +46,8 @@ export default class DialogPerk extends BM.Perk
 		this.upgrade(component, "vault", "dialog.modalPromise");
 		this.upgrade(component, "vault", "dialog.backdrop");
 		this.upgrade(component, "vault", "dialog.backdropPromise", Promise.resolve());
-		this.upgrade(component, "stats", "dialog.isModal", false);
-		this.upgrade(component, "stats", "dialog.modalResult", {});
+		this.upgrade(component, "state", "dialog.isModal", false);
+		this.upgrade(component, "state", "dialog.modalResult", {});
 		this.upgrade(component, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
 
 	}
@@ -133,8 +133,8 @@ export default class DialogPerk extends BM.Perk
 		console.debug(`DialogPerk._openModal(): Opening component modal. name=${component.tagName}, id=${component.id}`);
 
 		return new Promise((resolve, reject) => {
-			component.set("stats", "dialog.isModal", true);
-			component.set("stats", "dialog.modalResult", {"result":false});
+			component.set("state", "dialog.isModal", true);
+			component.set("state", "dialog.modalResult", {"result":false});
 			component.set("vault", "dialog.modalPromise", {"resolve":resolve,"reject":reject});
 			return DialogPerk._open(component, options);
 		});
@@ -168,9 +168,9 @@ export default class DialogPerk extends BM.Perk
 						return DialogPerk.__hideBackdrop(component, component.get("settings", "dialog.backdropOptions"));
 					}
 				}).then(() => {
-					if (component.get("stats", "dialog.isModal"))
+					if (component.get("state", "dialog.isModal"))
 					{
-						component.get("vault", "dialog.modalPromise").resolve(component.get("stats", "dialog.modalResult"));
+						component.get("vault", "dialog.modalPromise").resolve(component.get("state", "dialog.modalResult"));
 					}
 					console.debug(`DialogPerk._close(): Closed component. name=${component.tagName}, id=${component.id}`);
 

@@ -120,7 +120,7 @@ export default class FormPerk extends BM.Perk
 		// Upgrade component
 		this.upgrade(component, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
 		this.upgrade(component, "spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
-		this.upgrade(component, "stats", "form.cancelSubmit", false);
+		this.upgrade(component, "state", "form.cancelSubmit", false);
 		this.upgrade(component, "vault", "form.lastItems", {});
 		this.upgrade(component, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
 		this.upgrade(component, "event", "doClear", FormPerk.FormPerk_onDoClear);
@@ -165,7 +165,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		options = options || {};
-		component.set("stats", "form.cancelSubmit", false);
+		component.set("state", "form.cancelSubmit", false);
 
 		return FormPerk.__collect(component, options).then(() => {
 			// Validate values
@@ -173,9 +173,9 @@ export default class FormPerk extends BM.Perk
 			{
 				options["validatorName"] = options["validatorName"] || component.get("settings", "form.options.validatorName");
 				return component.use("spell", "validation.validate", options).then(() => {
-					if (!component.get("stats", "validation.validationResult.result"))
+					if (!component.get("state", "validation.validationResult.result"))
 					{
-						component.set("stats", "form.cancelSubmit", true);
+						component.set("state", "form.cancelSubmit", true);
 					}
 				});
 			}
@@ -183,7 +183,7 @@ export default class FormPerk extends BM.Perk
 			// Submit values
 			console.debug(`FormPerk._submit(): Submitting component. name=${component.tagName}, id=${component.id}`);
 			return component.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
-				if (!component.get("stats", "form.cancelSubmit"))
+				if (!component.get("state", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
 						return component.use("spell", "event.trigger", "doSubmit", options);

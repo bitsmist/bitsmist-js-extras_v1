@@ -61,7 +61,7 @@ export default class RoutePerk extends BM.Perk
 		this.upgrade(component, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
 		this.upgrade(component, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
 		this.upgrade(component, "vault", "routing.routes", []);
-		this.upgrade(component, "stats", "routing.routeInfo", {});
+		this.upgrade(component, "state", "routing.routeInfo", {});
 		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
 		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
 		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
@@ -86,7 +86,7 @@ export default class RoutePerk extends BM.Perk
 		});
 
 		// Set current route info.
-		this.set("stats", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
+		this.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
 
 	}
 
@@ -95,7 +95,7 @@ export default class RoutePerk extends BM.Perk
 	static RoutePerk_onDoStart(sender, e, ex)
 	{
 
-		let routeName = this.get("stats", "routing.routeInfo.name");
+		let routeName = this.get("state", "routing.routeInfo.name");
 		if (routeName)
 		{
 			let options = {
@@ -202,7 +202,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
-			component.set("stats", "routing.routeInfo.settings", settings);
+			component.set("state", "routing.routeInfo.settings", settings);
 		});
 
 	}
@@ -222,14 +222,14 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			if (!component.get("stats", "routing.routeInfo.extender"))
+			if (!component.get("state", "routing.routeInfo.extender"))
 			{
 				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(component, routeName)).then((extender) => {
-					component.set("stats", "routing.routeInfo.extender", extender);
+					component.set("state", "routing.routeInfo.extender", extender);
 				});
 			}
 		}).then(() => {
-			let extender = component.get("stats", "routing.routeInfo.extender");
+			let extender = component.get("state", "routing.routeInfo.extender");
 			if (extender)
 			{
 				new Function(`"use strict";${extender}`)();
@@ -266,7 +266,7 @@ export default class RoutePerk extends BM.Perk
 				return RoutePerk._loadExtender(component);
 			}
 		}).then(() => {
-			newSettings = component.get("stats", "routing.routeInfo.settings");
+			newSettings = component.get("state", "routing.routeInfo.settings");
 			component.use("skill", "setting.merge", newSettings);
 
 			return component.use("spell", "setting.apply", {"settings":newSettings});
@@ -291,7 +291,7 @@ export default class RoutePerk extends BM.Perk
 		options = Object.assign({}, options);
 
 		// Current route info
-		let curRouteInfo = component.get("stats", "routing.routeInfo");
+		let curRouteInfo = component.get("state", "routing.routeInfo");
 
 		let newURL;
 		let newRouteInfo;
@@ -322,7 +322,7 @@ export default class RoutePerk extends BM.Perk
 			{
 				history.pushState(RoutePerk.__getState("_open.pushState"), null, newURL);
 			}
-			component.set("stats", "routing.routeInfo", newRouteInfo);
+			component.set("state", "routing.routeInfo", newRouteInfo);
 			/*
 		}).then(() => {
 			// Load other component when new route name is different from the current route name.
@@ -418,7 +418,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
-		component.set("stats", "routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
+		component.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
 
 	}
 
@@ -462,7 +462,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (!component.get("stats", "routing.routeInfo.settings"))
+		if (!component.get("state", "routing.routeInfo.settings"))
 		{
 			ret = true;
 		}
@@ -488,7 +488,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let settingsRef = component.get("stats", "routing.routeInfo.settingsRef");
+		let settingsRef = component.get("state", "routing.routeInfo.settingsRef");
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -531,7 +531,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (component.get("stats", "routing.routeInfo.extenderRef") || component.get("stats", "routing.routeInfo.extender"))
+		if (component.get("state", "routing.routeInfo.extenderRef") || component.get("state", "routing.routeInfo.extender"))
 		{
 			ret = true;
 		}
@@ -557,7 +557,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let extenderRef = component.get("stats", "routing.routeInfo.extenderRef");
+		let extenderRef = component.get("state", "routing.routeInfo.extenderRef");
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -735,8 +735,8 @@ export default class RoutePerk extends BM.Perk
 		let newParams = BM.URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(component.get("stats", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("stats", `validation.validationResult.invalids.${key}`);
+		Object.keys(component.get("state", "validation.validationResult.invalids")).forEach((key) => {
+			let item = component.get("state", `validation.validationResult.invalids.${key}`);
 
 			if (item["fix"] !== undefined)
 			{
@@ -758,7 +758,7 @@ export default class RoutePerk extends BM.Perk
 			RoutePerk._replaceRoute(component, {"queryParameters":newParams});
 
 			// Fixed
-			component.set("stats", "validation.validationResult.result", true);
+			component.set("state", "validation.validationResult.result", true);
 		}
 
 	}
@@ -773,8 +773,8 @@ export default class RoutePerk extends BM.Perk
 	static __dumpValidationErrors(component)
 	{
 
-		Object.keys(component.get("stats", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("stats", `validation.validationResult.invalids.${key}`);
+		Object.keys(component.get("state", "validation.validationResult.invalids")).forEach((key) => {
+			let item = component.get("state", `validation.validationResult.invalids.${key}`);
 
 			if (item.failed)
 			{

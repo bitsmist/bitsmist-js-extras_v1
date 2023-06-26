@@ -39,7 +39,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Upgrade component
-		this.upgrade(component, "stats", "key.isComposing", false);
+		this.upgrade(component, "state", "key.isComposing", false);
 		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
@@ -80,7 +80,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onKeyDown(e, component)
 	{
 
-		component.set("stats", "key.isComposing", ( e.keyCode === 229 ? true : false ));
+		component.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -98,7 +98,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Ignore all key input when composing.
-		if (component.get("stats", "key.isComposing"))
+		if (component.get("state", "key.isComposing"))
 		{
 			return;
 		}
@@ -173,12 +173,12 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		return component.use("spell", "form.submit").then(() => {
-			if (!component.get("stats", "form.cancelSubmit"))
+			if (!component.get("state", "form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.get("stats", "dialog.isModal"))
+				if (component.get("state", "dialog.isModal"))
 				{
-					component.set("stats", "dialog.modalResult.result", true);
+					component.set("state", "dialog.modalResult.result", true);
 				}
 
 				// Auto close

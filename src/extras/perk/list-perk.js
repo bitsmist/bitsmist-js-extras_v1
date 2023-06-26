@@ -43,7 +43,7 @@ export default class ListPerk extends BM.Perk
 		// Upgrade component
 		this.upgrade(component, "spell", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 		this.upgrade(component, "vault", "list.lastItems", {});
-		this.upgrade(component, "stats", "list.activeRowSkinName", "");
+		this.upgrade(component, "state", "list.activeRowSkinName", "");
 		this.upgrade(component, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
 		this.upgrade(component, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
 		this.upgrade(component, "event", "doFill", ListPerk.ListPerk_onDoFill);
@@ -113,7 +113,7 @@ export default class ListPerk extends BM.Perk
 
 		options = options || {};
 
-		if (component.get("stats", "list.activeRowSkinName") === skinName)
+		if (component.get("state", "list.activeRowSkinName") === skinName)
 		{
 			return Promise.resolve();
 		}
@@ -122,7 +122,7 @@ export default class ListPerk extends BM.Perk
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${component.tagName}, rowSkinName=${skinName}, id=${component.id}, uniqueId=${component.uniqueId}`);
 			return component.use("spell", "skin.summon", skinName);
 		}).then(() => {
-			component.set("stats", "list.activeRowSkinName", skinName);
+			component.set("state", "list.activeRowSkinName", skinName);
 		}).then(() => {
 			return component.use("spell", "event.trigger", "afterTransformRow", options);
 		}).then(() => {
@@ -149,7 +149,7 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = component.get("inventory", "inventory", "skin.skins");
-		let activeRowSkinName = component.get("stats", "list.activeRowSkinName");
+		let activeRowSkinName = component.get("state", "list.activeRowSkinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 
@@ -209,7 +209,7 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = component.get("inventory", "skin.skins");
-		let activeRowSkinName = component.get("stats", "list.activeRowSkinName");
+		let activeRowSkinName = component.get("state", "list.activeRowSkinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${component.tagName}, rowSkinName=${activeRowSkinName}`);
 

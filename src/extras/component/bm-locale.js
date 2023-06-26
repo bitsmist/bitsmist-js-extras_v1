@@ -94,7 +94,7 @@ export default class LocaleServer extends BM.Component
 			let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
 			let attribName = this.get("settings", "options.autoAttribute.attributeName", "data-locale");
 
-			targetElement.setAttribute(attribName, this.get("stats", "locale.localeName"));
+			targetElement.setAttribute(attribName, this.get("state", "locale.localeName"));
 		}
 
 		// Notify locale change to clients
