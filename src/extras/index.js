@@ -146,3 +146,6 @@ window.BITSMIST.v1.LocaleServer = LocaleServer;
 
 import ErrorServer from "./component/bm-error.js";
 window.BITSMIST.v1.ErrorServer = ErrorServer;
+
+import Router from "./component/bm-router.js";
+window.BITSMIST.v1.Router = Router;
