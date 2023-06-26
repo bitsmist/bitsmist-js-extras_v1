@@ -116,7 +116,7 @@ export default class ElementPerk extends BM.Perk
 		}
 		else
 		{
-			elements = BM.Util.scopedSelectorAll(component._root, `#${elementName}`);
+			elements = BM.Util.scopedSelectorAll(component, `#${elementName}`);
 		}
 
 		return elements;
