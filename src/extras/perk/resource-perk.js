@@ -35,15 +35,15 @@ export default class ResourcePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
-		this.upgrade(component, "inventory", "resource.resources", {});
-		this.upgrade(component, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
-		this.upgrade(component, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
-		this.upgrade(component, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
+		// Upgrade unit
+		this.upgrade(unit, "spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		this.upgrade(unit, "inventory", "resource.resources", {});
+		this.upgrade(unit, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
+		this.upgrade(unit, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
+		this.upgrade(unit, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
 
 	}
 
@@ -125,24 +125,24 @@ export default class ResourcePerk extends BM.Perk
 	/**
      * Add resource. Load data if "autoLoad" option is true using added resource.
      *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
      * @param	{string}		handlerName			Resource handler name.
      * @param	{array}			options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addHandler(component, handlerName, options)
+	static _addHandler(unit, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${component.tagName}, handlerName=${handlerName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
-		let handler = component.get("inventory", `resource.resources.${handlerName}`);
+		let handler = unit.get("inventory", `resource.resources.${handlerName}`);
 
 		if (!handler)
 		{
-			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
-			component.set("inventory", `resource.resources.${handlerName}`, handler);
+			handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+			unit.set("inventory", `resource.resources.${handlerName}`, handler);
 
 			promise = handler.init(options);
 		}

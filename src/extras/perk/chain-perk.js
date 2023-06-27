@@ -35,24 +35,24 @@ export default class ChainPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "event", "doApplySettings", ChainPerk.onDoApplySettings);
+		// Upgrade unit
+		this.upgrade(unit, "event", "doApplySettings", ChainPerk.onDoApplySettings);
 
 	}
 
 	// -----------------------------------------------------------------------------
 
-	static deinit(component, options)
+	static deinit(unit, options)
 	{
 
 		let chains = e.details.setting["chains"];
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
-				component.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
+				unit.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
 			});
 		}
 
@@ -92,9 +92,19 @@ export default class ChainPerk extends BM.Perk
 			let status = targets[i]["status"] || "ready";
 			let sync = targets[i]["sync"];
 
-			let nodes = document.querySelectorAll(targets[i]["rootNode"]);
+		//	let nodes = document.querySelectorAll(targets[i]["rootNode"]);
+			let nodes;
+			if (this._root.innerHTML)
+			{
+				nodes = BM.Util.scopedSelectorAll(this._root, targets[i]["rootNode"]);
+			}
+			else
+			{
+				nodes = document.querySelectorAll(targets[i]["rootNode"]);
+			}
 			nodes = Array.prototype.slice.call(nodes, 0);
-			BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			//BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
 
 			if (sync)
 			{
@@ -120,21 +130,21 @@ export default class ChainPerk extends BM.Perk
 	/**
 	 * Execute target methods.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Array}			nodes				Nodes.
 	 * @param	{String}		skillName			Skill name to exec.
 	 * @param	{String}		status				Status to wait.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __execTarget(component, nodes, skillName, status)
+	static __execTarget(unit, nodes, skillName, status)
 	{
 
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = component.use("spell", "status.wait", [{"object":element, "status":status}]).then(() => {
-				return element.use("spell", skillName, {"sender":component});
+			let promise = unit.use("spell", "status.wait", [{"object":element, "status":status}]).then(() => {
+				return element.use("spell", skillName, {"sender":unit});
 			});
 			promises.push(promise);
 		});

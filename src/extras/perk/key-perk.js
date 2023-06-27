@@ -35,12 +35,12 @@ export default class KeyPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "state", "key.isComposing", false);
-		this.upgrade(component, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
+		// Upgrade unit
+		this.upgrade(unit, "state", "key.isComposing", false);
+		this.upgrade(unit, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
 
 	}
 
@@ -75,12 +75,12 @@ export default class KeyPerk extends BM.Perk
  	 * Key down event handler. Check if it is in composing mode or not.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 */
-	static KeyPerk_onKeyDown(e, component)
+	static KeyPerk_onKeyDown(e, unit)
 	{
 
-		component.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
+		unit.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -90,15 +90,15 @@ export default class KeyPerk extends BM.Perk
  	 * Key up event handler.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 * @param	{Object}		actions				Action info.
 	 */
-	static KeyPerk_onKeyUp(e, component, options, actions)
+	static KeyPerk_onKeyUp(e, unit, options, actions)
 	{
 
 		// Ignore all key input when composing.
-		if (component.get("state", "key.isComposing"))
+		if (unit.get("state", "key.isComposing"))
 		{
 			return;
 		}
@@ -117,7 +117,7 @@ export default class KeyPerk extends BM.Perk
 		// Take an action according to the key pressed
 		if (actions[key])
 		{
-			actions[key]["handler"].call(this, e, component, actions[key]["option"]);
+			actions[key]["handler"].call(this, e, unit, actions[key]["option"]);
 		}
 
 	}
@@ -128,14 +128,14 @@ export default class KeyPerk extends BM.Perk
 	 * Composition start event handler.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
 	/*
-	static onCompositionStart(e, component, options)
+	static onCompositionStart(e, unit, options)
 	{
 
-		component.__isComposing = true;
+		unit.__isComposing = true;
 
 	}
 	*/
@@ -146,14 +146,14 @@ export default class KeyPerk extends BM.Perk
 	 * Composition end event handler.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
 	/*
-	static onCompositionEnd(e, component, options)
+	static onCompositionEnd(e, unit, options)
 	{
 
-		component.__isComposing = false;
+		unit.__isComposing = false;
 
 	}
 	*/
@@ -166,25 +166,25 @@ export default class KeyPerk extends BM.Perk
 	 * Default submit.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultSubmit(e, component, options)
+	static __defaultSubmit(e, unit, options)
 	{
 
-		return component.use("spell", "form.submit").then(() => {
-			if (!component.get("state", "form.cancelSubmit"))
+		return unit.use("spell", "form.submit").then(() => {
+			if (!unit.get("state", "form.cancelSubmit"))
 			{
 				// Modal result
-				if (component.get("state", "dialog.isModal"))
+				if (unit.get("state", "dialog.isModal"))
 				{
-					component.set("state", "dialog.modalResult.result", true);
+					unit.set("state", "dialog.modalResult.result", true);
 				}
 
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					return component.use("spell", "dialog.close", {"reason":"submit"});
+					return unit.use("spell", "dialog.close", {"reason":"submit"});
 				}
 			}
 		});
@@ -197,13 +197,13 @@ export default class KeyPerk extends BM.Perk
 	 * Default cancel.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultCancel(e, component, options)
+	static __defaultCancel(e, unit, options)
 	{
 
-		return component.use("spell", "dialog.close", {"reason":"cancel"});
+		return unit.use("spell", "dialog.close", {"reason":"cancel"});
 
 	}
 
@@ -213,10 +213,10 @@ export default class KeyPerk extends BM.Perk
 	 * Default clear.
 	 *
 	 * @param	{Object}		e					Event info.
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultClear(e, component, options)
+	static __defaultClear(e, unit, options)
 	{
 
 		let target = "";
@@ -226,7 +226,7 @@ export default class KeyPerk extends BM.Perk
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return component.use("spell", "basic.clear", {"target":target, "options":options["options"]});
+		return unit.use("spell", "basic.clear", {"target":target, "options":options["options"]});
 
 	}
 
@@ -261,20 +261,20 @@ export default class KeyPerk extends BM.Perk
 	/**
 	 * Init buttons.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		action				Action.
 	 * @param	{Object}		options				Options.
 	 */
-	static __initButtons(component, action, options)
+	static __initButtons(unit, action, options)
 	{
 
 		if (options && options["rootNode"])
 		{
 			let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
-			let elements = BM.Util.scopedSelectorAll(component._root, options["rootNode"]);
+			let elements = BM.Util.scopedSelectorAll(unit._root, options["rootNode"]);
 
 			elements.forEach((element) => {
-				element.addEventListener("click", function(e){handler.call(this, e, component, options);});
+				element.addEventListener("click", function(e){handler.call(this, e, unit, options);});
 			});
 		}
 

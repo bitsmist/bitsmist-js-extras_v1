@@ -15,7 +15,7 @@ import ObservableStore from "../store/observable-store.js";
 //	Router Class
 // =============================================================================
 
-export default class Router extends BM.Component
+export default class Router extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------

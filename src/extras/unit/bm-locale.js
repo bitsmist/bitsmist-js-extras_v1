@@ -15,7 +15,7 @@ import ObservableStore from "../store/observable-store.js";
 //	Locale Server Class
 // =============================================================================
 
-export default class LocaleServer extends BM.Component
+export default class LocaleServer extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -109,15 +109,15 @@ export default class LocaleServer extends BM.Component
 	/**
 	 * Subscribe to the Server. Get a notification when prefrence changed.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	subscribe(component, options)
+	subscribe(unit, options)
 	{
 
 		this._store.subscribe(
-			`${component.tagName}_${component.uniqueId}`,
-			this.__triggerEvent.bind(component),
+			`${unit.tagName}_${unit.uniqueId}`,
+			this.__triggerEvent.bind(unit),
 		);
 
 	}

@@ -15,7 +15,7 @@ import ObservableStore from "../store/observable-store.js";
 //	Preference Server Class
 // =============================================================================
 
-export default class PreferenceServer extends BM.Component
+export default class PreferenceServer extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -134,15 +134,15 @@ export default class PreferenceServer extends BM.Component
 	/**
 	 * Subscribe to the Server. Get a notification when prefrence changed.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	subscribe(component, options)
+	subscribe(unit, options)
 	{
 
 		this._store.subscribe(
-			`${component.tagName}_${component.uniqueId}`,
-			this._triggerEvent.bind(component),
+			`${unit.tagName}_${unit.uniqueId}`,
+			this._triggerEvent.bind(unit),
 			options,
 		);
 

@@ -47,29 +47,29 @@ export default class RoutePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		this.upgrade(component, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-		this.upgrade(component, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		this.upgrade(component, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-		this.upgrade(component, "spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-		this.upgrade(component, "spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
-		this.upgrade(component, "spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
-		this.upgrade(component, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		this.upgrade(component, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-		this.upgrade(component, "vault", "routing.routes", []);
-		this.upgrade(component, "state", "routing.routeInfo", {});
-		this.upgrade(component, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this.upgrade(component, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
-		this.upgrade(component, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
-		this.upgrade(component, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
-		this.upgrade(component, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
+		// Upgrade unit
+		this.upgrade(unit, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
+		this.upgrade(unit, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
+		this.upgrade(unit, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		this.upgrade(unit, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
+		this.upgrade(unit, "spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
+		this.upgrade(unit, "spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		this.upgrade(unit, "spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		this.upgrade(unit, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		this.upgrade(unit, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
+		this.upgrade(unit, "vault", "routing.routes", []);
+		this.upgrade(unit, "state", "routing.routeInfo", {});
+		this.upgrade(unit, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
+		this.upgrade(unit, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
+		this.upgrade(unit, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
+		this.upgrade(unit, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
+		this.upgrade(unit, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
 
 		// Init popstate handler
-		RoutePerk.__initPopState(component);
+		RoutePerk.__initPopState(unit);
 
 	}
 
@@ -151,12 +151,12 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Add the route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		title				Route title.
 	 * @param	{Object}		routeInfo			Route info.
 	 * @param	{Boolean}		first				Add to top when true.
 	 */
-	static _addRoute(component, title, routeInfo, first)
+	static _addRoute(unit, title, routeInfo, first)
 	{
 
 		let keys = [];
@@ -174,7 +174,7 @@ export default class RoutePerk extends BM.Perk
 			"_keys":		keys,
 		};
 
-		let routes = component.get("vault", "routing.routes");
+		let routes = unit.get("vault", "routing.routes");
 		if (first)
 		{
 			routes.unshift(route);
@@ -183,7 +183,7 @@ export default class RoutePerk extends BM.Perk
 		{
 			routes.push(route);
 		}
-		component.set("vault", "routing.routes", routes);
+		unit.set("vault", "routing.routes", routes);
 
 	}
 
@@ -192,17 +192,17 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Load the extender file for this page.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 * @param	{Object}		options				Load options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _loadSettings(component, routeName, options)
+	static _loadSettings(unit, routeName, options)
 	{
 
-		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(component, routeName), Object.assign({"bindTo":this._component}, options)).then((settings) => {
-			component.set("state", "routing.routeInfo.settings", settings);
+		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(unit, routeName), Object.assign({"bindTo":this._unit}, options)).then((settings) => {
+			unit.set("state", "routing.routeInfo.settings", settings);
 		});
 
 	}
@@ -212,24 +212,24 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Load the extender file for this page.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 * @param	{Object}		options				Load options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _loadExtender(component, routeName, options)
+	static _loadExtender(unit, routeName, options)
 	{
 
 		return Promise.resolve().then(() => {
-			if (!component.get("state", "routing.routeInfo.extender"))
+			if (!unit.get("state", "routing.routeInfo.extender"))
 			{
-				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(component, routeName)).then((extender) => {
-					component.set("state", "routing.routeInfo.extender", extender);
+				return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(unit, routeName)).then((extender) => {
+					unit.set("state", "routing.routeInfo.extender", extender);
 				});
 			}
 		}).then(() => {
-			let extender = component.get("state", "routing.routeInfo.extender");
+			let extender = unit.get("state", "routing.routeInfo.extender");
 			if (extender)
 			{
 				new Function(`"use strict";${extender}`)();
@@ -243,33 +243,33 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Load the route speicific settings file and init.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static _switchRoute(component, routeName, options)
+	static _switchRoute(unit, routeName, options)
 	{
 
 		BM.Util.assert(routeName, "RoutePerk._switchRoute(): A route name not specified.", TypeError);
 
 		let newSettings;
 		return Promise.resolve().then(() => {
-			if (RoutePerk.__hasExternalSettings(component, routeName))
+			if (RoutePerk.__hasExternalSettings(unit, routeName))
 			{
-				return RoutePerk._loadSettings(component, routeName);
+				return RoutePerk._loadSettings(unit, routeName);
 			}
 		}).then(() => {
-			if (RoutePerk.__hasExternalExtender(component, routeName))
+			if (RoutePerk.__hasExternalExtender(unit, routeName))
 			{
-				return RoutePerk._loadExtender(component);
+				return RoutePerk._loadExtender(unit);
 			}
 		}).then(() => {
-			newSettings = component.get("state", "routing.routeInfo.settings");
-			component.use("skill", "setting.merge", newSettings);
+			newSettings = unit.get("state", "routing.routeInfo.settings");
+			unit.use("skill", "setting.merge", newSettings);
 
-			return component.use("spell", "setting.apply", {"settings":newSettings});
+			return unit.use("spell", "setting.apply", {"settings":newSettings});
 		});
 
 	}
@@ -279,26 +279,26 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Open route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		routeInfo			Route information.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static _open(component, routeInfo, options)
+	static _open(unit, routeInfo, options)
 	{
 
 		options = Object.assign({}, options);
 
 		// Current route info
-		let curRouteInfo = component.get("state", "routing.routeInfo");
+		let curRouteInfo = unit.get("state", "routing.routeInfo");
 
 		let newURL;
 		let newRouteInfo;
 		if (routeInfo)
 		{
 			newURL = BM.URLUtil.buildURL(routeInfo, options);
-			newRouteInfo = RoutePerk.__loadRouteInfo(component, newURL);
+			newRouteInfo = RoutePerk.__loadRouteInfo(unit, newURL);
 		}
 		else
 		{
@@ -311,7 +311,7 @@ export default class RoutePerk extends BM.Perk
 				|| ( curRouteInfo["name"] != newRouteInfo["name"]) // <--- remove this when _update() is ready.
 		)
 		{
-			RoutePerk._jumpRoute(component, {"url":newURL});
+			RoutePerk._jumpRoute(unit, {"url":newURL});
 			return;
 		}
 
@@ -322,32 +322,32 @@ export default class RoutePerk extends BM.Perk
 			{
 				history.pushState(RoutePerk.__getState("_open.pushState"), null, newURL);
 			}
-			component.set("state", "routing.routeInfo", newRouteInfo);
+			unit.set("state", "routing.routeInfo", newRouteInfo);
 			/*
 		}).then(() => {
-			// Load other component when new route name is different from the current route name.
+			// Load other unit when new route name is different from the current route name.
 			if (curRouteInfo["name"] != newRouteInfo["name"])
 			{
-				return RoutePerk._updateRoute(component, curRouteInfo, newRouteInfo, options);
+				return RoutePerk._updateRoute(unit, curRouteInfo, newRouteInfo, options);
 			}
 			*/
 		}).then(() => {
 			// Validate URL
-			if (component.get("settings", "routing.options.autoValidate"))
+			if (unit.get("settings", "routing.options.autoValidate"))
 			{
 				let validateOptions = {
-					"validatorName":	component.get("settings", "routing.options.validatorName"),
+					"validatorName":	unit.get("settings", "routing.options.validatorName"),
 					"items":			BM.URLUtil.loadParameters(newURL),
 					"url":				newURL,
 				};
-				return component.use("spell", "validation.validate", validateOptions);
+				return unit.use("spell", "validation.validate", validateOptions);
 			}
 		}).then(() => {
 			// Refresh
-			return RoutePerk._refreshRoute(component, newRouteInfo, options);
+			return RoutePerk._refreshRoute(unit, newRouteInfo, options);
 		}).then(() => {
 			// Normalize URL
-			return RoutePerk._normalizeRoute(component, window.location.href);
+			return RoutePerk._normalizeRoute(unit, window.location.href);
 		});
 
 	}
@@ -357,11 +357,11 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Jump to url.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		routeInfo			Route information.
 	 * @param	{Object}		options				Options.
 	 */
-	static _jumpRoute(component, routeInfo, options)
+	static _jumpRoute(unit, routeInfo, options)
 	{
 
 		let url = BM.URLUtil.buildURL(routeInfo, options)
@@ -374,16 +374,16 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Update route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		routeInfo			Route information.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static _updateRoute(component, curRouteInfo, newRouteInfo, options)
+	static _updateRoute(unit, curRouteInfo, newRouteInfo, options)
 	{
 
-		return RoutePerk._switchRoute(component, newRouteInfo["name"]);
+		return RoutePerk._switchRoute(unit, newRouteInfo["name"]);
 
 	}
 
@@ -392,16 +392,16 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Refresh route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		routeInfo			Route information.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static _refreshRoute(component, routeInfo, options)
+	static _refreshRoute(unit, routeInfo, options)
 	{
 
-		return component.use("spell", "basic.refresh", options);
+		return unit.use("spell", "basic.refresh", options);
 
 	}
 
@@ -410,15 +410,15 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Replace current url.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		routeInfo			Route information.
 	 * @param	{Object}		options				Options.
 	 */
-	static _replaceRoute(component, routeInfo, options)
+	static _replaceRoute(unit, routeInfo, options)
 	{
 
 		history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
-		component.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(component, window.location.href));
+		unit.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(unit, window.location.href));
 
 	}
 
@@ -427,20 +427,20 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Normalize route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		url					Url to normalize.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static _normalizeRoute(component, url)
+	static _normalizeRoute(unit, url)
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("spell", "event.trigger", "beforeNormalizeURL");
+			return unit.use("spell", "event.trigger", "beforeNormalizeURL");
 		}).then(() => {
-			return component.use("spell", "event.trigger", "doNormalizeURL");
+			return unit.use("spell", "event.trigger", "doNormalizeURL");
 		}).then(() => {
-			return component.use("spell", "event.trigger", "afterNormalizeURL");
+			return unit.use("spell", "event.trigger", "afterNormalizeURL");
 		});
 
 	}
@@ -450,19 +450,19 @@ export default class RoutePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check if the component has the external settings file.
+	 * Check if the unit has the external settings file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 *
-	 * @return  {Boolean}		True if the component has the external settings file.
+	 * @return  {Boolean}		True if the unit has the external settings file.
 	 */
-	static __hasExternalSettings(component, routeName)
+	static __hasExternalSettings(unit, routeName)
 	{
 
 		let ret = false;
 
-		if (!component.get("state", "routing.routeInfo.settings"))
+		if (!unit.get("state", "routing.routeInfo.settings"))
 		{
 			ret = true;
 		}
@@ -476,19 +476,19 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Return URL to settings file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 *
 	 * @return  {String}		URL.
 	 */
-	static __getSettingsURL(component, routeName)
+	static __getSettingsURL(unit, routeName)
 	{
 
 		let path;
 		let fileName;
 		let query;
 
-		let settingsRef = component.get("state", "routing.routeInfo.settingsRef");
+		let settingsRef = unit.get("state", "routing.routeInfo.settingsRef");
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -501,15 +501,15 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					component.get("settings", "system.appBaseURL", ""),
-					component.get("settings", "system.componentPath", ""),
-					component.get("settings", "unit.options..path", ""),
+					unit.get("settings", "system.appBaseURL", ""),
+					unit.get("settings", "system.unitPath", ""),
+					unit.get("settings", "unit.options..path", ""),
 				]);
-			let ext = component.get("settings", "routing.options.settingFormat",
-					component.get("settings", "system.settingFormat",
+			let ext = unit.get("settings", "routing.options.settingFormat",
+					unit.get("settings", "system.settingFormat",
 						"json"));
-			fileName = component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
-  			query = component.get("settings", "unit.options.query");
+			fileName = unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			query = unit.get("settings", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -519,19 +519,19 @@ export default class RoutePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check if the component has the external extender file.
+	 * Check if the unit has the external extender file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 *
-	 * @return  {Boolean}		True if the component has the external extender file.
+	 * @return  {Boolean}		True if the unit has the external extender file.
 	 */
-	static __hasExternalExtender(component, routeName)
+	static __hasExternalExtender(unit, routeName)
 	{
 
 		let ret = false;
 
-		if (component.get("state", "routing.routeInfo.extenderRef") || component.get("state", "routing.routeInfo.extender"))
+		if (unit.get("state", "routing.routeInfo.extenderRef") || unit.get("state", "routing.routeInfo.extender"))
 		{
 			ret = true;
 		}
@@ -545,19 +545,19 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Return URL to extender file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		routeName			Route name.
 	 *
 	 * @return  {String}		URL.
 	 */
-	static __getExtenderURL(component, routeName)
+	static __getExtenderURL(unit, routeName)
 	{
 
 		let path;
 		let fileName;
 		let query;
 
-		let extenderRef = component.get("state", "routing.routeInfo.extenderRef");
+		let extenderRef = unit.get("state", "routing.routeInfo.extenderRef");
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -570,12 +570,12 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = path || BM.Util.concatPath([
-					component.get("settings", "system.appBaseURL", ""),
-					component.get("settings", "system.componentPath", ""),
-					component.get("settings", "unit.options.path", ""),
+					unit.get("settings", "system.appBaseURL", ""),
+					unit.get("settings", "system.unitPath", ""),
+					unit.get("settings", "unit.options.path", ""),
 				]);
-			fileName = fileName || component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = component.get("settings", "unit.options.query");
+			fileName = fileName || unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
+			query = unit.get("settings", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -587,12 +587,12 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Get route info from the url.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		url					Url.
 	 *
 	 * @return  {Object}		Route info.
 	 */
-	static __loadRouteInfo(component, url)
+	static __loadRouteInfo(unit, url)
 	{
 
 		let parsedURL = new URL(url, window.location.href);
@@ -605,7 +605,7 @@ export default class RoutePerk extends BM.Perk
 		};
 
 		// Find the matching route
-		let routes = component.get("vault", "routing.routes");
+		let routes = unit.get("vault", "routing.routes");
 		for (let i = routes.length - 1; i >= 0; i--)
 		{
 			// Check origin
@@ -629,7 +629,7 @@ export default class RoutePerk extends BM.Perk
 				let settingsRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
 				routeInfo["settingsRef"] = RoutePerk.__interpolate(settingsRef, params);
 				let settings = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
-				routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.__getSettingFormat(component)});
+				routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.__getSettingFormat(unit)});
 				let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
 				routeInfo["extenderRef"] = RoutePerk.__interpolate(extenderRef, params);
 				routeInfo["extender"] = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
@@ -675,18 +675,18 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Init pop state handling.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 */
-	static __initPopState(component)
+	static __initPopState(unit)
 	{
 
 		window.addEventListener("popstate", (e) => {
 			return Promise.resolve().then(() => {
-				return component.use("spell", "event.trigger", "beforePopState");
+				return unit.use("spell", "event.trigger", "beforePopState");
 			}).then(() => {
-				return RoutePerk._open(component, {"url":window.location.href}, {"pushState":false});
+				return RoutePerk._open(unit, {"url":window.location.href}, {"pushState":false});
 			}).then(() => {
-				return component.use("spell", "event.trigger", "afterPopState");
+				return unit.use("spell", "event.trigger", "afterPopState");
 			});
 		});
 
@@ -723,20 +723,20 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Fix route.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		url					Url to validate.
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __fixRoute(component, url)
+	static __fixRoute(unit, url)
 	{
 
 		let isOk = true;
 		let newParams = BM.URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(component.get("state", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("state", `validation.validationResult.invalids.${key}`);
+		Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
+			let item = unit.get("state", `validation.validationResult.invalids.${key}`);
 
 			if (item["fix"] !== undefined)
 			{
@@ -755,10 +755,10 @@ export default class RoutePerk extends BM.Perk
 		if (isOk)
 		{
 			// Replace URL
-			RoutePerk._replaceRoute(component, {"queryParameters":newParams});
+			RoutePerk._replaceRoute(unit, {"queryParameters":newParams});
 
 			// Fixed
-			component.set("state", "validation.validationResult.result", true);
+			unit.set("state", "validation.validationResult.result", true);
 		}
 
 	}
@@ -768,13 +768,13 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Dump validation errors.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 */
-	static __dumpValidationErrors(component)
+	static __dumpValidationErrors(unit)
 	{
 
-		Object.keys(component.get("state", "validation.validationResult.invalids")).forEach((key) => {
-			let item = component.get("state", `validation.validationResult.invalids.${key}`);
+		Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
+			let item = unit.get("state", `validation.validationResult.invalids.${key}`);
 
 			if (item.failed)
 			{
@@ -793,15 +793,15 @@ export default class RoutePerk extends BM.Perk
 	/**
 	 * Return default settings file format.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 *
 	 * @return  {String}		"js" or "json".
 	 */
-	static __getSettingFormat(component)
+	static __getSettingFormat(unit)
 	{
 
-		return component.get("settings", "routing.options.settingFormat",
-				component.get("settings", "system.settingFormat",
+		return unit.get("settings", "routing.options.settingFormat",
+				unit.get("settings", "system.settingFormat",
 					"json"));
 
 	}

@@ -37,16 +37,16 @@ export default class PreferencePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
-		this.upgrade(component, "spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
-		this.upgrade(component, "spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
-		this.upgrade(component, "vault", "preference.server");
-		this.upgrade(component, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
-		this.upgrade(component, "event", "beforeSetup", PreferencePerk.PreferencePerk_onBeforeSetup);
+		// Upgrade unit
+		this.upgrade(unit, "skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
+		this.upgrade(unit, "spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
+		this.upgrade(unit, "spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
+		this.upgrade(unit, "vault", "preference.server");
+		this.upgrade(unit, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
+		this.upgrade(unit, "event", "beforeSetup", PreferencePerk.PreferencePerk_onBeforeSetup);
 
 	}
 
@@ -83,6 +83,26 @@ export default class PreferencePerk extends BM.Perk
 
 	}
 
+/*
+	static PreferencePerk_onDoApplySettings(sender, e, ex)
+	{
+
+		return this.get("inventory", "promise.documentReady").then(() => {
+			let rootNode = this.use("skill", "alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
+			let server = document.querySelector(rootNode);
+			if (server)
+			{
+				return this.use("spell", "status.wait", [{"rootNode":rootNode, "status":"started"}]).then(() => {
+					let server = document.querySelector(rootNode);
+					server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
+					this.set("vault", "preference.server", server);
+				});
+			}
+		});
+
+	}
+	*/
+
 	// -------------------------------------------------------------------------
 
 	static PreferencePerk_onBeforeSetup(sender, e, ex)
@@ -99,18 +119,18 @@ export default class PreferencePerk extends BM.Perk
 	/**
 	 * Apply preferences.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static _applyPreferences(component, options)
+	static _applyPreferences(unit, options)
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("spell", "event.trigger", "beforeApplyPreferences", options);
+			return unit.use("spell", "event.trigger", "beforeApplyPreferences", options);
 		}).then(() => {
-			return component.use("spell", "event.trigger", "doApplyPreferences", options);
+			return unit.use("spell", "event.trigger", "doApplyPreferences", options);
 		}).then(() => {
-			return component.use("spell", "event.trigger", "afterApplyPreferences", options);
+			return unit.use("spell", "event.trigger", "afterApplyPreferences", options);
 		});
 
 	}
@@ -120,20 +140,20 @@ export default class PreferencePerk extends BM.Perk
 	/**
 	 * Get preferences.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{String}		target				Preference name to get.
 	 * @param	{*}				defaultValue		Value returned when key is not found.
 	 */
-	static _getPreferences(component, key, defaultValue)
+	static _getPreferences(unit, key, defaultValue)
 	{
 
 		if (key)
 		{
-			return component.get("vault", "preference.server").getPreference(key, defaultValue);
+			return unit.get("vault", "preference.server").getPreference(key, defaultValue);
 		}
 		else
 		{
-			return component.get("vault", "preference.server").items;
+			return unit.get("vault", "preference.server").items;
 		}
 
 	}
@@ -143,14 +163,14 @@ export default class PreferencePerk extends BM.Perk
 	/**
 	 * Apply preferences.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		preferences 		Preferences to set.
 	 * @param	{Object}		options				Options.
 	 */
-	static _setPreferences(component, preferences, options)
+	static _setPreferences(unit, preferences, options)
 	{
 
-		return component.get("vault", "preference.server").setPreference(preferences, options, {"sender":component});
+		return unit.get("vault", "preference.server").setPreference(preferences, options, {"sender":unit});
 
 	}
 

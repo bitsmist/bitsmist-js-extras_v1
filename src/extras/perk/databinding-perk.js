@@ -38,34 +38,34 @@ export default class DatabindingPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		if (component.get("settings", "databinding.options.dataType", "single") === "single")
+		if (unit.get("settings", "databinding.options.dataType", "single") === "single")
 		{
-			// Upgrade component (single)
-			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
-			this.upgrade(component, "vault", "databinding.store", new BindableStore({
-				"resources":	component.get("inventory", "resource.resources"),
-				"direction":	component.get("settings", "databinding.options.direction", "two-way"),
+			// Upgrade unit (single)
+			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+			this.upgrade(unit, "vault", "databinding.store", new BindableStore({
+				"resources":	unit.get("inventory", "resource.resources"),
+				"direction":	unit.get("settings", "databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(component, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
-			this.upgrade(component, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+			this.upgrade(unit, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
+			this.upgrade(unit, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
 		}
 		else
 		{
-			// Upgrade component (multiple)
-			this.upgrade(component, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
-			this.upgrade(component, "vault", "databinding.store", new BindableArrayStore({
-				"resources":	component.resources,
-				"direction":	component.get("settings", "databinding.options.direction", "two-way"),
+			// Upgrade unit (multiple)
+			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+			this.upgrade(unit, "vault", "databinding.store", new BindableArrayStore({
+				"resources":	unit.resources,
+				"direction":	unit.get("settings", "databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(component, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+			this.upgrade(unit, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
 		}
 
-		// Upgrade component
-		this.upgrade(component, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
-		this.upgrade(component, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+		// Upgrade unit
+		this.upgrade(unit, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
+		this.upgrade(unit, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
 
 	}
 
@@ -133,13 +133,13 @@ export default class DatabindingPerk extends BM.Perk
 	/**
 	 * Bind data and elements.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{HTMLElement}	rootNode			Root node.
 	 */
-	static _bindData(component, rootNode)
+	static _bindData(unit, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : component._root );
+		rootNode = ( rootNode ? rootNode : unit._root );
 
 		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
@@ -151,10 +151,10 @@ export default class DatabindingPerk extends BM.Perk
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingPerk.__getCallback(component, key);
+			let callback = DatabindingPerk.__getCallback(unit, key);
 
 			// Bind
-			component.get("vault", "databinding.store").bindTo(key, elem, callback);
+			unit.get("vault", "databinding.store").bindTo(key, elem, callback);
 		});
 
 	}
@@ -164,14 +164,14 @@ export default class DatabindingPerk extends BM.Perk
 	/**
 	 * Bind array data and elements.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Integer}		index				Array index.
 	 * @param	{HTMLElement}	rootNode			Root node.
 	 */
-	static _bindDataArray(component, index, rootNode)
+	static _bindDataArray(unit, index, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : component._root );
+		rootNode = ( rootNode ? rootNode : unit._root );
 
 		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
@@ -183,10 +183,10 @@ export default class DatabindingPerk extends BM.Perk
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingPerk.__getCallback(component, key);
+			let callback = DatabindingPerk.__getCallback(unit, key);
 
 			// Bind
-			component.get("vault", "databinding.store").bindTo(index, key, elem, callback);
+			unit.get("vault", "databinding.store").bindTo(index, key, elem, callback);
 		});
 
 	}
@@ -198,15 +198,15 @@ export default class DatabindingPerk extends BM.Perk
 	/**
 	 * Get the callback function from settings.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		key					Field name.
 	 */
-	static __getCallback(component, key)
+	static __getCallback(unit, key)
 	{
 
 		let callback;
 
-		Object.entries(component.get("settings", "databinding", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(unit.get("settings", "databinding", {})).forEach(([sectionName, sectionValue]) => {
 			if (sectionValue["callback"])
 			{
 				const pattern = sectionValue["key"] || sectionName;

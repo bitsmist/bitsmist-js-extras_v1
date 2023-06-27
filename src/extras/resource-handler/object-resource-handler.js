@@ -22,11 +22,11 @@ export default class ObjectResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	constructor(component, resourceName, options)
+	constructor(unit, resourceName, options)
 	{
 
 		let defaults = {"autoLoad":true, "autoFetch":false, "autoSubmit":false};
-		super(component, resourceName, Object.assign(defaults, options));
+		super(unit, resourceName, Object.assign(defaults, options));
 
 		if (options["items"])
 		{

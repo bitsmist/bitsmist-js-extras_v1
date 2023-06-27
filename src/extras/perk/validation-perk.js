@@ -35,18 +35,18 @@ export default class ValidationPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		this.upgrade(component, "spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
-		this.upgrade(component, "inventory", "validation.validators", {});
-		this.upgrade(component, "state", "validation.validationResult", {});
-		this.upgrade(component, "state", "validation.validationResult", {});
-		this.upgrade(component, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
-		this.upgrade(component, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
-		this.upgrade(component, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
+		// Upgrade unit
+		this.upgrade(unit, "spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
+		this.upgrade(unit, "spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
+		this.upgrade(unit, "inventory", "validation.validators", {});
+		this.upgrade(unit, "state", "validation.validationResult", {});
+		this.upgrade(unit, "state", "validation.validationResult", {});
+		this.upgrade(unit, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
+		this.upgrade(unit, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
+		this.upgrade(unit, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
 
 	}
 
@@ -112,20 +112,20 @@ export default class ValidationPerk extends BM.Perk
 	/**
      * Add the validator.
      *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
      * @param	{string}		handlerName			Validation handler name.
      * @param	{array}			options				Options.
      */
-	static _addHandler(component, handlerName, options)
+	static _addHandler(unit, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
-		let handler = component.get("inventory", `validation.validators.${handlerName}`);
+		let handler = unit.get("inventory", `validation.validators.${handlerName}`);
 
 		if (options["handlerClassName"] && !handler)
 		{
-			handler = BM.ClassUtil.createObject(options["handlerClassName"], component, handlerName, options);
-			component.set("inventory", `validation.validators.${handlerName}`, handler);
+			handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+			unit.set("inventory", `validation.validators.${handlerName}`, handler);
 
 			promise = handler.init(options);
 		}
@@ -139,40 +139,40 @@ export default class ValidationPerk extends BM.Perk
 	/**
 	 * Validate the form.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _validate(component, options)
+	static _validate(unit, options)
 	{
 
 		options = options || {};
-		component.set("state", "validation.validationResult.result", true);
+		unit.set("state", "validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
-			console.debug(`ValidationPerk._validate(): Validating component. name=${component.tagName}, id=${component.id}`);
-			return component.use("spell", "event.trigger", "beforeValidate", options);
+			console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.id}`);
+			return unit.use("spell", "event.trigger", "beforeValidate", options);
 		}).then(() => {
-			return component.use("spell", "event.trigger", "doValidate", options);
+			return unit.use("spell", "event.trigger", "doValidate", options);
 		}).then(() => {
-			if (component.get("state", "validation.validationResult.result"))
+			if (unit.get("state", "validation.validationResult.result"))
 			{
-				console.debug(`ValidationPerk._validate(): Validation Success. name=${component.tagName}, id=${component.id}`);
-				return component.use("spell", "event.trigger", "doValidateSuccess", options);
+				console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.id}`);
+				return unit.use("spell", "event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
-				console.debug(`ValidationPerk._validate(): Validation Failed. name=${component.tagName}, id=${component.id}`);
-				return component.use("spell", "event.trigger", "doValidateFail", options);
+				console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.id}`);
+				return unit.use("spell", "event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
-			if (!component.get("state", "validation.validationResult.result"))
+			if (!unit.get("state", "validation.validationResult.result"))
 			{
-				return component.use("spell", "event.trigger", "doReportValidity", options);
+				return unit.use("spell", "event.trigger", "doReportValidity", options);
 			}
 		}).then(() => {
-			return component.use("spell", "event.trigger", "afterValidate", options);
+			return unit.use("spell", "event.trigger", "afterValidate", options);
 		});
 
 	}

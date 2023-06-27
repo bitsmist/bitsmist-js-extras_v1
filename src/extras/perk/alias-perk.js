@@ -45,11 +45,11 @@ export default class AliasPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
+		// Upgrade unit
+		this.upgrade(unit, "skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
 
 	}
 
@@ -57,10 +57,10 @@ export default class AliasPerk extends BM.Perk
 	//  Skills
 	// -------------------------------------------------------------------------
 
-	static _resolve(component, target)
+	static _resolve(unit, target)
 	{
 
-		return component.get("settings", `alias.${target}`, {});
+		return unit.get("settings", `alias.${target}`, {});
 
 	}
 

@@ -10,7 +10,7 @@
 
 import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
-import LocaleServer from "../component/bm-locale.js";
+import LocaleServer from "../unit/bm-locale.js";
 
 // =============================================================================
 //	Locale Perk Class
@@ -39,29 +39,29 @@ export default class LocalePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		this.upgrade(component, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-		this.upgrade(component, "spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
-		this.upgrade(component, "spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
-		this.upgrade(component, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
-		this.upgrade(component, "inventory", "locale.localizers", {});
-		this.upgrade(component, "inventory", "locale.messages", new MultiStore());
-		this.upgrade(component, "state", "locale", {
-			"localeName":			component.get("settings", "locale.options.localeName", component.get("settings", "system.localeName", navigator.language)),
-			"fallbackLocaleName":	component.get("settings", "locale.options.fallbackLocaleName", component.get("settings", "system.fallbackLocaleName", "en")),
-			"currencyName":			component.get("settings", "locale.options.currencyName", component.get("settings", "system.currencyName", "USD")),
+		// Upgrade unit
+		this.upgrade(unit, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
+		this.upgrade(unit, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
+		this.upgrade(unit, "spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
+		this.upgrade(unit, "spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
+		this.upgrade(unit, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
+		this.upgrade(unit, "inventory", "locale.localizers", {});
+		this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
+		this.upgrade(unit, "state", "locale", {
+			"localeName":			unit.get("settings", "locale.options.localeName", unit.get("settings", "system.localeName", navigator.language)),
+			"fallbackLocaleName":	unit.get("settings", "locale.options.fallbackLocaleName", unit.get("settings", "system.fallbackLocaleName", "en")),
+			"currencyName":			unit.get("settings", "locale.options.currencyName", unit.get("settings", "system.currencyName", "USD")),
 		});
-		this.upgrade(component, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this.upgrade(component, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
-		this.upgrade(component, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
-		this.upgrade(component, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
-		if (component.get("settings", "locale.options.autoLocalizeRows"))
+		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
+		this.upgrade(unit, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
+		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
+		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
+		if (unit.get("settings", "locale.options.autoLocalizeRows"))
 		{
-			this.upgrade(component, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
+			this.upgrade(unit, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}
 
 	}
@@ -206,22 +206,22 @@ export default class LocalePerk extends BM.Perk
 	/**
      * Add the localizer.
      *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
      * @param	{string}		handlerName			Locale handler name.
      * @param	{array}			options				Options.
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addHandler(component, handlerName, options)
+	static _addHandler(unit, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
 
-		if (!component.get("inventory", `locale.localizers.${handlerName}`))
+		if (!unit.get("inventory", `locale.localizers.${handlerName}`))
 		{
 			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-			let handler = BM.ClassUtil.createObject(handlerClassName, component, options);
-			component.set("inventory", `locale.localizers.${handlerName}`, handler);
+			let handler = BM.ClassUtil.createObject(handlerClassName, unit, options);
+			unit.set("inventory", `locale.localizers.${handlerName}`, handler);
 
 			promise = handler.init(options);
 		}
@@ -235,19 +235,19 @@ export default class LocalePerk extends BM.Perk
 	/**
 	 * Apply locale.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static _applyLocale(component, options)
+	static _applyLocale(unit, options)
 	{
 
 		return Promise.resolve().then(() => {
-			return component.use("spell", "event.trigger", "beforeApplyLocale", options);
+			return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
-			component.set("state", "locale.localeName", options["localeName"]);
-			return component.use("spell", "event.trigger", "doApplyLocale", options);
+			unit.set("state", "locale.localeName", options["localeName"]);
+			return unit.use("spell", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
-			return component.use("spell", "event.trigger", "afterApplyLocale", options);
+			return unit.use("spell", "event.trigger", "afterApplyLocale", options);
 		});
 
 	}
@@ -257,19 +257,19 @@ export default class LocalePerk extends BM.Perk
 	/**
 	 * Localize all the bm-locale fields with i18 messages using each handler.
 	 *
-     * @param	{Component}		component			Component.
+     * @param	{Unit}			unit				Unit.
 	 * @param	{HTMLElement}	rootNode			Target root node to localize.
 	 * @param	{Object}		interpolation		Interpolation parameters.
 	 */
-	static _localize(component, rootNode, interpolation)
+	static _localize(unit, rootNode, interpolation)
 	{
 
-		rootNode = rootNode || component;
+		rootNode = rootNode || unit;
 
-		Object.keys(component.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			component.get("inventory", `locale.localizers.${handlerName}`).localize(
+		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			unit.get("inventory", `locale.localizers.${handlerName}`).localize(
 				rootNode,
-				Object.assign({"interpolation":interpolation}, component.get("state", "locale"))
+				Object.assign({"interpolation":interpolation}, unit.get("state", "locale"))
 			);
 		});
 
@@ -280,19 +280,19 @@ export default class LocalePerk extends BM.Perk
 	/**
 	 * Load the messages file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		localeName			Locale name.
 	 * @param	{Object}		options				Load options.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _loadMessages(component, localeName, options)
+	static _loadMessages(unit, localeName, options)
 	{
 
 		let promises = [];
 
-		Object.keys(component.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			promises.push(component.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options));
+		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			promises.push(unit.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options));
 		});
 
 		return promises;
@@ -304,21 +304,21 @@ export default class LocalePerk extends BM.Perk
 	/**
 	 * Get the locale message.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		key					Key.
 	 * @param	{String}		localeName			Locale name.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _getLocaleMessage(component, key, localeName)
+	static _getLocaleMessage(unit, key, localeName)
 	{
 
-		localeName = localeName || component.get("state", "locale.localeName");
+		localeName = localeName || unit.get("state", "locale.localeName");
 
-		let value = component.get("inventory", "locale.messages").get(`${localeName}.${key}`);
+		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
-			value = component.get("inventory", "locale.messages").get(`${component.get("state", "locale.fallbackLocaleName")}.${key}`);
+			value = unit.get("inventory", "locale.messages").get(`${unit.get("state", "locale.fallbackLocaleName")}.${key}`);
 		}
 
 		return value;

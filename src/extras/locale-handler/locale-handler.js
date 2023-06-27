@@ -28,12 +28,12 @@ export default class LocaleHandler
      * @param	{String}		handlerName			Handler name.
      * @param	{Object}		options				Options.
      */
-	constructor(component, options)
+	constructor(unit, options)
 	{
 
 		options = options || {};
 
-		this._component = component;
+		this._unit = unit;
 		this._options = new BM.Store({"items":options});
 		this._messages = new BM.ChainableStore();
 		this._valueHandler = this.options.get("valueHandler", LocaleValueUtil);
@@ -85,7 +85,7 @@ export default class LocaleHandler
 	{
 
 		// Add messages from settings
-		let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._component)});
+		let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
 		if (messages)
 		{
 			Object.entries(messages).forEach(([sectionName, sectionValue]) => {
@@ -95,12 +95,12 @@ export default class LocaleHandler
 
 		// Load external messages
 		return Promise.resolve().then(() => {
-			if (this.__hasExternalMessages(this._component))
+			if (this.__hasExternalMessages(this._unit))
 			{
 				return this.loadMessages();
 			}
 		}).then(() => {
-			this._component.get("inventory", "locale.messages").add(this.messages);
+			this._unit.get("inventory", "locale.messages").add(this.messages);
 		});
 
 	}
@@ -186,7 +186,7 @@ export default class LocaleHandler
 	loadMessages(localeName, options)
 	{
 
-		return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._component, localeName), options).then((messages) => {
+		return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._unit, localeName), options).then((messages) => {
 			this._messages.merge(messages);
 		});
 
@@ -197,18 +197,18 @@ export default class LocaleHandler
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Check if the component has the external messages file.
+	 * Check if the unit has the external messages file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 *
-	 * @return  {Boolean}		True if the component has the external messages file.
+	 * @return  {Boolean}		True if the unit has the external messages file.
 	 */
-	__hasExternalMessages(component)
+	__hasExternalMessages(unit)
 	{
 
 		let ret = false;
 
-		if (component.hasAttribute("bm-localeref") || this._options.get("localeRef"))
+		if (unit.hasAttribute("bm-localeref") || this._options.get("localeRef"))
 		{
 			ret = true;
 		}
@@ -222,19 +222,19 @@ export default class LocaleHandler
 	/**
 	 * Return URL to messages file.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		localeName			Locale name.
 	 *
 	 * @return  {String}		URL.
 	 */
-	__getMessageURL(component, localeName)
+	__getMessageURL(unit, localeName)
 	{
 
 		let path;
 		let fileName;
 		let query;
 
-		let localeRef = (component.hasAttribute("bm-localeref") ?  component.getAttribute("bm-localeref") || true : this._options.get("localeRef"));
+		let localeRef = (unit.hasAttribute("bm-localeref") ?  unit.getAttribute("bm-localeref") || true : this._options.get("localeRef"));
 		if (localeRef && localeRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -247,16 +247,16 @@ export default class LocaleHandler
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					component.get("settings", "system.appBaseURL", ""),
-					component.get("settings", "system.localePath", component.get("settings", "system.componentPath", "")),
-					component.get("settings", "unit.options.path", ""),
+					unit.get("settings", "system.appBaseURL", ""),
+					unit.get("settings", "system.localePath", unit.get("settings", "system.unitPath", "")),
+					unit.get("settings", "unit.options.path", ""),
 				]);
-			fileName = this._options.get("fileName", component.get("settings", "unit.options.fileName", component.tagName.toLowerCase()));
-			let ext = this.__getMessageFormat(component);
-			query = component.get("settings", "unit.options.query");
+			fileName = this._options.get("fileName", unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()));
+			let ext = this.__getMessageFormat(unit);
+			query = unit.get("settings", "unit.options.query");
 
 			// Split Locale
-			let splitLocale = this._options.get("splitLocale", component.get("settings", "system.splitLocale", false));
+			let splitLocale = this._options.get("splitLocale", unit.get("settings", "system.splitLocale", false));
 			if (splitLocale)
 			{
 				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
@@ -274,16 +274,16 @@ export default class LocaleHandler
 	/**
 	 * Return default messages file format.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 *
 	 * @return  {String}		"js" or "json".
 	 */
-	__getMessageFormat(component)
+	__getMessageFormat(unit)
 	{
 
 		return this._options.get("messageFormat",
-			component.get("settings", "locale.options.messageFormat",
-				component.get("settings", "system.messageFormat",
+			unit.get("settings", "locale.options.messageFormat",
+				unit.get("settings", "system.messageFormat",
 					"json")));
 
 	}

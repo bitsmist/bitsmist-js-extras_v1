@@ -23,10 +23,10 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	constructor(component, validatorName, options)
+	constructor(unit, validatorName, options)
 	{
 
-		super(component, validatorName, options);
+		super(unit, validatorName, options);
 
 		this._valueHandler = this.options.get("valueHandler", ValueUtil);
 
@@ -41,7 +41,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids1 = {};
 		let invalids2;
-		let form = BM.Util.scopedSelectorAll(this._component._root, "form")[0];
+		let form = BM.Util.scopedSelectorAll(this._unit._root, "form")[0];
 		if (rules || options)
 		{
 			// Check allow/disallow list
@@ -51,8 +51,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		invalids2 = this._validate(form, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
-		this._component.set("state", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
-		this._component.set("state", "validation.validationResult.invalids", invalids);
+		this._unit.set("state", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
+		this._unit.set("state", "validation.validationResult.invalids", invalids);
 
 	}
 
@@ -61,7 +61,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	reportValidity(values, rules)
 	{
 
-		let form = BM.Util.scopedSelectorAll(this._component._root, "form")[0];
+		let form = BM.Util.scopedSelectorAll(this._unit._root, "form")[0];
 
 		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
 		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);

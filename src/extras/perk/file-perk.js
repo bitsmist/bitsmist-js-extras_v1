@@ -35,11 +35,11 @@ export default class FilePerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
+		// Upgrade unit
+		this.upgrade(unit, "event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
 
 	}
 

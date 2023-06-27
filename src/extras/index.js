@@ -127,25 +127,25 @@ window.BITSMIST.v1.ValueUtil = ValueUtil;
 import LocaleValueUtil from "./util/locale-value-util.js";
 window.BITSMIST.v1.LocaleValueUtil = LocaleValueUtil;
 
-// Component
+// Unit
 
-import ChainedSelect from "./component/bm-chainedselect.js";
+import ChainedSelect from "./unit/bm-chainedselect.js";
 window.BITSMIST.v1.ChainedSelect = ChainedSelect;
 
-import BmTabindex from "./component/bm-tabindex.js";
+import BmTabindex from "./unit/bm-tabindex.js";
 window.BITSMIST.v1.BmTabindex  = BmTabindex;
 
-import BmTabcontent from "./component/bm-tabcontent.js";
+import BmTabcontent from "./unit/bm-tabcontent.js";
 window.BITSMIST.v1.BmTabcontent = BmTabcontent;
 
-import PreferenceServer from "./component/bm-preference.js";
+import PreferenceServer from "./unit/bm-preference.js";
 window.BITSMIST.v1.PreferenceServer = PreferenceServer;
 
-import LocaleServer from "./component/bm-locale.js";
+import LocaleServer from "./unit/bm-locale.js";
 window.BITSMIST.v1.LocaleServer = LocaleServer;
 
-import ErrorServer from "./component/bm-error.js";
+import ErrorServer from "./unit/bm-error.js";
 window.BITSMIST.v1.ErrorServer = ErrorServer;
 
-import Router from "./component/bm-router.js";
+import Router from "./unit/bm-router.js";
 window.BITSMIST.v1.Router = Router;

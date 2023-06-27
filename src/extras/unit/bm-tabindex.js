@@ -14,7 +14,7 @@ import BM from "../bm";
 //	Tab Index Class
 // =============================================================================
 
-export default class TabIndex extends BM.Component
+export default class TabIndex extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------

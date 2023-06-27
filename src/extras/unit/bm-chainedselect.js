@@ -14,7 +14,7 @@ import BM from "../bm";
 //	Chained Select Class
 // =============================================================================
 
-export default class ChainedSelect extends BM.Component
+export default class ChainedSelect extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------

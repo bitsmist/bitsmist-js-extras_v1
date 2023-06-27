@@ -27,12 +27,12 @@ export default class ValidationHandler
      * @param	{String}		validatorName		Validator name.
      * @param	{Object}		options				Options.
      */
-	constructor(component, validatorName, options)
+	constructor(unit, validatorName, options)
 	{
 
 		options = options || {};
 
-		this._component = component;
+		this._unit = unit;
 		this._options = new BM.Store({"items":options});
 
 	}

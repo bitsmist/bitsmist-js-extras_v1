@@ -1,4 +1,4 @@
-if (!window.BITSMIST || !window.BITSMIST.v1 || !window.BITSMIST.v1.Component)
+if (!window.BITSMIST || !window.BITSMIST.v1 || !window.BITSMIST.v1.Unit)
 {
 	throw new ReferenceError("Bitsmist Core Library does not exist.");
 }

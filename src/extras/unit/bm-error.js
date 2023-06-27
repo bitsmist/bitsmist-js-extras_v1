@@ -15,7 +15,7 @@ import ObservableStore from "../store/observable-store.js";
 //	Error Server class
 // =============================================================================
 
-export default class ErrorServer extends BM.Component
+export default class ErrorServer extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -82,16 +82,16 @@ export default class ErrorServer extends BM.Component
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Filter target components to notify.
+	 * Filter target units to notify.
 	 *
-	 * @param	{Component}		component			Component.
+	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		observerInfo		Observer info.
 	 */
 	__filter(conditions, observerInfo, ...args)
 	{
 
 		let result = false;
-		let targets = observerInfo["options"]["component"].get("settings", "errors.targets");
+		let targets = observerInfo["options"]["unit"].get("settings", "errors.targets");
 		let e = args[0]["error"];
 
 		for (let i = 0; i < targets.length; i++)

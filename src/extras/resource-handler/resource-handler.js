@@ -27,13 +27,13 @@ export default class ResourceHandler
      * @param	{String}		resourceName		Resource name.
      * @param	{Object}		options				Options.
      */
-	constructor(component, resourceName, options)
+	constructor(unit, resourceName, options)
 	{
 
 		options = options || {};
 
 		this._resourceName = resourceName;
-		this._component = component;
+		this._unit = unit;
 		this._options = new BM.Store({"items":options});
 		this._data = {};
 		this._items = [];
@@ -172,7 +172,7 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._load(id, parameters);
 		}).then((data) => {
-//			BM.Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._component.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+//			BM.Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._unit.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 			this.data = data;
 

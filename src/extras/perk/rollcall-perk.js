@@ -45,13 +45,13 @@ export default class RollCallPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static init(component, options)
+	static init(unit, options)
 	{
 
-		// Upgrade component
-		this.upgrade(component, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-		this.upgrade(component, "spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-		this.upgrade(component, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
+		// Upgrade unit
+		this.upgrade(unit, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
+		this.upgrade(unit, "spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
+		this.upgrade(unit, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
 
 	}
 
@@ -74,18 +74,18 @@ export default class RollCallPerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Call component.
+	 * Call unit.
 	 *
-	 * @param	{Component}		component			Compoent to register.
+	 * @param	{Unit}			unit				Compoent to register.
 	 * @param	{Object}		optios				Options.
 	 */
-	static _call(component, name, options)
+	static _call(unit, name, options)
 	{
 
 		if (!RollCallPerk._records[name])
 		{
 			let waitInfo = {};
-			let timeout = BITSMIST.v1.Component.get("settings", "system.waitForTimeout", 10000);
+			let timeout = BITSMIST.v1.Unit.get("settings", "system.waitForTimeout", 10000);
 			let promise = new Promise((resolve, reject) => {
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;
@@ -119,12 +119,12 @@ export default class RollCallPerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Register component.
+	 * Register unit.
 	 *
-	 * @param	{Component}		component			Compoent to register.
+	 * @param	{Unit}			unit				Compoent to register.
 	 * @param	{String}		name				Register as this name.
 	 */
-	static _register(component, name)
+	static _register(unit, name)
 	{
 
 		if (!RollCallPerk._records[name])
@@ -133,7 +133,7 @@ export default class RollCallPerk extends BM.Perk
 		}
 
 		let entry = RollCallPerk._records[name];
-		entry.object = component;
+		entry.object = unit;
 		entry.waitInfo.resolve();
 		if (entry.waitInfo["timer"])
 		{
@@ -146,7 +146,7 @@ export default class RollCallPerk extends BM.Perk
 	// 	Privates
 	// -------------------------------------------------------------------------
 
-	static __createEntry(name, component, waitInfo)
+	static __createEntry(name, unit, waitInfo)
 	{
 
 		waitInfo = waitInfo || {
@@ -157,7 +157,7 @@ export default class RollCallPerk extends BM.Perk
 		};
 
 		let record = {
-			"object":	 	component,
+			"object":	 	unit,
 			"waitInfo":		waitInfo,
 		};
 

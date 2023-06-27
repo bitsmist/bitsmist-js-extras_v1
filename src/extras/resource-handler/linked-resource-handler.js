@@ -22,11 +22,11 @@ export default class LinkedResourceHandler extends ResourceHandler
 	//  Constructor
 	// -------------------------------------------------------------------------
 
-	constructor(component, resourceName, options)
+	constructor(unit, resourceName, options)
 	{
 
 		let defaults = {"autoLoad":true, "autoFetch":false, "autoSubmit":false};
-		super(component, resourceName, Object.assign(defaults, options));
+		super(unit, resourceName, Object.assign(defaults, options));
 
 		this._ref;
 
@@ -90,7 +90,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 		let rootNode = this._options.get("rootNode");
 		let resourceName = this._options.get("resourceName") || this._resourceName;
 
-		return this._component.use("spell", "status.wait", [{"rootNode":rootNode}]).then(() => {
+		return this._unit.use("spell", "status.wait", [{"rootNode":rootNode}]).then(() => {
 			this._ref = document.querySelector(rootNode).get("inventory", "resource.resources")[resourceName];
 			return this._ref;
 		});

@@ -14,7 +14,7 @@ import BM from "../bm";
 //	Tab Content Class
 // =============================================================================
 
-export default class TabContent extends BM.Component
+export default class TabContent extends BM.Unit
 {
 
 	// -------------------------------------------------------------------------
