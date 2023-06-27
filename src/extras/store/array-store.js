@@ -67,9 +67,6 @@ export default class ArrayStore extends BM.Store
 
 	/**
      * Clear.
-     *
-	 * @param	{Object}		component			Component to attach.
-	 * @param	{Object}		options				Plugin options.
      */
 	clear()
 	{
