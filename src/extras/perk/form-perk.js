@@ -213,10 +213,12 @@ export default class FormPerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
+			console.debug(`FormPerk.__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "beforeCollect", options);
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "doCollect", options);
 		}).then(() => {
+			console.debug(`FormPerk.__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "afterCollect", options);
 		});
 

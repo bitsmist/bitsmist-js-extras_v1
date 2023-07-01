@@ -242,11 +242,13 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
+			console.debug(`LocalePerk._applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
 			return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
 			unit.set("state", "locale.localeName", options["localeName"]);
 			return unit.use("spell", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
+			console.debug(`LocalePerk._applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
 			return unit.use("spell", "event.trigger", "afterApplyLocale", options);
 		});
 

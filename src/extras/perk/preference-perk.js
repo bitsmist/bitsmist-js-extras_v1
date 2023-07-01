@@ -126,10 +126,12 @@ export default class PreferencePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
+			console.debug(`PreferencePerk._applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "beforeApplyPreferences", options);
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "doApplyPreferences", options);
 		}).then(() => {
+			console.debug(`PreferencePerk._applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "afterApplyPreferences", options);
 		});
 
