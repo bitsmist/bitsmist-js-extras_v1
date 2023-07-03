@@ -28,28 +28,21 @@ export default class Router extends BM.Unit
 		return {
 			"basic": {
 				"options": {
-					"autoFetch":				false,
-					"autoFill":					false,
 					"autoRefresh":				false,
-					"autoTransform":			false,
 				}
 			},
-
 			"skin": {
 				"options": {
 					"skinRef":					false,
 				}
 			},
-
 			"style": {
 				"options": {
 					"styleRef":					false,
 				}
 			},
-
 			"routing": {
 			},
-
 			/*
 			"rollcall": {
 				"members": {

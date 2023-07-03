@@ -26,11 +26,6 @@ export default class PreferenceServer extends BM.Unit
 	{
 
 		return {
-			"basic": {
-				"options": {
-					"autoTransform":			false,
-				}
-			},
 			"event": {
 				"events": {
 					"this": {

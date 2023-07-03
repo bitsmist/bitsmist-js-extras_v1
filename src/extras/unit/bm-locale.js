@@ -26,11 +26,6 @@ export default class LocaleServer extends BM.Unit
 	{
 
 		return {
-			"basic": {
-				"options": {
-					"autoTransform":			false,
-				}
-			},
 			"event": {
 				"events": {
 					"this": {
