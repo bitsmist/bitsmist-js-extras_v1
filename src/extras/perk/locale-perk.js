@@ -120,7 +120,7 @@ export default class LocalePerk extends BM.Perk
 		let promises = [];
 
 		Object.keys(this.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			if (this.get("inventory", `locale.localizers.${handlerName}`).options.get("autoLoad") &&
+			if (this.get("inventory", `locale.localizers.${handlerName}`).options.get("handlerOptions.autoLoad") &&
 				!this.get("inventory", `locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
 			{
 				promises.push(this.get("inventory", `locale.localizers.${handlerName}`).loadMessages(e.detail.localeName));

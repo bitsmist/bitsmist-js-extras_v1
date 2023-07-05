@@ -251,12 +251,12 @@ export default class LocaleHandler
 					unit.get("settings", "system.localePath", unit.get("settings", "system.unitPath", "")),
 					unit.get("settings", "unit.options.path", ""),
 				]);
-			fileName = this._options.get("fileName", unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()));
+			fileName = this._options.get("handlerOptions.fileName", unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()));
 			let ext = this.__getMessageFormat(unit);
 			query = unit.get("settings", "unit.options.query");
 
 			// Split Locale
-			let splitLocale = this._options.get("splitLocale", unit.get("settings", "system.splitLocale", false));
+			let splitLocale = this._options.get("handlerOptions.splitLocale", unit.get("settings", "system.splitLocale", false));
 			if (splitLocale)
 			{
 				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
