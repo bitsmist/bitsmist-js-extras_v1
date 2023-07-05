@@ -27,8 +27,6 @@ export default class PreferencePerk extends BM.Perk
 		return {
 			"section":		"preference",
 			"order":		900,
-			"depends":		"AliasPerk",
-			//"depends":		"RollCallPerk",
 		};
 
 	}
@@ -54,54 +52,19 @@ export default class PreferencePerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	/*
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		return this.use("spell", "rollcall.call", "PreferenceServer", {"waitForAttendance":true}).then((server) => {
-			BM.Util.assert(server, `PreferencePerk.PreferencePerk_onDoApplySettings(): PreferenceServer doesn't exist. name=${this.tagName}`);
+		let serverNode = this.get("settings", "locale.options.preferenceServer", this.get("settings", "system.preferenceServer"));
+		serverNode = ( serverNode === true ? "bm-preference" : serverNode );
 
-			return this.use("spell", "status.wait", [{"object":server, "status":"started"}]).then(() => {
-				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-				this.set("vault", "preference.server", server);
-			});
-		});
-
-	}
-	*/
-
-	static PreferencePerk_onDoApplySettings(sender, e, ex)
-	{
-
-		let rootNode = this.use("skill", "alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
-
-		return this.use("spell", "status.wait", [{"rootNode":rootNode, "status":"started"}]).then(() => {
-			let server = document.querySelector(rootNode);
+		return this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"started"}]).then(() => {
+			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 			this.set("vault", "preference.server", server);
 		});
 
 	}
-
-/*
-	static PreferencePerk_onDoApplySettings(sender, e, ex)
-	{
-
-		return this.get("inventory", "promise.documentReady").then(() => {
-			let rootNode = this.use("skill", "alias.resolve", "PreferenceServer")["rootNode"] || "bm-preference";
-			let server = document.querySelector(rootNode);
-			if (server)
-			{
-				return this.use("spell", "status.wait", [{"rootNode":rootNode, "status":"started"}]).then(() => {
-					let server = document.querySelector(rootNode);
-					server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-					this.set("vault", "preference.server", server);
-				});
-			}
-		});
-
-	}
-	*/
 
 	// -------------------------------------------------------------------------
 
