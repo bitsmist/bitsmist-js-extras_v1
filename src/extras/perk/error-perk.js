@@ -37,29 +37,14 @@ export default class ErrorPerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	/*
 	static ErrorPerk_onDoStart(sender, e, ex)
 	{
 
-		return this.use("spell", "rollcall.call", "ErrorServer", {"waitForAttendance":true}).then((server) => {
-			BM.Util.assert(server, `ErrorPerk.ErrorPerk_onDoStart(): ErrorServer doesn't exist. name=${this.tagName}`);
+		let serverNode = this.get("settings", "locale.options.errorServer", this.get("settings", "system.errorServer"));
+		serverNode = ( serverNode === true ? "bm-error" : serverNode );
 
-			return this.use("spell", "status.wait", [{"object":server, "status":"started"}]).then(() => {
-				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
-				this.set("vault", "error.server", server);
-			});
-		});
-
-	}
-	*/
-
-	static ErrorPerk_onDoStart(sender, e, ex)
-	{
-
-		let rootNode = this.use("skill", "alias.resolve", "ErrorServer")["rootNode"] || "bm-error";
-
-		return this.use("spell", "status.wait", [{"rootNode":rootNode, "status":"started"}]).then(() => {
-			let server = document.querySelector(rootNode);
+		return this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"started"}]).then(() => {
+			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 			this.set("vault", "error.server", server);
 		});
