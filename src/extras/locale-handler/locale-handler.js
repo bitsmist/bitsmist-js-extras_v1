@@ -208,7 +208,7 @@ export default class LocaleHandler
 
 		let ret = false;
 
-		if (unit.hasAttribute("bm-localeref") || this._options.get("localeRef"))
+		if (unit.hasAttribute("bm-localeref") || this._options.get("handlerOptions.localeRef"))
 		{
 			ret = true;
 		}
@@ -234,7 +234,7 @@ export default class LocaleHandler
 		let fileName;
 		let query;
 
-		let localeRef = (unit.hasAttribute("bm-localeref") ?  unit.getAttribute("bm-localeref") || true : this._options.get("localeRef"));
+		let localeRef = (unit.hasAttribute("bm-localeref") ?  unit.getAttribute("bm-localeref") || true : this._options.get("handlerOptions.localeRef"));
 		if (localeRef && localeRef !== true)
 		{
 			// If URL is specified in ref, use it
