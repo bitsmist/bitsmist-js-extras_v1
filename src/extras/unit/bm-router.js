@@ -43,15 +43,6 @@ export default class Router extends BM.Unit
 			},
 			"routing": {
 			},
-			/*
-			"rollcall": {
-				"members": {
-					"Router": {
-						"rootNode":				this.tagName,
-					},
-				}
-			}
-			*/
 		}
 
 	}

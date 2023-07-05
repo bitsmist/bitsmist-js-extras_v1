@@ -53,15 +53,6 @@ export default class PreferenceServer extends BM.Unit
 					"styleRef":					false,
 				}
 			},
-			/*
-			"rollcall": {
-				"members": {
-					"PreferenceServer": {
-						"rootNode":				this.tagName,
-					},
-				}
-			}
-			*/
 		}
 
 	}

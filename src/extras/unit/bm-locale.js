@@ -53,15 +53,6 @@ export default class LocaleServer extends BM.Unit
 					"styleRef":					false,
 				}
 			},
-			/*
-			"rollcall": {
-				"members": {
-					"LocaleServer": {
-						"rootNode":				this.tagName,
-					},
-				}
-			}
-			*/
 		}
 
 	}

@@ -45,15 +45,6 @@ export default class ErrorServer extends BM.Unit
 					"styleRef":					false,
 				}
 			},
-			/*
-			"rollcall": {
-				"members": {
-					"ErrorServer": {
-						"rootNode":				this.tagName,
-					},
-				}
-			},
-			*/
 		}
 
 	}
