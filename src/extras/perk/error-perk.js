@@ -27,8 +27,6 @@ export default class ErrorPerk extends BM.Perk
 		return {
 			"section":		"error",
 			"order":		120,
-			"depends":		"AliasPerk",
-			//"depends":		"RollCallPerk",
 		};
 
 	}
