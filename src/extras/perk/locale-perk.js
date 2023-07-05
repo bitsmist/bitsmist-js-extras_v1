@@ -29,8 +29,6 @@ export default class LocalePerk extends BM.Perk
 		return {
 			"section":		"locale",
 			"order":		215,
-			"depends":		"AliasPerk",
-			//"depends":		"RollCallPerk",
 		};
 
 	}
@@ -70,7 +68,6 @@ export default class LocalePerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	/*
 	static LocalePerk_onDoApplySettings(sender, e, ex)
 	{
 
@@ -81,60 +78,21 @@ export default class LocalePerk extends BM.Perk
 			promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
 		});
 
-		// Subscribe to the Locale Server if exists
-		if (!(this instanceof LocaleServer))
+		// Connect to the locale server if specified
+		let serverNode = this.get("settings", "locale.options.localeServer", this.get("settings", "system.localeServer"));
+		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
+		if (serverNode && !(this instanceof LocaleServer))
 		{
-			promises.push(this.use("spell", "rollcall.call", "LocaleServer", {"waitForDOMContentLoaded":true, "waitForAttendance":false}).then((server) => {
-				if (server)
-				{
-					return this.use("spell", "status.wait", [{"object":server, "status":"starting"}]).then(() => {
-						server.subscribe(this);
-						this.set("vault", "locale.server", server);
+			promises.push(this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"ready"}]).then(() => {
+				let server = document.querySelector(serverNode);
+				server.subscribe(this);
+				this.set("vault", "locale.server", server);
 
-						// Synchronize to the server's locales
-						let localeSettings = server.get("state", "locale");
-						this.set("state", "locale.localeName", localeSettings["localeName"]);
-						this.set("state", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-						this.set("state", "locale.currencyName", localeSettings["currencyName"]);
-					});
-				}
-			}));
-		}
-
-		return Promise.all(promises);
-
-	}
-	*/
-
-	static LocalePerk_onDoApplySettings(sender, e, ex)
-	{
-
-		let promises = [];
-
-		// Add locale handlers
-		Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
-		});
-
-		// Subscribe to the Locale Server if exists
-		if (!(this instanceof LocaleServer))
-		{
-			promises.push(this.get("inventory", "promise.documentReady").then(() => {
-				let rootNode = this.use("skill", "alias.resolve", "LocaleServer")["rootNode"] || "bm-locale";
-				let server = document.querySelector(rootNode);
-				if (server)
-				{
-					return this.use("spell", "status.wait", [{"object":server, "status":"ready"}]).then(() => {
-						server.subscribe(this);
-						this.set("vault", "locale.server", server);
-
-						// Synchronize to the server's locales
-						let localeSettings = server.get("state", "locale");
-						this.set("state", "locale.localeName", localeSettings["localeName"]);
-						this.set("state", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-						this.set("state", "locale.currencyName", localeSettings["currencyName"]);
-					});
-				}
+				// Synchronize to the server's locales
+				let localeSettings = server.get("state", "locale");
+				this.set("state", "locale.localeName", localeSettings["localeName"]);
+				this.set("state", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+				this.set("state", "locale.currencyName", localeSettings["currencyName"]);
 			}));
 		}
 
