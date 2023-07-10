@@ -131,10 +131,10 @@ export default class LocaleHandler
 	 *
  	 * @return  {String}		Messages.
 	 */
-	get(key, localeName, ...args)
+	get(key, localeName)
 	{
 
-		key  = localeName + ( key ? `.${key}` : "" );
+		key = localeName + ( key ? `.${key}` : "" );
 
 		return this._messages.get(key);
 
