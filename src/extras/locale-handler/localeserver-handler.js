@@ -25,8 +25,10 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
-		let serverNode = this._unit.get("settings", "locale.options.localeServer", this._unit.get("settings", "system.localeServer"));
+		let serverNode = this._unit.get("settings", "locale.options.localeServer", this._unit.get("settings", "system.locale.options.localeServer"));
 		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
+
+		BM.Util.assert(serverNode, `Locale Server node not specified in settings. name=${this._unit.tagName}`);
 
 		return this._unit.use("spell", "status.wait", [{"rootNode":serverNode, "status":"starting"}]).then(() => {
 			let server = document.querySelector(serverNode);

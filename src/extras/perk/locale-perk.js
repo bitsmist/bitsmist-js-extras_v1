@@ -49,9 +49,9 @@ export default class LocalePerk extends BM.Perk
 		this.upgrade(unit, "inventory", "locale.localizers", {});
 		this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
 		this.upgrade(unit, "state", "locale", {
-			"localeName":			unit.get("settings", "locale.options.localeName", unit.get("settings", "system.localeName", navigator.language)),
-			"fallbackLocaleName":	unit.get("settings", "locale.options.fallbackLocaleName", unit.get("settings", "system.fallbackLocaleName", "en")),
-			"currencyName":			unit.get("settings", "locale.options.currencyName", unit.get("settings", "system.currencyName", "USD")),
+			"localeName":			unit.get("settings", "locale.options.localeName", unit.get("settings", "system.locale.options.localeName", navigator.language)),
+			"fallbackLocaleName":	unit.get("settings", "locale.options.fallbackLocaleName", unit.get("settings", "system.locale.options.fallbackLocaleName", "en")),
+			"currencyName":			unit.get("settings", "locale.options.currencyName", unit.get("settings", "system.locale.options.currencyName", "USD")),
 		});
 		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
 		this.upgrade(unit, "event", "afterTransform", LocalePerk.LocalePerk_onAfterTransform);
@@ -79,7 +79,7 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		// Connect to the locale server if specified
-		let serverNode = this.get("settings", "locale.options.localeServer", this.get("settings", "system.localeServer"));
+		let serverNode = this.get("settings", "locale.options.localeServer", this.get("settings", "system.locale.options.localeServer"));
 		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
 		if (serverNode && !(this instanceof LocaleServer))
 		{
