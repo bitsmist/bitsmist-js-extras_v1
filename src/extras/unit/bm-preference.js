@@ -80,7 +80,7 @@ export default class PreferenceServer extends BM.Unit
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._store = new ObservableStore({"items":this.get("settings", "options.defaults"), "filter":this._filter, "async":true});
+		this._store = new ObservableStore({"items":this.get("setting", "options.defaults"), "filter":this._filter, "async":true});
 
 		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
 			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
@@ -162,7 +162,7 @@ export default class PreferenceServer extends BM.Unit
 	setPreference(values, options, ...args)
 	{
 
-		let validatorName = this.get("settings", "options.validatorName");
+		let validatorName = this.get("setting", "options.validatorName");
 
 		return this.use("spell", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 

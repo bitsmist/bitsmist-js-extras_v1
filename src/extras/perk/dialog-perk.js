@@ -59,7 +59,7 @@ export default class DialogPerk extends BM.Perk
 	static DialogPerk_onAfterReady(sender, e, ex)
 	{
 
-		if (this.get("settings", "dialog.options.autoOpen"))
+		if (this.get("setting", "dialog.options.autoOpen"))
 		{
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening unit. name=${this.tagName}, id=${this.id}`);
 
@@ -91,13 +91,13 @@ export default class DialogPerk extends BM.Perk
 			{
 				return Promise.resolve().then(() => {
 					// Show backdrop
-					if (unit.get("settings", "dialog.backdropOptions.show"))
+					if (unit.get("setting", "dialog.backdropOptions.show"))
 					{
-						return DialogPerk.__showBackdrop(unit, unit.get("settings", "dialog.backdropOptions"));
+						return DialogPerk.__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
 					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("settings", "dialog.options.autoRefreshOnOpen", true)))
+					if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
 					{
 						return unit.use("spell", "basic.refresh", options);
 					}
@@ -156,10 +156,10 @@ export default class DialogPerk extends BM.Perk
 			{
 				return unit.use("spell", "event.trigger", "doClose", options).then(() => {
 					// Hide backdrop
-					if (unit.get("settings", "dialog.backdropOptions.show"))
+					if (unit.get("setting", "dialog.backdropOptions.show"))
 					{
 						DialogPerk.__removeCloseOnClickHandlers();
-						return DialogPerk.__hideBackdrop(unit, unit.get("settings", "dialog.backdropOptions"));
+						return DialogPerk.__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
 					if (unit.get("state", "dialog.isModal"))
@@ -214,9 +214,9 @@ export default class DialogPerk extends BM.Perk
 			unit.set("vault", "dialog.backdropPromise", new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let addClasses = ["show"].concat(unit.get("settings", "dialog.backdropOptions.showOptions.addClasses", []));
+				let addClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.showOptions.addClasses", []));
 				DialogPerk._backdrop.classList.add(...addClasses);
-				DialogPerk._backdrop.classList.remove(...unit.get("settings", "dialog.backdropOptions.showOptions.removeClasses", []));
+				DialogPerk._backdrop.classList.remove(...unit.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
 
 				let effect = DialogPerk.__getEffect();
 				if (effect)
@@ -266,9 +266,9 @@ export default class DialogPerk extends BM.Perk
 			unit.set("vault", "dialog.backdropPromise",  new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
 
-				let removeClasses = ["show"].concat(unit.get("settings", "dialog.backdropOptions.hideOptions.removeClasses", []));
+				let removeClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.hideOptions.removeClasses", []));
 				DialogPerk._backdrop.classList.remove(...removeClasses);
-				DialogPerk._backdrop.classList.add(...unit.get("settings", "dialog.backdropOptions.hideOptions.addClasses", []));
+				DialogPerk._backdrop.classList.add(...unit.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
 
 				let effect = DialogPerk.__getEffect();
 				if (effect)

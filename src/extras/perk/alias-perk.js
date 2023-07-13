@@ -60,7 +60,7 @@ export default class AliasPerk extends BM.Perk
 	static _resolve(unit, target)
 	{
 
-		return unit.get("settings", `alias.${target}`, {});
+		return unit.get("setting", `alias.${target}`, {});
 
 	}
 

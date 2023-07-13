@@ -50,7 +50,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoClear(sender, e, ex)
 	{
 
-		if (this.get("settings", "form.options.autoClear", true))
+		if (this.get("setting", "form.options.autoClear", true))
 		{
 			let target = BM.Util.safeGet(e.detail, "target", "");
 			let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
@@ -74,7 +74,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoFill(sender, e, ex)
 	{
 
-		if (this.get("settings", "form.options.autoFill", true))
+		if (this.get("setting", "form.options.autoFill", true))
 		{
 			let rootNode = ( e.detail && "rootNode" in e.detail ? BM.Util.scopedSelectorAll(this._root, e.detail.rootNode)[0] : this );
 			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.get("inventory", "resource.resources"), "triggerEvent":true});
@@ -90,7 +90,7 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.get("settings", "form.options.autoCollect", true))
+		if (this.get("setting", "form.options.autoCollect", true))
 		{
 			e.detail.items = ValueUtil.getFields(this);
 		}
@@ -103,7 +103,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		// Collect only submittable data
-		if (this.get("settings", "form.options.autoCrop", true))
+		if (this.get("setting", "form.options.autoCrop", true))
 		{
 			e.detail.items = FormPerk.__collectData(this, e.detail.items);
 		}
@@ -169,9 +169,9 @@ export default class FormPerk extends BM.Perk
 
 		return FormPerk.__collect(unit, options).then(() => {
 			// Validate values
-			if (unit.get("settings", "form.options.autoValidate", true))
+			if (unit.get("setting", "form.options.autoValidate", true))
 			{
-				options["validatorName"] = options["validatorName"] || unit.get("settings", "form.options.validatorName");
+				options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
 				return unit.use("spell", "validation.validate", options).then(() => {
 					if (!unit.get("state", "validation.validationResult.result"))
 					{

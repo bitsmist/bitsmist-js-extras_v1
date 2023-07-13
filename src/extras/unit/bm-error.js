@@ -77,7 +77,7 @@ export default class ErrorServer extends BM.Unit
 	{
 
 		let result = false;
-		let targets = observerInfo["options"]["unit"].get("settings", "errors.targets");
+		let targets = observerInfo["options"]["unit"].get("setting", "errors.targets");
 		let e = args[0]["error"];
 
 		for (let i = 0; i < targets.length; i++)
@@ -255,7 +255,7 @@ export default class ErrorServer extends BM.Unit
 		//window.stop();
 
 		let statusCode = e.object.status;
-		let handlers = this.get("settings", "handlers");
+		let handlers = this.get("setting", "handlers");
 		Object.keys(handlers["statusCode"]).forEach((code) => {
 			if (statusCode == code)
 			{

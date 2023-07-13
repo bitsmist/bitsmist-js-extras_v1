@@ -247,15 +247,15 @@ export default class LocaleHandler
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					unit.get("settings", "system.locale.options.path", unit.get("settings", "system.unit.options.path", "")),
-					unit.get("settings", "locale.options.path", unit.get("settings", "unit.options.path", "")),
+					unit.get("setting", "system.locale.options.path", unit.get("setting", "system.unit.options.path", "")),
+					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
-			fileName = this._options.get("handlerOptions.fileName", unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()));
+			fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
 			let ext = this.__getMessageFormat(unit);
-			query = unit.get("settings", "unit.options.query");
+			query = unit.get("setting", "unit.options.query");
 
 			// Split Locale
-			let splitLocale = this._options.get("handlerOptions.splitLocale", unit.get("settings", "system.locale.options.splitLocale", false));
+			let splitLocale = this._options.get("handlerOptions.splitLocale", unit.get("setting", "system.locale.options.splitLocale", false));
 			if (splitLocale)
 			{
 				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
@@ -281,8 +281,8 @@ export default class LocaleHandler
 	{
 
 		return this._options.get("messageFormat",
-			unit.get("settings", "locale.options.messageFormat",
-				unit.get("settings", "system.locale.options.messageFormat",
+			unit.get("setting", "locale.options.messageFormat",
+				unit.get("setting", "system.locale.options.messageFormat",
 					"json")));
 
 	}

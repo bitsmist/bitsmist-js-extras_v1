@@ -41,13 +41,13 @@ export default class DatabindingPerk extends BM.Perk
 	static init(unit, options)
 	{
 
-		if (unit.get("settings", "databinding.options.dataType", "single") === "single")
+		if (unit.get("setting", "databinding.options.dataType", "single") === "single")
 		{
 			// Upgrade unit (single)
 			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
 			this.upgrade(unit, "vault", "databinding.store", new BindableStore({
 				"resources":	unit.get("inventory", "resource.resources"),
-				"direction":	unit.get("settings", "databinding.options.direction", "two-way"),
+				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
 			this.upgrade(unit, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
 			this.upgrade(unit, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
@@ -58,7 +58,7 @@ export default class DatabindingPerk extends BM.Perk
 			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
 			this.upgrade(unit, "vault", "databinding.store", new BindableArrayStore({
 				"resources":	unit.resources,
-				"direction":	unit.get("settings", "databinding.options.direction", "two-way"),
+				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
 			this.upgrade(unit, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
 		}
@@ -119,7 +119,7 @@ export default class DatabindingPerk extends BM.Perk
 	static DatabindingPerk_onDoCollect(sender, e, ex)
 	{
 
-		if (this.get("settings", "databinding.options.autoCollect", true))
+		if (this.get("setting", "databinding.options.autoCollect", true))
 		{
 			e.detail.items = this.get("vault", "databinding.store").items;
 		}
@@ -206,7 +206,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		let callback;
 
-		Object.entries(unit.get("settings", "databinding", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(unit.get("setting", "databinding", {})).forEach(([sectionName, sectionValue]) => {
 			if (sectionValue["callback"])
 			{
 				const pattern = sectionValue["key"] || sectionName;

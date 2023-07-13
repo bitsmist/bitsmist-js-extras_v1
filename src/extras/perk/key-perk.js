@@ -51,7 +51,7 @@ export default class KeyPerk extends BM.Perk
 	static KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let keys = this.get("settings", "key.keys");
+		let keys = this.get("setting", "key.keys");
 		if (keys)
 		{
 			// Init keys

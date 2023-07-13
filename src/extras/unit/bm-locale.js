@@ -74,11 +74,11 @@ export default class LocaleServer extends BM.Unit
 	{
 
 		// Set locale attribute
-		if (this.get("settings", "options.autoAttribute"))
+		if (this.get("setting", "options.autoAttribute"))
 		{
-			let rootNode = this.get("settings", "options.autoAttribute.rootNode");
+			let rootNode = this.get("setting", "options.autoAttribute.rootNode");
 			let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
-			let attribName = this.get("settings", "options.autoAttribute.attributeName", "data-locale");
+			let attribName = this.get("setting", "options.autoAttribute.attributeName", "data-locale");
 
 			targetElement.setAttribute(attribName, this.get("state", "locale.localeName"));
 		}

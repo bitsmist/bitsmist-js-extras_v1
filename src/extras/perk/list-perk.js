@@ -57,11 +57,11 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onAfterTransform(sender, e, ex)
 	{
 
-		let rootNode = this.get("settings", "list.options.listRootNode");
+		let rootNode = this.get("setting", "list.options.listRootNode");
 		this._listRootNode = ( rootNode ? BM.Util.scopedSelectorAll(this._root, rootNode)[0] : this._root );
-		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.get("settings", "setting.listRootNode")}`);
+		BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.get("setting", "setting.listRootNode")}`);
 
-		return ListPerk._transformRow(this, this.get("settings", "list.options.rowSkinName", "row"));
+		return ListPerk._transformRow(this, this.get("setting", "list.options.rowSkinName", "row"));
 
 	}
 
@@ -79,7 +79,7 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onDoFill(sender, e, ex)
 	{
 
-		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.get("settings", "list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
+		let builder = ( BM.Util.safeGet(e.detail.options, "async", this.get("setting", "list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
 		let fragment = document.createDocumentFragment();
 
 		return Promise.resolve().then(() => {
@@ -153,7 +153,7 @@ export default class ListPerk extends BM.Perk
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
-		let rowEvents = unit.get("settings", "list.rowevents");
+		let rowEvents = unit.get("setting", "list.rowevents");
 		let skin = skinInfo[activeRowSkinName].HTML;
 
 		let chain = Promise.resolve();
@@ -177,7 +177,7 @@ export default class ListPerk extends BM.Perk
 				}
 
 				return unit.use("spell", "event.trigger", "beforeFillRow", options).then(() => {
-					if (unit.get("settings", "list.options.autoFill", true))
+					if (unit.get("setting", "list.options.autoFill", true))
 					{
 						// Fill fields
 						FormUtil.showConditionalElements(element, options["item"]);
@@ -213,7 +213,7 @@ export default class ListPerk extends BM.Perk
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
-		let rowEvents = unit.get("settings", "list.rowevents");
+		let rowEvents = unit.get("setting", "list.rowevents");
 		let skin = skinInfo[activeRowSkinName].HTML;
 
 		for (let i = 0; i < items.length; i++)
@@ -237,7 +237,7 @@ export default class ListPerk extends BM.Perk
 			// Call event handlers
 			unit.use("spell", "event.triggerAsync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
-			if (unit.get("settings", "list.options.autoFill", true))
+			if (unit.get("setting", "list.options.autoFill", true))
 			{
 				ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "resource.resources")});
 			}

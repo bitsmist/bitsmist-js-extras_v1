@@ -55,8 +55,10 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		let serverNode = this.get("settings", "locale.options.preferenceServer", this.get("settings", "system.preferenceServer"));
+		let serverNode = this.get("setting", "locale.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
 		serverNode = ( serverNode === true ? "bm-preference" : serverNode );
+
+		BM.Util.assert(serverNode, `Preference Server node not specified in settings. name=${this.tagName}`);
 
 		return this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"started"}]).then(() => {
 			let server = document.querySelector(serverNode);

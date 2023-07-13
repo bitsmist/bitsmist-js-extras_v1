@@ -99,7 +99,7 @@ export default class RoutePerk extends BM.Perk
 		if (routeName)
 		{
 			let options = {
-				"query": this.get("settings", "unit.options.query")
+				"query": this.get("setting", "unit.options.query")
 			};
 
 			return this.use("spell", "routing.switch", routeName, options);
@@ -126,7 +126,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Try to fix URL when validation failed
-		if (this.get("settings", "routing.options.autoFix"))
+		if (this.get("setting", "routing.options.autoFix"))
 		{
 			RoutePerk.__fixRoute(this, e.detail.url);
 		}
@@ -333,10 +333,10 @@ export default class RoutePerk extends BM.Perk
 			*/
 		}).then(() => {
 			// Validate URL
-			if (unit.get("settings", "routing.options.autoValidate"))
+			if (unit.get("setting", "routing.options.autoValidate"))
 			{
 				let validateOptions = {
-					"validatorName":	unit.get("settings", "routing.options.validatorName"),
+					"validatorName":	unit.get("setting", "routing.options.validatorName"),
 					"items":			BM.URLUtil.loadParameters(newURL),
 					"url":				newURL,
 				};
@@ -501,12 +501,12 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = BM.Util.concatPath([
-					unit.get("settings", "system.unit.options.path", ""),
-					unit.get("settings", "unit.options.path", ""),
+					unit.get("setting", "system.unit.options.path", ""),
+					unit.get("setting", "unit.options.path", ""),
 				]);
 			let ext = RoutePerk.__getSettingFormat(unit);
-			fileName = unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
-  			query = unit.get("settings", "unit.options.query");
+			fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			query = unit.get("setting", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -567,11 +567,11 @@ export default class RoutePerk extends BM.Perk
 		{
 			// Use default path and filename
 			path = path || BM.Util.concatPath([
-					unit.get("settings", "system.unit.options.path", ""),
-					unit.get("settings", "unit.options.path", ""),
+					unit.get("setting", "system.unit.options.path", ""),
+					unit.get("setting", "unit.options.path", ""),
 				]);
-			fileName = fileName || unit.get("settings", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = unit.get("settings", "unit.options.query");
+			fileName = fileName || unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
+			query = unit.get("setting", "unit.options.query");
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
@@ -796,8 +796,8 @@ export default class RoutePerk extends BM.Perk
 	static __getSettingFormat(unit)
 	{
 
-		return unit.get("settings", "routing.options.settingFormat",
-				unit.get("settings", "system.setting.options.settingFormat",
+		return unit.get("setting", "routing.options.settingFormat",
+				unit.get("setting", "system.setting.options.settingFormat",
 					"json"));
 
 	}

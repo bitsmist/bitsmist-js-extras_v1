@@ -49,15 +49,15 @@ export default class LocalePerk extends BM.Perk
 		this.upgrade(unit, "inventory", "locale.localizers", {});
 		this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
 		this.upgrade(unit, "state", "locale", {
-			"localeName":			unit.get("settings", "locale.options.localeName", unit.get("settings", "system.locale.options.localeName", navigator.language)),
-			"fallbackLocaleName":	unit.get("settings", "locale.options.fallbackLocaleName", unit.get("settings", "system.locale.options.fallbackLocaleName", "en")),
-			"currencyName":			unit.get("settings", "locale.options.currencyName", unit.get("settings", "system.locale.options.currencyName", "USD")),
+			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language)),
+			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
+			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
 		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
 		this.upgrade(unit, "event", "afterTransform", LocalePerk.LocalePerk_onAfterTransform);
 		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
 		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
-		if (unit.get("settings", "locale.options.autoLocalizeRows"))
+		if (unit.get("setting", "locale.options.autoLocalizeRows"))
 		{
 			this.upgrade(unit, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
 		}
@@ -79,7 +79,7 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		// Connect to the locale server if specified
-		let serverNode = this.get("settings", "locale.options.localeServer", this.get("settings", "system.locale.options.localeServer"));
+		let serverNode = this.get("setting", "locale.options.localeServer", this.get("setting", "system.locale.options.localeServer"));
 		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
 		if (serverNode && !(this instanceof LocaleServer))
 		{
