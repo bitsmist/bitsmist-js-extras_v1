@@ -37,4 +37,10 @@ export default class LocaleServerHandler extends LocaleHandler
 
 	}
 
+	// -------------------------------------------------------------------------
+
+	loadMessages(localeName, options)
+	{
+	}
+
 }
