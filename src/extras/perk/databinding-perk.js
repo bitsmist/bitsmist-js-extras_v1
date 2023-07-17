@@ -49,7 +49,7 @@ export default class DatabindingPerk extends BM.Perk
 				"resources":	unit.get("inventory", "resource.resources"),
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(unit, "event", "afterTransform", DatabindingPerk.DatabindingPerk_onAfterTransform);
+			this.upgrade(unit, "event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform);
 			this.upgrade(unit, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
 		}
 		else
@@ -73,7 +73,7 @@ export default class DatabindingPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onAfterTransform(sender, e, ex)
+	static DatabindingPerk_onBeforeTransform(sender, e, ex)
 	{
 
 		DatabindingPerk._bindData(this);
@@ -139,9 +139,10 @@ export default class DatabindingPerk extends BM.Perk
 	static _bindData(unit, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : unit._root );
+		rootNode = ( rootNode ? rootNode : unit );
 
-		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let targetNode = rootNode._root || rootNode;
+		let nodes = BM.Util.scopedSelectorAll(targetNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{
@@ -171,9 +172,10 @@ export default class DatabindingPerk extends BM.Perk
 	static _bindDataArray(unit, index, rootNode)
 	{
 
-		rootNode = ( rootNode ? rootNode : unit._root );
+		rootNode = ( rootNode ? rootNode : unit );
 
-		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let targetNode = rootNode._root || rootNode;
+		let nodes = BM.Util.scopedSelectorAll(targetNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{

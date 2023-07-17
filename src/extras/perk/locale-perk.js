@@ -54,7 +54,7 @@ export default class LocalePerk extends BM.Perk
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
 		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "afterTransform", LocalePerk.LocalePerk_onAfterTransform);
+		this.upgrade(unit, "event", "beforeTransform", LocalePerk.LocalePerk_onBeforeTransform);
 		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
 		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
@@ -102,7 +102,7 @@ export default class LocalePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onAfterTransform(sender, e, ex)
+	static LocalePerk_onBeforeTransform(sender, e, ex)
 	{
 
 		if (!(this instanceof LocaleServer))
@@ -255,7 +255,7 @@ export default class LocalePerk extends BM.Perk
 			promises.push(unit.get("inventory", `locale.localizers.${handlerName}`).loadMessages(localeName, options));
 		});
 
-		return promises;
+		return Promise.all(promises);
 
 	}
 
