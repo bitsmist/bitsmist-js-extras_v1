@@ -73,7 +73,7 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onBeforeTransform(sender, e, ex)
 	{
 
-		this.use("spell", "preference.apply", {"preferences":this.get("vault", "preference.server").items});
+		return this.use("spell", "preference.apply", {"preferences":this.get("vault", "preference.server").items});
 
 	}
 
