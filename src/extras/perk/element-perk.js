@@ -107,7 +107,7 @@ export default class ElementPerk extends BM.Perk
 			}
 			else
 			{
-				elements = BM.Util.scopedSelectorAll(unit._root, elementInfo["rootNode"]);
+				elements = BM.Util.scopedSelectorAll(unit.unitRoot, elementInfo["rootNode"]);
 			}
 		}
 		else if (elementName === "this" || elementName === unit.tagName.toLowerCase())
@@ -330,7 +330,7 @@ export default class ElementPerk extends BM.Perk
 		{
 			overlay = document.createElement("div");
 			overlay.classList.add("overlay");
-			unit._root.appendChild(overlay);
+			unit.unitRoot.appendChild(overlay);
 			unit.set("vault", "element.overlay", overlay);
 		}
 

@@ -94,9 +94,9 @@ export default class ChainPerk extends BM.Perk
 
 		//	let nodes = document.querySelectorAll(targets[i]["rootNode"]);
 			let nodes;
-			if (this._root.innerHTML)
+			if (this.unitRoot.innerHTML)
 			{
-				nodes = BM.Util.scopedSelectorAll(this._root, targets[i]["rootNode"]);
+				nodes = BM.Util.scopedSelectorAll(this.unitRoot, targets[i]["rootNode"]);
 			}
 			else
 			{

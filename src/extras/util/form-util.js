@@ -1,4 +1,4 @@
-// =============================================================================
+//// =============================================================================
 /**
  * BitsmistJS - Javascript Web Client Framework
  *
@@ -31,7 +31,7 @@ FormUtil.showConditionalElements = function(rootNode, item)
 {
 
 	// Get elements with bm-visible attribute
-	let targetNode = rootNode._root || rootNode;
+	let targetNode = rootNode.unitRoot || rootNode;
 	let elements = BM.Util.scopedSelectorAll(targetNode, "[bm-visible]");
 
 	// Show elements
@@ -60,7 +60,7 @@ FormUtil.hideConditionalElements = function(rootNode)
 {
 
 	// Get elements with bm-visible attribute
-	let targetNode = rootNode._root || rootNode;
+	let targetNode = rootNode.unitRoot || rootNode;
 	let elements = BM.Util.scopedSelectorAll(targetNode, "[bm-visible]");
 
 	// Hide elements
