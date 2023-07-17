@@ -78,7 +78,7 @@ export default class ValueUtil
 	{
 
 		// Get elements with the attribute
-		let targetNode = ( rootNode.shadowRoot ? rootNode.shadowRoot : rootNode);
+		let targetNode = rootNode._root || rootNode;
 		let elements = BM.Util.scopedSelectorAll(targetNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
@@ -120,7 +120,7 @@ export default class ValueUtil
 		let item = {};
 
 		// Get elements with the attribute
-		let targetNode = ( rootNode.shadowRoot ? rootNode.shadowRoot : rootNode);
+		let targetNode = rootNode._root || rootNode;
 		let elements = BM.Util.scopedSelectorAll(targetNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
