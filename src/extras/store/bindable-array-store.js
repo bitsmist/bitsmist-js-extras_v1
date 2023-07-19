@@ -38,17 +38,16 @@ export default class BindableArrayStore extends ArrayStore
 	//  Method
 	// -------------------------------------------------------------------------
 
-	clear()
+	clear(index, ...args)
 	{
 
-		super.clear();
-		this._elems = {};
+		super.clear(...args);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	replace(index, value)
+	replace(index, value, ...args)
 	{
 
 		this._items[index] = value;
@@ -65,7 +64,6 @@ export default class BindableArrayStore extends ArrayStore
 
 			return this._notify({"index":index, "values":value});
 		}
-
 
 	}
 
@@ -114,10 +112,11 @@ export default class BindableArrayStore extends ArrayStore
 			{
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
-				elem.addEventListener(eventName, (() => {
-					let value = this._valueHandler.getValue(elem);
-
-					this.set(index, key, value, null, elem);
+				elem.addEventListener(eventName, ((e) => {
+					if (!e.detail || (e.detail && e.detail["triggeredBy"] !== "store"))
+					{
+						this.set(index, key, this._valueHandler.getValue(elem), null, elem);
+					}
 				}).bind(this));
 			}
 
@@ -154,11 +153,12 @@ export default class BindableArrayStore extends ArrayStore
 	 * Notify observers asynchronously.
 	 *
 	 * @param	{Object}		conditions			Current conditions.
+	 * @param	{HTMLElement}	src					Changed element.
 	 * @param	{Object}		...args				Arguments to callback function.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_notifyAsync(conditions, ...args)
+	_notifyAsync(conditions, src, ...args)
 	{
 
 		let index = conditions["index"];
@@ -170,7 +170,16 @@ export default class BindableArrayStore extends ArrayStore
 				let value = this.get(index, key);
 				for (let i = 0; i < this._elems[index][key]["elements"].length; i++)
 				{
-					this._valueHandler.setValue(this._elems[index][key]["elements"][i], value, {"resources":this._options["resources"]});
+					if (this._elems[index][key]["elements"][i] !== src)
+					{
+						this._valueHandler.setValue(this._elems[index][key]["elements"][i], value, {
+							"resources":this._options["resources"],
+							"triggerEvent": true,
+							"triggerOptions": {
+								"triggeredBy": "store",
+							}
+						});
+					}
 				}
 			}
 		});

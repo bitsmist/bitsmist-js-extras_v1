@@ -37,17 +37,18 @@ export default class BindableStore extends BM.Store
 	//  Method
 	// -------------------------------------------------------------------------
 
-	clear()
+	clear(...args)
 	{
 
 		super.clear();
-		this._elems = {};
+
+		return this._notify("*", ...args);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	replace(value)
+	replace(value, ...args)
 	{
 
 		this._items = value;
@@ -104,10 +105,11 @@ export default class BindableStore extends BM.Store
 			{
 				// Update store value when element's value changed
 				let eventName = this._options["eventName"] || "change";
-				elem.addEventListener(eventName, (() => {
-					let value = this._valueHandler.getValue(elem);
-
-					this.set(key, value, null, elem);
+				elem.addEventListener(eventName, ((e) => {
+					if (!e.detail || (e.detail && e.detail["triggeredBy"] !== "store"))
+					{
+						this.set(key, this._valueHandler.getValue(elem), null, elem);
+					}
 				}).bind(this));
 			}
 
@@ -144,11 +146,12 @@ export default class BindableStore extends BM.Store
 	 * Notify observers asynchronously.
 	 *
 	 * @param	{Object}		conditions			Current conditions.
+	 * @param	{HTMLElement}	src					Changed element.
 	 * @param	{Object}		...args				Arguments to callback function.
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	_notifyAsync(conditions, ...args)
+	_notifyAsync(conditions, src, ...args)
 	{
 
 		Object.keys(conditions).forEach((key) => {
@@ -157,7 +160,16 @@ export default class BindableStore extends BM.Store
 				let value = this.get(key);
 				for (let i = 0; i < this._elems[key]["elements"].length; i++)
 				{
-					this._valueHandler.setValue(this._elems[key]["elements"][i], value, {"resources":this._options["resources"]});
+					if (this._elems[key]["elements"][i] !== src)
+					{
+						this._valueHandler.setValue(this._elems[key]["elements"][i], value, {
+							"resources":this._options["resources"],
+							"triggerEvent": true,
+							"triggerOptions": {
+								"triggeredBy": "store",
+							}
+						});
+					}
 				}
 			}
 		});
