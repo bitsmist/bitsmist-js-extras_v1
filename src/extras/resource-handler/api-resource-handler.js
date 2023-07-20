@@ -69,7 +69,7 @@ export default class APIResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({url:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
