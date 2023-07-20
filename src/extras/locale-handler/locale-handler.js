@@ -37,6 +37,7 @@ export default class LocaleHandler
 		this._options = new BM.Store({"items":options});
 		this._messages = new BM.ChainableStore();
 		this._valueHandler = this.options.get("valueHandler", LocaleValueUtil);
+		this._localeInfo = {};
 
 	}
 
@@ -100,7 +101,8 @@ export default class LocaleHandler
 				return this.loadMessages();
 			}
 		}).then(() => {
-			this._unit.get("inventory", "locale.messages").add(this.messages);
+			// Chain this handler's messages store to unit's locale.messages store
+			this._unit.get("inventory", "locale.messages").add(this._messages);
 		});
 
 	}
@@ -186,9 +188,36 @@ export default class LocaleHandler
 	loadMessages(localeName, options)
 	{
 
-		return BM.AjaxUtil.loadJSON(this.__getMessageURL(this._unit, localeName), options).then((messages) => {
-			this._messages.merge(messages);
-		});
+		let promise = Promise.resolve();
+		let localeInfo = this._localeInfo[localeName] || {};
+		let localeSettings = this._options.items;
+
+		if (localeInfo["status"] === "loaded")
+		{
+			console.debug(`LocaleHandler.loadMessages(): Messages already loaded. name=${this._unit.tagName}, localeName=${localeName}`);
+			return promise;
+		}
+
+		switch (localeSettings["type"]) {
+		case "messages":
+			localeInfo["messages"] = BM.Util.getObject(localeInfo["messages"]);
+			localeInfo["status"] = "loaded";
+			this._messages.merge(localeInfo["messages"]);
+			this._localeInfo[localeName] = localeInfo;
+			break;
+		case "URL":
+		default:
+			let url = localeSettings["URL"] || this.__getMessageURL(this._unit, localeName);
+			promise = BM.AjaxUtil.loadJSON(url, options).then((messages) => {
+				localeInfo["messages"] = messages;
+				localeInfo["status"] = "loaded";
+				this._messages.merge(messages);
+				this._localeInfo[localeName] = localeInfo;
+			});
+			break;
+		}
+
+		return promise;
 
 	}
 
