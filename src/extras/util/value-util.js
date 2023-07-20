@@ -177,7 +177,7 @@ export default class ValueUtil
 		let target = BM.Util.safeGet(options, "target", "");
 
 		// Clear input elements
-		let targetNode = ( rootNode.shadowRoot ? rootNode.shadowRoot : rootNode );
+		let targetNode = rootNode.unitRoot || rootNode;
 		let elements = BM.Util.scopedSelectorAll(targetNode, `${target} input`, options);
 		elements.forEach((element) => {
 			this.clearValue(element, options);
