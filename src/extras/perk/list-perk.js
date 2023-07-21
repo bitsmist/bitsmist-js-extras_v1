@@ -70,7 +70,10 @@ export default class ListPerk extends BM.Perk
 	static ListPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.get("vault", "list.lastItems");
+		if (e.detail.refill)
+		{
+			e.detail.items = this.get("vault", "list.lastItems");
+		}
 
 	}
 

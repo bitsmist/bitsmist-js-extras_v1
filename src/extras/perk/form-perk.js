@@ -65,7 +65,10 @@ export default class FormPerk extends BM.Perk
 	static FormPerk_onBeforeFill(sender, e, ex)
 	{
 
-		e.detail.items = e.detail.items || this.get("vault", "form.lastItems");
+		if (e.detail.refill)
+		{
+			e.detail.items = this.get("vault", "form.lastItems");
+		}
 
 	}
 
