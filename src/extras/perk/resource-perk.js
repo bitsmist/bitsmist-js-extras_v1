@@ -123,7 +123,7 @@ export default class ResourcePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-     * Add resource. Load data if "autoLoad" option is true using added resource.
+     * Add resource.
      *
      * @param	{Unit}			unit				Unit.
      * @param	{string}		handlerName			Resource handler name.
