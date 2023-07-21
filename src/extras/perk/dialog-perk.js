@@ -63,7 +63,6 @@ export default class DialogPerk extends BM.Perk
 		{
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening unit. name=${this.tagName}, id=${this.id}`);
 
-			//return this.open();
 			return this.use("spell", "dialog.open");
 		}
 
@@ -84,6 +83,7 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		options = options || {};
+		unit.set("vault", "dialog.options", options);
 
 		console.debug(`DialogPerk._open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
 		return unit.use("spell", "event.trigger", "beforeOpen", options).then(() => {
