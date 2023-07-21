@@ -80,13 +80,6 @@ export default class ResourcePerk extends BM.Perk
 
 				promises.push(resource.load(resource.target["id"], resource.target["parameters"]).then(() => {
 					e.detail.items = resource.items;
-
-					// Set the property automatically after resource is fetched
-					let autoSet = this.get("setting", `resource.${resourceName}.autoSetProperty`);
-					if (autoSet)
-					{
-						this[autoSet] = resource.items;
-					}
 				}));
 			}
 		});
