@@ -167,7 +167,10 @@ export default class FormPerk extends BM.Perk
 		options = options || {};
 		unit.set("state", "form.cancelSubmit", false);
 
-		return FormPerk.__collect(unit, options).then(() => {
+		return Promise.resolve().then(() => {
+			// Collect values
+			return FormPerk.__collect(unit, options);
+		}).then(() => {
 			// Validate values
 			if (unit.get("setting", "form.options.autoValidate", true))
 			{
