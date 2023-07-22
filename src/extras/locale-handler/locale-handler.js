@@ -128,33 +128,17 @@ export default class LocaleHandler
 	/**
 	 * Get the message which belong to the locale name.
 	 *
-	 * @param	{String}		key					Key.
 	 * @param	{String}		localeName			Locale name.
+	 * @param	{String}		key					Key.
 	 *
  	 * @return  {String}		Messages.
 	 */
-	get(key, localeName)
+	get(localeName, key)
 	{
 
 		key = localeName + ( key ? `.${key}` : "" );
 
 		return this._messages.get(key);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get all messages which belong to the locale name.
-	 *
-	 * @param	{String}		localeName			Locale name.
-	 *
- 	 * @return  {String}		Messages.
-	 */
-	getAll(localeName)
-	{
-
-		return this._messages.get(localeName);
 
 	}
 
@@ -169,7 +153,7 @@ export default class LocaleHandler
 	localize(rootNode, options)
 	{
 
-		let messages = (this.getAll(options["localeName"]) || this.getAll(options["fallbackLocaleName"]));
+		let messages = (this.get(options["localeName"]) || this.get(options["fallbackLocaleName"]));
 
 		this._valueHandler.setFields(rootNode, messages, options);
 
@@ -200,7 +184,7 @@ export default class LocaleHandler
 
 		switch (localeSettings["type"]) {
 		case "messages":
-			localeInfo["messages"] = BM.Util.getObject(localeInfo["messages"]);
+			localeInfo["messages"] = BM.Util.getObject(localeSettings["messages"]);
 			localeInfo["status"] = "loaded";
 			this._messages.merge(localeInfo["messages"]);
 			this._localeInfo[localeName] = localeInfo;
