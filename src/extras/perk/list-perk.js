@@ -43,7 +43,7 @@ export default class ListPerk extends BM.Perk
 		// Upgrade unit
 		this.upgrade(unit, "spell", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
 		this.upgrade(unit, "vault", "list.lastItems", {});
-		this.upgrade(unit, "state", "list.activeRowSkinName", "");
+		this.upgrade(unit, "state", "list.active.skinName", "");
 		this.upgrade(unit, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
 		this.upgrade(unit, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
 		this.upgrade(unit, "event", "doFill", ListPerk.ListPerk_onDoFill);
@@ -116,7 +116,7 @@ export default class ListPerk extends BM.Perk
 
 		options = options || {};
 
-		if (unit.get("state", "list.activeRowSkinName") === skinName)
+		if (unit.get("state", "list.active.skinName") === skinName)
 		{
 			return Promise.resolve();
 		}
@@ -125,7 +125,7 @@ export default class ListPerk extends BM.Perk
 			console.debug(`ListPerk._transformRow(): Switching the row skin. name=${unit.tagName}, rowSkinName=${skinName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "skin.summon", skinName);
 		}).then(() => {
-			unit.set("state", "list.activeRowSkinName", skinName);
+			unit.set("state", "list.active.skinName", skinName);
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "afterTransformRow", options);
 		}).then(() => {
@@ -152,7 +152,7 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = unit.get("inventory", "inventory", "skin.skins");
-		let activeRowSkinName = unit.get("state", "list.activeRowSkinName");
+		let activeRowSkinName = unit.get("state", "list.active.skinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
@@ -212,7 +212,7 @@ export default class ListPerk extends BM.Perk
 	{
 
 		let skinInfo = unit.get("inventory", "skin.skins");
-		let activeRowSkinName = unit.get("state", "list.activeRowSkinName");
+		let activeRowSkinName = unit.get("state", "list.active.skinName");
 
 		BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
