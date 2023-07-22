@@ -54,7 +54,7 @@ export default class LocalePerk extends BM.Perk
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
 		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "beforeTransform", LocalePerk.LocalePerk_onBeforeTransform);
+		this.upgrade(unit, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
 		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
 		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
@@ -102,7 +102,7 @@ export default class LocalePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static LocalePerk_onBeforeTransform(sender, e, ex)
+	static LocalePerk_onDoSetup(sender, e, ex)
 	{
 
 		return LocalePerk._applyLocale(this, {"localeName":this.get("state", "locale.active.localeName")});
@@ -112,6 +112,7 @@ export default class LocalePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	static LocalePerk_onBeforeApplyLocale(sender, e, ex)
+	{
 
 		return this.use("spell", "locale.summon", e.detail.localeName);
 

@@ -44,7 +44,7 @@ export default class PreferencePerk extends BM.Perk
 		this.upgrade(unit, "spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
 		this.upgrade(unit, "vault", "preference.server");
 		this.upgrade(unit, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "beforeTransform", PreferencePerk.PreferencePerk_onBeforeTransform);
+		this.upgrade(unit, "event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup);
 
 	}
 
@@ -70,7 +70,7 @@ export default class PreferencePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static PreferencePerk_onBeforeTransform(sender, e, ex)
+	static PreferencePerk_onDoSetup(sender, e, ex)
 	{
 
 		return this.use("spell", "preference.apply", {"preferences":this.get("vault", "preference.server").items});

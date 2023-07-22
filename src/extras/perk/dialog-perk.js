@@ -96,6 +96,12 @@ export default class DialogPerk extends BM.Perk
 						return DialogPerk.__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
+					// Setup
+					if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
+					{
+						return unit.use("spell", "basic.setup", options);
+					}
+				}).then(() => {
 					// Refresh
 					if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
 					{
