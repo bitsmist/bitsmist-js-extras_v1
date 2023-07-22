@@ -91,7 +91,7 @@ export default class DialogPerk extends BM.Perk
 			{
 				return Promise.resolve().then(() => {
 					// Show backdrop
-					if (unit.get("setting", "dialog.backdropOptions.show"))
+					if (unit.get("setting", "dialog.options.showBackdrop"))
 					{
 						return DialogPerk.__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
@@ -156,7 +156,7 @@ export default class DialogPerk extends BM.Perk
 			{
 				return unit.use("spell", "event.trigger", "doClose", options).then(() => {
 					// Hide backdrop
-					if (unit.get("setting", "dialog.backdropOptions.show"))
+					if (unit.get("setting", "dialog.options.showBackdrop"))
 					{
 						DialogPerk.__removeCloseOnClickHandlers();
 						return DialogPerk.__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
