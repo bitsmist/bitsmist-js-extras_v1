@@ -143,15 +143,12 @@ export default class ResourceHandler
 	init(options)
 	{
 
-		if (this._options.get("queryOptions"))
-		{
-			this._target.id = this._options.get("queryOptions.id", this.target.id);
-			this._target.parameters = this._options.get("queryOptions.parameters", this.target.parameters);
-		}
-
 		if (this._options.get("autoLoad"))
 		{
-			return this.load(this._target.id, this._target.parameters);
+			let id = this._options.get("autoLoadOptions.id");
+			let parameters = this._options.get("autoLoadOptions.parameters");
+
+			return this.load(id, parameters);
 		}
 
 	}
