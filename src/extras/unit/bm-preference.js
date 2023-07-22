@@ -26,6 +26,11 @@ export default class PreferenceServer extends BM.Unit
 	{
 
 		return {
+			"basic": {
+				"options": {
+					"autoRefresh":				false,
+				}
+			},
 			"event": {
 				"events": {
 					"this": {

@@ -29,6 +29,9 @@ export default class Router extends BM.Unit
 			"basic": {
 				"options": {
 					"autoRefresh":				false,
+					"autoFetch":				false,
+					"autoClear":				false,
+					"autoFill":					false,
 				}
 			},
 			"skin": {

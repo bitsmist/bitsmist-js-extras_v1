@@ -26,6 +26,11 @@ export default class LocaleServer extends BM.Unit
 	{
 
 		return {
+			"basic": {
+				"options": {
+					"autoRefresh":				false,
+				}
+			},
 			"event": {
 				"events": {
 					"this": {
@@ -80,7 +85,7 @@ export default class LocaleServer extends BM.Unit
 			let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
 			let attribName = this.get("setting", "options.autoAttribute.attributeName", "data-locale");
 
-			targetElement.setAttribute(attribName, this.get("state", "locale.localeName"));
+			targetElement.setAttribute(attribName, this.get("state", "locale.active.localeName"));
 		}
 
 		// Notify locale change to clients
@@ -123,6 +128,7 @@ export default class LocaleServer extends BM.Unit
 	__triggerEvent(conditions, observerInfo, options)
 	{
 
+		console.log("@@@notify", conditions);
 		return this.use("spell", "locale.apply", {"localeName":options.localeName});
 
 	}
