@@ -48,8 +48,8 @@ export default class LocalePerk extends BM.Perk
 		this.upgrade(unit, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
 		this.upgrade(unit, "inventory", "locale.localizers", {});
 		this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
-		this.upgrade(unit, "state", "locale", {
-			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language)),
+		this.upgrade(unit, "state", "locale.active", {
+			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language.substring(0, 2))),
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
@@ -89,10 +89,11 @@ export default class LocalePerk extends BM.Perk
 				this.set("vault", "locale.server", server);
 
 				// Synchronize to the server's locales
-				let localeSettings = server.get("state", "locale");
-				this.set("state", "locale.localeName", localeSettings["localeName"]);
-				this.set("state", "locale.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-				this.set("state", "locale.currencyName", localeSettings["currencyName"]);
+				let localeSettings = server.get("state", "locale.active");
+				this.set("state", "locale.active.localeName", localeSettings["localeName"]);
+				this.set("state", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+				this.set("state", "locale.active.currencyName", localeSettings["currencyName"]);
+				console.log("@@@connected", this.tagName, this.get("state", "locale.active"));
 			}));
 		}
 
@@ -120,6 +121,7 @@ export default class LocalePerk extends BM.Perk
 		let promises = [];
 
 		Object.keys(this.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			let localizer = this.get("inventory", `locale.localizers.${handlerName}`);
 			if (this.get("inventory", `locale.localizers.${handlerName}`).options.get("handlerOptions.autoLoad") &&
 				!this.get("inventory", `locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
 			{
@@ -142,7 +144,7 @@ export default class LocalePerk extends BM.Perk
 		// Refill (Do not refill when starting)
 		if (this.get("state", "status.status") === "ready")
 		{
-			return this.use("spell", "basic.fill");
+			return this.use("spell", "basic.fill", {"refill":true});
 		}
 
 	}
@@ -203,7 +205,7 @@ export default class LocalePerk extends BM.Perk
 			console.debug(`LocalePerk._applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
 			return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
-			unit.set("state", "locale.localeName", options["localeName"]);
+			unit.set("state", "locale.active.localeName", options["localeName"]);
 			return unit.use("spell", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
 			console.debug(`LocalePerk._applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
@@ -229,7 +231,7 @@ export default class LocalePerk extends BM.Perk
 		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
 			unit.get("inventory", `locale.localizers.${handlerName}`).localize(
 				rootNode,
-				Object.assign({"interpolation":interpolation}, unit.get("state", "locale"))
+				Object.assign({"interpolation":interpolation}, unit.get("state", "locale.active"))
 			);
 		});
 
@@ -273,7 +275,7 @@ export default class LocalePerk extends BM.Perk
 	static _getLocaleMessage(unit, key, localeName)
 	{
 
-		localeName = localeName || unit.get("state", "locale.localeName");
+		localeName = localeName || unit.get("state", "locale.active.localeName");
 
 		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
