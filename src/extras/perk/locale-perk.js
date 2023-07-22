@@ -54,7 +54,8 @@ export default class LocalePerk extends BM.Perk
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
 		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "beforeTransform", LocalePerk.LocalePerk_onBeforeTransform);
+		//this.upgrade(unit, "event", "beforeTransform", LocalePerk.LocalePerk_onBeforeTransform);
+		this.upgrade(unit, "event", "doSetup", LocalePerk.LocalePerk_onBeforeTransform);
 		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
 		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
@@ -106,30 +107,15 @@ export default class LocalePerk extends BM.Perk
 	static LocalePerk_onBeforeTransform(sender, e, ex)
 	{
 
-		if (!(this instanceof LocaleServer))
-		{
-			return LocalePerk._applyLocale(this, {"localeName":this.get("state", "locale.localeName")});
-		}
+		return LocalePerk._applyLocale(this, {"localeName":this.get("state", "locale.active.localeName")});
 
 	}
 
 	// -------------------------------------------------------------------------
 
 	static LocalePerk_onBeforeApplyLocale(sender, e, ex)
-	{
 
-		let promises = [];
-
-		Object.keys(this.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			let localizer = this.get("inventory", `locale.localizers.${handlerName}`);
-			if (this.get("inventory", `locale.localizers.${handlerName}`).options.get("handlerOptions.autoLoad") &&
-				!this.get("inventory", `locale.localizers.${handlerName}`).messages.has(e.detail.localeName))
-			{
-				promises.push(this.get("inventory", `locale.localizers.${handlerName}`).loadMessages(e.detail.localeName));
-			}
-		});
-
-		return Promise.all(promises);
+		return this.use("spell", "locale.summon", e.detail.localeName);
 
 	}
 
