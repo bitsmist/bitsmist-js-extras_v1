@@ -85,25 +85,8 @@ export default class LocaleHandler
 	init(options)
 	{
 
-		// Add messages from settings
-		let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
-		if (messages)
-		{
-			Object.entries(messages).forEach(([sectionName, sectionValue]) => {
-				this._messages.set(sectionName, sectionValue);
-			});
-		}
-
-		// Load external messages
-		return Promise.resolve().then(() => {
-			if (this.__hasExternalMessages(this._unit))
-			{
-				return this.loadMessages();
-			}
-		}).then(() => {
-			// Chain this handler's messages store to unit's locale.messages store
-			this._unit.get("inventory", "locale.messages").add(this._messages);
-		});
+		// Chain this handler's messages store to unit's locale.messages store
+		this._unit.get("inventory", "locale.messages").add(this._messages);
 
 	}
 
@@ -172,9 +155,12 @@ export default class LocaleHandler
 	loadMessages(localeName, options)
 	{
 
-		let promise = Promise.resolve();
+		let splitMessages = BM.Util.safeGet(options, "splitLocale",
+								this._options.get("handlerOptions.splitLocale",
+									this._unit.get("setting", "system.locale.options.splitLocale")));
+		localeName = ( splitMessages ? localeName : "" );
 		let localeInfo = this._localeInfo[localeName] || {};
-		let localeSettings = this._options.items;
+		let promise = Promise.resolve();
 
 		if (localeInfo["status"] === "loaded")
 		{
@@ -182,16 +168,16 @@ export default class LocaleHandler
 			return promise;
 		}
 
-		switch (localeSettings["type"]) {
+		switch (this._options.get("type")) {
 		case "messages":
-			localeInfo["messages"] = BM.Util.getObject(localeSettings["messages"]);
+			localeInfo["messages"] = BM.Util.getObject(this._options.get("messages"));
 			localeInfo["status"] = "loaded";
 			this._messages.merge(localeInfo["messages"]);
 			this._localeInfo[localeName] = localeInfo;
 			break;
 		case "URL":
 		default:
-			let url = localeSettings["URL"] || this.__getMessageURL(this._unit, localeName);
+			let url = this._options.get("URL", this.__getMessageURL(this._unit, localeName));
 			promise = BM.AjaxUtil.loadJSON(url, options).then((messages) => {
 				localeInfo["messages"] = messages;
 				localeInfo["status"] = "loaded";
@@ -207,29 +193,6 @@ export default class LocaleHandler
 
 	// -------------------------------------------------------------------------
 	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Check if the unit has the external messages file.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 *
-	 * @return  {Boolean}		True if the unit has the external messages file.
-	 */
-	__hasExternalMessages(unit)
-	{
-
-		let ret = false;
-
-		if (unit.hasAttribute("bm-localeref") || this._options.get("handlerOptions.localeRef"))
-		{
-			ret = true;
-		}
-
-		return ret;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -264,12 +227,13 @@ export default class LocaleHandler
 					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
 			fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
-			let ext = this.__getMessageFormat(unit);
+			let ext = this._options.get("messageFormat",
+						unit.get("setting", "locale.options.messageFormat",
+							unit.get("setting", "system.locale.options.messageFormat", "json")));
 			query = unit.get("setting", "unit.options.query");
 
 			// Split Locale
-			let splitLocale = this._options.get("handlerOptions.splitLocale", unit.get("setting", "system.locale.options.splitLocale", false));
-			if (splitLocale)
+			if (localeName)
 			{
 				fileName = ( localeName ? `${fileName}.${localeName}` : fileName);
 			}
@@ -278,25 +242,6 @@ export default class LocaleHandler
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Return default messages file format.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 *
-	 * @return  {String}		"js" or "json".
-	 */
-	__getMessageFormat(unit)
-	{
-
-		return this._options.get("messageFormat",
-			unit.get("setting", "locale.options.messageFormat",
-				unit.get("setting", "system.locale.options.messageFormat",
-					"json")));
 
 	}
 
