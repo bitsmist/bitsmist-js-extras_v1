@@ -78,8 +78,7 @@ export default class ValueUtil
 	{
 
 		// Get elements with the attribute
-		let targetNode = rootNode.unitRoot || rootNode;
-		let elements = BM.Util.scopedSelectorAll(targetNode, `[${this.attributeName}]`);
+		let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
 			elements.push(rootNode);
@@ -120,8 +119,7 @@ export default class ValueUtil
 		let item = {};
 
 		// Get elements with the attribute
-		let targetNode = rootNode.unitRoot || rootNode;
-		let elements = BM.Util.scopedSelectorAll(targetNode, `[${this.attributeName}]`);
+		let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
 			elements.push(rootNode);
@@ -177,8 +175,7 @@ export default class ValueUtil
 		let target = BM.Util.safeGet(options, "target", "");
 
 		// Clear input elements
-		let targetNode = rootNode.unitRoot || rootNode;
-		let elements = BM.Util.scopedSelectorAll(targetNode, `${target} input`, options);
+		let elements = BM.Util.scopedSelectorAll(rootNode, `${target} input`, options);
 		elements.forEach((element) => {
 			this.clearValue(element, options);
 		});
