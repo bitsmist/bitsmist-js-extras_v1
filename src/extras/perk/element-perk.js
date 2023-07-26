@@ -293,23 +293,25 @@ export default class ElementPerk extends BM.Perk
 	static __setClasses(element, options)
 	{
 
-		Object.keys(options).forEach((mode) => {
-			switch (mode)
-			{
-			case "add":
-				element.classList.add(options[mode]);
-				break;
-			case "remove":
-				element.classList.remove(options[mode]);
-				break;
-			case "replace":
-				element.setAttribute("class", options[mode]);
-				break;
-			default:
-				console.warn(`ElementPerk.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
-				break;
-			}
-		});
+		setTimeout(() => {
+			Object.keys(options).forEach((mode) => {
+				switch (mode)
+				{
+				case "add":
+					element.classList.add(options[mode]);
+					break;
+				case "remove":
+					element.classList.remove(options[mode]);
+					break;
+				case "replace":
+					element.setAttribute("class", options[mode]);
+					break;
+				default:
+					console.warn(`ElementPerk.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
+					break;
+				}
+			});
+		}, 1);
 
 	}
 
