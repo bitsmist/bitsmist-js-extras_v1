@@ -107,7 +107,7 @@ export default class ElementPerk extends BM.Perk
 			}
 			else
 			{
-				elements = BM.Util.scopedSelectorAll(unit.unitRoot, elementInfo["rootNode"]);
+				elements = BM.Util.scopedSelectorAll(unit, elementInfo["rootNode"]);
 			}
 		}
 		else if (elementName === "this" || elementName === unit.tagName.toLowerCase())

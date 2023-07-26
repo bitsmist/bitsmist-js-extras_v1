@@ -141,8 +141,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		rootNode = ( rootNode ? rootNode : unit );
 
-		let targetNode = rootNode.unitRoot || rootNode;
-		let nodes = BM.Util.scopedSelectorAll(targetNode, "[bm-bind]");
+		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{
@@ -174,8 +173,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		rootNode = ( rootNode ? rootNode : unit );
 
-		let targetNode = rootNode.unitRoot || rootNode;
-		let nodes = BM.Util.scopedSelectorAll(targetNode, "[bm-bind]");
+		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{

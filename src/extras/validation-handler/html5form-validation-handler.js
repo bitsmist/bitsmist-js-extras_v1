@@ -41,7 +41,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids1 = {};
 		let invalids2;
-		let form = BM.Util.scopedSelectorAll(this._unit.unitRoot, "form")[0];
+		let form = BM.Util.scopedSelectorAll(this._unit, "form")[0];
 		if (rules || options)
 		{
 			// Check allow/disallow list
@@ -61,7 +61,7 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 	reportValidity(values, rules)
 	{
 
-		let form = BM.Util.scopedSelectorAll(this._unit.unitRoot, "form")[0];
+		let form = BM.Util.scopedSelectorAll(this._unit, "form")[0];
 
 		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
 		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
