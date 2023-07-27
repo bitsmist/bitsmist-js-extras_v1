@@ -128,7 +128,6 @@ export default class LocaleServer extends BM.Unit
 	__triggerEvent(conditions, observerInfo, options)
 	{
 
-		console.log("@@@notify", conditions);
 		return this.use("spell", "locale.apply", {"localeName":options.localeName});
 
 	}
