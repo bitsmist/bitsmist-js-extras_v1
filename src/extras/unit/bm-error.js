@@ -271,9 +271,9 @@ export default class ErrorServer extends BM.Unit
 					case "route":
 						let routeInfo = options["routeInfo"];
 						Object.keys(routeInfo["queryParameters"]).forEach((key) => {
-							routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@url@", location.href);
+							routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@URL@", location.href);
 						});
-						window.location.href = BM.URLUtil.buildURL(routeInfo, {"jump":true});
+						window.location.href = BM.URLUtil.buildURL(routeInfo);
 						/*
 						let tagName = options["rootNode"] || "bm-router";
 						document.querySelector(tagName).use("spell", "routing.openRoute", routeInfo, {"jump":true});
