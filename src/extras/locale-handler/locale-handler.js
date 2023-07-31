@@ -88,6 +88,12 @@ export default class LocaleHandler
 		// Chain this handler's messages store to unit's locale.messages store
 		this._unit.get("inventory", "locale.messages").add(this._messages);
 
+		// Get messages from settings
+		if (options["messages"]) {
+			let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
+			this._messages.merge(messages);
+		}
+
 	}
 
 	// -------------------------------------------------------------------------
@@ -168,23 +174,15 @@ export default class LocaleHandler
 			return promise;
 		}
 
-		switch (this._options.get("type")) {
-		case "messages":
-			localeInfo["messages"] = BM.Util.getObject(this._options.get("messages"));
-			localeInfo["status"] = "loaded";
-			this._messages.merge(localeInfo["messages"]);
-			this._localeInfo[localeName] = localeInfo;
-			break;
-		case "URL":
-		default:
-			let url = this._options.get("URL", this.__getMessageURL(this._unit, localeName));
+		if (this.__hasExternalMessages(this._unit))
+		{
+			let url = this.__getMessageURL(this._unit, localeName);
 			promise = BM.AjaxUtil.loadJSON(url, options).then((messages) => {
-				localeInfo["messages"] = messages;
+				localeInfo["messages"] = BM.Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
 				localeInfo["status"] = "loaded";
 				this._messages.merge(messages);
 				this._localeInfo[localeName] = localeInfo;
 			});
-			break;
 		}
 
 		return promise;
@@ -193,6 +191,29 @@ export default class LocaleHandler
 
 	// -------------------------------------------------------------------------
 	//  Privates
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Check if the unit has the external messages file.
+	 *
+	 * @param	{Unit}			unit				Unit.
+	 *
+	 * @return  {Boolean}		True if the unit has the external messages file.
+	 */
+	__hasExternalMessages(unit)
+	{
+
+		let ret = false;
+
+		if (unit.hasAttribute("bm-localeref") || this._options.get("handlerOptions.localeRef"))
+		{
+			ret = true;
+		}
+
+		return ret;
+
+	}
+
 	// -------------------------------------------------------------------------
 
 	/**
@@ -227,9 +248,7 @@ export default class LocaleHandler
 					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
 			fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
-			let ext = this._options.get("messageFormat",
-						unit.get("setting", "locale.options.messageFormat",
-							unit.get("setting", "system.locale.options.messageFormat", "json")));
+			let ext = this.__getMessageFormat(unit);
 			query = unit.get("setting", "unit.options.query");
 
 			// Split Locale
@@ -242,6 +261,25 @@ export default class LocaleHandler
 		}
 
 		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Return default messages file format.
+	 *
+	 * @param       {Unit}                  unit                            Unit.
+	 *
+	 * @return  {String}            "js" or "json".
+	 */
+	__getMessageFormat(unit)
+	{
+
+		return this._options.get("messageFormat",
+			unit.get("setting", "locale.options.messageFormat",
+				unit.get("setting", "system.locale.options.messageFormat",
+					"json")));
 
 	}
 
