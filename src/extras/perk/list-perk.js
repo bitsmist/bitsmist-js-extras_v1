@@ -238,14 +238,14 @@ export default class ListPerk extends BM.Perk
 			}
 
 			// Call event handlers
-			unit.use("spell", "event.triggerAsync", "beforeFillRow", options);
+			unit.use("skill", "event.triggerSync", "beforeFillRow", options);
 			FormUtil.showConditionalElements(element, options["item"]);
 			if (unit.get("setting", "list.options.autoFill", true))
 			{
 				ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "resource.resources")});
 			}
-			unit.use("spell", "event.triggerAsync", "doFillRow", options);
-			unit.use("spell", "event.triggerAsync", "afterFillRow", options);
+			unit.use("skill", "event.triggerSync", "doFillRow", options);
+			unit.use("skill", "event.triggerSync", "afterFillRow", options);
 		}
 
 		delete options["no"];
