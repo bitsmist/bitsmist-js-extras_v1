@@ -81,9 +81,10 @@ export default class LocalePerk extends BM.Perk
 		// Connect to the locale server if specified
 		let serverNode = this.get("setting", "locale.options.localeServer", this.get("setting", "system.locale.options.localeServer"));
 		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
+
 		if (serverNode && !(this instanceof LocaleServer))
 		{
-			promises.push(this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"ready"}]).then(() => {
+			promises.push(this.use("spell", "status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
 				server.subscribe(this);
 				this.set("vault", "locale.server", server);

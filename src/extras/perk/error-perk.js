@@ -41,7 +41,7 @@ export default class ErrorPerk extends BM.Perk
 		let serverNode = this.get("setting", "locale.options.errorServer", this.get("setting", "system.errorServer"));
 		serverNode = ( serverNode === true ? "bm-error" : serverNode );
 
-		return this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"started"}]).then(() => {
+		return this.use("spell", "status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 			this.set("vault", "error.server", server);

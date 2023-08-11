@@ -92,19 +92,8 @@ export default class ChainPerk extends BM.Perk
 			let status = targets[i]["status"] || "ready";
 			let sync = targets[i]["sync"];
 
-		//	let nodes = document.querySelectorAll(targets[i]["rootNode"]);
-			let nodes;
-			if (this.unitRoot.innerHTML)
-			{
-				nodes = BM.Util.scopedSelectorAll(this, targets[i]["rootNode"]);
-			}
-			else
-			{
-				nodes = document.querySelectorAll(targets[i]["rootNode"]);
-			}
-			nodes = Array.prototype.slice.call(nodes, 0);
-			//BM.Util.assert(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
-			BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${targets[i]["rootNode"]}, method=${method}`)
+			let nodes = this.use("skill", "basic.locateAll", targets[i]);
+			BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`)
 
 			if (sync)
 			{

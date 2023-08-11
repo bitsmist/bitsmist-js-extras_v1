@@ -60,7 +60,7 @@ export default class PreferencePerk extends BM.Perk
 
 		BM.Util.assert(serverNode, `Preference Server node not specified in settings. name=${this.tagName}`);
 
-		return this.use("spell", "status.wait", [{"rootNode":serverNode, "status":"started"}]).then(() => {
+		return this.use("spell", "status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 			this.set("vault", "preference.server", server);
