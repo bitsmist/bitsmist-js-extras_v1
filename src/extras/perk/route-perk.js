@@ -311,7 +311,8 @@ export default class RoutePerk extends BM.Perk
 				|| ( curRouteInfo["name"] != newRouteInfo["name"]) // <--- remove this when _update() is ready.
 		)
 		{
-			RoutePerk._jumpRoute(unit, {"url":newURL});
+			window.location.href = newURL;
+			//RoutePerk._jumpRoute(unit, {"URL":newURL});
 			return;
 		}
 
