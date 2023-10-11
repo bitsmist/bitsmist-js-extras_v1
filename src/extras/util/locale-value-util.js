@@ -24,20 +24,6 @@ export default class LocaleValueUtil extends ValueUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Class name.
-	 *
-	 * @type	{String}
-	 */
-	static get name()
-	{
-
-		return "LocaleValueUtil";
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Attribute name.
 	 *
 	 * @type	{String}

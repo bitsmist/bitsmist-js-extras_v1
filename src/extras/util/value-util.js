@@ -23,20 +23,6 @@ export default class ValueUtil
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Class name.
-	 *
-	 * @type	{String}
-	 */
-	static get name()
-	{
-
-		return "ValueUtil";
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Attribute name.
 	 *
 	 * @type	{String}
@@ -200,7 +186,8 @@ export default class ValueUtil
 	{
 
 		options = options || {};
-		let result = ( value === undefined || value === null ? "" : String(value) );
+		//let result = ( value === undefined || value === null ? "" : String(value) );
+		let result = ( value === undefined || value === null ? "" : value );
 
 		// Format
 		if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
@@ -210,7 +197,7 @@ export default class ValueUtil
 		}
 
 		// Interpolate
-		if (result.charAt(0) === "`")
+		if (typeof(result) === "string" && result.charAt(0) === "`")
 		{
 			result = this.formatter.interpolateResources(result, value, options);
 			result = this.formatter.interpolate(result, options);
@@ -413,7 +400,7 @@ export default class ValueUtil
 					element.value = value;
 					break;
 				case "checkbox":
-					element.checked = ( value ? true : false );
+					element.checked = ( value && value != "0" ? true : false );
 					break;
 				case "radio":
 					if (element.value === value)
@@ -485,7 +472,11 @@ export default class ValueUtil
 			case "checkbox":
 				if (element.checked)
 				{
-					ret = ( element.hasAttribute("value") ? element.getAttribute("value") : element.checked );
+					ret = ( element.hasAttribute("value") ? element.getAttribute("value") : true );
+				}
+				else
+				{
+					ret = false;
 				}
 				break;
 			default:
