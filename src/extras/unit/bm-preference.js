@@ -28,34 +28,34 @@ export default class PreferenceServer extends BM.Unit
 		return {
 			"basic": {
 				"options": {
-					"autoRefresh":				false,
+					"autoRefresh":					false,
 				}
 			},
 			"event": {
 				"events": {
 					"this": {
 						"handlers": {
-							"beforeStart":		["PreferenceServer_onBeforeStart"],
-							"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
-							"doReportValidity":	["PreferenceServer_onDoReportValidity"]
+							"beforeStart":			["PreferenceServer_onBeforeStart"],
+							"beforeSubmit":			["PreferenceServer_onBeforeSubmit"],
+							"doReportValidity":		["PreferenceServer_onDoReportValidity"]
 						}
 					}
 				}
 			},
 			"form": {
 				"options": {
-					"autoCollect":				false,
-					"autoCrop":					false,
+					"autoCollect":					false,
+					"autoCrop":						false,
 				}
 			},
 			"skin": {
 				"options": {
-					"skinRef":					false,
+					"hasSkin":						false,
 				}
 			},
 			"style": {
 				"options": {
-					"styleRef":					false,
+					"hasStyle":						false,
 				}
 			},
 		}

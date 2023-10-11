@@ -28,26 +28,26 @@ export default class ErrorServer extends BM.Unit
 		return {
 			"basic": {
 				"options": {
-					"autoRefresh":				false,
+					"autoRefresh":					false,
 				}
 			},
 			"event": {
 				"events": {
 					"this": {
 						"handlers": {
-							"beforeStart":		["ErrorServer_onBeforeStart"],
+							"beforeStart":			["ErrorServer_onBeforeStart"],
 						}
 					}
 				}
 			},
 			"skin": {
 				"options": {
-					"skinRef":					false,
+					"hasSkin":						false,
 				}
 			},
 			"style": {
 				"options": {
-					"styleRef":					false,
+					"hasStyle":						false,
 				}
 			},
 		}

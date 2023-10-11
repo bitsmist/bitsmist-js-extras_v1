@@ -28,15 +28,15 @@ export default class LocaleServer extends BM.Unit
 		return {
 			"basic": {
 				"options": {
-					"autoRefresh":				false,
+					"autoRefresh":					false,
 				}
 			},
 			"event": {
 				"events": {
 					"this": {
 						"handlers": {
-							"beforeStart":		["LocaleServer_onBeforeStart"],
-							"doApplyLocale":	["LocaleServer_onDoApplyLocale"],
+							"beforeStart":			["LocaleServer_onBeforeStart"],
+							"doApplyLocale":		["LocaleServer_onDoApplyLocale"],
 						}
 					}
 				}
@@ -44,17 +44,18 @@ export default class LocaleServer extends BM.Unit
 			"locale": {
 				"handlers": {
 					"default": {
-						"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+						"handlerClassName":			"BITSMIST.v1.LocaleHandler",
 					}
 				}
 			},
 			"skin": {
 				"options": {
-					"skinRef":					false,
+					"hasSkin":						false,
 				}
 			},
 			"style": {
 				"options": {
+					"hasStyle":					false,
 					"styleRef":					false,
 				}
 			},
