@@ -134,7 +134,7 @@ export default class ResourcePerk extends BM.Perk
 
 		if (!handler)
 		{
-			handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+			handler = this.createHandler(options["handlerClassName"], unit, handlerName, options);
 			unit.set("inventory", `resource.resources.${handlerName}`, handler);
 
 			promise = handler.init(options);

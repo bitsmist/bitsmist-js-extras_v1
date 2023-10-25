@@ -30,88 +30,88 @@ window.BITSMIST.v1.BindableArrayStore = BindableArrayStore;
 // Perk
 
 import FilePerk from "./perk/file-perk.js";
-BM.PerkPerk.register(FilePerk);
+BM.Perk.registerPerk(FilePerk);
 
 import ErrorPerk from "./perk/error-perk.js";
-BM.PerkPerk.register(ErrorPerk);
+BM.Perk.registerPerk(ErrorPerk);
 
 import ElementPerk from "./perk/element-perk.js";
-BM.PerkPerk.register(ElementPerk);
+BM.Perk.registerPerk(ElementPerk);
 
 import ResourcePerk from "./perk/resource-perk.js";
-BM.PerkPerk.register(ResourcePerk);
+BM.Perk.registerPerk(ResourcePerk);
 
 import ValidationPerk from "./perk/validation-perk.js";
-BM.PerkPerk.register(ValidationPerk);
+BM.Perk.registerPerk(ValidationPerk);
 
 import FormPerk from "./perk/form-perk.js";
-BM.PerkPerk.register(FormPerk);
+BM.Perk.registerPerk(FormPerk);
 
 import ListPerk from "./perk/list-perk.js";
-BM.PerkPerk.register(ListPerk);
+BM.Perk.registerPerk(ListPerk);
 
 import DatabindingPerk from "./perk/databinding-perk.js";
-BM.PerkPerk.register(DatabindingPerk);
+BM.Perk.registerPerk(DatabindingPerk);
 
 import LocalePerk from "./perk/locale-perk.js";
-BM.PerkPerk.register(LocalePerk);
+BM.Perk.registerPerk(LocalePerk);
 
 import KeyPerk from "./perk/key-perk.js";
-BM.PerkPerk.register(KeyPerk);
+BM.Perk.registerPerk(KeyPerk);
 
 import ChainPerk from "./perk/chain-perk.js";
-BM.PerkPerk.register(ChainPerk);
+BM.Perk.registerPerk(ChainPerk);
 
 import DialogPerk from "./perk/dialog-perk.js";
-BM.PerkPerk.register(DialogPerk);
+BM.Perk.registerPerk(DialogPerk);
 
 import PreferencePerk from "./perk/preference-perk.js";
-BM.PerkPerk.register(PreferencePerk);
+BM.Perk.registerPerk(PreferencePerk);
 
 import RoutePerk from "./perk/route-perk.js";
-BM.PerkPerk.register(RoutePerk);
+BM.Perk.registerPerk(RoutePerk);
 
 import AliasPerk from "./perk/alias-perk.js";
-BM.PerkPerk.register(AliasPerk);
+BM.Perk.registerPerk(AliasPerk);
 
 import RollCallPerk from "./perk/rollcall-perk.js";
-BM.PerkPerk.register(RollCallPerk);
+BM.Perk.registerPerk(RollCallPerk);
 
 // Resource handler
 
 import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
-window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
+BM.Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
 
 import APIResourceHandler from "./resource-handler/api-resource-handler.js";
-window.BITSMIST.v1.APIResourceHandler = APIResourceHandler;
+BM.Perk.registerHandler(APIResourceHandler, "ResourcePerk");
 
 import ObjectResourceHandler from "./resource-handler/object-resource-handler.js";
-window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
+BM.Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
 
 import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
-window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
+BM.Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
 
 import WebStorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
-window.BITSMIST.v1.WebStorageResourceHandler = WebStorageResourceHandler;
+BM.Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
 
 // Locale Handler
 
 import LocaleHandler from "./locale-handler/locale-handler.js";
-window.BITSMIST.v1.LocaleHandler = LocaleHandler;
+BM.Perk.registerHandler(LocaleHandler, "LocalePerk");
 
 import LocaleServerHandler from "./locale-handler/localeserver-handler.js";
-window.BITSMIST.v1.LocaleServerHandler = LocaleServerHandler;
+BM.Perk.registerHandler(LocaleServerHandler, "LocalePerk");
 
 // Validation handler
 
 import ValidationHandler from "./validation-handler/validation-handler.js";
-window.BITSMIST.v1.ValidationHandler = ValidationHandler;
+BM.Perk.registerHandler(ValidationHandler, "ValidationPerk");
 
 import HTML5FormValidationHandler from "./validation-handler/html5form-validation-handler.js";
-window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
+BM.Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
 
 import ObjectValidationHandler from "./validation-handler/object-validation-handler.js";
-window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
+BM.Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
 
 // Util
 
@@ -131,6 +131,9 @@ window.BITSMIST.v1.LocaleValueUtil = LocaleValueUtil;
 
 import ChainedSelect from "./unit/bm-chainedselect.js";
 window.BITSMIST.v1.ChainedSelect = ChainedSelect;
+
+import BmTab from "./unit/bm-tab.js";
+window.BITSMIST.v1.BmTab  = BmTab;
 
 import BmTabindex from "./unit/bm-tabindex.js";
 window.BITSMIST.v1.BmTabindex  = BmTabindex;

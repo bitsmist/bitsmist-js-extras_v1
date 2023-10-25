@@ -124,7 +124,7 @@ export default class ValidationPerk extends BM.Perk
 
 		if (options["handlerClassName"] && !handler)
 		{
-			handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+			handler = this.createHandler(options["handlerClassName"], unit, handlerName, options);
 			unit.set("inventory", `validation.validators.${handlerName}`, handler);
 
 			promise = handler.init(options);

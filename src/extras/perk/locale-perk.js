@@ -166,7 +166,7 @@ export default class LocalePerk extends BM.Perk
 		if (!unit.get("inventory", `locale.localizers.${handlerName}`))
 		{
 			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-			let handler = BM.ClassUtil.createObject(handlerClassName, unit, options);
+			let handler = this.createHandler(handlerClassName, unit, options);
 			unit.set("inventory", `locale.localizers.${handlerName}`, handler);
 
 			promise = handler.init(options);
