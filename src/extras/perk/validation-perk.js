@@ -151,19 +151,19 @@ export default class ValidationPerk extends BM.Perk
 		unit.set("state", "validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
-			console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.id}`);
+			console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "beforeValidate", options);
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "doValidate", options);
 		}).then(() => {
 			if (unit.get("state", "validation.validationResult.result"))
 			{
-				console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.id}`);
+				console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.uniqueId}`);
 				return unit.use("spell", "event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
-				console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.id}`);
+				console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.uniqueId}`);
 				return unit.use("spell", "event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
