@@ -25,9 +25,14 @@ export default class TabContent extends BM.Unit
 	{
 
 		return {
-			"basic": {
+			"skin": {
 				"options": {
-					"autoTransform":			false,
+					"hasSkin":						false,
+				}
+			},
+			"style": {
+				"options": {
+					"hasStyle":						false,
 				}
 			},
 		}
@@ -52,8 +57,6 @@ export default class TabContent extends BM.Unit
 		// Activate specified content
 		this.querySelector(`:scope > [data-tabindex='${index}']`).classList.add("active");
 		this.querySelector(`:scope > [data-tabindex='${index}']`).focus();
-	//		this.querySelector(`:scope nth-child(${index})`).classList.add("active");
-	//		this.querySelector(`:scope > [data-index='${index}']`).focus();
 
 	}
 

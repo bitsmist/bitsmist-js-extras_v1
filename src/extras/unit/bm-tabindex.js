@@ -25,17 +25,22 @@ export default class TabIndex extends BM.Unit
 	{
 
 		return {
-			"basic": {
+			"skin": {
 				"options": {
-					"autoTransform":			false,
+					"hasSkin":						false,
+				}
+			},
+			"style": {
+				"options": {
+					"hasStyle":						false,
 				}
 			},
 			"event": {
 				"events": {
 					"tab-indices": {
-						"rootNode": 			"[data-tabindex]",
+						"rootNode": 				"[data-tabindex]",
 						"handlers": {
-							"click": 			["TabIndex_onTabIndexClick"]
+							"click": 				["TabIndex_onTabIndexClick"]
 						}
 					},
 				}
@@ -71,8 +76,8 @@ export default class TabIndex extends BM.Unit
 	switchIndex(index)
 	{
 
-		this.querySelector(":scope [data-tabindex].active").classList.remove("active");
-		let tabIndex = this.querySelector(`:scope [data-tabindex='${index}']`);
+		this.use("skill", "basic.scan", ":scope [data-tabindex].active").classList.remove("active");
+		let tabIndex = this.use("skill", "basic.scan", `:scope [data-tabindex='${index}']`);
 		tabIndex.classList.add("active");
 
 		let container = document.querySelector(this.getAttribute("data-pair"));
@@ -94,7 +99,7 @@ export default class TabIndex extends BM.Unit
 	getActiveIndex()
 	{
 
-		return this.querySelector(":scope .active");
+		return this.use("skill", "basic.scan", ":scope .active");
 
 	}
 
