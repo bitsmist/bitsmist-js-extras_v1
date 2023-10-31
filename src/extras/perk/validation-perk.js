@@ -39,14 +39,14 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		this.upgrade(unit, "spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
-		this.upgrade(unit, "inventory", "validation.validators", {});
-		this.upgrade(unit, "state", "validation.validationResult", {});
-		this.upgrade(unit, "state", "validation.validationResult", {});
-		this.upgrade(unit, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
-		this.upgrade(unit, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
-		this.upgrade(unit, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
+		unit.upgrade("spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
+		unit.upgrade("spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
+		unit.upgrade("inventory", "validation.validators", {});
+		unit.upgrade("state", "validation.validationResult", {});
+		unit.upgrade("state", "validation.validationResult", {});
+		unit.upgrade("event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate, {"order":this.info["order"]});
+		unit.upgrade("event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity, {"order":this.info["order"]});
 
 	}
 

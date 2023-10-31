@@ -39,16 +39,16 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "spell", "dialog.open", function(...args) { return DialogPerk._open(...args); });
-		this.upgrade(unit, "spell", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-		this.upgrade(unit, "spell", "dialog.close", function(...args) { return DialogPerk._close(...args); });
-		this.upgrade(unit, "inventory", "dialog.cancelClose");
-		this.upgrade(unit, "vault", "dialog.modalPromise");
-		this.upgrade(unit, "vault", "dialog.backdrop");
-		this.upgrade(unit, "vault", "dialog.backdropPromise", Promise.resolve());
-		this.upgrade(unit, "state", "dialog.isModal", false);
-		this.upgrade(unit, "state", "dialog.modalResult", {});
-		this.upgrade(unit, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
+		unit.upgrade("spell", "dialog.open", function(...args) { return DialogPerk._open(...args); });
+		unit.upgrade("spell", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
+		unit.upgrade("spell", "dialog.close", function(...args) { return DialogPerk._close(...args); });
+		unit.upgrade("inventory", "dialog.cancelClose");
+		unit.upgrade("vault", "dialog.modalPromise");
+		unit.upgrade("vault", "dialog.backdrop");
+		unit.upgrade("vault", "dialog.backdropPromise", Promise.resolve());
+		unit.upgrade("state", "dialog.isModal", false);
+		unit.upgrade("state", "dialog.modalResult", {});
+		unit.upgrade("event", "afterReady", DialogPerk.DialogPerk_onAfterReady, {"order":this.info["order"]});
 
 	}
 

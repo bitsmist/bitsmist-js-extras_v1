@@ -51,22 +51,22 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-		this.upgrade(unit, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-		this.upgrade(unit, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		this.upgrade(unit, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-		this.upgrade(unit, "spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-		this.upgrade(unit, "spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
-		this.upgrade(unit, "spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
-		this.upgrade(unit, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-		this.upgrade(unit, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-		this.upgrade(unit, "vault", "routing.routes", []);
-		this.upgrade(unit, "state", "routing.routeInfo", {});
-		this.upgrade(unit, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
-		this.upgrade(unit, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
-		this.upgrade(unit, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
-		this.upgrade(unit, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
+		unit.upgrade("skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
+		unit.upgrade("skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
+		unit.upgrade("skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		unit.upgrade("skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
+		unit.upgrade("spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
+		unit.upgrade("spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
+		unit.upgrade("spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
+		unit.upgrade("spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
+		unit.upgrade("spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
+		unit.upgrade("vault", "routing.routes", []);
+		unit.upgrade("state", "routing.routeInfo", {});
+		unit.upgrade("event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doStart", RoutePerk.RoutePerk_onDoStart, {"order":this.info["order"]});
+		unit.upgrade("event", "afterReady", RoutePerk.RoutePerk_onAfterReady, {"order":this.info["order"]});
+		unit.upgrade("event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail, {"order":this.info["order"]});
+		unit.upgrade("event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity, {"order":this.info["order"]});
 
 		// Init popstate handler
 		RoutePerk.__initPopState(unit);

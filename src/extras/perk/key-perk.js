@@ -39,8 +39,8 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "state", "key.isComposing", false);
-		this.upgrade(unit, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
+		unit.upgrade("state", "key.isComposing", false);
+		unit.upgrade("event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform, {"order":this.info["order"]});
 
 	}
 

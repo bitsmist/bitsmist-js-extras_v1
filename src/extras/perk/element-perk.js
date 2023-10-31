@@ -40,9 +40,9 @@ export default class ElementPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "vault", "element.overlay", );
-		this.upgrade(unit, "vault", "element.overlayPromise", Promise.resolve());
-		this.upgrade(unit, "event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
+		unit.upgrade("vault", "element.overlay", );
+		unit.upgrade("vault", "element.overlayPromise", Promise.resolve());
+		unit.upgrade("event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings, {"order":this.info["order"]});
 
 	}
 
@@ -237,7 +237,7 @@ export default class ElementPerk extends BM.Perk
 			// Timeout timer
 			let timer = setTimeout(() => {
 				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
-			}, BM.Unit.get("setting", "system.waitForTimeout", 10000));
+			}, BM.Unit.get("setting", "system.options.waitForTimeout", 10000));
 
 			// Resolve when finished
 			element.addEventListener(`${elementInfo["waitFor"]}end`, () => {

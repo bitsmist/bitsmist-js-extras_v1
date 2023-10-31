@@ -44,28 +44,28 @@ export default class DatabindingPerk extends BM.Perk
 		if (unit.get("setting", "databinding.options.dataType", "single") === "single")
 		{
 			// Upgrade unit (single)
-			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
-			this.upgrade(unit, "vault", "databinding.store", new BindableStore({
+			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+			unit.upgrade("vault", "databinding.store", new BindableStore({
 				"resources":	unit.get("inventory", "resource.resources"),
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(unit, "event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform);
-			this.upgrade(unit, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+			unit.upgrade("event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform, {"order":this.info["order"]});
+			unit.upgrade("event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill, {"order":this.info["order"]});
 		}
 		else
 		{
 			// Upgrade unit (multiple)
-			this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
-			this.upgrade(unit, "vault", "databinding.store", new BindableArrayStore({
+			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+			unit.upgrade("vault", "databinding.store", new BindableArrayStore({
 				"resources":	unit.resources,
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			this.upgrade(unit, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+			unit.upgrade("event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow, {"order":this.info["order"]});
 		}
 
 		// Upgrade unit
-		this.upgrade(unit, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
-		this.upgrade(unit, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+		unit.upgrade("event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear, {"order":this.info["order"]});
+		unit.upgrade("event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect, {"order":this.info["order"]});
 
 	}
 

@@ -39,11 +39,11 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
-		this.upgrade(unit, "inventory", "resource.resources", {});
-		this.upgrade(unit, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
-		this.upgrade(unit, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
+		unit.upgrade("spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		unit.upgrade("inventory", "resource.resources", {});
+		unit.upgrade("event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch, {"order":this.info["order"]});
+		unit.upgrade("event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit, {"order":this.info["order"]});
 
 	}
 

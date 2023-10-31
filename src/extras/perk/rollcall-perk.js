@@ -49,9 +49,9 @@ export default class RollCallPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-		this.upgrade(unit, "spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-		this.upgrade(unit, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
+		unit.upgrade("skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
+		unit.upgrade("spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
+		unit.upgrade("event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings, {"order":this.info["order"]});
 
 	}
 
@@ -85,7 +85,7 @@ export default class RollCallPerk extends BM.Perk
 		if (!RollCallPerk._records[name])
 		{
 			let waitInfo = {};
-			let timeout = BITSMIST.v1.Unit.get("setting", "system.waitForTimeout", 10000);
+			let timeout = BITSMIST.v1.Unit.get("setting", "system.status.options.waitForTimeout", 10000);
 			let promise = new Promise((resolve, reject) => {
 					waitInfo["resolve"] = resolve;
 					waitInfo["reject"] = reject;

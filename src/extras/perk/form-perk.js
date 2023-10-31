@@ -121,16 +121,16 @@ export default class FormPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
-		this.upgrade(unit, "spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
-		this.upgrade(unit, "state", "form.cancelSubmit", false);
-		this.upgrade(unit, "vault", "form.lastItems", {});
-		this.upgrade(unit, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
-		this.upgrade(unit, "event", "doClear", FormPerk.FormPerk_onDoClear);
-		this.upgrade(unit, "event", "beforeFill", FormPerk.FormPerk_onBeforeFill);
-		this.upgrade(unit, "event", "doFill", FormPerk.FormPerk_onDoFill);
-		this.upgrade(unit, "event", "doCollect", FormPerk.FormPerk_onDoCollect);
-		this.upgrade(unit, "event", "afterCollect", FormPerk.FormPerk_onAfterCollect);
+		unit.upgrade("skill", "form.build", function(...args) { return FormPerk._build(...args); });
+		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
+		unit.upgrade("state", "form.cancelSubmit", false);
+		unit.upgrade("vault", "form.lastItems", {});
+		unit.upgrade("event", "afterTransform", FormPerk.FormPerk_onAfterTransform, {"order":this.info["order"]});
+		unit.upgrade("event", "doClear", FormPerk.FormPerk_onDoClear, {"order":this.info["order"]});
+		unit.upgrade("event", "beforeFill", FormPerk.FormPerk_onBeforeFill, {"order":this.info["order"]});
+		unit.upgrade("event", "doFill", FormPerk.FormPerk_onDoFill, {"order":this.info["order"]});
+		unit.upgrade("event", "doCollect", FormPerk.FormPerk_onDoCollect, {"order":this.info["order"]});
+		unit.upgrade("event", "afterCollect", FormPerk.FormPerk_onAfterCollect, {"order":this.info["order"]});
 
 	}
 

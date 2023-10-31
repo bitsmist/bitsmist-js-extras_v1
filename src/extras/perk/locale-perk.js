@@ -41,25 +41,26 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
-		this.upgrade(unit, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-		this.upgrade(unit, "spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
-		this.upgrade(unit, "spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
-		this.upgrade(unit, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
-		this.upgrade(unit, "inventory", "locale.localizers", {});
-		this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
-		this.upgrade(unit, "state", "locale.active", {
+		unit.upgrade("skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
+		unit.upgrade("skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
+		unit.upgrade("spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
+		unit.upgrade("spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
+		unit.upgrade("spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
+		unit.upgrade("inventory", "locale.localizers", {});
+		unit.upgrade("inventory", "locale.messages", new MultiStore());
+		unit.upgrade("state", "locale.active", {
 			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language.substring(0, 2))),
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
-		this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
-		this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
-		this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
+		unit.upgrade("event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doSetup", LocalePerk.LocalePerk_onDoSetup, {"order":this.info["order"]});
+		unit.upgrade("event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale, {"order":this.info["order"]});
+
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
 		{
-			this.upgrade(unit, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
+			unit.upgrade("event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow, {"order":this.info["order"]});
 		}
 
 	}

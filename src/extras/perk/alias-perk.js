@@ -49,7 +49,7 @@ export default class AliasPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
+		unit.upgrade("skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
 
 	}
 

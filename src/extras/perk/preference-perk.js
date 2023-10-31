@@ -39,12 +39,12 @@ export default class PreferencePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		this.upgrade(unit, "skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
-		this.upgrade(unit, "spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
-		this.upgrade(unit, "spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
-		this.upgrade(unit, "vault", "preference.server");
-		this.upgrade(unit, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
-		this.upgrade(unit, "event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup);
+		unit.upgrade("skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
+		unit.upgrade("spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
+		unit.upgrade("spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
+		unit.upgrade("vault", "preference.server");
+		unit.upgrade("event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup, {"order":this.info["order"]});
 
 	}
 
@@ -55,7 +55,7 @@ export default class PreferencePerk extends BM.Perk
 	static PreferencePerk_onDoApplySettings(sender, e, ex)
 	{
 
-		let serverNode = this.get("setting", "locale.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
+		let serverNode = this.get("setting", "preference.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
 		serverNode = ( serverNode === true ? "bm-preference" : serverNode );
 
 		BM.Util.assert(serverNode, `Preference Server node not specified in settings. name=${this.tagName}`);
