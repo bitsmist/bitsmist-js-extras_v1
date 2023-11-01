@@ -18,16 +18,22 @@ export default class ErrorPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"error",
+		"order":		120,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"error",
-			"order":		120,
-		};
+		return ErrorPerk.#__info;
 
 	}
 
@@ -35,7 +41,7 @@ export default class ErrorPerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static ErrorPerk_onDoStart(sender, e, ex)
+	static #ErrorPerk_onDoStart(sender, e, ex)
 	{
 
 		let serverNode = this.get("setting", "error.options.errorServer", this.get("setting", "system.error.options.errorServer"));

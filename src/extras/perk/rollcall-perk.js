@@ -18,16 +18,23 @@ export default class RollCallPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__records = {};
+	static #__info = {
+		"section":		"rollcall",
+		"order":		330,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"rollcall",
-			"order":		330,
-		};
+		return RollCallPerk.#__info;
 
 	}
 
@@ -35,23 +42,13 @@ export default class RollCallPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static globalInit()
-	{
-
-		// Init vars
-		RollCallPerk._records = {};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(unit, options)
 	{
 
 		// Upgrade unit
-		unit.upgrade("skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-		unit.upgrade("spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-		unit.upgrade("event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings, {"order":RollCallPerk.info["order"]});
+		unit.upgrade("skill", "rollcall.register", function(...args) { return RollCallPerk.#_register(...args); });
+		unit.upgrade("spell", "rollcall.call", function(...args) { return RollCallPerk.#_call(...args); });
+		unit.upgrade("event", "doApplySettings", RollCallPerk.#RollCallPerk_onDoApplySettings, {"order":RollCallPerk.info["order"]});
 
 	}
 
@@ -59,12 +56,12 @@ export default class RollCallPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static RollCallPerk_onDoApplySettings(sender, e, ex)
+	static #RollCallPerk_onDoApplySettings(sender, e, ex)
 	{
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
 			let name = sectionValue["name"] || sectionName;
-			RollCallPerk._register(this, name, sectionValue);
+			RollCallPerk.#_register(this, name, sectionValue);
 		});
 
 	}
@@ -79,10 +76,10 @@ export default class RollCallPerk extends BM.Perk
 	 * @param	{Unit}			unit				Compoent to register.
 	 * @param	{Object}		optios				Options.
 	 */
-	static _call(unit, name, options)
+	static #_call(unit, name, options)
 	{
 
-		if (!RollCallPerk._records[name])
+		if (!RollCallPerk.#__records[name])
 		{
 			let waitInfo = {};
 			let timeout = BITSMIST.v1.Unit.get("setting", "system.status.options.waitForTimeout", 10000);
@@ -95,10 +92,10 @@ export default class RollCallPerk extends BM.Perk
 			});
 			waitInfo["promise"] = promise;
 
-			RollCallPerk.__createEntry(name, null, waitInfo);
+			RollCallPerk.#__createEntry(name, null, waitInfo);
 		}
 
-		let entry = RollCallPerk._records[name];
+		let entry = RollCallPerk.#__records[name];
 
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
@@ -124,15 +121,15 @@ export default class RollCallPerk extends BM.Perk
 	 * @param	{Unit}			unit				Compoent to register.
 	 * @param	{String}		name				Register as this name.
 	 */
-	static _register(unit, name)
+	static #_register(unit, name)
 	{
 
-		if (!RollCallPerk._records[name])
+		if (!RollCallPerk.#__records[name])
 		{
-			RollCallPerk.__createEntry(name);
+			RollCallPerk.#__createEntry(name);
 		}
 
-		let entry = RollCallPerk._records[name];
+		let entry = RollCallPerk.#__records[name];
 		entry.object = unit;
 		entry.waitInfo.resolve();
 		if (entry.waitInfo["timer"])
@@ -146,7 +143,7 @@ export default class RollCallPerk extends BM.Perk
 	// 	Privates
 	// -------------------------------------------------------------------------
 
-	static __createEntry(name, unit, waitInfo)
+	static #__createEntry(name, unit, waitInfo)
 	{
 
 		waitInfo = waitInfo || {
@@ -161,7 +158,7 @@ export default class RollCallPerk extends BM.Perk
 			"waitInfo":		waitInfo,
 		};
 
-		RollCallPerk._records[name] = record;
+		RollCallPerk.#__records[name] = record;
 
 		return record;
 

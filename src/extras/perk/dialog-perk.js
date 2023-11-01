@@ -18,16 +18,23 @@ export default class DialogPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__backdrop;
+	static #__info = {
+		"section":		"dialog",
+		"order":		800,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"dialog",
-			"order":		800,
-		};
+		return DialogPerk.#__info;
 
 	}
 
@@ -39,16 +46,16 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("spell", "dialog.open", function(...args) { return DialogPerk._open(...args); });
-		unit.upgrade("spell", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-		unit.upgrade("spell", "dialog.close", function(...args) { return DialogPerk._close(...args); });
+		unit.upgrade("spell", "dialog.open", function(...args) { return DialogPerk.#_open(...args); });
+		unit.upgrade("spell", "dialog.openModal", function(...args) { return DialogPerk.#_openModal(...args); });
+		unit.upgrade("spell", "dialog.close", function(...args) { return DialogPerk.#_close(...args); });
 		unit.upgrade("inventory", "dialog.cancelClose");
 		unit.upgrade("vault", "dialog.modalPromise");
 		unit.upgrade("vault", "dialog.backdrop");
 		unit.upgrade("vault", "dialog.backdropPromise", Promise.resolve());
 		unit.upgrade("state", "dialog.isModal", false);
 		unit.upgrade("state", "dialog.modalResult", {});
-		unit.upgrade("event", "afterReady", DialogPerk.DialogPerk_onAfterReady, {"order":DialogPerk.info["order"]});
+		unit.upgrade("event", "afterReady", DialogPerk.#DialogPerk_onAfterReady, {"order":DialogPerk.info["order"]});
 
 	}
 
@@ -56,7 +63,7 @@ export default class DialogPerk extends BM.Perk
 	//  Event Handlers
 	// -------------------------------------------------------------------------
 
-	static DialogPerk_onAfterReady(sender, e, ex)
+	static #DialogPerk_onAfterReady(sender, e, ex)
 	{
 
 		if (this.get("setting", "dialog.options.autoOpen"))
@@ -79,13 +86,13 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _open(unit, options)
+	static #_open(unit, options)
 	{
 
 		options = options || {};
 		unit.set("vault", "dialog.options", options);
 
-		console.debug(`DialogPerk._open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
+		console.debug(`DialogPerk.#_open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
 		return unit.use("spell", "event.trigger", "beforeOpen", options).then(() => {
 			if (!unit.get("inventory", "dialog.cancelOpen"))
 			{
@@ -93,7 +100,7 @@ export default class DialogPerk extends BM.Perk
 					// Show backdrop
 					if (unit.get("setting", "dialog.options.showBackdrop"))
 					{
-						return DialogPerk.__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
+						return DialogPerk.#__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
 					// Setup
@@ -110,7 +117,7 @@ export default class DialogPerk extends BM.Perk
 				}).then(() => {
 					return unit.use("spell", "event.trigger", "doOpen", options);
 				}).then(() => {
-					console.debug(`DialogPerk._open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
+					console.debug(`DialogPerk.#_open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
 					return unit.use("spell", "event.trigger", "afterOpen", options);
 				});
 			}
@@ -127,16 +134,16 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _openModal(unit, options)
+	static #_openModal(unit, options)
 	{
 
-		console.debug(`DialogPerk._openModal(): Opening unit modal. name=${unit.tagName}, id=${unit.id}`);
+		console.debug(`DialogPerk.#_openModal(): Opening unit modal. name=${unit.tagName}, id=${unit.id}`);
 
 		return new Promise((resolve, reject) => {
 			unit.set("state", "dialog.isModal", true);
 			unit.set("state", "dialog.modalResult", {"result":false});
 			unit.set("vault", "dialog.modalPromise", {"resolve":resolve,"reject":reject});
-			return DialogPerk._open(unit, options);
+			return DialogPerk.#_open(unit, options);
 		});
 
 	}
@@ -150,13 +157,13 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _close(unit, options)
+	static #_close(unit, options)
 	{
 
 		options = options || {};
 		unit.set("inventory", "dialog.cancelClose", false);
 
-		console.debug(`DialogPerk._close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
+		console.debug(`DialogPerk.#_close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
 		return unit.use("spell", "event.trigger", "beforeClose", options).then(() => {
 			if (!unit.get("inventory", "dialog.cancelClose"))
 			{
@@ -164,15 +171,15 @@ export default class DialogPerk extends BM.Perk
 					// Hide backdrop
 					if (unit.get("setting", "dialog.options.showBackdrop"))
 					{
-						DialogPerk.__removeCloseOnClickHandlers();
-						return DialogPerk.__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
+						DialogPerk.#__removeCloseOnClickHandlers();
+						return DialogPerk.#__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
 					if (unit.get("state", "dialog.isModal"))
 					{
 						unit.get("vault", "dialog.modalPromise").resolve(unit.get("state", "dialog.modalResult"));
 					}
-					console.debug(`DialogPerk._close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
+					console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
 
 					return unit.use("spell", "event.trigger", "afterClose", options);
 				});
@@ -191,14 +198,14 @@ export default class DialogPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __createBackdrop(unit, options)
+	static #__createBackdrop(unit, options)
 	{
 
-		if (!DialogPerk._backdrop)
+		if (!DialogPerk.#__backdrop)
 		{
 			// Create the backdrop
 			document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
-			DialogPerk._backdrop = document.body.firstElementChild;
+			DialogPerk.#__backdrop = document.body.firstElementChild;
 		}
 
 	}
@@ -211,27 +218,27 @@ export default class DialogPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __showBackdrop(unit, options)
+	static #__showBackdrop(unit, options)
 	{
 
-		DialogPerk.__createBackdrop(unit);
+		DialogPerk.#__createBackdrop(unit);
 
 		return unit.get("vault", "dialog.backdropPromise").then(() => {
 			unit.set("vault", "dialog.backdropPromise", new Promise((resolve, reject) => {
-				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
+				window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let addClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.showOptions.addClasses", []));
-				DialogPerk._backdrop.classList.add(...addClasses);
-				DialogPerk._backdrop.classList.remove(...unit.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
+				DialogPerk.#__backdrop.classList.add(...addClasses);
+				DialogPerk.#__backdrop.classList.remove(...unit.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
 
-				let effect = DialogPerk.__getEffect();
+				let effect = DialogPerk.#__getEffect();
 				if (effect)
 				{
 					// Transition/Animation
-					DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
+					DialogPerk.#__backdrop.addEventListener(`${effect}end`, () => {
 						if (BM.Util.safeGet(options, "closeOnClick", true))
 						{
-							DialogPerk.__installCloseOnClickHandler(unit);
+							DialogPerk.#__installCloseOnClickHandler(unit);
 						}
 						resolve();
 					}, {"once":true});
@@ -241,7 +248,7 @@ export default class DialogPerk extends BM.Perk
 					// No Transition/Animation
 					if (BM.Util.safeGet(options, "closeOnClick", true))
 					{
-						DialogPerk.__installCloseOnClickHandler(unit);
+						DialogPerk.#__installCloseOnClickHandler(unit);
 					}
 
 					resolve();
@@ -265,21 +272,21 @@ export default class DialogPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __hideBackdrop(unit, options)
+	static #__hideBackdrop(unit, options)
 	{
 
 		return unit.get("vault", "dialog.backdropPromise").then(() => {
 			unit.set("vault", "dialog.backdropPromise",  new Promise((resolve, reject) => {
-				window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
+				window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let removeClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.hideOptions.removeClasses", []));
-				DialogPerk._backdrop.classList.remove(...removeClasses);
-				DialogPerk._backdrop.classList.add(...unit.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
+				DialogPerk.#__backdrop.classList.remove(...removeClasses);
+				DialogPerk.#__backdrop.classList.add(...unit.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
 
-				let effect = DialogPerk.__getEffect();
+				let effect = DialogPerk.#__getEffect();
 				if (effect)
 				{
-					DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
+					DialogPerk.#__backdrop.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
 				}
@@ -306,13 +313,13 @@ export default class DialogPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __installCloseOnClickHandler(unit, options)
+	static #__installCloseOnClickHandler(unit, options)
 	{
 
-		DialogPerk._backdrop.onclick = (e) => {
+		DialogPerk.#__backdrop.onclick = (e) => {
 			if (e.target === e.currentTarget)
 			{
-				DialogPerk._close(unit, {"reason":"cancel"});
+				DialogPerk.#_close(unit, {"reason":"cancel"});
 			}
 		};
 
@@ -326,10 +333,10 @@ export default class DialogPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __removeCloseOnClickHandlers()
+	static #__removeCloseOnClickHandlers()
 	{
 
-		DialogPerk._backdrop.onclick = null;
+		DialogPerk.#__backdrop.onclick = null;
 
 	}
 
@@ -340,16 +347,16 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return 	{String}		Effect ("transition" or "animation").
 	 */
-	static __getEffect()
+	static #__getEffect()
 	{
 
 		let effect = "";
 
-		if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('transition-duration') !== "0s")
+		if (window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue('transition-duration') !== "0s")
 		{
 			effect = "transition";
 		}
-		else if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('animation-name') !== "none")
+		else if (window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue('animation-name') !== "none")
 		{
 			effect = "animation";
 		}

@@ -18,16 +18,23 @@ export default class KeyPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	//static #__isComposing = false;
+	static #__info = {
+		"section":		"key",
+		"order":		800,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"key",
-			"order":		800,
-		};
+		return KeyPerk.#__info;
 
 	}
 
@@ -40,7 +47,7 @@ export default class KeyPerk extends BM.Perk
 
 		// Upgrade unit
 		unit.upgrade("state", "key.isComposing", false);
-		unit.upgrade("event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform, {"order":KeyPerk.info["order"]});
+		unit.upgrade("event", "afterTransform", KeyPerk.#KeyPerk_onAfterTransform, {"order":KeyPerk.info["order"]});
 
 	}
 
@@ -48,22 +55,22 @@ export default class KeyPerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static KeyPerk_onAfterTransform(sender, e, ex)
+	static #KeyPerk_onAfterTransform(sender, e, ex)
 	{
 
 		let keys = this.get("setting", "key.keys");
 		if (keys)
 		{
 			// Init keys
-			let actions = KeyPerk.__getActions(keys);
-			this.addEventListener("keydown", function(e){KeyPerk.KeyPerk_onKeyDown.call(this, e, this);});
-			this.addEventListener("keyup", function(e){KeyPerk.KeyPerk_onKeyUp.call(this, e, this, keys, actions);});
+			let actions = KeyPerk.#__getActions(keys);
+			this.addEventListener("keydown", function(e){KeyPerk.#KeyPerk_onKeyDown.call(this, e, this);});
+			this.addEventListener("keyup", function(e){KeyPerk.#KeyPerk_onKeyUp.call(this, e, this, keys, actions);});
 			//this.addEventListener("compositionstart", function(e){KeyPerk.onCompositionStart.call(this, e, this, keys);});
 			//this.addEventListener("compositionend", function(e){KeyPerk.onCompositionEnd.call(this, e, this, keys);});
 
 			// Init buttons
 			Object.entries(keys).forEach(([sectionName, sectionValue]) => {
-				KeyPerk.__initButtons(this, sectionName, sectionValue);
+				KeyPerk.#__initButtons(this, sectionName, sectionValue);
 			});
 		}
 
@@ -77,7 +84,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Object}		e					Event info.
 	 * @param	{Unit}			unit				Unit.
 	 */
-	static KeyPerk_onKeyDown(e, unit)
+	static #KeyPerk_onKeyDown(e, unit)
 	{
 
 		unit.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
@@ -94,7 +101,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Object}		options				Options.
 	 * @param	{Object}		actions				Action info.
 	 */
-	static KeyPerk_onKeyUp(e, unit, options, actions)
+	static #KeyPerk_onKeyUp(e, unit, options, actions)
 	{
 
 		// Ignore all key input when composing.
@@ -103,7 +110,7 @@ export default class KeyPerk extends BM.Perk
 			return;
 		}
 
-		let key  = ( e.key ? e.key : KeyPerk.__getKeyfromKeyCode(e.keyCode) );
+		let key  = ( e.key ? e.key : KeyPerk.#__getKeyfromKeyCode(e.keyCode) );
 		switch (key)
 		{
 			case "Esc":		key = "Escape";		break;
@@ -132,10 +139,10 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Object}		options				Options.
 	 */
 	/*
-	static onCompositionStart(e, unit, options)
+	static #onCompositionStart(e, unit, options)
 	{
 
-		unit.__isComposing = true;
+		unit.#__isComposing = true;
 
 	}
 	*/
@@ -150,10 +157,10 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Object}		options				Options.
 	 */
 	/*
-	static onCompositionEnd(e, unit, options)
+	static #onCompositionEnd(e, unit, options)
 	{
 
-		unit.__isComposing = false;
+		unit.#__isComposing = false;
 
 	}
 	*/
@@ -169,7 +176,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultSubmit(e, unit, options)
+	static #__defaultSubmit(e, unit, options)
 	{
 
 		return unit.use("spell", "form.submit").then(() => {
@@ -200,7 +207,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultCancel(e, unit, options)
+	static #__defaultCancel(e, unit, options)
 	{
 
 		return unit.use("spell", "dialog.close", {"reason":"cancel"});
@@ -216,7 +223,7 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __defaultClear(e, unit, options)
+	static #__defaultClear(e, unit, options)
 	{
 
 		let target = "";
@@ -237,7 +244,7 @@ export default class KeyPerk extends BM.Perk
 	 *
 	 * @param	{Integer}		code				Key code.
 	 */
-	static __getKeyfromKeyCode(code)
+	static #__getKeyfromKeyCode(code)
 	{
 
 		let ret;
@@ -265,12 +272,12 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{String}		action				Action.
 	 * @param	{Object}		options				Options.
 	 */
-	static __initButtons(unit, action, options)
+	static #__initButtons(unit, action, options)
 	{
 
 		if (options && options["rootNode"])
 		{
-			let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
+			let handler = ( options["handler"] ? options["handler"] : KeyPerk.#__getDefaultHandler(action) );
 			let elements = BM.Util.scopedSelectorAll(unit, options["rootNode"]);
 
 			elements.forEach((element) => {
@@ -289,7 +296,7 @@ export default class KeyPerk extends BM.Perk
 	 *
 	 * @return 	{Object}		Action info.
 	 */
-	static __getActions(settings)
+	static #__getActions(settings)
 	{
 
 		let actions = {};
@@ -301,7 +308,7 @@ export default class KeyPerk extends BM.Perk
 			{
 				actions[keys[i]] = {};
 				actions[keys[i]]["type"] = key;
-				actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyPerk.__getDefaultHandler(key) );
+				actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyPerk.#__getDefaultHandler(key) );
 				actions[keys[i]]["option"] = settings[key];
 			}
 		});
@@ -319,7 +326,7 @@ export default class KeyPerk extends BM.Perk
 	 *
 	 * @return 	{Function}		Handler.
 	 */
-	static __getDefaultHandler(action)
+	static #__getDefaultHandler(action)
 	{
 
 		let handler;
@@ -327,13 +334,13 @@ export default class KeyPerk extends BM.Perk
 		switch (action)
 		{
 		case "submit":
-			handler = KeyPerk.__defaultSubmit;
+			handler = KeyPerk.#__defaultSubmit;
 			break;
 		case "clear":
-			handler = KeyPerk.__defaultClear;
+			handler = KeyPerk.#__defaultClear;
 			break;
 		case "cancel":
-			handler = KeyPerk.__defaultCancel;
+			handler = KeyPerk.#__defaultCancel;
 			break;
 		}
 

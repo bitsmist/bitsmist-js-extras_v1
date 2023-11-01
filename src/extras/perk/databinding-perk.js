@@ -21,16 +21,22 @@ export default class DatabindingPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"databinding",
+		"order":		320,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"databinding",
-			"order":		320,
-		};
+		return DatabindingPerk.#__info;
 
 	}
 
@@ -44,28 +50,28 @@ export default class DatabindingPerk extends BM.Perk
 		if (unit.get("setting", "databinding.options.dataType", "single") === "single")
 		{
 			// Upgrade unit (single)
-			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
+			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindData(...args); });
 			unit.upgrade("vault", "databinding.store", new BindableStore({
 				"resources":	unit.get("inventory", "resource.resources"),
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			unit.upgrade("event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform, {"order":DatabindingPerk.info["order"]});
-			unit.upgrade("event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill, {"order":DatabindingPerk.info["order"]});
+			unit.upgrade("event", "beforeTransform", DatabindingPerk.#DatabindingPerk_onBeforeTransform, {"order":DatabindingPerk.info["order"]});
+			unit.upgrade("event", "doFill", DatabindingPerk.#DatabindingPerk_onDoFill, {"order":DatabindingPerk.info["order"]});
 		}
 		else
 		{
 			// Upgrade unit (multiple)
-			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
+			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindDataArray(...args); });
 			unit.upgrade("vault", "databinding.store", new BindableArrayStore({
 				"resources":	unit.resources,
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			unit.upgrade("event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow, {"order":DatabindingPerk.info["order"]});
+			unit.upgrade("event", "doFillRow", DatabindingPerk.#DatabindingPerk_onDoFillRow, {"order":DatabindingPerk.info["order"]});
 		}
 
 		// Upgrade unit
-		unit.upgrade("event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear, {"order":DatabindingPerk.info["order"]});
-		unit.upgrade("event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect, {"order":DatabindingPerk.info["order"]});
+		unit.upgrade("event", "doClear", DatabindingPerk.#DatabindingPerk_onDoClear, {"order":DatabindingPerk.info["order"]});
+		unit.upgrade("event", "doCollect", DatabindingPerk.#DatabindingPerk_onDoCollect, {"order":DatabindingPerk.info["order"]});
 
 	}
 
@@ -73,16 +79,16 @@ export default class DatabindingPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onBeforeTransform(sender, e, ex)
+	static #DatabindingPerk_onBeforeTransform(sender, e, ex)
 	{
 
-		DatabindingPerk._bindData(this);
+		DatabindingPerk.#_bindData(this);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onDoClear(sender, e, ex)
+	static #DatabindingPerk_onDoClear(sender, e, ex)
 	{
 
 		this.get("vault", "databinding.store").clear();
@@ -91,7 +97,7 @@ export default class DatabindingPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onDoFill(sender, e, ex)
+	static #DatabindingPerk_onDoFill(sender, e, ex)
 	{
 
 		if (e.detail.items)
@@ -104,19 +110,17 @@ export default class DatabindingPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onDoFillRow(sender, e, ex)
+	static #DatabindingPerk_onDoFillRow(sender, e, ex)
 	{
 
-		console.log("%c@@@DatabindingPerk_onDoFillRow", "color:white;background-color:green", this.tagName, e.detail.no);
-
-		DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
+		DatabindingPerk.#_bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
 		this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
 
 	}
 
 	// -------------------------------------------------------------------------
 
-	static DatabindingPerk_onDoCollect(sender, e, ex)
+	static #DatabindingPerk_onDoCollect(sender, e, ex)
 	{
 
 		if (this.get("setting", "databinding.options.autoCollect", true))
@@ -136,7 +140,7 @@ export default class DatabindingPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{HTMLElement}	rootNode			Root node.
 	 */
-	static _bindData(unit, rootNode)
+	static #_bindData(unit, rootNode)
 	{
 
 		rootNode = ( rootNode ? rootNode : unit );
@@ -151,7 +155,7 @@ export default class DatabindingPerk extends BM.Perk
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingPerk.__getCallback(unit, key);
+			let callback = DatabindingPerk.#__getCallback(unit, key);
 
 			// Bind
 			unit.get("vault", "databinding.store").bindTo(key, elem, callback);
@@ -168,7 +172,7 @@ export default class DatabindingPerk extends BM.Perk
 	 * @param	{Integer}		index				Array index.
 	 * @param	{HTMLElement}	rootNode			Root node.
 	 */
-	static _bindDataArray(unit, index, rootNode)
+	static #_bindDataArray(unit, index, rootNode)
 	{
 
 		rootNode = ( rootNode ? rootNode : unit );
@@ -183,7 +187,7 @@ export default class DatabindingPerk extends BM.Perk
 		nodes.forEach(elem => {
 			// Get the callback function from settings
 			let key = elem.getAttribute("bm-bind");
-			let callback = DatabindingPerk.__getCallback(unit, key);
+			let callback = DatabindingPerk.#__getCallback(unit, key);
 
 			// Bind
 			unit.get("vault", "databinding.store").bindTo(index, key, elem, callback);
@@ -201,7 +205,7 @@ export default class DatabindingPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{String}		key					Field name.
 	 */
-	static __getCallback(unit, key)
+	static #__getCallback(unit, key)
 	{
 
 		let callback;

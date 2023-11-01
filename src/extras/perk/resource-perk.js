@@ -18,16 +18,22 @@ export default class ResourcePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"resource",
+		"order":		300,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"resource",
-			"order":		300,
-		};
+		return ResourcePerk.#__info;
 
 	}
 
@@ -39,11 +45,11 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
+		unit.upgrade("spell", "resource.addHandler", function(...args) { return ResourcePerk.#_addHandler(...args); });
 		unit.upgrade("inventory", "resource.resources", {});
-		unit.upgrade("event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings, {"order":this.info["order"]});
-		unit.upgrade("event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch, {"order":this.info["order"]});
-		unit.upgrade("event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", ResourcePerk.#ResourcePerk_onDoApplySettings, {"order":ResourcePerk.info["order"]});
+		unit.upgrade("event", "doFetch", ResourcePerk.#ResourcePerk_onDoFetch, {"order":ResourcePerk.info["order"]});
+		unit.upgrade("event", "doSubmit", ResourcePerk.#ResourcePerk_onDoSubmit, {"order":ResourcePerk.info["order"]});
 
 	}
 
@@ -51,13 +57,13 @@ export default class ResourcePerk extends BM.Perk
 	//  Event handlers
 	// -------------------------------------------------------------------------
 
-	static ResourcePerk_onDoApplySettings(sender, e, ex)
+	static #ResourcePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ResourcePerk._addHandler(this, sectionName, sectionValue));
+			promises.push(ResourcePerk.#_addHandler(this, sectionName, sectionValue));
 		});
 
 		return Promise.all(promises);
@@ -66,7 +72,7 @@ export default class ResourcePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static ResourcePerk_onDoFetch(sender, e, ex)
+	static #ResourcePerk_onDoFetch(sender, e, ex)
 	{
 
 		let promises = [];
@@ -90,7 +96,7 @@ export default class ResourcePerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static ResourcePerk_onDoSubmit(sender, e, ex)
+	static #ResourcePerk_onDoSubmit(sender, e, ex)
 	{
 
 		let promises = [];
@@ -124,10 +130,10 @@ export default class ResourcePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
      */
-	static _addHandler(unit, handlerName, options)
+	static #_addHandler(unit, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
+		BM.Util.assert(options["handlerClassName"], `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
 		let handler = unit.get("inventory", `resource.resources.${handlerName}`);

@@ -18,16 +18,22 @@ export default class FilePerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"file",
+		"order":		110,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"file",
-			"order":		110,
-		};
+		return FilePerk.#__info;
 
 	}
 
@@ -39,7 +45,7 @@ export default class FilePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings, {"order":FilePerk.info["order"]});
+		unit.upgrade("event", "doApplySettings", FilePerk.#FilePerk_onDoApplySettings, {"order":FilePerk.info["order"]});
 
 	}
 
@@ -47,7 +53,7 @@ export default class FilePerk extends BM.Perk
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static FilePerk_onDoApplySettings(sender, e, ex)
+	static #FilePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];

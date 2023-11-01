@@ -18,16 +18,23 @@ export default class AliasPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__records = {};
+	static #__info = {
+		"section":		"alias",
+		"order":		330,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"alias",
-			"order":		330,
-		};
+		return AliasPerk.#__info;
 
 	}
 
@@ -35,21 +42,11 @@ export default class AliasPerk extends BM.Perk
 	//  Methods
 	// -------------------------------------------------------------------------
 
-	static globalInit()
-	{
-
-		// Init vars
-		AliasPerk._records = {};
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	static init(unit, options)
 	{
 
 		// Upgrade unit
-		unit.upgrade("skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
+		unit.upgrade("skill", "alias.resolve", function(...args) { return AliasPerk.#_resolve(...args); });
 
 	}
 
@@ -57,7 +54,7 @@ export default class AliasPerk extends BM.Perk
 	//  Skills
 	// -------------------------------------------------------------------------
 
-	static _resolve(unit, target)
+	static #_resolve(unit, target)
 	{
 
 		return unit.get("setting", `alias.${target}`, {});

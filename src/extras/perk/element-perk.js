@@ -19,16 +19,22 @@ export default class ElementPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"element",
+		"order":		220,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"element",
-			"order":		220,
-		};
+		return ElementPerk.#__info;
 
 	}
 
@@ -42,7 +48,7 @@ export default class ElementPerk extends BM.Perk
 		// Upgrade unit
 		unit.upgrade("vault", "element.overlay", );
 		unit.upgrade("vault", "element.overlayPromise", Promise.resolve());
-		unit.upgrade("event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings, {"order":ElementPerk.info["order"]});
+		unit.upgrade("event", "doApplySettings", ElementPerk.#ElementPerk_onDoApplySettings, {"order":ElementPerk.info["order"]});
 
 	}
 
@@ -50,7 +56,7 @@ export default class ElementPerk extends BM.Perk
 	//	Event handlers
 	// -----------------------------------------------------------------------------
 
-	static ElementPerk_onDoApplySettings(sender, e, ex)
+	static #ElementPerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let order = ElementPerk.info["order"];
@@ -74,7 +80,7 @@ export default class ElementPerk extends BM.Perk
 		let promises = [];
 
 		Object.keys(settings).forEach((elementName) => {
-			promises = promises.concat(ElementPerk.__initElements(this, e, elementName, settings[elementName]));
+			promises = promises.concat(ElementPerk.#__initElements(this, e, elementName, settings[elementName]));
 		});
 
 		return Promise.all(promises);
@@ -94,7 +100,7 @@ export default class ElementPerk extends BM.Perk
 	 *
  	 * @return  {Array}			HTML elements.
 	 */
-	static __getTargetElements(unit, elementName, elementInfo)
+	static #__getTargetElements(unit, elementName, elementInfo)
 	{
 
 		let elements;
@@ -133,11 +139,11 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{String}		elementName			Element name.
 	 * @param	{Object}		elementInfo			Element info.
 	 */
-	static __initElements(unit, eventInfo, elementName, elementInfo)
+	static #__initElements(unit, eventInfo, elementName, elementInfo)
 	{
 
 		let ret = [];
-		let elements = ElementPerk.__getTargetElements(unit, elementName, elementInfo);
+		let elements = ElementPerk.#__getTargetElements(unit, elementName, elementInfo);
 
 		for (let i = 0; i < elements.length; i++)
 		{
@@ -150,11 +156,11 @@ export default class ElementPerk extends BM.Perk
 					elements[i].scrollTo(elementInfo[key]);
 					break;
 				case "showLoader":
-					ElementPerk.__showOverlay(unit, elementInfo[key]);
+					ElementPerk.#__showOverlay(unit, elementInfo[key]);
 					waitForElement = unit.get("vault", "element.overlay");
 					break;
 				case "hideLoader":
-					ElementPerk.__hideOverlay(unit, elementInfo[key]);
+					ElementPerk.#__hideOverlay(unit, elementInfo[key]);
 					waitForElement = unit.get("vault", "element.overlay");
 					break;
 				case "build":
@@ -162,10 +168,10 @@ export default class ElementPerk extends BM.Perk
 					FormUtil.build(elements[i], unit.get("inventory", `resource.resources.${resourceName}`).items, elementInfo[key]);
 					break;
 				case "attribute":
-					ElementPerk.__setAttributes(elements[i], elementInfo[key]);
+					ElementPerk.#__setAttributes(elements[i], elementInfo[key]);
 					break;
 				case "class":
-					ElementPerk.__setClasses(elements[i], elementInfo[key]);
+					ElementPerk.#__setClasses(elements[i], elementInfo[key]);
 					break;
 				case "style":
 					Object.keys(elementInfo[key]).forEach((styleName) => {
@@ -184,7 +190,7 @@ export default class ElementPerk extends BM.Perk
 				case "waitFor":
 					break;
 				default:
-					console.warn(`ElementPerk.__initAttr(): Invalid type. name=${unit.tagName}, eventName=${eventInfo.type}, type=${key}`);
+					console.warn(`ElementPerk.#__initAttr(): Invalid type. name=${unit.tagName}, eventName=${eventInfo.type}, type=${key}`);
 					break;
 				}
 			});
@@ -192,7 +198,7 @@ export default class ElementPerk extends BM.Perk
 			// Wait for transition/animation to finish
 			if (elementInfo["waitFor"])
 			{
-				ret.push(ElementPerk.__waitFor(unit, eventInfo, elementName, elementInfo, waitForElement));
+				ret.push(ElementPerk.#__waitFor(unit, eventInfo, elementName, elementInfo, waitForElement));
 			}
 		}
 
@@ -213,7 +219,7 @@ export default class ElementPerk extends BM.Perk
 	 *
  	 * @return  {Promise}		Promise.
 	 */
-	static __waitFor(unit, eventInfo, elementName, elementInfo, element)
+	static #__waitFor(unit, eventInfo, elementName, elementInfo, element)
 	{
 
 		let inTransition = false;
@@ -227,16 +233,16 @@ export default class ElementPerk extends BM.Perk
 			inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
 			break;
 		default:
-			console.warn(`ElementPerk.__initAttr(): Invalid waitFor. name=${unit.tagName}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+			console.warn(`ElementPerk.#__initAttr(): Invalid waitFor. name=${unit.tagName}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
 			break;
 		}
 
-		BM.Util.warn(inTransition, `ElementPerk.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
+		BM.Util.warn(inTransition, `ElementPerk.#__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 
 		return new Promise((resolve, reject) => {
 			// Timeout timer
 			let timer = setTimeout(() => {
-				reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
+				reject(`ElementPerk.#__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 			}, BM.Unit.get("setting", "system.options.waitForTimeout", 10000));
 
 			// Resolve when finished
@@ -256,7 +262,7 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{HTMLElement}	element				Element to set classes.
 	 * @param	{Object}		options				Options.
 	 */
-	static __setAttributes(element, options)
+	static #__setAttributes(element, options)
 	{
 
 		Object.keys(options).forEach((mode) => {
@@ -274,7 +280,7 @@ export default class ElementPerk extends BM.Perk
 				};
 				break;
 			default:
-				console.warn(`ElementPerk.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
+				console.warn(`ElementPerk.#__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
 				break;
 			}
 		});
@@ -290,7 +296,7 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{HTMLElement}	element				Element to set classes.
 	 * @param	{Object}		options				Options.
 	 */
-	static __setClasses(element, options)
+	static #__setClasses(element, options)
 	{
 
 		setTimeout(() => {
@@ -307,7 +313,7 @@ export default class ElementPerk extends BM.Perk
 					element.setAttribute("class", options[mode]);
 					break;
 				default:
-					console.warn(`ElementPerk.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
+					console.warn(`ElementPerk.#__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
 					break;
 				}
 			});
@@ -323,7 +329,7 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __createOverlay(unit, options)
+	static #__createOverlay(unit, options)
 	{
 
 		let overlay = unit.get("vault", "element.overlay");
@@ -348,7 +354,7 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __closeOnClick(unit, options)
+	static #__closeOnClick(unit, options)
 	{
 
 		unit.get("vault", "element.overlay").addEventListener("click", (e) => {
@@ -369,7 +375,7 @@ export default class ElementPerk extends BM.Perk
 	 *
 	 * @return 	{String}		Effect ("transition" or "animation").
 	 */
-	static __getEffect(overlay)
+	static #__getEffect(overlay)
 	{
 
 		let effect = "";
@@ -395,15 +401,15 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __showOverlay(unit, options)
+	static #__showOverlay(unit, options)
 	{
 
-		let overlay = ElementPerk.__createOverlay(unit);
+		let overlay = ElementPerk.#__createOverlay(unit);
 
 		// Add close on click event handler
 		if (BM.Util.safeGet(options, "closeOnClick"))
 		{
-			ElementPerk.__closeOnClick(unit);
+			ElementPerk.#__closeOnClick(unit);
 		}
 
 		window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
@@ -412,7 +418,7 @@ export default class ElementPerk extends BM.Perk
 		overlay.classList.add(...addClasses);
 		overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
 
-		let effect = ElementPerk.__getEffect(overlay);
+		let effect = ElementPerk.#__getEffect(overlay);
 		if (effect)
 		{
 			unit.get("vault", "element.overlayPromise").then(() => {
@@ -438,7 +444,7 @@ export default class ElementPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static __hideOverlay(unit, options)
+	static #__hideOverlay(unit, options)
 	{
 
 		let overlay = unit.get("vault", "element.overlay");

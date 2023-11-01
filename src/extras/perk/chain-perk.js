@@ -18,16 +18,22 @@ export default class ChainPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"chain",
+		"order":		800,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"chain",
-			"order":		800,
-		};
+		return ChainPerk.#__info;
 
 	}
 
@@ -39,7 +45,7 @@ export default class ChainPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", ChainPerk.onDoApplySettings, {"order":ChainPerk.info["order"]});
+		unit.upgrade("event", "doApplySettings", ChainPerk.#onDoApplySettings, {"order":ChainPerk.info["order"]});
 
 	}
 
@@ -52,7 +58,7 @@ export default class ChainPerk extends BM.Perk
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
-				unit.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
+				unit.removeEventHandler(eventName, {"handler":ChainPerk.#onDoApplySettings, "options":chains[eventName]});
 			});
 		}
 
@@ -62,16 +68,16 @@ export default class ChainPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static onDoApplySettings(sender, e, ex)
+	static #onDoApplySettings(sender, e, ex)
 	{
 
 		let order = ChainPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.use("skill", "event.add", sectionName, {
-				"handler":ChainPerk.onDoProcess,
+				"handler":	ChainPerk.#onDoProcess,
 				"order":	order,
-				"options":sectionValue
+				"options":	sectionValue
 			});
 		});
 
@@ -79,7 +85,7 @@ export default class ChainPerk extends BM.Perk
 
 	// -----------------------------------------------------------------------------
 
-	static onDoProcess(sender, e, ex)
+	static #onDoProcess(sender, e, ex)
 	{
 
 		let targets = ex.options;
@@ -98,12 +104,12 @@ export default class ChainPerk extends BM.Perk
 			if (sync)
 			{
 				chain = chain.then(() => {
-					return ChainPerk.__execTarget(this, nodes, method, status);
+					return ChainPerk.#__execTarget(this, nodes, method, status);
 				});
 			}
 			else
 			{
-				chain = ChainPerk.__execTarget(this, nodes, method, status);
+				chain = ChainPerk.#__execTarget(this, nodes, method, status);
 			}
 			promises.push(chain);
 		}
@@ -126,7 +132,7 @@ export default class ChainPerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static __execTarget(unit, nodes, skillName, status)
+	static #__execTarget(unit, nodes, skillName, status)
 	{
 
 		let promises = [];

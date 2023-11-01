@@ -20,17 +20,44 @@ export default class FormPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"section":		"form",
+		"order":		310,
+		"depends":		"ValidationPerk",
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"form",
-			"order":		310,
-			"depends":		"ValidationPerk",
-		};
+		return FormPerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Methods
+	// -------------------------------------------------------------------------
+
+	static init(unit, options)
+	{
+
+		// Upgrade unit
+		unit.upgrade("skill", "form.build", function(...args) { return FormPerk.#_build(...args); });
+		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk.#_submit(...args); });
+		unit.upgrade("state", "form.cancelSubmit", false);
+		unit.upgrade("vault", "form.lastItems", {});
+		unit.upgrade("event", "afterTransform", FormPerk.#FormPerk_onAfterTransform, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doClear", FormPerk.#FormPerk_onDoClear, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "beforeFill", FormPerk.#FormPerk_onBeforeFill, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doFill", FormPerk.#FormPerk_onDoFill, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doCollect", FormPerk.#FormPerk_onDoCollect, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "afterCollect", FormPerk.#FormPerk_onAfterCollect, {"order":FormPerk.info["order"]});
 
 	}
 
@@ -38,7 +65,7 @@ export default class FormPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onAfterTransform(sender, e, ex)
+	static #FormPerk_onAfterTransform(sender, e, ex)
 	{
 
 		FormUtil.hideConditionalElements(this);
@@ -47,7 +74,7 @@ export default class FormPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onDoClear(sender, e, ex)
+	static #FormPerk_onDoClear(sender, e, ex)
 	{
 
 		if (this.get("setting", "form.options.autoClear", true))
@@ -62,7 +89,7 @@ export default class FormPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onBeforeFill(sender, e, ex)
+	static #FormPerk_onBeforeFill(sender, e, ex)
 	{
 
 		if (e.detail.refill)
@@ -74,7 +101,7 @@ export default class FormPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onDoFill(sender, e, ex)
+	static #FormPerk_onDoFill(sender, e, ex)
 	{
 
 		if (this.get("setting", "form.options.autoFill", true))
@@ -90,7 +117,7 @@ export default class FormPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onDoCollect(sender, e, ex)
+	static #FormPerk_onDoCollect(sender, e, ex)
 	{
 
 		if (this.get("setting", "form.options.autoCollect", true))
@@ -102,35 +129,14 @@ export default class FormPerk extends BM.Perk
 
 	// -------------------------------------------------------------------------
 
-	static FormPerk_onAfterCollect(sender, e, ex)
+	static #FormPerk_onAfterCollect(sender, e, ex)
 	{
 
 		// Collect only submittable data
 		if (this.get("setting", "form.options.autoCrop", true))
 		{
-			e.detail.items = FormPerk.__collectData(this, e.detail.items);
+			e.detail.items = FormPerk.#__collectData(this, e.detail.items);
 		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(unit, options)
-	{
-
-		// Upgrade unit
-		unit.upgrade("skill", "form.build", function(...args) { return FormPerk._build(...args); });
-		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
-		unit.upgrade("state", "form.cancelSubmit", false);
-		unit.upgrade("vault", "form.lastItems", {});
-		unit.upgrade("event", "afterTransform", FormPerk.FormPerk_onAfterTransform, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doClear", FormPerk.FormPerk_onDoClear, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "beforeFill", FormPerk.FormPerk_onBeforeFill, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doFill", FormPerk.FormPerk_onDoFill, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doCollect", FormPerk.FormPerk_onDoCollect, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "afterCollect", FormPerk.FormPerk_onAfterCollect, {"order":FormPerk.info["order"]});
 
 	}
 
@@ -147,7 +153,7 @@ export default class FormPerk extends BM.Perk
 	 * @param	{Object}		items				Items to fill elements.
 	 * @param	{Object}		options				Options.
 	 */
-	static _build(unit, element, items, options)
+	static #_build(unit, element, items, options)
 	{
 
 		FormUtil.build(element, items, options);
@@ -164,7 +170,7 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _submit(unit, options)
+	static #_submit(unit, options)
 	{
 
 		options = options || {};
@@ -172,7 +178,7 @@ export default class FormPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			// Collect values
-			return FormPerk.__collect(unit, options);
+			return FormPerk.#__collect(unit, options);
 		}).then(() => {
 			// Validate values
 			if (unit.get("setting", "form.options.autoValidate", true))
@@ -187,14 +193,14 @@ export default class FormPerk extends BM.Perk
 			}
 		}).then(() => {
 			// Submit values
-			console.debug(`FormPerk._submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
+			console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
 			return unit.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
 				if (!unit.get("state", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
 						return unit.use("spell", "event.trigger", "doSubmit", options);
 					}).then(() => {
-						console.debug(`FormPerk._submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
+						console.debug(`FormPerk.#_submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
 						return unit.use("spell", "event.trigger", "afterSubmit", options);
 					});
 				}
@@ -215,16 +221,16 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static __collect(unit, options)
+	static #__collect(unit, options)
 	{
 
 		return Promise.resolve().then(() => {
-			console.debug(`FormPerk.__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			console.debug(`FormPerk.#__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "beforeCollect", options);
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "doCollect", options);
 		}).then(() => {
-			console.debug(`FormPerk.__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			console.debug(`FormPerk.#__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 			return unit.use("spell", "event.trigger", "afterCollect", options);
 		});
 
@@ -240,7 +246,7 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Object}		Collected data.
 	 */
-	static __collectData(unit, items)
+	static #__collectData(unit, items)
 	{
 
 		let submitItem = {};
