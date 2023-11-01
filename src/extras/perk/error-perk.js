@@ -38,7 +38,7 @@ export default class ErrorPerk extends BM.Perk
 	static ErrorPerk_onDoStart(sender, e, ex)
 	{
 
-		let serverNode = this.get("setting", "locale.options.errorServer", this.get("setting", "system.errorServer"));
+		let serverNode = this.get("setting", "error.options.errorServer", this.get("setting", "system.error.options.errorServer"));
 		serverNode = ( serverNode === true ? "bm-error" : serverNode );
 
 		return this.use("spell", "status.wait", [serverNode]).then(() => {
