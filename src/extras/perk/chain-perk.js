@@ -45,7 +45,7 @@ export default class ChainPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", ChainPerk.#onDoApplySettings, {"order":ChainPerk.info["order"]});
+		unit.upgrade("event", "doApplySettings", ChainPerk.#ChainPerk_onDoApplySettings, {"order":ChainPerk.info["order"]});
 
 	}
 
@@ -68,14 +68,14 @@ export default class ChainPerk extends BM.Perk
 	//	Event handlers
 	// -------------------------------------------------------------------------
 
-	static #onDoApplySettings(sender, e, ex)
+	static #ChainPerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let order = ChainPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.use("skill", "event.add", sectionName, {
-				"handler":	ChainPerk.#onDoProcess,
+				"handler":	ChainPerk.#ChainPerk_onDoProcess,
 				"order":	order,
 				"options":	sectionValue
 			});
@@ -85,7 +85,7 @@ export default class ChainPerk extends BM.Perk
 
 	// -----------------------------------------------------------------------------
 
-	static #onDoProcess(sender, e, ex)
+	static #ChainPerk_onDoProcess(sender, e, ex)
 	{
 
 		let targets = ex.options;
