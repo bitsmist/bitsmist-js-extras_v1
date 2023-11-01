@@ -49,8 +49,8 @@ export default class DatabindingPerk extends BM.Perk
 				"resources":	unit.get("inventory", "resource.resources"),
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			unit.upgrade("event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform, {"order":DataBindingPerk.info["order"]});
-			unit.upgrade("event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill, {"order":DataBindingPerk.info["order"]});
+			unit.upgrade("event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform, {"order":DatabindingPerk.info["order"]});
+			unit.upgrade("event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill, {"order":DatabindingPerk.info["order"]});
 		}
 		else
 		{
@@ -60,12 +60,12 @@ export default class DatabindingPerk extends BM.Perk
 				"resources":	unit.resources,
 				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 			}));
-			unit.upgrade("event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow, {"order":DataBindingPerk.info["order"]});
+			unit.upgrade("event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow, {"order":DatabindingPerk.info["order"]});
 		}
 
 		// Upgrade unit
-		unit.upgrade("event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear, {"order":DataBindingPerk.info["order"]});
-		unit.upgrade("event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect, {"order":DataBindingPerk.info["order"]});
+		unit.upgrade("event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear, {"order":DatabindingPerk.info["order"]});
+		unit.upgrade("event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect, {"order":DatabindingPerk.info["order"]});
 
 	}
 
