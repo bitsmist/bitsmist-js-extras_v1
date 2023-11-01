@@ -51,7 +51,7 @@ export default class RollCallPerk extends BM.Perk
 		// Upgrade unit
 		unit.upgrade("skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
 		unit.upgrade("spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-		unit.upgrade("event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings, {"order":RollCallPerk.info["order"]});
 
 	}
 
@@ -87,12 +87,12 @@ export default class RollCallPerk extends BM.Perk
 			let waitInfo = {};
 			let timeout = BITSMIST.v1.Unit.get("setting", "system.status.options.waitForTimeout", 10000);
 			let promise = new Promise((resolve, reject) => {
-					waitInfo["resolve"] = resolve;
-					waitInfo["reject"] = reject;
-					waitInfo["timer"] = setTimeout(() => {
-						reject(`RollCallPerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
-					}, timeout);
-				});
+				waitInfo["resolve"] = resolve;
+				waitInfo["reject"] = reject;
+				waitInfo["timer"] = setTimeout(() => {
+					reject(`RollCallPerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
+				}, timeout);
+			});
 			waitInfo["promise"] = promise;
 
 			RollCallPerk.__createEntry(name, null, waitInfo);
@@ -103,7 +103,7 @@ export default class RollCallPerk extends BM.Perk
 		return Promise.resolve().then(() => {
 			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
 			{
-				return this.get("inventory", "promise.documentReady");
+				return unit.get("inventory", "promise.documentReady");
 			}
 		}).then(() => {
 			if (BM.Util.safeGet(options, "waitForAttendance"))

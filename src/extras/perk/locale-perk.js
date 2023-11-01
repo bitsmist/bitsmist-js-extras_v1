@@ -53,14 +53,14 @@ export default class LocalePerk extends BM.Perk
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
-		unit.upgrade("event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings, {"order":this.info["order"]});
-		unit.upgrade("event", "doSetup", LocalePerk.LocalePerk_onDoSetup, {"order":this.info["order"]});
-		unit.upgrade("event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale, {"order":this.info["order"]});
-		unit.upgrade("event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings, {"order":LocalePerk.info["order"]});
+		unit.upgrade("event", "doSetup", LocalePerk.LocalePerk_onDoSetup, {"order":LocalePerk.info["order"]});
+		unit.upgrade("event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale, {"order":LocalePerk.info["order"]});
+		unit.upgrade("event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale, {"order":LocalePerk.info["order"]});
 
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
 		{
-			unit.upgrade("event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow, {"order":this.info["order"]});
+			unit.upgrade("event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow, {"order":LocalePerk.info["order"]});
 		}
 
 	}

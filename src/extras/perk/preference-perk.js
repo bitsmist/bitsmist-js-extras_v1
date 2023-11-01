@@ -43,8 +43,8 @@ export default class PreferencePerk extends BM.Perk
 		unit.upgrade("spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
 		unit.upgrade("spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
 		unit.upgrade("vault", "preference.server");
-		unit.upgrade("event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings, {"order":this.info["order"]});
-		unit.upgrade("event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings, {"order":PreferencePerk.info["order"]});
+		unit.upgrade("event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup, {"order":PreferencePerk.info["order"]});
 
 	}
 

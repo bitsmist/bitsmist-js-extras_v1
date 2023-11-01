@@ -39,7 +39,7 @@ export default class FilePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings, {"order":FilePerk.info["order"]});
 
 	}
 

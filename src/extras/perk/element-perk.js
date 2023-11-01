@@ -42,7 +42,7 @@ export default class ElementPerk extends BM.Perk
 		// Upgrade unit
 		unit.upgrade("vault", "element.overlay", );
 		unit.upgrade("vault", "element.overlayPromise", Promise.resolve());
-		unit.upgrade("event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings, {"order":ElementPerk.info["order"]});
 
 	}
 

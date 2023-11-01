@@ -62,11 +62,11 @@ export default class RoutePerk extends BM.Perk
 		unit.upgrade("spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
 		unit.upgrade("vault", "routing.routes", []);
 		unit.upgrade("state", "routing.routeInfo", {});
-		unit.upgrade("event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings, {"order":this.info["order"]});
-		unit.upgrade("event", "doStart", RoutePerk.RoutePerk_onDoStart, {"order":this.info["order"]});
-		unit.upgrade("event", "afterReady", RoutePerk.RoutePerk_onAfterReady, {"order":this.info["order"]});
-		unit.upgrade("event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail, {"order":this.info["order"]});
-		unit.upgrade("event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings, {"order":RoutePerk.info["order"]});
+		unit.upgrade("event", "doStart", RoutePerk.RoutePerk_onDoStart, {"order":RoutePerk.info["order"]});
+		unit.upgrade("event", "afterReady", RoutePerk.RoutePerk_onAfterReady, {"order":RoutePerk.info["order"]});
+		unit.upgrade("event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail, {"order":RoutePerk.info["order"]});
+		unit.upgrade("event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity, {"order":RoutePerk.info["order"]});
 
 		// Init popstate handler
 		RoutePerk.__initPopState(unit);
@@ -201,7 +201,7 @@ export default class RoutePerk extends BM.Perk
 	static _loadSettings(unit, routeName, options)
 	{
 
-		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(unit, routeName), Object.assign({"bindTo":this._unit}, options)).then((settings) => {
+		return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options)).then((settings) => {
 			unit.set("state", "routing.routeInfo.settings", settings);
 		});
 

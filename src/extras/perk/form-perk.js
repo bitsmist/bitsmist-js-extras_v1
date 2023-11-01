@@ -125,12 +125,12 @@ export default class FormPerk extends BM.Perk
 		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
 		unit.upgrade("state", "form.cancelSubmit", false);
 		unit.upgrade("vault", "form.lastItems", {});
-		unit.upgrade("event", "afterTransform", FormPerk.FormPerk_onAfterTransform, {"order":this.info["order"]});
-		unit.upgrade("event", "doClear", FormPerk.FormPerk_onDoClear, {"order":this.info["order"]});
-		unit.upgrade("event", "beforeFill", FormPerk.FormPerk_onBeforeFill, {"order":this.info["order"]});
-		unit.upgrade("event", "doFill", FormPerk.FormPerk_onDoFill, {"order":this.info["order"]});
-		unit.upgrade("event", "doCollect", FormPerk.FormPerk_onDoCollect, {"order":this.info["order"]});
-		unit.upgrade("event", "afterCollect", FormPerk.FormPerk_onAfterCollect, {"order":this.info["order"]});
+		unit.upgrade("event", "afterTransform", FormPerk.FormPerk_onAfterTransform, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doClear", FormPerk.FormPerk_onDoClear, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "beforeFill", FormPerk.FormPerk_onBeforeFill, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doFill", FormPerk.FormPerk_onDoFill, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "doCollect", FormPerk.FormPerk_onDoCollect, {"order":FormPerk.info["order"]});
+		unit.upgrade("event", "afterCollect", FormPerk.FormPerk_onAfterCollect, {"order":FormPerk.info["order"]});
 
 	}
 

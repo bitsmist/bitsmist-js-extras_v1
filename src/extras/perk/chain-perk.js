@@ -39,7 +39,7 @@ export default class ChainPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", ChainPerk.onDoApplySettings, {"order":this.info["order"]});
+		unit.upgrade("event", "doApplySettings", ChainPerk.onDoApplySettings, {"order":ChainPerk.info["order"]});
 
 	}
 

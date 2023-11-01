@@ -48,7 +48,7 @@ export default class DialogPerk extends BM.Perk
 		unit.upgrade("vault", "dialog.backdropPromise", Promise.resolve());
 		unit.upgrade("state", "dialog.isModal", false);
 		unit.upgrade("state", "dialog.modalResult", {});
-		unit.upgrade("event", "afterReady", DialogPerk.DialogPerk_onAfterReady, {"order":this.info["order"]});
+		unit.upgrade("event", "afterReady", DialogPerk.DialogPerk_onAfterReady, {"order":DialogPerk.info["order"]});
 
 	}
 
