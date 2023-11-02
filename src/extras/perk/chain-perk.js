@@ -58,7 +58,7 @@ export default class ChainPerk extends BM.Perk
 		if (chains)
 		{
 			Object.keys(chains).forEach((eventName) => {
-				unit.removeEventHandler(eventName, {"handler":ChainPerk.#onDoApplySettings, "options":chains[eventName]});
+				unit.removeEventHandler(eventName, {"handler":ChainPerk.#ChainPerk_onDoApplySettings, "options":chains[eventName]});
 			});
 		}
 
