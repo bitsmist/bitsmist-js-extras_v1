@@ -42,8 +42,8 @@ export default class ValidationPerk extends BM.Perk
 		unit.upgrade("spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
 		unit.upgrade("spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 		unit.upgrade("inventory", "validation.validators", {});
-		unit.upgrade("state", "validation.validationResult", {});
-		unit.upgrade("state", "validation.validationResult", {});
+		unit.upgrade("inventory", "validation.validationResult", {});
+		unit.upgrade("inventory", "validation.validationResult", {});
 		unit.upgrade("event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings, {"order":this.info["order"]});
 		unit.upgrade("event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate, {"order":this.info["order"]});
 		unit.upgrade("event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity, {"order":this.info["order"]});
@@ -148,7 +148,7 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		options = options || {};
-		unit.set("state", "validation.validationResult.result", true);
+		unit.set("inventory", "validation.validationResult.result", true);
 
 		return Promise.resolve().then(() => {
 			console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.uniqueId}`);
@@ -156,7 +156,7 @@ export default class ValidationPerk extends BM.Perk
 		}).then(() => {
 			return unit.use("spell", "event.trigger", "doValidate", options);
 		}).then(() => {
-			if (unit.get("state", "validation.validationResult.result"))
+			if (unit.get("inventory", "validation.validationResult.result"))
 			{
 				console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.uniqueId}`);
 				return unit.use("spell", "event.trigger", "doValidateSuccess", options);
@@ -167,7 +167,7 @@ export default class ValidationPerk extends BM.Perk
 				return unit.use("spell", "event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
-			if (!unit.get("state", "validation.validationResult.result"))
+			if (!unit.get("inventory", "validation.validationResult.result"))
 			{
 				return unit.use("spell", "event.trigger", "doReportValidity", options);
 			}

@@ -24,6 +24,7 @@ export default class DatabindingPerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"databinding",
 		"order":		320,
@@ -49,23 +50,29 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (unit.get("setting", "databinding.options.dataType", "single") === "single")
 		{
+			// Init unit vault
+			DatabindingPerk.#__vault.set(unit, {"store": new BindableStore({
+					"resources":	unit.get("inventory", "resource.resources"),
+					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
+				})
+			});
+
 			// Upgrade unit (single)
 			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindData(...args); });
-			unit.upgrade("vault", "databinding.store", new BindableStore({
-				"resources":	unit.get("inventory", "resource.resources"),
-				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
-			}));
 			unit.upgrade("event", "beforeTransform", DatabindingPerk.#DatabindingPerk_onBeforeTransform, {"order":DatabindingPerk.info["order"]});
 			unit.upgrade("event", "doFill", DatabindingPerk.#DatabindingPerk_onDoFill, {"order":DatabindingPerk.info["order"]});
 		}
 		else
 		{
+			// Init unit vault
+			DatabindingPerk.#__vault.set(unit, {"store": new BindableArrayStore({
+					"resources":	unit.get("inventory", "resource.resources"),
+					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
+				})
+			});
+
 			// Upgrade unit (multiple)
 			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindDataArray(...args); });
-			unit.upgrade("vault", "databinding.store", new BindableArrayStore({
-				"resources":	unit.resources,
-				"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
-			}));
 			unit.upgrade("event", "doFillRow", DatabindingPerk.#DatabindingPerk_onDoFillRow, {"order":DatabindingPerk.info["order"]});
 		}
 
@@ -91,7 +98,7 @@ export default class DatabindingPerk extends BM.Perk
 	static #DatabindingPerk_onDoClear(sender, e, ex)
 	{
 
-		this.get("vault", "databinding.store").clear();
+		DatabindingPerk.#__vault.get(this)["store"].clear();
 
 	}
 
@@ -102,7 +109,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (e.detail.items)
 		{
-			this.get("vault", "databinding.store").replace(e.detail.items);
+			DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.items);
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
@@ -114,7 +121,7 @@ export default class DatabindingPerk extends BM.Perk
 	{
 
 		DatabindingPerk.#_bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-		this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
+		DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.no, e.detail.item);
 
 	}
 
@@ -125,7 +132,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		if (this.get("setting", "databinding.options.autoCollect", true))
 		{
-			e.detail.items = this.get("vault", "databinding.store").items;
+			e.detail.items = DatabindingPerk.#__vault.get(this)["store"].items;
 		}
 
 	}
@@ -158,7 +165,7 @@ export default class DatabindingPerk extends BM.Perk
 			let callback = DatabindingPerk.#__getCallback(unit, key);
 
 			// Bind
-			unit.get("vault", "databinding.store").bindTo(key, elem, callback);
+			DatabindingPerk.#__vault.get(unit)["store"].bindTo(key, elem, callback);
 		});
 
 	}
@@ -190,7 +197,7 @@ export default class DatabindingPerk extends BM.Perk
 			let callback = DatabindingPerk.#__getCallback(unit, key);
 
 			// Bind
-			unit.get("vault", "databinding.store").bindTo(index, key, elem, callback);
+			DatabindingPerk.#__vault.get(unit)["store"].bindTo(index, key, elem, callback);
 		});
 
 	}

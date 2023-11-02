@@ -23,6 +23,7 @@ export default class LocalePerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"locale",
 		"order":		215,
@@ -46,6 +47,11 @@ export default class LocalePerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		LocalePerk.#__vault.set(unit, {
+			"server":	null,
+		});
+
 		// Upgrade unit
 		unit.upgrade("skill", "locale.localize", function(...args) { return LocalePerk.#_localize(...args); });
 		unit.upgrade("skill", "locale.translate", function(...args) { return LocalePerk.#_getLocaleMessage(...args); });
@@ -54,7 +60,7 @@ export default class LocalePerk extends BM.Perk
 		unit.upgrade("spell", "locale.addHandler", function(...args) { return LocalePerk.#_addHandler(...args); });
 		unit.upgrade("inventory", "locale.localizers", {});
 		unit.upgrade("inventory", "locale.messages", new MultiStore());
-		unit.upgrade("state", "locale.active", {
+		unit.upgrade("inventory", "locale.active", {
 			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language.substring(0, 2))),
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
@@ -94,13 +100,13 @@ export default class LocalePerk extends BM.Perk
 			promises.push(this.use("spell", "status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
 				server.subscribe(this);
-				this.set("vault", "locale.server", server);
+				LocalePerk.#__vault.get(this)["server"] = server;
 
 				// Synchronize to the server's locales
-				let localeSettings = server.get("state", "locale.active");
-				this.set("state", "locale.active.localeName", localeSettings["localeName"]);
-				this.set("state", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-				this.set("state", "locale.active.currencyName", localeSettings["currencyName"]);
+				let localeSettings = server.get("inventory", "locale.active");
+				this.set("inventory", "locale.active.localeName", localeSettings["localeName"]);
+				this.set("inventory", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+				this.set("inventory", "locale.active.currencyName", localeSettings["currencyName"]);
 			}));
 		}
 
@@ -113,7 +119,7 @@ export default class LocalePerk extends BM.Perk
 	static #LocalePerk_onDoSetup(sender, e, ex)
 	{
 
-		return LocalePerk.#_applyLocale(this, {"localeName":this.get("state", "locale.active.localeName")});
+		return LocalePerk.#_applyLocale(this, {"localeName":this.get("inventory", "locale.active.localeName")});
 
 	}
 
@@ -135,7 +141,7 @@ export default class LocalePerk extends BM.Perk
 		LocalePerk.#_localize(this, this);
 
 		// Refill (Do not refill when starting)
-		if (this.get("state", "status.status") === "ready")
+		if (this.get("inventory", "status.status") === "ready")
 		{
 			return this.use("spell", "basic.fill", {"refill":true});
 		}
@@ -198,7 +204,7 @@ export default class LocalePerk extends BM.Perk
 			console.debug(`LocalePerk.#_applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
 			return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
-			unit.set("state", "locale.active.localeName", options["localeName"]);
+			unit.set("inventory", "locale.active.localeName", options["localeName"]);
 			return unit.use("spell", "event.trigger", "doApplyLocale", options);
 		}).then(() => {
 			console.debug(`LocalePerk.#_applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
@@ -224,7 +230,7 @@ export default class LocalePerk extends BM.Perk
 		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
 			unit.get("inventory", `locale.localizers.${handlerName}`).localize(
 				rootNode,
-				Object.assign({"interpolation":interpolation}, unit.get("state", "locale.active"))
+				Object.assign({"interpolation":interpolation}, unit.get("inventory", "locale.active"))
 			);
 		});
 
@@ -268,12 +274,12 @@ export default class LocalePerk extends BM.Perk
 	static #_getLocaleMessage(unit, key, localeName)
 	{
 
-		localeName = localeName || unit.get("state", "locale.active.localeName");
+		localeName = localeName || unit.get("inventory", "locale.active.localeName");
 
 		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
 		if (value === undefined)
 		{
-			value = unit.get("inventory", "locale.messages").get(`${unit.get("state", "locale.fallbackLocaleName")}.${key}`);
+			value = unit.get("inventory", "locale.messages").get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
 		}
 
 		return value;

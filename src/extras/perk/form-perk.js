@@ -23,6 +23,7 @@ export default class FormPerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"form",
 		"order":		310,
@@ -47,11 +48,15 @@ export default class FormPerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		FormPerk.#__vault.set(unit, {
+			"lastItems":	{},
+		});
+
 		// Upgrade unit
 		unit.upgrade("skill", "form.build", function(...args) { return FormPerk.#_build(...args); });
 		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk.#_submit(...args); });
-		unit.upgrade("state", "form.cancelSubmit", false);
-		unit.upgrade("vault", "form.lastItems", {});
+		unit.upgrade("inventory", "form.cancelSubmit", false);
 		unit.upgrade("event", "afterTransform", FormPerk.#FormPerk_onAfterTransform, {"order":FormPerk.info["order"]});
 		unit.upgrade("event", "doClear", FormPerk.#FormPerk_onDoClear, {"order":FormPerk.info["order"]});
 		unit.upgrade("event", "beforeFill", FormPerk.#FormPerk_onBeforeFill, {"order":FormPerk.info["order"]});
@@ -94,7 +99,7 @@ export default class FormPerk extends BM.Perk
 
 		if (e.detail.refill)
 		{
-			e.detail.items = this.get("vault", "form.lastItems");
+			e.detail.items = FormPerk.#__vault.get(this)["lastItems"];
 		}
 
 	}
@@ -111,7 +116,7 @@ export default class FormPerk extends BM.Perk
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
-		this.set("vault", "form.lastItems", e.detail.items);
+		FormPerk.#__vault.get(this)["lastItems"] = e.detail.items;
 
 	}
 
@@ -174,7 +179,7 @@ export default class FormPerk extends BM.Perk
 	{
 
 		options = options || {};
-		unit.set("state", "form.cancelSubmit", false);
+		unit.set("inventory", "form.cancelSubmit", false);
 
 		return Promise.resolve().then(() => {
 			// Collect values
@@ -185,9 +190,9 @@ export default class FormPerk extends BM.Perk
 			{
 				options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
 				return unit.use("spell", "validation.validate", options).then(() => {
-					if (!unit.get("state", "validation.validationResult.result"))
+					if (!unit.get("inventory", "validation.validationResult.result"))
 					{
-						unit.set("state", "form.cancelSubmit", true);
+						unit.set("inventory", "form.cancelSubmit", true);
 					}
 				});
 			}
@@ -195,7 +200,7 @@ export default class FormPerk extends BM.Perk
 			// Submit values
 			console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
 			return unit.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
-				if (!unit.get("state", "form.cancelSubmit"))
+				if (!unit.get("inventory", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
 						return unit.use("spell", "event.trigger", "doSubmit", options);

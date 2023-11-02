@@ -21,6 +21,7 @@ export default class PreferencePerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"preference",
 		"order":		900,
@@ -44,11 +45,15 @@ export default class PreferencePerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		PreferencePerk.#__vault.set(unit, {
+			"server":	null,
+		});
+
 		// Upgrade unit
 		unit.upgrade("skill", "preference.get", function(...args) { return PreferencePerk.#_getPreferences(...args); });
 		unit.upgrade("spell", "preference.set", function(...args) { return PreferencePerk.#_setPreferences(...args); });
 		unit.upgrade("spell", "preference.apply", function(...args) { return PreferencePerk.#_applyPreferences(...args); });
-		unit.upgrade("vault", "preference.server");
 		unit.upgrade("event", "doApplySettings", PreferencePerk.#PreferencePerk_onDoApplySettings, {"order":PreferencePerk.info["order"]});
 		unit.upgrade("event", "doSetup", PreferencePerk.#PreferencePerk_onDoSetup, {"order":PreferencePerk.info["order"]});
 
@@ -69,7 +74,7 @@ export default class PreferencePerk extends BM.Perk
 		return this.use("spell", "status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-			this.set("vault", "preference.server", server);
+			PreferencePerk.#__vault.get(this)["server"] = server;
 		});
 
 	}
@@ -79,7 +84,7 @@ export default class PreferencePerk extends BM.Perk
 	static #PreferencePerk_onDoSetup(sender, e, ex)
 	{
 
-		return this.use("spell", "preference.apply", {"preferences":this.get("vault", "preference.server").items});
+		return this.use("spell", "preference.apply", {"preferences":PreferencePerk.#__vault.get(this)["server"].items});
 
 	}
 
@@ -122,11 +127,11 @@ export default class PreferencePerk extends BM.Perk
 
 		if (key)
 		{
-			return unit.get("vault", "preference.server").getPreference(key, defaultValue);
+			return PreferencePerk.#__vault.get(unit)["server"].getPreference(key, defaultValue);
 		}
 		else
 		{
-			return unit.get("vault", "preference.server").items;
+			return PreferencePerk.#__vault.get(unit)["server"].items;
 		}
 
 	}
@@ -143,7 +148,7 @@ export default class PreferencePerk extends BM.Perk
 	static #_setPreferences(unit, preferences, options)
 	{
 
-		return unit.get("vault", "preference.server").setPreference(preferences, options, {"sender":unit});
+		return PreferencePerk.#__vault.get(unit)["server"].setPreference(preferences, options, {"sender":unit});
 
 	}
 

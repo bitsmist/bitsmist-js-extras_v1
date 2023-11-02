@@ -22,6 +22,7 @@ export default class DialogPerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	static #__backdrop;
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"dialog",
 		"order":		800,
@@ -45,16 +46,21 @@ export default class DialogPerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		DialogPerk.#__vault.set(unit, {
+			"backdrop":			null,
+			"backdropPromise":	Promise.resolve(),
+			"modalPromise":		null,
+		});
+
 		// Upgrade unit
 		unit.upgrade("spell", "dialog.open", function(...args) { return DialogPerk.#_open(...args); });
 		unit.upgrade("spell", "dialog.openModal", function(...args) { return DialogPerk.#_openModal(...args); });
 		unit.upgrade("spell", "dialog.close", function(...args) { return DialogPerk.#_close(...args); });
 		unit.upgrade("inventory", "dialog.cancelClose");
-		unit.upgrade("vault", "dialog.modalPromise");
-		unit.upgrade("vault", "dialog.backdrop");
-		unit.upgrade("vault", "dialog.backdropPromise", Promise.resolve());
-		unit.upgrade("state", "dialog.isModal", false);
-		unit.upgrade("state", "dialog.modalResult", {});
+		unit.upgrade("inventory", "dialog.isModal", false);
+		unit.upgrade("inventory", "dialog.modalResult", {});
+		unit.upgrade("inventory", "dialog.options");
 		unit.upgrade("event", "afterReady", DialogPerk.#DialogPerk_onAfterReady, {"order":DialogPerk.info["order"]});
 
 	}
@@ -90,7 +96,7 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		options = options || {};
-		unit.set("vault", "dialog.options", options);
+		unit.set("inventory", "dialog.options", options);
 
 		console.debug(`DialogPerk.#_open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
 		return unit.use("spell", "event.trigger", "beforeOpen", options).then(() => {
@@ -140,9 +146,10 @@ export default class DialogPerk extends BM.Perk
 		console.debug(`DialogPerk.#_openModal(): Opening unit modal. name=${unit.tagName}, id=${unit.id}`);
 
 		return new Promise((resolve, reject) => {
-			unit.set("state", "dialog.isModal", true);
-			unit.set("state", "dialog.modalResult", {"result":false});
-			unit.set("vault", "dialog.modalPromise", {"resolve":resolve,"reject":reject});
+			unit.set("inventory", "dialog.isModal", true);
+			unit.set("inventory", "dialog.modalResult", {"result":false});
+			DialogPerk.#__vault.get(unit)["modalPromise"] = {"resolve":resolve,"reject":reject};
+
 			return DialogPerk.#_open(unit, options);
 		});
 
@@ -175,9 +182,9 @@ export default class DialogPerk extends BM.Perk
 						return DialogPerk.#__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 					}
 				}).then(() => {
-					if (unit.get("state", "dialog.isModal"))
+					if (unit.get("inventory", "dialog.isModal"))
 					{
-						unit.get("vault", "dialog.modalPromise").resolve(unit.get("state", "dialog.modalResult"));
+						DialogPerk.#__vault.get(unit)["modalPromise"].resolve(unit.get("inventory", "dialog.modalResult"));
 					}
 					console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
 
@@ -223,8 +230,8 @@ export default class DialogPerk extends BM.Perk
 
 		DialogPerk.#__createBackdrop(unit);
 
-		return unit.get("vault", "dialog.backdropPromise").then(() => {
-			unit.set("vault", "dialog.backdropPromise", new Promise((resolve, reject) => {
+		return DialogPerk.#__vault.get(unit)["backdropPromise"].then(() => {
+			DialogPerk.#__vault.get(unit)["backdropPromise"] = new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let addClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.showOptions.addClasses", []));
@@ -253,12 +260,12 @@ export default class DialogPerk extends BM.Perk
 
 					resolve();
 				}
-			}));
+			});
 
 			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return unit.get("vault", "dialog.backdropPromise");
+				return DialogPerk.#__vault.get(unit)["backdropPromise"];
 			}
 		});
 
@@ -275,8 +282,8 @@ export default class DialogPerk extends BM.Perk
 	static #__hideBackdrop(unit, options)
 	{
 
-		return unit.get("vault", "dialog.backdropPromise").then(() => {
-			unit.set("vault", "dialog.backdropPromise",  new Promise((resolve, reject) => {
+		return DialogPerk.#__vault.get(unit)["backdropPromise"].then(() => {
+			DialogPerk.#__vault.get(unit)["backdropPromise"] = new Promise((resolve, reject) => {
 				window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 				let removeClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.hideOptions.removeClasses", []));
@@ -294,12 +301,12 @@ export default class DialogPerk extends BM.Perk
 				{
 					resolve();
 				}
-			}));
+			});
 
 			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
 			if (sync)
 			{
-				return unit.get("vault", "dialog.backdropPromise");
+				return DialogPerk.#__vault.get(unit)["backdropPromise"];
 			}
 		});
 

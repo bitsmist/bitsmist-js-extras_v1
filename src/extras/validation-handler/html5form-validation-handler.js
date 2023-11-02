@@ -51,8 +51,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 		invalids2 = this._validate(form, rules);
 		let invalids = BM.Util.deepMerge(invalids1, invalids2);
 
-		this._unit.set("state", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
-		this._unit.set("state", "validation.validationResult.invalids", invalids);
+		this._unit.set("inventory", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
+		this._unit.set("inventory", "validation.validationResult.invalids", invalids);
 
 	}
 

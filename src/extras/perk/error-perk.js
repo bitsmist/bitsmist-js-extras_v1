@@ -21,6 +21,7 @@ export default class ErrorPerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"error",
 		"order":		120,
@@ -50,7 +51,7 @@ export default class ErrorPerk extends BM.Perk
 		return this.use("spell", "status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
-			this.set("vault", "error.server", server);
+			DialogPerk.#__vault.get(unit)["server"] = server;
 		});
 
 	}

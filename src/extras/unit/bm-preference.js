@@ -111,8 +111,8 @@ export default class PreferenceServer extends BM.Unit
 	{
 
 		let msg = `Invalid preference value. name=${this.tagName}`;
-		Object.keys(this.get("state", "validation.validationResult.invalids")).forEach((key) => {
-			msg += "\n\tkey=" + this.get("state", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("state", `validation.validationResult.invalids.${key}.value`);
+		Object.keys(this.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+			msg += "\n\tkey=" + this.get("inventory", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("inventory", `validation.validationResult.invalids.${key}.value`);
 		});
 		console.error(msg);
 

@@ -22,6 +22,7 @@ export default class RoutePerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"routing",
 		"order":		900,
@@ -56,6 +57,11 @@ export default class RoutePerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		RoutePerk.#__vault.set(unit, {
+			"routes":	[],
+		});
+
 		// Upgrade unit
 		unit.upgrade("skill", "routing.addRoute", function(...args) { return RoutePerk.#_addRoute(...args); });
 		unit.upgrade("skill", "routing.jumpRoute", function(...args) { return RoutePerk.#_jumpRoute(...args); });
@@ -66,8 +72,7 @@ export default class RoutePerk extends BM.Perk
 		unit.upgrade("spell", "routing.updateRoute", function(...args) { return RoutePerk.#_updateRoute(...args); });
 		unit.upgrade("spell", "routing.refreshRoute", function(...args) { return RoutePerk.#_refreshRoute(...args); });
 		unit.upgrade("spell", "routing.normalizeRoute", function(...args) { return RoutePerk.#_normalizeRoute(...args); });
-		unit.upgrade("vault", "routing.routes", []);
-		unit.upgrade("state", "routing.routeInfo", {});
+		unit.upgrade("inventory", "routing.routeInfo", {});
 		unit.upgrade("event", "doApplySettings", RoutePerk.#RoutePerk_onDoApplySettings, {"order":RoutePerk.info["order"]});
 		unit.upgrade("event", "doStart", RoutePerk.#RoutePerk_onDoStart, {"order":RoutePerk.info["order"]});
 		unit.upgrade("event", "afterReady", RoutePerk.#RoutePerk_onAfterReady, {"order":RoutePerk.info["order"]});
@@ -92,7 +97,7 @@ export default class RoutePerk extends BM.Perk
 		});
 
 		// Set current route info.
-		this.set("state", "routing.routeInfo", RoutePerk.#__loadRouteInfo(this, window.location.href));
+		this.set("inventory", "routing.routeInfo", RoutePerk.#__loadRouteInfo(this, window.location.href));
 
 	}
 
@@ -101,7 +106,7 @@ export default class RoutePerk extends BM.Perk
 	static #RoutePerk_onDoStart(sender, e, ex)
 	{
 
-		let routeName = this.get("state", "routing.routeInfo.name");
+		let routeName = this.get("inventory", "routing.routeInfo.name");
 		if (routeName)
 		{
 			let options = {
@@ -180,7 +185,7 @@ export default class RoutePerk extends BM.Perk
 			"__keys":		keys,
 		};
 
-		let routes = unit.get("vault", "routing.routes");
+		let routes = RoutePerk.#__vault.get(unit)["routes"];
 		if (first)
 		{
 			routes.unshift(route);
@@ -189,7 +194,6 @@ export default class RoutePerk extends BM.Perk
 		{
 			routes.push(route);
 		}
-		unit.set("vault", "routing.routes", routes);
 
 	}
 
@@ -208,7 +212,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return BM.AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options)).then((settings) => {
-			unit.set("state", "routing.routeInfo.settings", settings);
+			unit.set("inventory", "routing.routeInfo.settings", settings);
 		});
 
 	}
@@ -228,14 +232,14 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			if (!unit.get("state", "routing.routeInfo.extender"))
+			if (!unit.get("inventory", "routing.routeInfo.extender"))
 			{
 				return BM.AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName)).then((extender) => {
-					unit.set("state", "routing.routeInfo.extender", extender);
+					unit.set("inventory", "routing.routeInfo.extender", extender);
 				});
 			}
 		}).then(() => {
-			let extender = unit.get("state", "routing.routeInfo.extender");
+			let extender = unit.get("inventory", "routing.routeInfo.extender");
 			if (extender)
 			{
 				new Function(`"use strict";${extender}`)();
@@ -272,10 +276,12 @@ export default class RoutePerk extends BM.Perk
 				return RoutePerk.#_loadExtender(unit);
 			}
 		}).then(() => {
-			newSettings = unit.get("state", "routing.routeInfo.settings");
+			newSettings = unit.get("inventory", "routing.routeInfo.settings");
 			unit.use("skill", "setting.merge", newSettings);
 
 			return unit.use("spell", "setting.apply", {"settings":newSettings});
+		}).then(() => {
+			return unit.use("spell", "basic.transform");
 		});
 
 	}
@@ -297,7 +303,7 @@ export default class RoutePerk extends BM.Perk
 		options = Object.assign({}, options);
 
 		// Current route info
-		let curRouteInfo = unit.get("state", "routing.routeInfo");
+		let curRouteInfo = unit.get("inventory", "routing.routeInfo");
 
 		let newURL;
 		let newRouteInfo;
@@ -329,7 +335,7 @@ export default class RoutePerk extends BM.Perk
 			{
 				history.pushState(RoutePerk.#__getState("_open.pushState"), null, newURL);
 			}
-			unit.set("state", "routing.routeInfo", newRouteInfo);
+			unit.set("inventory", "routing.routeInfo", newRouteInfo);
 			/*
 		}).then(() => {
 			// Load other unit when new route name is different from the current route name.
@@ -425,7 +431,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		history.replaceState(RoutePerk.#__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
-		unit.set("state", "routing.routeInfo", RoutePerk.#__loadRouteInfo(unit, window.location.href));
+		unit.set("inventory", "routing.routeInfo", RoutePerk.#__loadRouteInfo(unit, window.location.href));
 
 	}
 
@@ -469,7 +475,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (!unit.get("state", "routing.routeInfo.settings"))
+		if (!unit.get("inventory", "routing.routeInfo.settings"))
 		{
 			ret = true;
 		}
@@ -495,7 +501,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let settingsRef = unit.get("state", "routing.routeInfo.settingsRef");
+		let settingsRef = unit.get("inventory", "routing.routeInfo.settingsRef");
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -535,7 +541,7 @@ export default class RoutePerk extends BM.Perk
 
 		let ret = false;
 
-		if (unit.get("state", "routing.routeInfo.extenderRef") || unit.get("state", "routing.routeInfo.extender"))
+		if (unit.get("inventory", "routing.routeInfo.extenderRef") || unit.get("inventory", "routing.routeInfo.extender"))
 		{
 			ret = true;
 		}
@@ -561,7 +567,7 @@ export default class RoutePerk extends BM.Perk
 		let fileName;
 		let query;
 
-		let extenderRef = unit.get("state", "routing.routeInfo.extenderRef");
+		let extenderRef = unit.get("inventory", "routing.routeInfo.extenderRef");
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
@@ -608,7 +614,7 @@ export default class RoutePerk extends BM.Perk
 		};
 
 		// Find the matching route
-		let routes = unit.get("vault", "routing.routes");
+		let routes = RoutePerk.#__vault.get(unit)["routes"];
 		for (let i = routes.length - 1; i >= 0; i--)
 		{
 			// Check origin
@@ -738,8 +744,8 @@ export default class RoutePerk extends BM.Perk
 		let newParams = BM.URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
-		Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
-			let item = unit.get("state", `validation.validationResult.invalids.${key}`);
+		Object.keys(unit.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+			let item = unit.get("inventory", `validation.validationResult.invalids.${key}`);
 
 			if (item["fix"] !== undefined)
 			{
@@ -761,7 +767,7 @@ export default class RoutePerk extends BM.Perk
 			RoutePerk.#_replaceRoute(unit, {"queryParameters":newParams});
 
 			// Fixed
-			unit.set("state", "validation.validationResult.result", true);
+			unit.set("inventory", "validation.validationResult.result", true);
 		}
 
 	}
@@ -776,8 +782,8 @@ export default class RoutePerk extends BM.Perk
 	static #__dumpValidationErrors(unit)
 	{
 
-		Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
-			let item = unit.get("state", `validation.validationResult.invalids.${key}`);
+		Object.keys(unit.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+			let item = unit.get("inventory", `validation.validationResult.invalids.${key}`);
 
 			if (item.failed)
 			{

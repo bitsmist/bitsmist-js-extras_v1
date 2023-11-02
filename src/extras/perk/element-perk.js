@@ -22,6 +22,7 @@ export default class ElementPerk extends BM.Perk
 	//  Private Variables
 	// -------------------------------------------------------------------------
 
+	static #__vault = new WeakMap();
 	static #__info = {
 		"section":		"element",
 		"order":		220,
@@ -45,9 +46,13 @@ export default class ElementPerk extends BM.Perk
 	static init(unit, options)
 	{
 
+		// Init unit vault
+		ElementPerk.#__vault.set(unit, {
+			"overlay":			null,
+			"overlayPromise":	Promise.resolve(),
+		})
+
 		// Upgrade unit
-		unit.upgrade("vault", "element.overlay", );
-		unit.upgrade("vault", "element.overlayPromise", Promise.resolve());
 		unit.upgrade("event", "doApplySettings", ElementPerk.#ElementPerk_onDoApplySettings, {"order":ElementPerk.info["order"]});
 
 	}
@@ -157,11 +162,11 @@ export default class ElementPerk extends BM.Perk
 					break;
 				case "showLoader":
 					ElementPerk.#__showOverlay(unit, elementInfo[key]);
-					waitForElement = unit.get("vault", "element.overlay");
+					waitForElement = ElementPerk.#__vault.get(unit)["overlay"];
 					break;
 				case "hideLoader":
 					ElementPerk.#__hideOverlay(unit, elementInfo[key]);
-					waitForElement = unit.get("vault", "element.overlay");
+					waitForElement = ElementPerk.#__vault.get(unit)["overlay"];
 					break;
 				case "build":
 					let resourceName = elementInfo[key]["resourceName"];
@@ -332,14 +337,14 @@ export default class ElementPerk extends BM.Perk
 	static #__createOverlay(unit, options)
 	{
 
-		let overlay = unit.get("vault", "element.overlay");
+		let overlay = ElementPerk.#__vault.get(unit)["overlay"];
 
 		if (!overlay)
 		{
 			overlay = document.createElement("div");
 			overlay.classList.add("overlay");
-			unit.unitRoot.appendChild(overlay);
-			unit.set("vault", "element.overlay", overlay);
+			unit.get("inventory", "basic.unitRoot").appendChild(overlay);
+			ElementPerk.#__vault.get(unit)["overlay"] = overlay;
 		}
 
 		return overlay
@@ -357,7 +362,7 @@ export default class ElementPerk extends BM.Perk
 	static #__closeOnClick(unit, options)
 	{
 
-		unit.get("vault", "element.overlay").addEventListener("click", (e) => {
+		ElementPerk.#__vault.get(unit)["overlay"].addEventListener("click", (e) => {
 			if (e.target === e.currentTarget && typeof unit.close === "function")
 			{
 				unit.close({"reason":"cancel"});
@@ -421,12 +426,12 @@ export default class ElementPerk extends BM.Perk
 		let effect = ElementPerk.#__getEffect(overlay);
 		if (effect)
 		{
-			unit.get("vault", "element.overlayPromise").then(() => {
-				unit.set("vault", "element.overlayPromise", new Promise((resolve, reject) => {
+			ElementPerk.#__vault.get(unit)["overlayPromise"].then(() => {
+				ElementPerk.#__vault.get(unit)["overlayPromise"] = new Promise((resolve, reject) => {
 					overlay.addEventListener(`${effect}end`, () => {
 						resolve();
 					}, {"once":true});
-				}));
+				});
 			});
 		}
 		else
@@ -447,9 +452,9 @@ export default class ElementPerk extends BM.Perk
 	static #__hideOverlay(unit, options)
 	{
 
-		let overlay = unit.get("vault", "element.overlay");
+		let overlay = ElementPerk.#__vault.get(unit)["overlay"];
 
-		unit.get("vault", "element.overlayPromise").then(() => {
+		ElementPerk.#__vault.get(unit)["overlayPromise"].then(() => {
 			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
 			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));

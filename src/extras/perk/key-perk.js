@@ -46,7 +46,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("state", "key.isComposing", false);
+		unit.upgrade("inventory", "key.isComposing", false);
 		unit.upgrade("event", "afterTransform", KeyPerk.#KeyPerk_onAfterTransform, {"order":KeyPerk.info["order"]});
 
 	}
@@ -87,7 +87,7 @@ export default class KeyPerk extends BM.Perk
 	static #KeyPerk_onKeyDown(e, unit)
 	{
 
-		unit.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
+		unit.set("inventory", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 	}
 
@@ -105,7 +105,7 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		// Ignore all key input when composing.
-		if (unit.get("state", "key.isComposing"))
+		if (unit.get("inventory", "key.isComposing"))
 		{
 			return;
 		}
@@ -180,12 +180,12 @@ export default class KeyPerk extends BM.Perk
 	{
 
 		return unit.use("spell", "form.submit").then(() => {
-			if (!unit.get("state", "form.cancelSubmit"))
+			if (!unit.get("inventory", "form.cancelSubmit"))
 			{
 				// Modal result
-				if (unit.get("state", "dialog.isModal"))
+				if (unit.get("inventory", "dialog.isModal"))
 				{
-					unit.set("state", "dialog.modalResult.result", true);
+					unit.set("inventory", "dialog.modalResult.result", true);
 				}
 
 				// Auto close
