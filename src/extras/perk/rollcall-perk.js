@@ -23,8 +23,14 @@ export default class RollCallPerk extends BM.Perk
 
 	static #__records = {};
 	static #__info = {
-		"section":		"rollcall",
-		"order":		330,
+		"sectionName":		"rollcall",
+		"order":			330,
+	};
+	static #__skills = {
+		"register":			RollCallPerk.#_register,
+	};
+	static #__spells = {
+		"call":				RollCallPerk.#_call,
 	};
 
 	// -------------------------------------------------------------------------
@@ -39,16 +45,32 @@ export default class RollCallPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
+
+	static get skills()
+	{
+
+		return RollcallPerk.#__skills;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return RollcallPerk.#__spells;
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
 	static init(unit, options)
 	{
 
-		// Upgrade unit
-		unit.upgrade("skill", "rollcall.register", function(...args) { return RollCallPerk.#_register(...args); });
-		unit.upgrade("spell", "rollcall.call", function(...args) { return RollCallPerk.#_call(...args); });
-		unit.upgrade("event", "doApplySettings", RollCallPerk.#RollCallPerk_onDoApplySettings, {"order":RollCallPerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":RollCallPerk.#RollCallPerk_onDoApplySettings, "order":RollCallPerk.info["order"]});
 
 	}
 

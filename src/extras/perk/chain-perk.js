@@ -22,7 +22,7 @@ export default class ChainPerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	static #__info = {
-		"section":		"chain",
+		"sectionName":	"chain",
 		"order":		800,
 	};
 
@@ -44,8 +44,8 @@ export default class ChainPerk extends BM.Perk
 	static init(unit, options)
 	{
 
-		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", ChainPerk.#ChainPerk_onDoApplySettings, {"order":ChainPerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":ChainPerk.#ChainPerk_onDoApplySettings, "order":ChainPerk.info["order"]});
 
 	}
 
@@ -74,7 +74,7 @@ export default class ChainPerk extends BM.Perk
 		let order = ChainPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
-			this.use("skill", "event.add", sectionName, {
+			this.use("event.add", sectionName, {
 				"handler":	ChainPerk.#ChainPerk_onDoProcess,
 				"order":	order,
 				"options":	sectionValue
@@ -98,7 +98,7 @@ export default class ChainPerk extends BM.Perk
 			let status = targets[i]["status"] || "ready";
 			let sync = targets[i]["sync"];
 
-			let nodes = this.use("skill", "basic.locateAll", targets[i]);
+			let nodes = this.use("basic.locateAll", targets[i]);
 			BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`)
 
 			if (sync)
@@ -138,8 +138,8 @@ export default class ChainPerk extends BM.Perk
 		let promises = [];
 
 		nodes.forEach((element) => {
-			let promise = unit.use("spell", "status.wait", [{"object":element, "status":status}]).then(() => {
-				return element.use("spell", skillName, {"sender":unit});
+			let promise = unit.cast("status.wait", [{"object":element, "status":status}]).then(() => {
+				return element.cast(skillName, {"sender":unit});
 			});
 			promises.push(promise);
 		});

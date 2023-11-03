@@ -23,8 +23,11 @@ export default class AliasPerk extends BM.Perk
 
 	static #__records = {};
 	static #__info = {
-		"section":		"alias",
-		"order":		330,
+		"sectionName":		"alias",
+		"order":			330,
+	};
+	static #__skills = {
+		"resolve":			AliasPerk.#_resolve(...args),
 	};
 
 	// -------------------------------------------------------------------------
@@ -39,14 +42,11 @@ export default class AliasPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
 
-	static init(unit, options)
+	static get skills()
 	{
 
-		// Upgrade unit
-		unit.upgrade("skill", "alias.resolve", function(...args) { return AliasPerk.#_resolve(...args); });
+		return AliasPerk.#__skills;
 
 	}
 

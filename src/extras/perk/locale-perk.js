@@ -25,8 +25,17 @@ export default class LocalePerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"locale",
-		"order":		215,
+		"sectionName":		"locale",
+		"order":			215,
+	};
+	static #__skills = {
+		"localize":			LocalePerk.#_localize,
+		"translate":		LocalePerk.#_getLocaleMessage,
+	};
+	static #__spells = {
+		"apply":			LocalePerk.#_applyLocale,
+		"summon":			LocalePerk.#_loadMessages,
+		"addHandler":		LocalePerk.#_addHandler,
 	};
 
 	// -------------------------------------------------------------------------
@@ -37,6 +46,24 @@ export default class LocalePerk extends BM.Perk
 	{
 
 		return LocalePerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get skills()
+	{
+
+		return LocalePerk.#__skills;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return LocalePerk.#__spells;
 
 	}
 
@@ -53,11 +80,6 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		// Upgrade unit
-		unit.upgrade("skill", "locale.localize", function(...args) { return LocalePerk.#_localize(...args); });
-		unit.upgrade("skill", "locale.translate", function(...args) { return LocalePerk.#_getLocaleMessage(...args); });
-		unit.upgrade("spell", "locale.apply", function(...args) { return LocalePerk.#_applyLocale(...args); });
-		unit.upgrade("spell", "locale.summon", function(...args) { return LocalePerk.#_loadMessages(...args); });
-		unit.upgrade("spell", "locale.addHandler", function(...args) { return LocalePerk.#_addHandler(...args); });
 		unit.upgrade("inventory", "locale.localizers", {});
 		unit.upgrade("inventory", "locale.messages", new MultiStore());
 		unit.upgrade("inventory", "locale.active", {
@@ -65,14 +87,16 @@ export default class LocalePerk extends BM.Perk
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
-		unit.upgrade("event", "doApplySettings", LocalePerk.#LocalePerk_onDoApplySettings, {"order":LocalePerk.info["order"]});
-		unit.upgrade("event", "doSetup", LocalePerk.#LocalePerk_onDoSetup, {"order":LocalePerk.info["order"]});
-		unit.upgrade("event", "beforeApplyLocale", LocalePerk.#LocalePerk_onBeforeApplyLocale, {"order":LocalePerk.info["order"]});
-		unit.upgrade("event", "doApplyLocale", LocalePerk.#LocalePerk_onDoApplyLocale, {"order":LocalePerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":Perk.info["order"]});
+		unit.use("event.add", "doSetup", {"handler":LocalePerk.#LocalePerk_onDoSetup, "order":Perk.info["order"]});
+		unit.use("event.add", "beforeApplyLocale", {"handler":LocalePerk.#LocalePerk_onBeforeApplyLocale, "order":Perk.info["order"]});
+		unit.use("event.add", "doApplyLocale", {"handler":LocalePerk.#LocalePerk_onDoApplyLocale, "order":Perk.info["order"]});
 
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
 		{
-			unit.upgrade("event", "afterFillRow", LocalePerk.#LocalePerk_onAfterFillRow, {"order":LocalePerk.info["order"]});
+			unit.use("event.add", "afterFillRow", {"handler":LocalePerk.#LocalePerk_onAfterFillRow, "order":LocalePerk.info["order"]});
 		}
 
 	}
@@ -97,7 +121,7 @@ export default class LocalePerk extends BM.Perk
 
 		if (serverNode && !(this instanceof LocaleServer))
 		{
-			promises.push(this.use("spell", "status.wait", [serverNode]).then(() => {
+			promises.push(this.cast("status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
 				server.subscribe(this);
 				LocalePerk.#__vault.get(this)["server"] = server;
@@ -128,7 +152,7 @@ export default class LocalePerk extends BM.Perk
 	static #LocalePerk_onBeforeApplyLocale(sender, e, ex)
 	{
 
-		return this.use("spell", "locale.summon", e.detail.localeName);
+		return this.cast("locale.summon", e.detail.localeName);
 
 	}
 
@@ -143,7 +167,7 @@ export default class LocalePerk extends BM.Perk
 		// Refill (Do not refill when starting)
 		if (this.get("inventory", "status.status") === "ready")
 		{
-			return this.use("spell", "basic.fill", {"refill":true});
+			return this.cast("basic.fill", {"refill":true});
 		}
 
 	}
@@ -202,13 +226,13 @@ export default class LocalePerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`LocalePerk.#_applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-			return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
+			return unit.cast("event.trigger", "beforeApplyLocale", options);
 		}).then(() => {
 			unit.set("inventory", "locale.active.localeName", options["localeName"]);
-			return unit.use("spell", "event.trigger", "doApplyLocale", options);
+			return unit.cast("event.trigger", "doApplyLocale", options);
 		}).then(() => {
 			console.debug(`LocalePerk.#_applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-			return unit.use("spell", "event.trigger", "afterApplyLocale", options);
+			return unit.cast("event.trigger", "afterApplyLocale", options);
 		});
 
 	}

@@ -22,8 +22,11 @@ export default class ResourcePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	static #__info = {
-		"section":		"resource",
-		"order":		300,
+		"sectionName":		"resource",
+		"order":			300,
+	};
+	static #__spells = {
+		"addHandler":		ResourcePerk.#_addHandler,
 	};
 
 	// -------------------------------------------------------------------------
@@ -38,6 +41,15 @@ export default class ResourcePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return ResourcePerk.#__spells;
+
+	}
+
+	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -45,11 +57,12 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("spell", "resource.addHandler", function(...args) { return ResourcePerk.#_addHandler(...args); });
 		unit.upgrade("inventory", "resource.resources", {});
-		unit.upgrade("event", "doApplySettings", ResourcePerk.#ResourcePerk_onDoApplySettings, {"order":ResourcePerk.info["order"]});
-		unit.upgrade("event", "doFetch", ResourcePerk.#ResourcePerk_onDoFetch, {"order":ResourcePerk.info["order"]});
-		unit.upgrade("event", "doSubmit", ResourcePerk.#ResourcePerk_onDoSubmit, {"order":ResourcePerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":ResourcePerk.#ResourcePerk_onDoApplySettings, "order":ResourcePerk.info["order"]});
+		unit.use("event.add", "doFetch", {"handler":ResourcePerk.#ResourcePerk_onDoFetch, "order":ResourcePerk.info["order"]});
+		unit.use("event.add", "doSubmit", {"handler":ResourcePerk.#ResourcePerk_onDoSubmit, "order":ResourcePerk.info["order"]});
 
 	}
 

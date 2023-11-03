@@ -23,8 +23,15 @@ export default class PreferencePerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"preference",
-		"order":		900,
+		"sectionName":		"preference",
+		"order":			900,
+	};
+	static #__skills = {
+		"get":				PreferencePerk.#_getPreferences,
+	};
+	static #__spells = {
+		"set":				PreferencePerk.#_setPreferences,
+		"apply":			PreferencePerk.#_applyPreferences,
 	};
 
 	// -------------------------------------------------------------------------
@@ -35,6 +42,24 @@ export default class PreferencePerk extends BM.Perk
 	{
 
 		return PreferencePerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get skills()
+	{
+
+		return PreferencePerk.#__skills;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return PreferencePerk.#__spells;
 
 	}
 
@@ -50,12 +75,9 @@ export default class PreferencePerk extends BM.Perk
 			"server":	null,
 		});
 
-		// Upgrade unit
-		unit.upgrade("skill", "preference.get", function(...args) { return PreferencePerk.#_getPreferences(...args); });
-		unit.upgrade("spell", "preference.set", function(...args) { return PreferencePerk.#_setPreferences(...args); });
-		unit.upgrade("spell", "preference.apply", function(...args) { return PreferencePerk.#_applyPreferences(...args); });
-		unit.upgrade("event", "doApplySettings", PreferencePerk.#PreferencePerk_onDoApplySettings, {"order":PreferencePerk.info["order"]});
-		unit.upgrade("event", "doSetup", PreferencePerk.#PreferencePerk_onDoSetup, {"order":PreferencePerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":PreferencePerk.#PreferencePerk_onDoApplySettings, "order":PreferencePerk.info["order"]});
+		unit.use("event.add", "doSetup", {"handler":PreferencePerk.#PreferencePerk_onDoSetup, "order":PreferencePerk.info["order"]});
 
 	}
 
@@ -71,7 +93,7 @@ export default class PreferencePerk extends BM.Perk
 
 		BM.Util.assert(serverNode, `Preference Server node not specified in settings. name=${this.tagName}`);
 
-		return this.use("spell", "status.wait", [serverNode]).then(() => {
+		return this.cast("status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
 			PreferencePerk.#__vault.get(this)["server"] = server;
@@ -84,7 +106,7 @@ export default class PreferencePerk extends BM.Perk
 	static #PreferencePerk_onDoSetup(sender, e, ex)
 	{
 
-		return this.use("spell", "preference.apply", {"preferences":PreferencePerk.#__vault.get(this)["server"].items});
+		return this.cast("preference.apply", {"preferences":PreferencePerk.#__vault.get(this)["server"].items});
 
 	}
 
@@ -103,12 +125,12 @@ export default class PreferencePerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.use("spell", "event.trigger", "beforeApplyPreferences", options);
+			return unit.cast("event.trigger", "beforeApplyPreferences", options);
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "doApplyPreferences", options);
+			return unit.cast("event.trigger", "doApplyPreferences", options);
 		}).then(() => {
 			console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.use("spell", "event.trigger", "afterApplyPreferences", options);
+			return unit.cast("event.trigger", "afterApplyPreferences", options);
 		});
 
 	}

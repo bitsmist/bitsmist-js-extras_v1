@@ -24,7 +24,7 @@ export default class ElementPerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"element",
+		"sectionName":	"element",
 		"order":		220,
 	};
 
@@ -52,8 +52,8 @@ export default class ElementPerk extends BM.Perk
 			"overlayPromise":	Promise.resolve(),
 		})
 
-		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", ElementPerk.#ElementPerk_onDoApplySettings, {"order":ElementPerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":ElementPerk.#ElementPerk_onDoApplySettings, "order":ElementPerk.info["order"]});
 
 	}
 
@@ -67,7 +67,7 @@ export default class ElementPerk extends BM.Perk
 		let order = ElementPerk.info["order"];
 
 		Object.entries(BM.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
-			this.use("skill", "event.add", sectionName, {
+			this.use("event.add", sectionName, {
 				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,
 				"options":	{"attrs":sectionValue}

@@ -23,7 +23,7 @@ export default class KeyPerk extends BM.Perk
 
 	//static #__isComposing = false;
 	static #__info = {
-		"section":		"key",
+		"sectionName":	"key",
 		"order":		800,
 	};
 
@@ -47,7 +47,9 @@ export default class KeyPerk extends BM.Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "key.isComposing", false);
-		unit.upgrade("event", "afterTransform", KeyPerk.#KeyPerk_onAfterTransform, {"order":KeyPerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "afterTransform", {"handler":KeyPerk.#KeyPerk_onAfterTransform, "order":KeyPerk.info["order"]});
 
 	}
 
@@ -179,7 +181,7 @@ export default class KeyPerk extends BM.Perk
 	static #__defaultSubmit(e, unit, options)
 	{
 
-		return unit.use("spell", "form.submit").then(() => {
+		return unit.cast("form.submit").then(() => {
 			if (!unit.get("inventory", "form.cancelSubmit"))
 			{
 				// Modal result
@@ -191,7 +193,7 @@ export default class KeyPerk extends BM.Perk
 				// Auto close
 				if (options && options["autoClose"])
 				{
-					return unit.use("spell", "dialog.close", {"reason":"submit"});
+					return unit.cast("dialog.close", {"reason":"submit"});
 				}
 			}
 		});
@@ -210,7 +212,7 @@ export default class KeyPerk extends BM.Perk
 	static #__defaultCancel(e, unit, options)
 	{
 
-		return unit.use("spell", "dialog.close", {"reason":"cancel"});
+		return unit.cast("dialog.close", {"reason":"cancel"});
 
 	}
 
@@ -233,7 +235,7 @@ export default class KeyPerk extends BM.Perk
 			target = this.getAttribute("bm-cleartarget");
 		}
 
-		return unit.use("spell", "basic.clear", {"target":target, "options":options["options"]});
+		return unit.cast("basic.clear", {"target":target, "options":options["options"]});
 
 	}
 

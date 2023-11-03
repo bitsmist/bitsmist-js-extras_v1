@@ -25,9 +25,15 @@ export default class FormPerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"form",
-		"order":		310,
-		"depends":		"ValidationPerk",
+		"sectionName":		"form",
+		"order":			310,
+		"depends":			"ValidationPerk",
+	};
+	static #__skills = {
+		"build":			FormPerk.#_build,
+	};
+	static #__spells = {
+		"submit":				FormPerk.#_submit,
 	};
 
 	// -------------------------------------------------------------------------
@@ -38,6 +44,24 @@ export default class FormPerk extends BM.Perk
 	{
 
 		return FormPerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get skills()
+	{
+
+		return FormPerk.#__skills;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return FormPerk.#__spells;
 
 	}
 
@@ -54,15 +78,15 @@ export default class FormPerk extends BM.Perk
 		});
 
 		// Upgrade unit
-		unit.upgrade("skill", "form.build", function(...args) { return FormPerk.#_build(...args); });
-		unit.upgrade("spell", "form.submit", function(...args) { return FormPerk.#_submit(...args); });
 		unit.upgrade("inventory", "form.cancelSubmit", false);
-		unit.upgrade("event", "afterTransform", FormPerk.#FormPerk_onAfterTransform, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doClear", FormPerk.#FormPerk_onDoClear, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "beforeFill", FormPerk.#FormPerk_onBeforeFill, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doFill", FormPerk.#FormPerk_onDoFill, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "doCollect", FormPerk.#FormPerk_onDoCollect, {"order":FormPerk.info["order"]});
-		unit.upgrade("event", "afterCollect", FormPerk.#FormPerk_onAfterCollect, {"order":FormPerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "afterTransform", {"handler":FormPerk.#FormPerk_onAfterTransform, "order":FormPerk.info["order"]});
+		unit.use("event.add", "doClear", {"handler":FormPerk.#FormPerk_onDoClear, "order":FormPerk.info["order"]});
+		unit.use("event.add", "beforeFill", {"handler":FormPerk.#FormPerk_onBeforeFill, "order":FormPerk.info["order"]});
+		unit.use("event.add", "doFill", {"handler":FormPerk.#FormPerk_onDoFill, "order":FormPerk.info["order"]});
+		unit.use("event.add", "doCollect", {"handler":FormPerk.#FormPerk_onDoCollect, "order":FormPerk.info["order"]});
+		unit.use("event.add", "afterCollect", {"handler":FormPerk.#FormPerk_onAfterCollect, "order":FormPerk.info["order"]});
 
 	}
 
@@ -189,7 +213,7 @@ export default class FormPerk extends BM.Perk
 			if (unit.get("setting", "form.options.autoValidate", true))
 			{
 				options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
-				return unit.use("spell", "validation.validate", options).then(() => {
+				return unit.cast("validation.validate", options).then(() => {
 					if (!unit.get("inventory", "validation.validationResult.result"))
 					{
 						unit.set("inventory", "form.cancelSubmit", true);
@@ -199,14 +223,14 @@ export default class FormPerk extends BM.Perk
 		}).then(() => {
 			// Submit values
 			console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
-			return unit.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
+			return unit.cast("event.trigger", "beforeSubmit", options).then(() => {
 				if (!unit.get("inventory", "form.cancelSubmit"))
 				{
 					return Promise.resolve().then(() => {
-						return unit.use("spell", "event.trigger", "doSubmit", options);
+						return unit.cast("event.trigger", "doSubmit", options);
 					}).then(() => {
 						console.debug(`FormPerk.#_submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
-						return unit.use("spell", "event.trigger", "afterSubmit", options);
+						return unit.cast("event.trigger", "afterSubmit", options);
 					});
 				}
 			});
@@ -231,12 +255,12 @@ export default class FormPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`FormPerk.#__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.use("spell", "event.trigger", "beforeCollect", options);
+			return unit.cast("event.trigger", "beforeCollect", options);
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "doCollect", options);
+			return unit.cast("event.trigger", "doCollect", options);
 		}).then(() => {
 			console.debug(`FormPerk.#__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.use("spell", "event.trigger", "afterCollect", options);
+			return unit.cast("event.trigger", "afterCollect", options);
 		});
 
 	}

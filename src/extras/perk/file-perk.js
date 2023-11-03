@@ -22,7 +22,7 @@ export default class FilePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	static #__info = {
-		"section":		"file",
+		"sectionName":	"file",
 		"order":		110,
 	};
 
@@ -44,8 +44,8 @@ export default class FilePerk extends BM.Perk
 	static init(unit, options)
 	{
 
-		// Upgrade unit
-		unit.upgrade("event", "doApplySettings", FilePerk.#FilePerk_onDoApplySettings, {"order":FilePerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":FilePerk.#FilePerk_onDoApplySettings, "order":FilePerk.info["order"]});
 
 	}
 

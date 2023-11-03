@@ -23,7 +23,7 @@ export default class ErrorPerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"error",
+		"sectionName":	"error",
 		"order":		120,
 	};
 
@@ -48,7 +48,7 @@ export default class ErrorPerk extends BM.Perk
 		let serverNode = this.get("setting", "error.options.errorServer", this.get("setting", "system.error.options.errorServer"));
 		serverNode = ( serverNode === true ? "bm-error" : serverNode );
 
-		return this.use("spell", "status.wait", [serverNode]).then(() => {
+		return this.cast("status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
 			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
 			DialogPerk.#__vault.get(unit)["server"] = server;

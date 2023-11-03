@@ -24,8 +24,13 @@ export default class DialogPerk extends BM.Perk
 	static #__backdrop;
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"dialog",
-		"order":		800,
+		"sectionName":		"dialog",
+		"order":			800,
+	};
+	static #__spells = {
+		"open":				DialogPerk.#_open,
+		"openModal":		DialogPerk.#_openModal,
+		"close":			DialogPerk.#_close,
 	};
 
 	// -------------------------------------------------------------------------
@@ -36,6 +41,15 @@ export default class DialogPerk extends BM.Perk
 	{
 
 		return DialogPerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return DialogPerk.#__spells;
 
 	}
 
@@ -54,14 +68,13 @@ export default class DialogPerk extends BM.Perk
 		});
 
 		// Upgrade unit
-		unit.upgrade("spell", "dialog.open", function(...args) { return DialogPerk.#_open(...args); });
-		unit.upgrade("spell", "dialog.openModal", function(...args) { return DialogPerk.#_openModal(...args); });
-		unit.upgrade("spell", "dialog.close", function(...args) { return DialogPerk.#_close(...args); });
 		unit.upgrade("inventory", "dialog.cancelClose");
 		unit.upgrade("inventory", "dialog.isModal", false);
 		unit.upgrade("inventory", "dialog.modalResult", {});
 		unit.upgrade("inventory", "dialog.options");
-		unit.upgrade("event", "afterReady", DialogPerk.#DialogPerk_onAfterReady, {"order":DialogPerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "afterReady", {"handler":DialogPerk.#DialogPerk_onAfterReady, "order":DialogPerk.info["order"]});
 
 	}
 
@@ -76,7 +89,7 @@ export default class DialogPerk extends BM.Perk
 		{
 			console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening unit. name=${this.tagName}, id=${this.id}`);
 
-			return this.use("spell", "dialog.open");
+			return this.cast("dialog.open");
 		}
 
 	}
@@ -99,7 +112,7 @@ export default class DialogPerk extends BM.Perk
 		unit.set("inventory", "dialog.options", options);
 
 		console.debug(`DialogPerk.#_open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
-		return unit.use("spell", "event.trigger", "beforeOpen", options).then(() => {
+		return unit.cast("event.trigger", "beforeOpen", options).then(() => {
 			if (!unit.get("inventory", "dialog.cancelOpen"))
 			{
 				return Promise.resolve().then(() => {
@@ -112,19 +125,19 @@ export default class DialogPerk extends BM.Perk
 					// Setup
 					if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
 					{
-						return unit.use("spell", "basic.setup", options);
+						return unit.cast("basic.setup", options);
 					}
 				}).then(() => {
 					// Refresh
 					if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
 					{
-						return unit.use("spell", "basic.refresh", options);
+						return unit.cast("basic.refresh", options);
 					}
 				}).then(() => {
-					return unit.use("spell", "event.trigger", "doOpen", options);
+					return unit.cast("event.trigger", "doOpen", options);
 				}).then(() => {
 					console.debug(`DialogPerk.#_open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
-					return unit.use("spell", "event.trigger", "afterOpen", options);
+					return unit.cast("event.trigger", "afterOpen", options);
 				});
 			}
 		});
@@ -171,10 +184,10 @@ export default class DialogPerk extends BM.Perk
 		unit.set("inventory", "dialog.cancelClose", false);
 
 		console.debug(`DialogPerk.#_close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
-		return unit.use("spell", "event.trigger", "beforeClose", options).then(() => {
+		return unit.cast("event.trigger", "beforeClose", options).then(() => {
 			if (!unit.get("inventory", "dialog.cancelClose"))
 			{
-				return unit.use("spell", "event.trigger", "doClose", options).then(() => {
+				return unit.cast("event.trigger", "doClose", options).then(() => {
 					// Hide backdrop
 					if (unit.get("setting", "dialog.options.showBackdrop"))
 					{
@@ -188,7 +201,7 @@ export default class DialogPerk extends BM.Perk
 					}
 					console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
 
-					return unit.use("spell", "event.trigger", "afterClose", options);
+					return unit.cast("event.trigger", "afterClose", options);
 				});
 			}
 		});

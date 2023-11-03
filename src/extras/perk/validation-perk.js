@@ -18,16 +18,35 @@ export default class ValidationPerk extends BM.Perk
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	static #__info = {
+		"sectionName":		"validation",
+		"order":			310,
+	};
+	static #__spells = {
+		"addHandler":		ValidationPerk._addHandler,
+		"validate":			ValidationPerk._validate,
+	};
+
+	// -------------------------------------------------------------------------
 	//  Properties
 	// -------------------------------------------------------------------------
 
 	static get info()
 	{
 
-		return {
-			"section":		"validation",
-			"order":		310,
-		};
+		return ValidationPerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return ValidationPerk.#__spells;
 
 	}
 
@@ -39,14 +58,13 @@ export default class ValidationPerk extends BM.Perk
 	{
 
 		// Upgrade unit
-		unit.upgrade("spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-		unit.upgrade("spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
 		unit.upgrade("inventory", "validation.validators", {});
 		unit.upgrade("inventory", "validation.validationResult", {});
-		unit.upgrade("inventory", "validation.validationResult", {});
-		unit.upgrade("event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings, {"order":this.info["order"]});
-		unit.upgrade("event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate, {"order":this.info["order"]});
-		unit.upgrade("event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity, {"order":this.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":Perk.info["order"]});
+		unit.use("event.add", "doValidate", {"handler":ValidationPerk.ValidationPerk_onDoValidate, "order":Perk.info["order"]});
+		unit.use("event.add", "doReportValidity", {"handler":ValidationPerk.ValidationPerk_onDoReportValidity, "order":Perk.info["order"]});
 
 	}
 
@@ -152,27 +170,27 @@ export default class ValidationPerk extends BM.Perk
 
 		return Promise.resolve().then(() => {
 			console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.uniqueId}`);
-			return unit.use("spell", "event.trigger", "beforeValidate", options);
+			return unit.cast("event.trigger", "beforeValidate", options);
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "doValidate", options);
+			return unit.cast("event.trigger", "doValidate", options);
 		}).then(() => {
 			if (unit.get("inventory", "validation.validationResult.result"))
 			{
 				console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "doValidateSuccess", options);
+				return unit.cast("event.trigger", "doValidateSuccess", options);
 			}
 			else
 			{
 				console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "doValidateFail", options);
+				return unit.cast("event.trigger", "doValidateFail", options);
 			}
 		}).then(() => {
 			if (!unit.get("inventory", "validation.validationResult.result"))
 			{
-				return unit.use("spell", "event.trigger", "doReportValidity", options);
+				return unit.cast("event.trigger", "doReportValidity", options);
 			}
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "afterValidate", options);
+			return unit.cast("event.trigger", "afterValidate", options);
 		});
 
 	}

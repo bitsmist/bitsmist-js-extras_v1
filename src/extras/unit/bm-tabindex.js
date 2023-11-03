@@ -76,8 +76,8 @@ export default class TabIndex extends BM.Unit
 	switchIndex(index)
 	{
 
-		this.use("skill", "basic.scan", ":scope [data-tabindex].active").classList.remove("active");
-		let tabIndex = this.use("skill", "basic.scan", `:scope [data-tabindex='${index}']`);
+		this.use("basic.scan", ":scope [data-tabindex].active").classList.remove("active");
+		let tabIndex = this.use("basic.scan", `:scope [data-tabindex='${index}']`);
 		tabIndex.classList.add("active");
 
 		let container = document.querySelector(this.getAttribute("data-pair"));
@@ -99,7 +99,7 @@ export default class TabIndex extends BM.Unit
 	getActiveIndex()
 	{
 
-		return this.use("skill", "basic.scan", ":scope .active");
+		return this.use("basic.scan", ":scope .active");
 
 	}
 

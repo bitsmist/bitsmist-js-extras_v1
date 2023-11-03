@@ -26,9 +26,12 @@ export default class DatabindingPerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"databinding",
-		"order":		320,
+		"sectionName":		"databinding",
+		"order":			320,
 	};
+	static #__skills = {
+	};
+
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -58,9 +61,11 @@ export default class DatabindingPerk extends BM.Perk
 			});
 
 			// Upgrade unit (single)
-			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindData(...args); });
-			unit.upgrade("event", "beforeTransform", DatabindingPerk.#DatabindingPerk_onBeforeTransform, {"order":DatabindingPerk.info["order"]});
-			unit.upgrade("event", "doFill", DatabindingPerk.#DatabindingPerk_onDoFill, {"order":DatabindingPerk.info["order"]});
+			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindData;
+
+			// Add event handlers
+			unit.use("event.add", "beforeTransform", {"handler":DatabindingPerk.#DatabindingPerk_onBeforeTransform, "order":DatabindingPerk.info["order"]});
+			unit.use("event.add", "doFill", {"handler":DatabindingPerk.#DatabindingPerk_onDoFill, "order":DatabindingPerk.info["order"]});
 		}
 		else
 		{
@@ -72,13 +77,15 @@ export default class DatabindingPerk extends BM.Perk
 			});
 
 			// Upgrade unit (multiple)
-			unit.upgrade("skill", "databinding.bindData", function(...args) { return DatabindingPerk.#_bindDataArray(...args); });
-			unit.upgrade("event", "doFillRow", DatabindingPerk.#DatabindingPerk_onDoFillRow, {"order":DatabindingPerk.info["order"]});
+			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindDataArray;
+
+			// Add event handlers
+			unit.use("event.add", "doFillRow", {"handler":DatabindingPerk.#DatabindingPerk_onDoFillRow, "order":DatabindingPerk.info["order"]});
 		}
 
-		// Upgrade unit
-		unit.upgrade("event", "doClear", DatabindingPerk.#DatabindingPerk_onDoClear, {"order":DatabindingPerk.info["order"]});
-		unit.upgrade("event", "doCollect", DatabindingPerk.#DatabindingPerk_onDoCollect, {"order":DatabindingPerk.info["order"]});
+		// Add event handlers
+		unit.use("event.add", "doClear", {"handler":DatabindingPerk.#DatabindingPerk_onDoClear, "order":DatabindingPerk.info["order"]});
+		unit.use("event.add", "doCollect", {"handler":DatabindingPerk.#DatabindingPerk_onDoCollect, "order":DatabindingPerk.info["order"]});
 
 	}
 

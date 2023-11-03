@@ -24,9 +24,22 @@ export default class RoutePerk extends BM.Perk
 
 	static #__vault = new WeakMap();
 	static #__info = {
-		"section":		"routing",
-		"order":		900,
-		"depends":		"ValidationPerk",
+		"sectionName":		"routing",
+		"order":			900,
+		"depends":			"ValidationPerk",
+	};
+	static #__skills = {
+		"addRoute":			RoutePerk.#_addRoute,
+		"jumpRoute":		RoutePerk.#_jumpRoute,
+		"refreshRoute":		RoutePerk.#_refreshRoute,
+		"replaceRoute":		RoutePerk.#_replaceRoute,
+	};
+	static #__spells = {
+		"switch":			RoutePerk.#_switchRoute,
+		"openRoute":		RoutePerk.#_open,
+		"updateRoute":		RoutePerk.#_updateRoute,
+		"refreshRoute":		RoutePerk.#_refreshRoute,
+		"normalizeRoute":	RoutePerk.#_normalizeRoute,
 	};
 
 	// -------------------------------------------------------------------------
@@ -37,6 +50,24 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return RoutePerk.#__info;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get skills()
+	{
+
+		return RoutePerk.#__skills;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	static get spells()
+	{
+
+		return RoutePerk.#__spells;
 
 	}
 
@@ -63,21 +94,14 @@ export default class RoutePerk extends BM.Perk
 		});
 
 		// Upgrade unit
-		unit.upgrade("skill", "routing.addRoute", function(...args) { return RoutePerk.#_addRoute(...args); });
-		unit.upgrade("skill", "routing.jumpRoute", function(...args) { return RoutePerk.#_jumpRoute(...args); });
-		unit.upgrade("skill", "routing.refreshRoute", function(...args) { return RoutePerk.#_refreshRoute(...args); });
-		unit.upgrade("skill", "routing.replaceRoute", function(...args) { return RoutePerk.#_replaceRoute(...args); });
-		unit.upgrade("spell", "routing.switch", function(...args) { return RoutePerk.#_switchRoute(...args); });
-		unit.upgrade("spell", "routing.openRoute", function(...args) { return RoutePerk.#_open(...args); });
-		unit.upgrade("spell", "routing.updateRoute", function(...args) { return RoutePerk.#_updateRoute(...args); });
-		unit.upgrade("spell", "routing.refreshRoute", function(...args) { return RoutePerk.#_refreshRoute(...args); });
-		unit.upgrade("spell", "routing.normalizeRoute", function(...args) { return RoutePerk.#_normalizeRoute(...args); });
 		unit.upgrade("inventory", "routing.routeInfo", {});
-		unit.upgrade("event", "doApplySettings", RoutePerk.#RoutePerk_onDoApplySettings, {"order":RoutePerk.info["order"]});
-		unit.upgrade("event", "doStart", RoutePerk.#RoutePerk_onDoStart, {"order":RoutePerk.info["order"]});
-		unit.upgrade("event", "afterReady", RoutePerk.#RoutePerk_onAfterReady, {"order":RoutePerk.info["order"]});
-		unit.upgrade("event", "doValidateFail", RoutePerk.#RoutePerk_onDoValidateFail, {"order":RoutePerk.info["order"]});
-		unit.upgrade("event", "doReportValidity", RoutePerk.#RoutePerk_onDoReportValidity, {"order":RoutePerk.info["order"]});
+
+		// Add event handlers
+		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":Perk.info["order"]});
+		unit.use("event.add", "doStart", {"handler":RoutePerk.#RoutePerk_onDoStart, "order":Perk.info["order"]});
+		unit.use("event.add", "afterReady", {"handler":RoutePerk.#RoutePerk_onAfterReady, "order":Perk.info["order"]});
+		unit.use("event.add", "doValidateFail", {"handler":RoutePerk.#RoutePerk_onDoValidateFail, "order":Perk.info["order"]});
+		unit.use("event.add", "doReportValidity", {"handler":RoutePerk.#RoutePerk_onDoReportValidity, "order":Perk.info["order"]});
 
 		// Init popstate handler
 		RoutePerk.#__initPopState(unit);
@@ -113,7 +137,7 @@ export default class RoutePerk extends BM.Perk
 				"query": this.get("setting", "unit.options.query")
 			};
 
-			return this.use("spell", "routing.switch", routeName, options);
+			return this.cast("routing.switch", routeName, options);
 		}
 		else
 		{
@@ -127,7 +151,7 @@ export default class RoutePerk extends BM.Perk
 	static #RoutePerk_onAfterReady(sender, e, ex)
 	{
 
-		return this.use("spell", "routing.openRoute");
+		return this.cast("routing.openRoute");
 
 	}
 
@@ -277,11 +301,11 @@ export default class RoutePerk extends BM.Perk
 			}
 		}).then(() => {
 			newSettings = unit.get("inventory", "routing.routeInfo.settings");
-			unit.use("skill", "setting.merge", newSettings);
+			unit.use("setting.merge", newSettings);
 
-			return unit.use("spell", "setting.apply", {"settings":newSettings});
+			return unit.cast("setting.apply", {"settings":newSettings});
 		}).then(() => {
-			return unit.use("spell", "basic.transform");
+			return unit.cast("basic.transform");
 		});
 
 	}
@@ -353,7 +377,7 @@ export default class RoutePerk extends BM.Perk
 					"items":			BM.URLUtil.loadParameters(newURL),
 					"url":				newURL,
 				};
-				return unit.use("spell", "validation.validate", validateOptions);
+				return unit.cast("validation.validate", validateOptions);
 			}
 		}).then(() => {
 			// Refresh
@@ -414,7 +438,7 @@ export default class RoutePerk extends BM.Perk
 	static #_refreshRoute(unit, routeInfo, options)
 	{
 
-		return unit.use("spell", "basic.refresh", options);
+		return unit.cast("basic.refresh", options);
 
 	}
 
@@ -449,11 +473,11 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		return Promise.resolve().then(() => {
-			return unit.use("spell", "event.trigger", "beforeNormalizeURL");
+			return unit.cast("event.trigger", "beforeNormalizeURL");
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "doNormalizeURL");
+			return unit.cast("event.trigger", "doNormalizeURL");
 		}).then(() => {
-			return unit.use("spell", "event.trigger", "afterNormalizeURL");
+			return unit.cast("event.trigger", "afterNormalizeURL");
 		});
 
 	}
@@ -691,11 +715,11 @@ export default class RoutePerk extends BM.Perk
 
 		window.addEventListener("popstate", (e) => {
 			return Promise.resolve().then(() => {
-				return unit.use("spell", "event.trigger", "beforePopState");
+				return unit.cast("event.trigger", "beforePopState");
 			}).then(() => {
 				return RoutePerk.#_open(unit, {"url":window.location.href}, {"pushState":false});
 			}).then(() => {
-				return unit.use("spell", "event.trigger", "afterPopState");
+				return unit.cast("event.trigger", "afterPopState");
 			});
 		});
 
