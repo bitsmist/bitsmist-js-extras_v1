@@ -169,7 +169,7 @@ export default class PreferenceServer extends BM.Unit
 
 		let validatorName = this.get("setting", "options.validatorName");
 
-		return this.use("spell", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
+		return this.cast("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 
 	}
 
@@ -189,7 +189,7 @@ export default class PreferenceServer extends BM.Unit
 
 		let sender = BM.Util.safeGet(options, "sender", this);
 
-		return this.use("spell", "preference.apply", {"sender":sender, "preferences":changedItems});
+		return this.cast("preference.apply", {"sender":sender, "preferences":changedItems});
 
 	}
 
