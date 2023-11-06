@@ -53,7 +53,7 @@ export default class ObservableStore extends BM.Store
 	set filter(value)
 	{
 
-		BM.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
+		BM.Util.assert(typeof value === "function", () => `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
 		this._filter = value;
 
@@ -141,7 +141,7 @@ export default class ObservableStore extends BM.Store
 	subscribe(id, handler, options)
 	{
 
-		BM.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
+		BM.Util.assert(typeof handler === "function", () => `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 		this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -288,7 +288,7 @@ export default class ObservableStore extends BM.Store
 		changedItem = changedItem || {};
 		let key = "";
 
-		BM.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+		BM.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
 
 		Object.keys(obj2).forEach((key) => {
 			if (Array.isArray(obj1[key]))

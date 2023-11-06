@@ -62,9 +62,9 @@ export default class ValidationPerk extends BM.Perk
 		unit.upgrade("inventory", "validation.validationResult", {});
 
 		// Add event handlers
-		unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":Perk.info["order"]});
-		unit.use("event.add", "doValidate", {"handler":ValidationPerk.ValidationPerk_onDoValidate, "order":Perk.info["order"]});
-		unit.use("event.add", "doReportValidity", {"handler":ValidationPerk.ValidationPerk_onDoReportValidity, "order":Perk.info["order"]});
+		unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":ValidationPerk.info["order"]});
+		unit.use("event.add", "doValidate", {"handler":ValidationPerk.ValidationPerk_onDoValidate, "order":ValidationPerk.info["order"]});
+		unit.use("event.add", "doReportValidity", {"handler":ValidationPerk.ValidationPerk_onDoReportValidity, "order":ValidationPerk.info["order"]});
 
 	}
 
@@ -93,7 +93,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), () => `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
@@ -112,7 +112,7 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			BM.Util.assert(this.get("inventory", () => `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
 			let items = BM.Util.safeGet(e.detail, "items");
 			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);

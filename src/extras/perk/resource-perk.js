@@ -146,7 +146,7 @@ export default class ResourcePerk extends BM.Perk
 	static #_addHandler(unit, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
+		BM.Util.assert(options["handlerClassName"], () => `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
 		let handler = unit.get("inventory", `resource.resources.${handlerName}`);

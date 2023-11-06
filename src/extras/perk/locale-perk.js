@@ -89,10 +89,10 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		// Add event handlers
-		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":Perk.info["order"]});
-		unit.use("event.add", "doSetup", {"handler":LocalePerk.#LocalePerk_onDoSetup, "order":Perk.info["order"]});
-		unit.use("event.add", "beforeApplyLocale", {"handler":LocalePerk.#LocalePerk_onBeforeApplyLocale, "order":Perk.info["order"]});
-		unit.use("event.add", "doApplyLocale", {"handler":LocalePerk.#LocalePerk_onDoApplyLocale, "order":Perk.info["order"]});
+		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":LocalePerk.info["order"]});
+		unit.use("event.add", "doSetup", {"handler":LocalePerk.#LocalePerk_onDoSetup, "order":LocalePerk.info["order"]});
+		unit.use("event.add", "beforeApplyLocale", {"handler":LocalePerk.#LocalePerk_onBeforeApplyLocale, "order":LocalePerk.info["order"]});
+		unit.use("event.add", "doApplyLocale", {"handler":LocalePerk.#LocalePerk_onDoApplyLocale, "order":LocalePerk.info["order"]});
 
 		if (unit.get("setting", "locale.options.autoLocalizeRows"))
 		{

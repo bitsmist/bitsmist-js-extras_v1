@@ -55,7 +55,7 @@ export default class ArrayStore extends BM.Store
 	set items(value)
 	{
 
-		BM.Util.assert(Array.isArray(value), `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
+		BM.Util.assert(Array.isArray(value), () => `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
 
 		this._items = value;
 

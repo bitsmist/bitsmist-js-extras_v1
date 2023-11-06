@@ -63,8 +63,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let form = BM.Util.scopedSelectorAll(this._unit, "form")[0];
 
-		BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
-		BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
+		BM.Util.assert(form, () => `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.reportValidity, () => `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
 
 		form.reportValidity();
 
@@ -79,8 +79,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids = {};
 
-		BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-		BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+		BM.Util.assert(form, () => `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.checkValidity, () => `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
 		let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])")
 		elements.forEach((element) => {
@@ -106,8 +106,8 @@ export default class HTML5FormValidationHandler extends ValidationHandler
 
 		let invalids = [];
 
-		BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-		BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+		BM.Util.assert(form, () => `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+		BM.Util.assert(form.checkValidity, () => `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
 		if (!form.checkValidity())
 		{

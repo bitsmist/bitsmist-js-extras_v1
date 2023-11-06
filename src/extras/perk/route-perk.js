@@ -97,11 +97,11 @@ export default class RoutePerk extends BM.Perk
 		unit.upgrade("inventory", "routing.routeInfo", {});
 
 		// Add event handlers
-		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":Perk.info["order"]});
-		unit.use("event.add", "doStart", {"handler":RoutePerk.#RoutePerk_onDoStart, "order":Perk.info["order"]});
-		unit.use("event.add", "afterReady", {"handler":RoutePerk.#RoutePerk_onAfterReady, "order":Perk.info["order"]});
-		unit.use("event.add", "doValidateFail", {"handler":RoutePerk.#RoutePerk_onDoValidateFail, "order":Perk.info["order"]});
-		unit.use("event.add", "doReportValidity", {"handler":RoutePerk.#RoutePerk_onDoReportValidity, "order":Perk.info["order"]});
+		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":RoutePerk.info["order"]});
+		unit.use("event.add", "doStart", {"handler":RoutePerk.#RoutePerk_onDoStart, "order":RoutePerk.info["order"]});
+		unit.use("event.add", "afterReady", {"handler":RoutePerk.#RoutePerk_onAfterReady, "order":RoutePerk.info["order"]});
+		unit.use("event.add", "doValidateFail", {"handler":RoutePerk.#RoutePerk_onDoValidateFail, "order":RoutePerk.info["order"]});
+		unit.use("event.add", "doReportValidity", {"handler":RoutePerk.#RoutePerk_onDoReportValidity, "order":RoutePerk.info["order"]});
 
 		// Init popstate handler
 		RoutePerk.#__initPopState(unit);
@@ -286,7 +286,7 @@ export default class RoutePerk extends BM.Perk
 	static #_switchRoute(unit, routeName, options)
 	{
 
-		BM.Util.assert(routeName, "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
+		BM.Util.assert(routeName, () => "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
 
 		let newSettings;
 		return Promise.resolve().then(() => {
