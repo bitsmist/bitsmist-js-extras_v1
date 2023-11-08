@@ -221,19 +221,15 @@ export default class LocalePerk extends BM.Perk
      * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static #_applyLocale(unit, options)
+	static async #_applyLocale(unit, options)
 	{
 
-		return Promise.resolve().then(() => {
-			console.debug(`LocalePerk.#_applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-			return unit.cast("event.trigger", "beforeApplyLocale", options);
-		}).then(() => {
-			unit.set("inventory", "locale.active.localeName", options["localeName"]);
-			return unit.cast("event.trigger", "doApplyLocale", options);
-		}).then(() => {
-			console.debug(`LocalePerk.#_applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-			return unit.cast("event.trigger", "afterApplyLocale", options);
-		});
+		console.debug(`LocalePerk.#_applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
+		await unit.cast("event.trigger", "beforeApplyLocale", options);
+		unit.set("inventory", "locale.active.localeName", options["localeName"]);
+		await unit.cast("event.trigger", "doApplyLocale", options);
+		console.debug(`LocalePerk.#_applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
+		await unit.cast("event.trigger", "afterApplyLocale", options);
 
 	}
 

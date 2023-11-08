@@ -105,42 +105,38 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #_open(unit, options)
+	static async #_open(unit, options)
 	{
 
 		options = options || {};
 		unit.set("inventory", "dialog.options", options);
 
 		console.debug(`DialogPerk.#_open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
-		return unit.cast("event.trigger", "beforeOpen", options).then(() => {
-			if (!unit.get("inventory", "dialog.cancelOpen"))
+		await unit.cast("event.trigger", "beforeOpen", options);
+		if (!unit.get("inventory", "dialog.cancelOpen"))
+		{
+			// Show backdrop
+			if (unit.get("setting", "dialog.options.showBackdrop"))
 			{
-				return Promise.resolve().then(() => {
-					// Show backdrop
-					if (unit.get("setting", "dialog.options.showBackdrop"))
-					{
-						return DialogPerk.#__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
-					}
-				}).then(() => {
-					// Setup
-					if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
-					{
-						return unit.cast("basic.setup", options);
-					}
-				}).then(() => {
-					// Refresh
-					if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
-					{
-						return unit.cast("basic.refresh", options);
-					}
-				}).then(() => {
-					return unit.cast("event.trigger", "doOpen", options);
-				}).then(() => {
-					console.debug(`DialogPerk.#_open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
-					return unit.cast("event.trigger", "afterOpen", options);
-				});
+				await DialogPerk.#__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 			}
-		});
+
+			// Setup
+			if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
+			{
+				await unit.cast("basic.setup", options);
+			}
+
+			// Refresh
+			if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
+			{
+				await unit.cast("basic.refresh", options);
+			}
+
+			await unit.cast("event.trigger", "doOpen", options);
+			console.debug(`DialogPerk.#_open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
+			await unit.cast("event.trigger", "afterOpen", options);
+		}
 
 	}
 
@@ -177,34 +173,33 @@ export default class DialogPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #_close(unit, options)
+	static async #_close(unit, options)
 	{
 
 		options = options || {};
 		unit.set("inventory", "dialog.cancelClose", false);
 
 		console.debug(`DialogPerk.#_close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
-		return unit.cast("event.trigger", "beforeClose", options).then(() => {
-			if (!unit.get("inventory", "dialog.cancelClose"))
-			{
-				return unit.cast("event.trigger", "doClose", options).then(() => {
-					// Hide backdrop
-					if (unit.get("setting", "dialog.options.showBackdrop"))
-					{
-						DialogPerk.#__removeCloseOnClickHandlers();
-						return DialogPerk.#__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
-					}
-				}).then(() => {
-					if (unit.get("inventory", "dialog.isModal"))
-					{
-						DialogPerk.#__vault.get(unit)["modalPromise"].resolve(unit.get("inventory", "dialog.modalResult"));
-					}
-					console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
+		await unit.cast("event.trigger", "beforeClose", options);
+		if (!unit.get("inventory", "dialog.cancelClose"))
+		{
+			await unit.cast("event.trigger", "doClose", options)
 
-					return unit.cast("event.trigger", "afterClose", options);
-				});
+			// Hide backdrop
+			if (unit.get("setting", "dialog.options.showBackdrop"))
+			{
+				DialogPerk.#__removeCloseOnClickHandlers();
+				await DialogPerk.#__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 			}
-		});
+
+			if (unit.get("inventory", "dialog.isModal"))
+			{
+				DialogPerk.#__vault.get(unit)["modalPromise"].resolve(unit.get("inventory", "dialog.modalResult"));
+			}
+			console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
+
+			await unit.cast("event.trigger", "afterClose", options);
+		}
 
 	}
 

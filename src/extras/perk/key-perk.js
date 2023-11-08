@@ -178,25 +178,25 @@ export default class KeyPerk extends BM.Perk
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static #__defaultSubmit(e, unit, options)
+	static async #__defaultSubmit(e, unit, options)
 	{
 
-		return unit.cast("form.submit").then(() => {
-			if (!unit.get("inventory", "form.cancelSubmit"))
-			{
-				// Modal result
-				if (unit.get("inventory", "dialog.isModal"))
-				{
-					unit.set("inventory", "dialog.modalResult.result", true);
-				}
+		await unit.cast("form.submit");
 
-				// Auto close
-				if (options && options["autoClose"])
-				{
-					return unit.cast("dialog.close", {"reason":"submit"});
-				}
+		if (!unit.get("inventory", "form.cancelSubmit"))
+		{
+			// Modal result
+			if (unit.get("inventory", "dialog.isModal"))
+			{
+				unit.set("inventory", "dialog.modalResult.result", true);
 			}
-		});
+
+			// Auto close
+			if (options && options["autoClose"])
+			{
+				await unit.cast("dialog.close", {"reason":"submit"});
+			}
+		}
 
 	}
 

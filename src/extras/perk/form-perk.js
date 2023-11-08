@@ -199,42 +199,34 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #_submit(unit, options)
+	static async #_submit(unit, options)
 	{
 
 		options = options || {};
 		unit.set("inventory", "form.cancelSubmit", false);
 
-		return Promise.resolve().then(() => {
-			// Collect values
-			return FormPerk.#__collect(unit, options);
-		}).then(() => {
-			// Validate values
-			if (unit.get("setting", "form.options.autoValidate", true))
+		// Collect values
+		await FormPerk.#__collect(unit, options);
+
+		// Validate values
+		if (unit.get("setting", "form.options.autoValidate", true))
+		{
+			options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
+			await unit.cast("validation.validate", options);
+			if (!unit.get("inventory", "validation.validationResult.result"))
 			{
-				options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
-				return unit.cast("validation.validate", options).then(() => {
-					if (!unit.get("inventory", "validation.validationResult.result"))
-					{
-						unit.set("inventory", "form.cancelSubmit", true);
-					}
-				});
+				unit.set("inventory", "form.cancelSubmit", true);
 			}
-		}).then(() => {
-			// Submit values
-			console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
-			return unit.cast("event.trigger", "beforeSubmit", options).then(() => {
-				if (!unit.get("inventory", "form.cancelSubmit"))
-				{
-					return Promise.resolve().then(() => {
-						return unit.cast("event.trigger", "doSubmit", options);
-					}).then(() => {
-						console.debug(`FormPerk.#_submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
-						return unit.cast("event.trigger", "afterSubmit", options);
-					});
-				}
-			});
-		});
+		}
+		// Submit values
+		console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
+		await unit.cast("event.trigger", "beforeSubmit", options);
+		if (!unit.get("inventory", "form.cancelSubmit"))
+		{
+			await unit.cast("event.trigger", "doSubmit", options);
+			console.debug(`FormPerk.#_submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
+			await unit.cast("event.trigger", "afterSubmit", options);
+		}
 
 	}
 
@@ -250,18 +242,14 @@ export default class FormPerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #__collect(unit, options)
+	static async #__collect(unit, options)
 	{
 
-		return Promise.resolve().then(() => {
-			console.debug(`FormPerk.#__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.cast("event.trigger", "beforeCollect", options);
-		}).then(() => {
-			return unit.cast("event.trigger", "doCollect", options);
-		}).then(() => {
-			console.debug(`FormPerk.#__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.cast("event.trigger", "afterCollect", options);
-		});
+		console.debug(`FormPerk.#__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "beforeCollect", options);
+		await unit.cast("event.trigger", "doCollect", options);
+		console.debug(`FormPerk.#__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "afterCollect", options);
 
 	}
 

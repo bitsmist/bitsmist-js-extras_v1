@@ -98,7 +98,7 @@ export default class RollCallPerk extends BM.Perk
 	 * @param	{Unit}			unit				Compoent to register.
 	 * @param	{Object}		optios				Options.
 	 */
-	static #_call(unit, name, options)
+	static async #_call(unit, name, options)
 	{
 
 		if (!RollCallPerk.#__records[name])
@@ -119,19 +119,16 @@ export default class RollCallPerk extends BM.Perk
 
 		let entry = RollCallPerk.#__records[name];
 
-		return Promise.resolve().then(() => {
-			if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
-			{
-				return unit.get("inventory", "promise.documentReady");
-			}
-		}).then(() => {
-			if (BM.Util.safeGet(options, "waitForAttendance"))
-			{
-				return entry.waitInfo.promise;
-			}
-		}).then(() => {
-			return entry.object;
-		});
+		if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
+		{
+			await unit.get("inventory", "promise.documentReady");
+		}
+		if (BM.Util.safeGet(options, "waitForAttendance"))
+		{
+			await entry.waitInfo.promise;
+		}
+
+		return entry.object;
 
 	}
 

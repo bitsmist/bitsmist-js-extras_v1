@@ -232,12 +232,11 @@ export default class RoutePerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #_loadSettings(unit, routeName, options)
+	static async #_loadSettings(unit, routeName, options)
 	{
 
-		return BM.AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options)).then((settings) => {
-			unit.set("inventory", "routing.routeInfo.settings", settings);
-		});
+		let settings = await BM.AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options));
+		unit.set("inventory", "routing.routeInfo.settings", settings);
 
 	}
 
@@ -252,23 +251,19 @@ export default class RoutePerk extends BM.Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static #_loadExtender(unit, routeName, options)
+	static async #_loadExtender(unit, routeName, options)
 	{
 
-		return Promise.resolve().then(() => {
-			if (!unit.get("inventory", "routing.routeInfo.extender"))
-			{
-				return BM.AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName)).then((extender) => {
-					unit.set("inventory", "routing.routeInfo.extender", extender);
-				});
-			}
-		}).then(() => {
-			let extender = unit.get("inventory", "routing.routeInfo.extender");
-			if (extender)
-			{
-				new Function(`"use strict";${extender}`)();
-			}
-		});
+		if (!unit.get("inventory", "routing.routeInfo.extender"))
+		{
+			let extender = await BM.AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName));
+			unit.set("inventory", "routing.routeInfo.extender", extender);
+		}
+		let extender = unit.get("inventory", "routing.routeInfo.extender");
+		if (extender)
+		{
+			new Function(`"use strict";${extender}`)();
+		}
 
 	}
 
@@ -283,30 +278,32 @@ export default class RoutePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static #_switchRoute(unit, routeName, options)
+	static async #_switchRoute(unit, routeName, options)
 	{
 
 		BM.Util.assert(routeName, () => "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
 
 		let newSettings;
-		return Promise.resolve().then(() => {
-			if (RoutePerk.#__hasExternalSettings(unit, routeName))
-			{
-				return RoutePerk.#_loadSettings(unit, routeName);
-			}
-		}).then(() => {
-			if (RoutePerk.#__hasExternalExtender(unit, routeName))
-			{
-				return RoutePerk.#_loadExtender(unit);
-			}
-		}).then(() => {
-			newSettings = unit.get("inventory", "routing.routeInfo.settings");
-			unit.use("setting.merge", newSettings);
 
-			return unit.cast("setting.apply", {"settings":newSettings});
-		}).then(() => {
-			return unit.cast("basic.transform");
-		});
+		// Load extra settings
+		if (RoutePerk.#__hasExternalSettings(unit, routeName))
+		{
+			await RoutePerk.#_loadSettings(unit, routeName);
+		}
+
+		// Load extra codes
+		if (RoutePerk.#__hasExternalExtender(unit, routeName))
+		{
+			await RoutePerk.#_loadExtender(unit);
+		}
+
+		// Merge & apply new settings
+		newSettings = unit.get("inventory", "routing.routeInfo.settings");
+		unit.use("setting.merge", newSettings);
+		await unit.cast("setting.apply", {"settings":newSettings});
+
+		// Cast trasform to load & apply CSS
+		await unit.cast("basic.transform");
 
 	}
 
@@ -321,7 +318,7 @@ export default class RoutePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static #_open(unit, routeInfo, options)
+	static async #_open(unit, routeInfo, options)
 	{
 
 		options = Object.assign({}, options);
@@ -352,40 +349,39 @@ export default class RoutePerk extends BM.Perk
 			return;
 		}
 
-		return Promise.resolve().then(() => {
-			// Replace URL
-			let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
-			if (pushState)
-			{
-				history.pushState(RoutePerk.#__getState("_open.pushState"), null, newURL);
-			}
-			unit.set("inventory", "routing.routeInfo", newRouteInfo);
-			/*
-		}).then(() => {
-			// Load other unit when new route name is different from the current route name.
-			if (curRouteInfo["name"] != newRouteInfo["name"])
-			{
-				return RoutePerk.#_updateRoute(unit, curRouteInfo, newRouteInfo, options);
-			}
-			*/
-		}).then(() => {
-			// Validate URL
-			if (unit.get("setting", "routing.options.autoValidate"))
-			{
-				let validateOptions = {
-					"validatorName":	unit.get("setting", "routing.options.validatorName"),
-					"items":			BM.URLUtil.loadParameters(newURL),
-					"url":				newURL,
-				};
-				return unit.cast("validation.validate", validateOptions);
-			}
-		}).then(() => {
-			// Refresh
-			return RoutePerk.#_refreshRoute(unit, newRouteInfo, options);
-		}).then(() => {
-			// Normalize URL
-			return RoutePerk.#_normalizeRoute(unit, window.location.href);
-		});
+		// Replace URL
+		let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
+		if (pushState)
+		{
+			history.pushState(RoutePerk.#__getState("_open.pushState"), null, newURL);
+		}
+		unit.set("inventory", "routing.routeInfo", newRouteInfo);
+
+		/*
+		// Update route
+		// Load other unit when new route name is different from the current route name.
+		if (curRouteInfo["name"] != newRouteInfo["name"])
+		{
+			await RoutePerk.#_updateRoute(unit, curRouteInfo, newRouteInfo, options);
+		}
+		*/
+
+		// Validate URL
+		if (unit.get("setting", "routing.options.autoValidate"))
+		{
+			let validateOptions = {
+				"validatorName":	unit.get("setting", "routing.options.validatorName"),
+				"items":			BM.URLUtil.loadParameters(newURL),
+				"url":				newURL,
+			};
+			await unit.cast("validation.validate", validateOptions);
+		}
+
+		// Refresh
+		await RoutePerk.#_refreshRoute(unit, newRouteInfo, options);
+
+		// Normalize URL
+		await RoutePerk.#_normalizeRoute(unit, window.location.href);
 
 	}
 
@@ -469,16 +465,12 @@ export default class RoutePerk extends BM.Perk
 	 *
 	 * @return 	{Promise}		Promise.
 	 */
-	static #_normalizeRoute(unit, url)
+	static async #_normalizeRoute(unit, url)
 	{
 
-		return Promise.resolve().then(() => {
-			return unit.cast("event.trigger", "beforeNormalizeURL");
-		}).then(() => {
-			return unit.cast("event.trigger", "doNormalizeURL");
-		}).then(() => {
-			return unit.cast("event.trigger", "afterNormalizeURL");
-		});
+		await unit.cast("event.trigger", "beforeNormalizeURL");
+		await unit.cast("event.trigger", "doNormalizeURL");
+		await unit.cast("event.trigger", "afterNormalizeURL");
 
 	}
 
@@ -713,14 +705,10 @@ export default class RoutePerk extends BM.Perk
 	static #__initPopState(unit)
 	{
 
-		window.addEventListener("popstate", (e) => {
-			return Promise.resolve().then(() => {
-				return unit.cast("event.trigger", "beforePopState");
-			}).then(() => {
-				return RoutePerk.#_open(unit, {"url":window.location.href}, {"pushState":false});
-			}).then(() => {
-				return unit.cast("event.trigger", "afterPopState");
-			});
+		window.addEventListener("popstate", async (e) => {
+			await unit.cast("event.trigger", "beforePopState");
+			await RoutePerk.#_open(unit, {"url":window.location.href}, {"pushState":false});
+			await unit.cast("event.trigger", "afterPopState");
 		});
 
 	}

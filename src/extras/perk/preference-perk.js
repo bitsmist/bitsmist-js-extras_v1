@@ -120,18 +120,14 @@ export default class PreferencePerk extends BM.Perk
      * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
 	 */
-	static #_applyPreferences(unit, options)
+	static async #_applyPreferences(unit, options)
 	{
 
-		return Promise.resolve().then(() => {
-			console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.cast("event.trigger", "beforeApplyPreferences", options);
-		}).then(() => {
-			return unit.cast("event.trigger", "doApplyPreferences", options);
-		}).then(() => {
-			console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			return unit.cast("event.trigger", "afterApplyPreferences", options);
-		});
+		console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "beforeApplyPreferences", options);
+		await unit.cast("event.trigger", "doApplyPreferences", options);
+		console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "afterApplyPreferences", options);
 
 	}
 
