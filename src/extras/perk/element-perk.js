@@ -58,7 +58,7 @@ export default class ElementPerk extends BM.Perk
 	}
 
 	// -----------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -----------------------------------------------------------------------------
 
 	static #ElementPerk_onDoApplySettings(sender, e, ex)

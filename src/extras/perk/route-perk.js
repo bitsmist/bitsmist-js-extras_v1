@@ -109,7 +109,7 @@ export default class RoutePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #RoutePerk_onDoApplySettings(sender, e, ex)
@@ -180,7 +180,7 @@ export default class RoutePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

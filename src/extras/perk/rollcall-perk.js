@@ -75,7 +75,7 @@ export default class RollCallPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #RollCallPerk_onDoApplySettings(sender, e, ex)
@@ -89,7 +89,7 @@ export default class RollCallPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

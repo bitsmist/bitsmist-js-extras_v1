@@ -67,7 +67,7 @@ export default class ResourcePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #ResourcePerk_onDoApplySettings(sender, e, ex)
@@ -131,7 +131,7 @@ export default class ResourcePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

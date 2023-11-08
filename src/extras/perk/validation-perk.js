@@ -69,7 +69,7 @@ export default class ValidationPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static ValidationPerk_onDoApplySettings(sender, e, ex)
@@ -124,7 +124,7 @@ export default class ValidationPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

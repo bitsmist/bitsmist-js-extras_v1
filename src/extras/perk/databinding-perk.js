@@ -90,7 +90,7 @@ export default class DatabindingPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #DatabindingPerk_onBeforeTransform(sender, e, ex)
@@ -145,7 +145,7 @@ export default class DatabindingPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

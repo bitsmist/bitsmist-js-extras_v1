@@ -65,7 +65,7 @@ export default class ChainPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #ChainPerk_onDoApplySettings(sender, e, ex)

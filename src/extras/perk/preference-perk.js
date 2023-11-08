@@ -82,7 +82,7 @@ export default class PreferencePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #PreferencePerk_onDoApplySettings(sender, e, ex)
@@ -111,26 +111,7 @@ export default class PreferencePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Apply preferences.
-	 *
-     * @param	{Unit}			unit				Unit.
-	 * @param	{Object}		options				Options.
-	 */
-	static async #_applyPreferences(unit, options)
-	{
-
-		console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-		await unit.cast("event.trigger", "beforeApplyPreferences", options);
-		await unit.cast("event.trigger", "doApplyPreferences", options);
-		console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-		await unit.cast("event.trigger", "afterApplyPreferences", options);
-
-	}
-
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -151,6 +132,27 @@ export default class PreferencePerk extends BM.Perk
 		{
 			return PreferencePerk.#__vault.get(unit)["server"].items;
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Spells (Unit)
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Apply preferences.
+	 *
+     * @param	{Unit}			unit				Unit.
+	 * @param	{Object}		options				Options.
+	 */
+	static async #_applyPreferences(unit, options)
+	{
+
+		console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "beforeApplyPreferences", options);
+		await unit.cast("event.trigger", "doApplyPreferences", options);
+		console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+		await unit.cast("event.trigger", "afterApplyPreferences", options);
 
 	}
 

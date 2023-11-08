@@ -54,7 +54,7 @@ export default class KeyPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #KeyPerk_onAfterTransform(sender, e, ex)

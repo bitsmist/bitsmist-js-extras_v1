@@ -102,7 +102,7 @@ export default class LocalePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #LocalePerk_onDoApplySettings(sender, e, ex)
@@ -183,7 +183,58 @@ export default class LocalePerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Skills (Unit)
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Localize all the bm-locale fields with i18 messages using each handler.
+	 *
+     * @param	{Unit}			unit				Unit.
+	 * @param	{HTMLElement}	rootNode			Target root node to localize.
+	 * @param	{Object}		interpolation		Interpolation parameters.
+	 */
+	static #_localize(unit, rootNode, interpolation)
+	{
+
+		rootNode = rootNode || unit;
+
+		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			unit.get("inventory", `locale.localizers.${handlerName}`).localize(
+				rootNode,
+				Object.assign({"interpolation":interpolation}, unit.get("inventory", "locale.active"))
+			);
+		});
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Get the locale message.
+	 *
+	 * @param	{Unit}			unit				Unit.
+	 * @param	{String}		key					Key.
+	 * @param	{String}		localeName			Locale name.
+	 *
+	 * @return  {Promise}		Promise.
+	 */
+	static #_getLocaleMessage(unit, key, localeName)
+	{
+
+		localeName = localeName || unit.get("inventory", "locale.active.localeName");
+
+		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
+		if (value === undefined)
+		{
+			value = unit.get("inventory", "locale.messages").get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
+		}
+
+		return value;
+
+	}
+
+	// -------------------------------------------------------------------------
+	//  Skills (Unit)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -236,29 +287,6 @@ export default class LocalePerk extends BM.Perk
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Localize all the bm-locale fields with i18 messages using each handler.
-	 *
-     * @param	{Unit}			unit				Unit.
-	 * @param	{HTMLElement}	rootNode			Target root node to localize.
-	 * @param	{Object}		interpolation		Interpolation parameters.
-	 */
-	static #_localize(unit, rootNode, interpolation)
-	{
-
-		rootNode = rootNode || unit;
-
-		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
-			unit.get("inventory", `locale.localizers.${handlerName}`).localize(
-				rootNode,
-				Object.assign({"interpolation":interpolation}, unit.get("inventory", "locale.active"))
-			);
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Load the messages file.
 	 *
 	 * @param	{Unit}			unit				Unit.
@@ -277,32 +305,6 @@ export default class LocalePerk extends BM.Perk
 		});
 
 		return Promise.all(promises);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the locale message.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 * @param	{String}		key					Key.
-	 * @param	{String}		localeName			Locale name.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	static #_getLocaleMessage(unit, key, localeName)
-	{
-
-		localeName = localeName || unit.get("inventory", "locale.active.localeName");
-
-		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
-		if (value === undefined)
-		{
-			value = unit.get("inventory", "locale.messages").get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
-		}
-
-		return value;
 
 	}
 

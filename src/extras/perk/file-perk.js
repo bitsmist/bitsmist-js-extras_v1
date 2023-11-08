@@ -50,7 +50,7 @@ export default class FilePerk extends BM.Perk
 	}
 
 	// -----------------------------------------------------------------------------
-	//	Event handlers
+	//	Event Handlers (Unit)
 	// -----------------------------------------------------------------------------
 
 	static #FilePerk_onDoApplySettings(sender, e, ex)

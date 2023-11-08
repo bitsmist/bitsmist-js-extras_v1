@@ -79,7 +79,7 @@ export default class DialogPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event Handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #DialogPerk_onAfterReady(sender, e, ex)
@@ -95,7 +95,7 @@ export default class DialogPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills
+	//  Spells (Unit)
 	// -------------------------------------------------------------------------
 
 	/**

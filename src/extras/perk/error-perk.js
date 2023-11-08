@@ -39,7 +39,7 @@ export default class ErrorPerk extends BM.Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Event handlers
+	//  Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
 	static #ErrorPerk_onDoStart(sender, e, ex)
