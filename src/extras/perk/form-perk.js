@@ -135,7 +135,7 @@ export default class FormPerk extends BM.Perk
 
 		if (this.get("setting", "form.options.autoFill", true))
 		{
-			let rootNode = ( e.detail && "rootNode" in e.detail ? BM.Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
+			let rootNode = ( e.detail && "selector" in e.detail ? BM.Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
 			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.get("inventory", "resource.resources"), "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}

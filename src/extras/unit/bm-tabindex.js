@@ -38,7 +38,7 @@ export default class TabIndex extends BM.Unit
 			"event": {
 				"events": {
 					"tab-indices": {
-						"rootNode": 				"[data-tabindex]",
+						"selector": 				"[data-tabindex]",
 						"handlers": {
 							"click": 				["TabIndex_onTabIndexClick"]
 						}

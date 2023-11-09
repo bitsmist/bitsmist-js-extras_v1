@@ -110,15 +110,15 @@ export default class ElementPerk extends BM.Perk
 
 		let elements;
 
-		if (elementInfo["rootNode"])
+		if (elementInfo["selector"])
 		{
-			if (elementInfo["rootNode"] === "this" || elementInfo["rootNode"] === unit.tagName.toLowerCase())
+			if (elementInfo["selector"] === "this" || elementInfo["selector"] === unit.tagName.toLowerCase())
 			{
 				elements = [unit];
 			}
 			else
 			{
-				elements = BM.Util.scopedSelectorAll(unit, elementInfo["rootNode"]);
+				elements = BM.Util.scopedSelectorAll(unit, elementInfo["selector"]);
 			}
 		}
 		else if (elementName === "this" || elementName === unit.tagName.toLowerCase())
@@ -191,7 +191,7 @@ export default class ElementPerk extends BM.Perk
 				case "autoFocus":
 					elements[i].focus();
 					break;
-				case "rootNode":
+				case "selector":
 				case "waitFor":
 					break;
 				default:

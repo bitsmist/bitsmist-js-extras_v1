@@ -87,7 +87,7 @@ export default class LinkedResourceHandler extends ResourceHandler
 	_load(id, parameters)
 	{
 
-		let rootNode = this._options.get("rootNode");
+		let rootNode = this._options.get("selector");
 		let resourceName = this._options.get("resourceName") || this._resourceName;
 
 		return this._unit.cast("status.wait", [rootNode]).then(() => {
