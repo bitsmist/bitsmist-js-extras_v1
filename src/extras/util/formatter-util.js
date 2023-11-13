@@ -34,7 +34,7 @@ export default class FormatterUtil
 		options = options || {};
 		let ret = value;
 
-		let tokens = this.__bisect(format, "-");
+		let tokens = FormatterUtil.#__bisect(format, "-");
 		let type = tokens[0];
 		let typeOption = (tokens.length > 1 ? tokens[1] : "");
 
@@ -349,7 +349,7 @@ export default class FormatterUtil
 		if (parameters && format.indexOf("${") > -1)
 		{
 			ret = ret.replace(/\$\{(.+)\}/g, (_, name) => {
-				let tokens = this.__bisect(name, ":");
+				let tokens = FormatterUtil.#__bisect(name, ":");
 				let value = parameters[tokens[0]];
 
 				if (!value)
@@ -388,7 +388,7 @@ export default class FormatterUtil
 		if (format.indexOf("${value") > -1)
 		{
 			ret = ret.replace(/\$\{value(.*)\}/g, (_, name) => {
-				let tokens = this.__bisect(name, ":");
+				let tokens = FormatterUtil.#__bisect(name, ":");
 				let tmp = value;
 
 				if (tokens.length > 1)
@@ -427,7 +427,7 @@ export default class FormatterUtil
 				let arr = name.split(".");
 				let resourceName = arr[0];
 				let key = arr[1];
-				return this.__getResourceValue(resources, resourceName, value, key) || "";
+				return FormatterUtil.#__getResourceValue(resources, resourceName, value, key) || "";
 			});
 		}
 
@@ -449,7 +449,7 @@ export default class FormatterUtil
 	 *
 	 * @return  {String}		Resource value.
 	 */
-	static __getResourceValue(resources, resourceName, value, key)
+	static #__getResourceValue(resources, resourceName, value, key)
 	{
 
 		let ret = value;
@@ -477,7 +477,7 @@ export default class FormatterUtil
 	 *
 	 * @return  {Arry}			Splitted string.
 	 */
-	static __bisect(target, delimiter)
+	static #__bisect(target, delimiter)
 	{
 
 		let ret = [];
