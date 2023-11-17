@@ -97,7 +97,7 @@ export default class ResourceHandler
 	{
 
 		this._data = value;
-		this._items = this.__reshapeItems(value);
+		this._items = this.#__reshapeItems(value);
 
 	}
 
@@ -209,7 +209,7 @@ export default class ResourceHandler
 	add(id, data, parameters)
 	{
 
-		return this._add(id, this.__reshapeData(data), parameters);
+		return this._add(id, this.#__reshapeData(data), parameters);
 
 	}
 
@@ -227,7 +227,7 @@ export default class ResourceHandler
 	update(id, data, parameters)
 	{
 
-		return this._update(id, this.__reshapeData(data), parameters);
+		return this._update(id, this.#__reshapeData(data), parameters);
 
 	}
 
@@ -349,7 +349,7 @@ export default class ResourceHandler
 	 *
 	 * @return  {Object}		Reshaped items.
 	 */
-	__reshapeItems(data)
+	#__reshapeItems(data)
 	{
 
 		// Get items
@@ -359,7 +359,7 @@ export default class ResourceHandler
 		// Reshape
 		if (this._options.get("reshapeOptions.load.reshape"))
 		{
-			let reshaper = this._options.get("reshapeOptions.load.reshaper", this.__reshaper_load.bind(this));
+			let reshaper = this._options.get("reshapeOptions.load.reshaper", this.#__reshaper_load.bind(this));
 			items = reshaper(items);
 		}
 
@@ -376,7 +376,7 @@ export default class ResourceHandler
 	 *
 	 * @return  {Object}		Reshaped data.
 	 */
-	__reshapeData(data)
+	#__reshapeData(data)
 	{
 
 		if (this._options.get("reshapeOptions.update.reshape"))
@@ -398,7 +398,7 @@ export default class ResourceHandler
 	 *
 	 * @return  {Object}		Master object.
      */
-	__reshaper_load(target)
+	#__reshaper_load(target)
 	{
 
 		let items;

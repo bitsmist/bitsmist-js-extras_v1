@@ -77,7 +77,7 @@ export default class ObservableStore extends Store
 
 		if (holder && typeof holder === "object")
 		{
-			this.__deepMerge(holder, value, changedItem);
+			this.#__deepMerge(holder, value, changedItem);
 		}
 		else
 		{
@@ -119,7 +119,7 @@ export default class ObservableStore extends Store
     {
 
         this._items = {};
-        this.__deepMerge(this._items, value);
+        this.#__deepMerge(this._items, value);
 
         let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this._options, "notifyOnChange"));
         if (notify)
@@ -282,13 +282,13 @@ export default class ObservableStore extends Store
 	 *
 	 * @return  {Object}		Merged array.
 	 */
-	__deepMerge(obj1, obj2, changedItem)
+	#__deepMerge(obj1, obj2, changedItem)
 	{
 
 		changedItem = changedItem || {};
 		let key = "";
 
-		Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+		Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.#__deepMerge(): Parameters must be an object.", TypeError);
 
 		Object.keys(obj2).forEach((key) => {
 			if (Array.isArray(obj1[key]))

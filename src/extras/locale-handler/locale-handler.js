@@ -90,7 +90,7 @@ export default class LocaleHandler
 
 		// Get messages from settings
 		if (options["messages"]) {
-			let messages = Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
+			let messages = Util.getObject(options["messages"], {"format":this.#__getMessageFormat(this._unit)});
 			this._messages.merge(messages);
 		}
 
@@ -174,11 +174,11 @@ export default class LocaleHandler
 			return promise;
 		}
 
-		if (this.__hasExternalMessages(this._unit))
+		if (this.#__hasExternalMessages(this._unit))
 		{
-			let url = this.__getMessageURL(this._unit, localeName);
+			let url = this.#__getMessageURL(this._unit, localeName);
 			promise = AjaxUtil.loadJSON(url, options).then((messages) => {
-				localeInfo["messages"] = Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
+				localeInfo["messages"] = Util.getObject(messages, {"format":this.#__getMessageFormat(this._unit)});
 				localeInfo["status"] = "loaded";
 				this._messages.merge(messages);
 				this._localeInfo[localeName] = localeInfo;
@@ -200,7 +200,7 @@ export default class LocaleHandler
 	 *
 	 * @return  {Boolean}		True if the unit has the external messages file.
 	 */
-	__hasExternalMessages(unit)
+	#__hasExternalMessages(unit)
 	{
 
 		let ret = false;
@@ -224,7 +224,7 @@ export default class LocaleHandler
 	 *
 	 * @return  {String}		URL.
 	 */
-	__getMessageURL(unit, localeName)
+	#__getMessageURL(unit, localeName)
 	{
 
 		let path;
@@ -248,7 +248,7 @@ export default class LocaleHandler
 					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
 			fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
-			let ext = this.__getMessageFormat(unit);
+			let ext = this.#__getMessageFormat(unit);
 			query = unit.get("setting", "unit.options.query");
 
 			// Split Locale
@@ -273,7 +273,7 @@ export default class LocaleHandler
 	 *
 	 * @return  {String}            "js" or "json".
 	 */
-	__getMessageFormat(unit)
+	#__getMessageFormat(unit)
 	{
 
 		return this._options.get("messageFormat",

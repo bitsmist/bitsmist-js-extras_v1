@@ -39,7 +39,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	_load(id, parameters)
 	{
 
-		return this.__getCookie(this._cookieName);
+		return this.#__getCookie(this._cookieName);
 
 	}
 
@@ -48,7 +48,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	_add(id, data, parameters)
 	{
 
-		this.__setCookie(this._cookieName, data);
+		this.#__setCookie(this._cookieName, data);
 
 	}
 
@@ -57,7 +57,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	_update(id, data, parameters)
 	{
 
-		this.__setCookie(this._cookieName, data);
+		this.#__setCookie(this._cookieName, data);
 
 	}
 
@@ -70,7 +70,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	*
 	* @param	{String}		key					Key.
 	*/
-	__getCookie(key)
+	#__getCookie(key)
 	{
 
 		let decoded = document.cookie.split(';').reduce((result, current) => {
@@ -95,7 +95,7 @@ export default class CookieResourceHandler extends ResourceHandler
 	* @param	{String}		key					Key.
 	* @param	{Object}		value				Value.
 	*/
-	__setCookie(key, value)
+	#__setCookie(key, value)
 	{
 
 		let cookie = key + `=${encodeURIComponent(JSON.stringify(value))}; `;

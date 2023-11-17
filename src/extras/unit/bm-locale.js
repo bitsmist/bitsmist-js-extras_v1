@@ -109,7 +109,7 @@ export default class LocaleServer extends Unit
 
 		this._store.subscribe(
 			`${unit.tagName}_${unit.uniqueId}`,
-			this.__triggerEvent.bind(unit),
+			this.#__triggerEvent.bind(unit),
 		);
 
 	}
@@ -126,7 +126,7 @@ export default class LocaleServer extends Unit
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	__triggerEvent(conditions, observerInfo, options)
+	#__triggerEvent(conditions, observerInfo, options)
 	{
 
 		return this.cast("locale.apply", {"localeName":options.localeName});

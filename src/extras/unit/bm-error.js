@@ -61,10 +61,10 @@ export default class ErrorServer extends Unit
 	ErrorServer_onBeforeStart(sender, e, ex)
 	{
 
-		this._observers = new ObservableStore({"filter":this.__filter});
+		this._observers = new ObservableStore({"filter":this.#__filter});
 
 		// Install error listner
-		this.__initListeners();
+		this.#__initListeners();
 
 	}
 
@@ -78,7 +78,7 @@ export default class ErrorServer extends Unit
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		observerInfo		Observer info.
 	 */
-	__filter(conditions, observerInfo, ...args)
+	#__filter(conditions, observerInfo, ...args)
 	{
 
 		let result = false;
@@ -103,11 +103,11 @@ export default class ErrorServer extends Unit
 	/**
 	 * Init error handling listeners.
 	 */
-	__initListeners()
+	#__initListeners()
 	{
 
-		window.addEventListener("unhandledrejection", this.__rejectionHandler.bind(this));
-		window.addEventListener("error", this.__errorHandler.bind(this));
+		window.addEventListener("unhandledrejection", this.#__rejectionHandler.bind(this));
+		window.addEventListener("error", this.#__errorHandler.bind(this));
 
 	}
 
@@ -118,7 +118,7 @@ export default class ErrorServer extends Unit
 	 *
 	 * @param	{Error}			error				Error object.
 	 */
-	__rejectionHandler(error)
+	#__rejectionHandler(error)
 	{
 
 		let e = {};
@@ -144,7 +144,7 @@ export default class ErrorServer extends Unit
 				e.message = error;
 			}
 			e.type = error.type;
-			e.name = this.__getErrorName(error);
+			e.name = this.#__getErrorName(error);
 			e.filename = "";
 			e.funcname = ""
 			e.lineno = "";
@@ -152,7 +152,7 @@ export default class ErrorServer extends Unit
 			// e.stack = error.reason.stack;
 			// e.object = error.reason;
 			//
-			this.__handleException(e);
+			this.#__handleException(e);
 		}
 		catch(e)
 		{
@@ -174,7 +174,7 @@ export default class ErrorServer extends Unit
 	 * @param	{Number}		line				Line no.
 	 * @param	{Number}		col					Col no.
 	 */
-	__errorHandler(error, file, line, col)
+	#__errorHandler(error, file, line, col)
 	{
 
 		let e = {};
@@ -182,7 +182,7 @@ export default class ErrorServer extends Unit
 		try
 		{
 			e.type = "error";
-			e.name = this.__getErrorName(error);
+			e.name = this.#__getErrorName(error);
 			e.message = error.message;
 			e.file = error.filename;
 			e.line = error.lineno;
@@ -193,7 +193,7 @@ export default class ErrorServer extends Unit
 				e.object = error.error;
 			}
 
-			this.__handleException(e);
+			this.#__handleException(e);
 		}
 		catch(e)
 		{
@@ -214,7 +214,7 @@ export default class ErrorServer extends Unit
 	 *
 	 * @return  {String}		Error name.
 	 */
-	__getErrorName(error)
+	#__getErrorName(error)
 	{
 
 		let name;
@@ -254,7 +254,7 @@ export default class ErrorServer extends Unit
 	 *
 	 * @param	{Object}		e					Error object.
 	 */
-	__handleException(e)
+	#__handleException(e)
 	{
 
 		//window.stop();
