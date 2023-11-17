@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import FormatterUtil from "../util/formatter-util.js";
+import {Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Value Util Class
@@ -64,7 +64,7 @@ export default class ValueUtil
 	{
 
 		// Get elements with the attribute
-		let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
+		let elements = Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
 			elements.push(rootNode);
@@ -78,7 +78,7 @@ export default class ValueUtil
 			}
 			else
 			{
-				value = BM.Util.safeGet(items, element.getAttribute(this.attributeName));
+				value = Util.safeGet(items, element.getAttribute(this.attributeName));
 			}
 
 			// Set
@@ -105,7 +105,7 @@ export default class ValueUtil
 		let item = {};
 
 		// Get elements with the attribute
-		let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
+		let elements = Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 		if (rootNode.matches(`[${this.attributeName}]`))
 		{
 			elements.push(rootNode);
@@ -158,16 +158,16 @@ export default class ValueUtil
 	static clearFields(rootNode, options)
 	{
 
-		let target = BM.Util.safeGet(options, "target", "");
+		let target = Util.safeGet(options, "target", "");
 
 		// Clear input elements
-		let elements = BM.Util.scopedSelectorAll(rootNode, `${target} input`, options);
+		let elements = Util.scopedSelectorAll(rootNode, `${target} input`, options);
 		elements.forEach((element) => {
 			this.clearValue(element, options);
 		});
 
 		// Clear select elements
-		elements = BM.Util.scopedSelectorAll(rootNode, `${target} select`, options);
+		elements = Util.scopedSelectorAll(rootNode, `${target} select`, options);
 		elements.forEach((element) => {
 			this.clearValue(element, options);
 		});

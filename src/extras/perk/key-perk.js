@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Key Perk class
 // =============================================================================
 
-export default class KeyPerk extends BM.Perk
+export default class KeyPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -280,7 +280,7 @@ export default class KeyPerk extends BM.Perk
 		if (options && options["selector"])
 		{
 			let handler = ( options["handler"] ? options["handler"] : KeyPerk.#__getDefaultHandler(action) );
-			let elements = BM.Util.scopedSelectorAll(unit, options["selector"]);
+			let elements = Util.scopedSelectorAll(unit, options["selector"]);
 
 			elements.forEach((element) => {
 				element.addEventListener("click", function(e){handler.call(this, e, unit, options);});

@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import FormatterUtil from "./formatter-util.js";
+import {Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Form util class
@@ -31,12 +31,12 @@ FormUtil.showConditionalElements = function(rootNode, item)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let elements = Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 	// Show elements
 	elements.forEach((element) => {
 		let condition = element.getAttribute("bm-visible");
-		if (BM.Util.safeEval(condition, item))
+		if (Util.safeEval(condition, item))
 		{
 			element.style.removeProperty("display");
 		}
@@ -59,7 +59,7 @@ FormUtil.hideConditionalElements = function(rootNode)
 {
 
 	// Get elements with bm-visible attribute
-	let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+	let elements = Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 	// Hide elements
 	elements.forEach((element) => {

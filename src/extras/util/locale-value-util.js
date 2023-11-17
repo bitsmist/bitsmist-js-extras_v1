@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import LocaleFormatterUtil from "../util/locale-formatter-util";
 import ValueUtil from "./value-util";
 

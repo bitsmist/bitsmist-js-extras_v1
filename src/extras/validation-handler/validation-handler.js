@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Store} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Validation Handler class
@@ -33,7 +33,7 @@ export default class ValidationHandler
 		options = options || {};
 
 		this._unit = unit;
-		this._options = new BM.Store({"items":options});
+		this._options = new Store({"items":options});
 
 	}
 

@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ObservableStore from "../store/observable-store.js";
+import {Unit, URLUtil} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Error Server class
 // =============================================================================
 
-export default class ErrorServer extends BM.Unit
+export default class ErrorServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -61,7 +61,7 @@ export default class ErrorServer extends BM.Unit
 	ErrorServer_onBeforeStart(sender, e, ex)
 	{
 
-		this._observers = new BM.ObservableStore({"filter":this.__filter});
+		this._observers = new ObservableStore({"filter":this.__filter});
 
 		// Install error listner
 		this.__initListeners();
@@ -273,7 +273,7 @@ export default class ErrorServer extends BM.Unit
 						Object.keys(routeInfo["queryParameters"]).forEach((key) => {
 							routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@URL@", location.href);
 						});
-						window.location.href = BM.URLUtil.buildURL(routeInfo);
+						window.location.href = URLUtil.buildURL(routeInfo);
 						/*
 						let tagName = options["selector"] || "bm-router";
 						document.querySelector(tagName).cast("routing.openRoute", routeInfo, {"jump":true});

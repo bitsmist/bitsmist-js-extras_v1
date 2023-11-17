@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ResourceHandler from "./resource-handler.js";
+import {AjaxUtil, URLUtil} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	API Resource Handler class
@@ -33,7 +33,7 @@ export default class APIResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options}).then((xhr) => {
+		return AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options}).then((xhr) => {
 			return this._convertResponseData(xhr.responseText, dataType);
 		});
 
@@ -52,7 +52,7 @@ export default class APIResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options});
+		return AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options});
 
 	}
 
@@ -69,7 +69,7 @@ export default class APIResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
@@ -86,7 +86,7 @@ export default class APIResourceHandler extends ResourceHandler
 
 		let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-		return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+		return AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 	}
 
@@ -199,7 +199,7 @@ export default class APIResourceHandler extends ResourceHandler
 					replace("@resource@", resourceName).
 					replace("@id@", id).
 					replace("@dataType@", dataType).
-					replace("@query@", BM.URLUtil.buildQuery(parameters)).
+					replace("@query@", URLUtil.buildQuery(parameters)).
 					replace("@version@", version);
 
 		return url

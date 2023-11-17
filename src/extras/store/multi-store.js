@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Store, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Multi Chainable store class
 // =============================================================================
 
-export default class MultiStore extends BM.Store
+export default class MultiStore extends Store
 {
 
 	// -------------------------------------------------------------------------
@@ -65,7 +65,7 @@ export default class MultiStore extends BM.Store
 
 		for (let i = 0; i < this._stores.length; i++)
 		{
-			BM.Util.deepMerge(items, this._stores[i].items);
+			Util.deepMerge(items, this._stores[i].items);
 		}
 
 		return items;

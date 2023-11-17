@@ -8,15 +8,15 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import FormUtil from "../util/form-util.js";
 import ValueUtil from "../util/value-util.js";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Form Perk Class
 // =============================================================================
 
-export default class FormPerk extends BM.Perk
+export default class FormPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -108,7 +108,7 @@ export default class FormPerk extends BM.Perk
 
 		if (this.get("setting", "form.options.autoClear", true))
 		{
-			let target = BM.Util.safeGet(e.detail, "target", "");
+			let target = Util.safeGet(e.detail, "target", "");
 			let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
 
 			ValueUtil.clearFields(this, options);
@@ -135,7 +135,7 @@ export default class FormPerk extends BM.Perk
 
 		if (this.get("setting", "form.options.autoFill", true))
 		{
-			let rootNode = ( e.detail && "selector" in e.detail ? BM.Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
+			let rootNode = ( e.detail && "selector" in e.detail ? Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
 			ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.get("inventory", "resource.resources"), "triggerEvent":true});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
@@ -271,7 +271,7 @@ export default class FormPerk extends BM.Perk
 		let submitItem = {};
 
 		// Collect values only from nodes that has [bm-submit] attribute.
-		let nodes = BM.Util.scopedSelectorAll(unit, "[bm-submit]");
+		let nodes = Util.scopedSelectorAll(unit, "[bm-submit]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		nodes.forEach((elem) => {
 			let key = elem.getAttribute("bm-bind");

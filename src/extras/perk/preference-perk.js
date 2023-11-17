@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Preference Perk class
 // =============================================================================
 
-export default class PreferencePerk extends BM.Perk
+export default class PreferencePerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -91,11 +91,11 @@ export default class PreferencePerk extends BM.Perk
 		let serverNode = this.get("setting", "preference.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
 		serverNode = ( serverNode === true ? "bm-preference" : serverNode );
 
-		BM.Util.assert(serverNode, () => `Preference Server node not specified in settings. name=${this.tagName}`);
+		Util.assert(serverNode, () => `Preference Server node not specified in settings. name=${this.tagName}`);
 
 		return this.cast("status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
-			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
+			server.subscribe(this, Util.safeGet(e.detail, "settings.preference"));
 			PreferencePerk.#__vault.get(this)["server"] = server;
 		});
 

@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Resource Perk class
 // =============================================================================
 
-export default class ResourcePerk extends BM.Perk
+export default class ResourcePerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -75,7 +75,7 @@ export default class ResourcePerk extends BM.Perk
 
 		let promises = [];
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(ResourcePerk.#_addHandler(this, sectionName, sectionValue));
 		});
 
@@ -94,8 +94,8 @@ export default class ResourcePerk extends BM.Perk
 			let resource = this.get("inventory", `resource.resources.${resourceName}`);
 			if (resource.options.get("autoFetch", true))
 			{
-				resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-				resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+				resource.target["id"] = Util.safeGet(e.detail, "id", resource.target["id"]);
+				resource.target["parameters"] = Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 				promises.push(resource.load(resource.target["id"], resource.target["parameters"]).then(() => {
 					e.detail.items = resource.items;
@@ -113,14 +113,14 @@ export default class ResourcePerk extends BM.Perk
 	{
 
 		let promises = [];
-		let submitItem = BM.Util.safeGet(e.detail, "items");
+		let submitItem = Util.safeGet(e.detail, "items");
 
 		Object.keys(this.get("inventory", "resource.resources")).forEach((resourceName) => {
 			let resource = this.get("inventory", `resource.resources.${resourceName}`);
 			if (resource.options.get("autoSubmit", true)) {
-				let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
-				let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-				let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+				let method = Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
+				let id = Util.safeGet(e.detail, "id", resource.target["id"]);
+				let parameters = Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 				promises.push(this.get("inventory", `resource.resources.${resourceName}`)[method](id, submitItem, parameters));
 			}
@@ -146,7 +146,7 @@ export default class ResourcePerk extends BM.Perk
 	static #_addHandler(unit, handlerName, options)
 	{
 
-		BM.Util.assert(options["handlerClassName"], () => `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
+		Util.assert(options["handlerClassName"], () => `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
 
 		let promise = Promise.resolve();
 		let handler = unit.get("inventory", `resource.resources.${handlerName}`);

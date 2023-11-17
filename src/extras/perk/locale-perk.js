@@ -8,15 +8,15 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import MultiStore from "../store/multi-store.js";
 import LocaleServer from "../unit/bm-locale.js";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Locale Perk Class
 // =============================================================================
 
-export default class LocalePerk extends BM.Perk
+export default class LocalePerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -111,7 +111,7 @@ export default class LocalePerk extends BM.Perk
 		let promises = [];
 
 		// Add locale handlers
-		Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(LocalePerk.#_addHandler(this, sectionName, sectionValue));
 		});
 
@@ -253,7 +253,7 @@ export default class LocalePerk extends BM.Perk
 
 		if (!unit.get("inventory", `locale.localizers.${handlerName}`))
 		{
-			let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
+			let handlerClassName = Util.safeGet(options, "handlerClassName", "LocaleHandler");
 			let handler = this.createHandler(handlerClassName, unit, options);
 			unit.set("inventory", `locale.localizers.${handlerName}`, handler);
 

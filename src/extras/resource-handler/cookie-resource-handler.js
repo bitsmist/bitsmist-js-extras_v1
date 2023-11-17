@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ResourceHandler from "./resource-handler.js";
+import {Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Cookie resource handler class
@@ -28,7 +28,7 @@ export default class CookieResourceHandler extends ResourceHandler
 		let defaults = {"autoLoad":true, "autoFetch":false};
 		super(unit, resourceName, Object.assign(defaults, options));
 
-		this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
+		this._cookieName = Util.safeGet(options, "cookieOptions.name", "preferences");
 
 	}
 

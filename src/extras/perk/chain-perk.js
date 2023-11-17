@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Chain Perk class
 // =============================================================================
 
-export default class ChainPerk extends BM.Perk
+export default class ChainPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -73,7 +73,7 @@ export default class ChainPerk extends BM.Perk
 
 		let order = ChainPerk.info["order"];
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.use("event.add", sectionName, {
 				"handler":	ChainPerk.#ChainPerk_onDoProcess,
 				"order":	order,
@@ -99,7 +99,7 @@ export default class ChainPerk extends BM.Perk
 			let sync = targets[i]["sync"];
 
 			let nodes = this.use("basic.locateAll", targets[i]);
-			BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`)
+			Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`)
 
 			if (sync)
 			{

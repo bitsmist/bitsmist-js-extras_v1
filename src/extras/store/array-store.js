@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Store, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Array Store class
 // =============================================================================
 
-export default class ArrayStore extends BM.Store
+export default class ArrayStore extends Store
 {
 
 	// -------------------------------------------------------------------------
@@ -32,7 +32,7 @@ export default class ArrayStore extends BM.Store
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this.items = BM.Util.safeGet(this._options, "items", []);
+		this.items = Util.safeGet(this._options, "items", []);
 
 	}
 
@@ -55,7 +55,7 @@ export default class ArrayStore extends BM.Store
 	set items(value)
 	{
 
-		BM.Util.assert(Array.isArray(value), () => `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
+		Util.assert(Array.isArray(value), () => `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
 
 		this._items = value;
 
@@ -85,7 +85,7 @@ export default class ArrayStore extends BM.Store
 	clone()
 	{
 
-		return BM.Util.deepMerge([], this._items);
+		return Util.deepMerge([], this._items);
 
 	}
 
@@ -102,7 +102,7 @@ export default class ArrayStore extends BM.Store
 	get(index, key, defaultValue)
 	{
 
-		return BM.Util.safeGet(this._items[index], key, defaultValue);
+		return Util.safeGet(this._items[index], key, defaultValue);
 
 	}
 
@@ -119,11 +119,11 @@ export default class ArrayStore extends BM.Store
 
 		if (options && options["merge"])
 		{
-			return BM.Util.safeMerge(this._items[index], key, defaultValue);
+			return Util.safeMerge(this._items[index], key, defaultValue);
 		}
 		else
 		{
-			BM.Util.safeSet(this._items[index], key, value);
+			Util.safeSet(this._items[index], key, value);
 		}
 
 	}
@@ -138,7 +138,7 @@ export default class ArrayStore extends BM.Store
 	remove(index, key)
 	{
 
-		BM.Util.safeRemove(this._items[i], key);
+		Util.safeRemove(this._items[i], key);
 
 	}
 
@@ -154,7 +154,7 @@ export default class ArrayStore extends BM.Store
 	has(index, key)
 	{
 
-		return BM.Util.safeHas(this._items[index], key);
+		return Util.safeHas(this._items[index], key);
 
 	}
 

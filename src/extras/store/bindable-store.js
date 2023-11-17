@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ValueUtil from "../util/value-util.js";
+import {Store, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Bindable store class
 // =============================================================================
 
-export default class BindableStore extends BM.Store
+export default class BindableStore extends Store
 {
 
 	// -------------------------------------------------------------------------
@@ -29,7 +29,7 @@ export default class BindableStore extends BM.Store
 		super(Object.assign(defaults, options));
 
 		this._elems = {};
-		this._valueHandler = BM.Util.safeGet(options, "valueHandler", ValueUtil);
+		this._valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
 
 	}
 

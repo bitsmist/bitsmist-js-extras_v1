@@ -10,14 +10,14 @@
 
 import BindableArrayStore from "../store/bindable-array-store.js";
 import BindableStore from "../store/bindable-store.js";
-import BM from "../bm";
 import FormUtil from "../util/form-util.js";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Databinding Perk class
 // =============================================================================
 
-export default class DatabindingPerk extends BM.Perk
+export default class DatabindingPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -159,7 +159,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		rootNode = ( rootNode ? rootNode : unit );
 
-		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let nodes = Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{
@@ -191,7 +191,7 @@ export default class DatabindingPerk extends BM.Perk
 
 		rootNode = ( rootNode ? rootNode : unit );
 
-		let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+		let nodes = Util.scopedSelectorAll(rootNode, "[bm-bind]");
 		nodes = Array.prototype.slice.call(nodes, 0);
 		if (rootNode.matches("[bm-bind]"))
 		{

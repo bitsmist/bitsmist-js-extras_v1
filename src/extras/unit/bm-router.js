@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ObservableStore from "../store/observable-store.js";
+import {Unit} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Router Class
 // =============================================================================
 
-export default class Router extends BM.Unit
+export default class Router extends Unit
 {
 
 	// -------------------------------------------------------------------------

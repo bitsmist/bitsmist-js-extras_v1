@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ValidationHandler from "./validation-handler.js";
+import {Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Object validation Handler class
@@ -27,7 +27,7 @@ export default class ObjectValidationHandler extends ValidationHandler
 
 		let invalids1 = super._validate(values, rules, options); // Check allow/disallow/required
 		let invalids2 = this._validate(values, rules);
-		let invalids = BM.Util.deepMerge(invalids1, invalids2);
+		let invalids = Util.deepMerge(invalids1, invalids2);
 
 		this._unit.set("inventory", "validation.validationResult.result", ( Object.keys(invalids).length > 0 ? false : true ));
 		this._unit.set("inventory", "validation.validationResult.invalids", invalids);

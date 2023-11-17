@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Error Perk class
 // =============================================================================
 
-export default class ErrorPerk extends BM.Perk
+export default class ErrorPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -50,7 +50,7 @@ export default class ErrorPerk extends BM.Perk
 
 		return this.cast("status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
-			server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
+			server.subscribe(this, Util.safeGet(e.detail, "settings.error"));
 			DialogPerk.#__vault.get(unit)["server"] = server;
 		});
 

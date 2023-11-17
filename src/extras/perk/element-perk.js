@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import FormUtil from "../util/form-util.js";
+import {Perk, Util, Unit} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Element Perk class
 // =============================================================================
 
-export default class ElementPerk extends BM.Perk
+export default class ElementPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -66,7 +66,7 @@ export default class ElementPerk extends BM.Perk
 
 		let order = ElementPerk.info["order"];
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
 			this.use("event.add", sectionName, {
 				"handler":	ElementPerk.ElementPerk_onDoProcess,
 				"order":	order,
@@ -118,7 +118,7 @@ export default class ElementPerk extends BM.Perk
 			}
 			else
 			{
-				elements = BM.Util.scopedSelectorAll(unit, elementInfo["selector"]);
+				elements = Util.scopedSelectorAll(unit, elementInfo["selector"]);
 			}
 		}
 		else if (elementName === "this" || elementName === unit.tagName.toLowerCase())
@@ -127,7 +127,7 @@ export default class ElementPerk extends BM.Perk
 		}
 		else
 		{
-			elements = BM.Util.scopedSelectorAll(unit, `#${elementName}`);
+			elements = Util.scopedSelectorAll(unit, `#${elementName}`);
 		}
 
 		return elements;
@@ -242,13 +242,13 @@ export default class ElementPerk extends BM.Perk
 			break;
 		}
 
-		BM.Util.warn(inTransition, `ElementPerk.#__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
+		Util.warn(inTransition, `ElementPerk.#__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 
 		return new Promise((resolve, reject) => {
 			// Timeout timer
 			let timer = setTimeout(() => {
 				reject(`ElementPerk.#__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
-			}, BM.Unit.get("setting", "system.options.waitForTimeout", 10000));
+			}, unit.get("setting", "status.options.waitForTimeout", unit.get("setting", "system.status.options.waitForTimeout", 10000)));
 
 			// Resolve when finished
 			element.addEventListener(`${elementInfo["waitFor"]}end`, () => {
@@ -412,16 +412,16 @@ export default class ElementPerk extends BM.Perk
 		let overlay = ElementPerk.#__createOverlay(unit);
 
 		// Add close on click event handler
-		if (BM.Util.safeGet(options, "closeOnClick"))
+		if (Util.safeGet(options, "closeOnClick"))
 		{
 			ElementPerk.#__closeOnClick(unit);
 		}
 
 		window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
-		let addClasses = ["show"].concat(BM.Util.safeGet(options, "addClasses", []));
+		let addClasses = ["show"].concat(Util.safeGet(options, "addClasses", []));
 		overlay.classList.add(...addClasses);
-		overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
+		overlay.classList.remove(...Util.safeGet(options, "removeClasses", []));
 
 		let effect = ElementPerk.#__getEffect(overlay);
 		if (effect)
@@ -457,9 +457,9 @@ export default class ElementPerk extends BM.Perk
 		ElementPerk.#__vault.get(unit)["overlayPromise"].then(() => {
 			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
-			let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
+			let removeClasses = ["show"].concat(Util.safeGet(options, "removeClasses", []));
 			overlay.classList.remove(...removeClasses);
-			overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+			overlay.classList.add(...Util.safeGet(options, "addClasses", []));
 		});
 	}
 

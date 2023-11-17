@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Validation Perk Class
 // =============================================================================
 
-export default class ValidationPerk extends BM.Perk
+export default class ValidationPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -77,7 +77,7 @@ export default class ValidationPerk extends BM.Perk
 
 		let promises = [];
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
 			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
 		});
 
@@ -93,9 +93,9 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), () => `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			Util.assert(this.get("inventory", `validation.validators.${validatorName}`), () => `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
-			let items = BM.Util.safeGet(e.detail, "items");
+			let items = Util.safeGet(e.detail, "items");
 			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
 			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
 
@@ -112,9 +112,9 @@ export default class ValidationPerk extends BM.Perk
 		let validatorName = e.detail.validatorName;
 		if (validatorName)
 		{
-			BM.Util.assert(this.get("inventory", () => `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+			Util.assert(this.get("inventory", () => `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
-			let items = BM.Util.safeGet(e.detail, "items");
+			let items = Util.safeGet(e.detail, "items");
 			let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
 			let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
 

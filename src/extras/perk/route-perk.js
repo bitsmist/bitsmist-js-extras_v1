@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
-import { pathToRegexp } from "path-to-regexp";
+import {Perk, Util, AjaxUtil, URLUtil} from "@bitsmist-js_v1/core";
+import {pathToRegexp} from "path-to-regexp";
 
 // =============================================================================
 //	Route Perk class
 // =============================================================================
 
-export default class RoutePerk extends BM.Perk
+export default class RoutePerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -116,7 +116,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		// Routings
-		Object.entries(BM.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
 			RoutePerk.#_addRoute(this, sectionName, sectionValue);
 		});
 
@@ -235,7 +235,7 @@ export default class RoutePerk extends BM.Perk
 	static async #_loadSettings(unit, routeName, options)
 	{
 
-		let settings = await BM.AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options));
+		let settings = await AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options));
 		unit.set("inventory", "routing.routeInfo.settings", settings);
 
 	}
@@ -256,7 +256,7 @@ export default class RoutePerk extends BM.Perk
 
 		if (!unit.get("inventory", "routing.routeInfo.extender"))
 		{
-			let extender = await BM.AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName));
+			let extender = await AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName));
 			unit.set("inventory", "routing.routeInfo.extender", extender);
 		}
 		let extender = unit.get("inventory", "routing.routeInfo.extender");
@@ -281,7 +281,7 @@ export default class RoutePerk extends BM.Perk
 	static async #_switchRoute(unit, routeName, options)
 	{
 
-		BM.Util.assert(routeName, () => "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
+		Util.assert(routeName, () => "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
 
 		let newSettings;
 
@@ -330,7 +330,7 @@ export default class RoutePerk extends BM.Perk
 		let newRouteInfo;
 		if (routeInfo)
 		{
-			newURL = BM.URLUtil.buildURL(routeInfo, options);
+			newURL = URLUtil.buildURL(routeInfo, options);
 			newRouteInfo = RoutePerk.#__loadRouteInfo(unit, newURL);
 		}
 		else
@@ -350,7 +350,7 @@ export default class RoutePerk extends BM.Perk
 		}
 
 		// Replace URL
-		let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
+		let pushState = Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
 		if (pushState)
 		{
 			history.pushState(RoutePerk.#__getState("_open.pushState"), null, newURL);
@@ -371,7 +371,7 @@ export default class RoutePerk extends BM.Perk
 		{
 			let validateOptions = {
 				"validatorName":	unit.get("setting", "routing.options.validatorName"),
-				"items":			BM.URLUtil.loadParameters(newURL),
+				"items":			URLUtil.loadParameters(newURL),
 				"url":				newURL,
 			};
 			await unit.cast("validation.validate", validateOptions);
@@ -397,7 +397,7 @@ export default class RoutePerk extends BM.Perk
 	static #_jumpRoute(unit, routeInfo, options)
 	{
 
-		let url = BM.URLUtil.buildURL(routeInfo, options)
+		let url = URLUtil.buildURL(routeInfo, options)
 		window.location.href = url;
 
 	}
@@ -450,7 +450,7 @@ export default class RoutePerk extends BM.Perk
 	static #_replaceRoute(unit, routeInfo, options)
 	{
 
-		history.replaceState(RoutePerk.#__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
+		history.replaceState(RoutePerk.#__getState("replaceRoute", window.history.state), null, URLUtil.buildURL(routeInfo, options));
 		unit.set("inventory", "routing.routeInfo", RoutePerk.#__loadRouteInfo(unit, window.location.href));
 
 	}
@@ -521,7 +521,7 @@ export default class RoutePerk extends BM.Perk
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.URLUtil.parseURL(settingsRef);
+			let url = URLUtil.parseURL(settingsRef);
 			fileName = url.filename;
 			path = url.path;
 			query = url.query;
@@ -529,7 +529,7 @@ export default class RoutePerk extends BM.Perk
 		else
 		{
 			// Use default path and filename
-			path = BM.Util.concatPath([
+			path = Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
@@ -538,7 +538,7 @@ export default class RoutePerk extends BM.Perk
   			query = unit.get("setting", "unit.options.query");
 		}
 
-		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 
@@ -587,7 +587,7 @@ export default class RoutePerk extends BM.Perk
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.URLUtil.parseURL(extenderRef);
+			let url = URLUtil.parseURL(extenderRef);
 			path = url.path;
 			fileName = url.filename;
 			query = url.query;
@@ -595,7 +595,7 @@ export default class RoutePerk extends BM.Perk
 		else
 		{
 			// Use default path and filename
-			path = path || BM.Util.concatPath([
+			path = path || Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
@@ -603,7 +603,7 @@ export default class RoutePerk extends BM.Perk
 			query = unit.get("setting", "unit.options.query");
 		}
 
-		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 
@@ -626,7 +626,7 @@ export default class RoutePerk extends BM.Perk
 			"path":				parsedURL.pathname,
 			"query":			parsedURL.search,
 			"parsedURL":		parsedURL,
-			"queryParameters":	BM.URLUtil.loadParameters(url),
+			"queryParameters":	URLUtil.loadParameters(url),
 		};
 
 		// Find the matching route
@@ -651,13 +651,13 @@ export default class RoutePerk extends BM.Perk
 				routeInfo["title"] = routes[i].title;
 				let routeName = RoutePerk.#__interpolate(routes[i].name, params);
 				routeInfo["name"] = routeName;
-				let settingsRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
+				let settingsRef = Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
 				routeInfo["settingsRef"] = RoutePerk.#__interpolate(settingsRef, params);
-				let settings = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
-				routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.#__getSettingFormat(unit)});
-				let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
+				let settings = Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
+				routeInfo["settings"] = Util.getObject(settings, {"format":RoutePerk.#__getSettingFormat(unit)});
+				let extenderRef = Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
 				routeInfo["extenderRef"] = RoutePerk.#__interpolate(extenderRef, params);
-				routeInfo["extender"] = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
+				routeInfo["extender"] = Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
 				routeInfo["routeParameters"] = params;
 				break;
 			}
@@ -732,7 +732,7 @@ export default class RoutePerk extends BM.Perk
 
 		if (options)
 		{
-			newState = BM.Util.deepMerge(BM.Util.deepClone(options), newState);
+			newState = Util.deepMerge(Util.deepClone(options), newState);
 		}
 
 		return newState;
@@ -753,7 +753,7 @@ export default class RoutePerk extends BM.Perk
 	{
 
 		let isOk = true;
-		let newParams = BM.URLUtil.loadParameters(url);
+		let newParams = URLUtil.loadParameters(url);
 
 		// Fix invalid paramters
 		Object.keys(unit.get("inventory", "validation.validationResult.invalids")).forEach((key) => {

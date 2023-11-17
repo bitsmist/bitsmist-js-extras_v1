@@ -8,8 +8,8 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import LocaleValueUtil from "../util/locale-value-util.js";
+import {Util, AjaxUtil, URLUtil, Store, ChainableStore} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Locale Handler class
@@ -34,8 +34,8 @@ export default class LocaleHandler
 		options = options || {};
 
 		this._unit = unit;
-		this._options = new BM.Store({"items":options});
-		this._messages = new BM.ChainableStore();
+		this._options = new Store({"items":options});
+		this._messages = new ChainableStore();
 		this._valueHandler = this.options.get("valueHandler", LocaleValueUtil);
 		this._localeInfo = {};
 
@@ -90,7 +90,7 @@ export default class LocaleHandler
 
 		// Get messages from settings
 		if (options["messages"]) {
-			let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
+			let messages = Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
 			this._messages.merge(messages);
 		}
 
@@ -161,7 +161,7 @@ export default class LocaleHandler
 	loadMessages(localeName, options)
 	{
 
-		let splitMessages = BM.Util.safeGet(options, "splitLocale",
+		let splitMessages = Util.safeGet(options, "splitLocale",
 								this._options.get("handlerOptions.splitLocale",
 									this._unit.get("setting", "system.locale.options.splitLocale")));
 		localeName = ( splitMessages ? localeName : "" );
@@ -177,8 +177,8 @@ export default class LocaleHandler
 		if (this.__hasExternalMessages(this._unit))
 		{
 			let url = this.__getMessageURL(this._unit, localeName);
-			promise = BM.AjaxUtil.loadJSON(url, options).then((messages) => {
-				localeInfo["messages"] = BM.Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
+			promise = AjaxUtil.loadJSON(url, options).then((messages) => {
+				localeInfo["messages"] = Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
 				localeInfo["status"] = "loaded";
 				this._messages.merge(messages);
 				this._localeInfo[localeName] = localeInfo;
@@ -235,7 +235,7 @@ export default class LocaleHandler
 		if (localeRef && localeRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = BM.URLUtil.parseURL(localeRef);
+			let url = URLUtil.parseURL(localeRef);
 			fileName = url.filename;
 			path = url.path;
 			query = url.query;
@@ -243,7 +243,7 @@ export default class LocaleHandler
 		else
 		{
 			// Use default path and filename
-			path = BM.Util.concatPath([
+			path = Util.concatPath([
 					unit.get("setting", "system.locale.options.path", unit.get("setting", "system.unit.options.path", "")),
 					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
@@ -260,7 +260,7 @@ export default class LocaleHandler
 			fileName = `${fileName}.messages.${ext}`;
 		}
 
-		return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 	}
 

@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ObservableStore from "../store/observable-store.js";
+import {Unit, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Preference Server Class
 // =============================================================================
 
-export default class PreferenceServer extends BM.Unit
+export default class PreferenceServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -187,7 +187,7 @@ export default class PreferenceServer extends BM.Unit
 	_triggerEvent(changedItems, observerInfo, options)
 	{
 
-		let sender = BM.Util.safeGet(options, "sender", this);
+		let sender = Util.safeGet(options, "sender", this);
 
 		return this.cast("preference.apply", {"sender":sender, "preferences":changedItems});
 

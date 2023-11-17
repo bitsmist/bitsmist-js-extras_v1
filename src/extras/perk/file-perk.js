@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util, AjaxUtil} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	File Perk class
 // =============================================================================
 
-export default class FilePerk extends BM.Perk
+export default class FilePerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -58,8 +58,8 @@ export default class FilePerk extends BM.Perk
 
 		let promises = [];
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+		Object.entries(Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
+			promises.push(AjaxUtil.loadScript(sectionValue["href"]));
 		});
 
 		return Promise.all(promises);

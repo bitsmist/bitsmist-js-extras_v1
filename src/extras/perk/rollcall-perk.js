@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	RollCall Perk Class
 // =============================================================================
 
-export default class RollCallPerk extends BM.Perk
+export default class RollCallPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -81,7 +81,7 @@ export default class RollCallPerk extends BM.Perk
 	static #RollCallPerk_onDoApplySettings(sender, e, ex)
 	{
 
-		Object.entries(BM.Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
+		Object.entries(Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
 			let name = sectionValue["name"] || sectionName;
 			RollCallPerk.#_register(this, name, sectionValue);
 		});
@@ -104,7 +104,7 @@ export default class RollCallPerk extends BM.Perk
 		if (!RollCallPerk.#__records[name])
 		{
 			let waitInfo = {};
-			let timeout = BITSMIST.v1.Unit.get("setting", "system.status.options.waitForTimeout", 10000);
+			let timeout = Unit.get("setting", "system.status.options.waitForTimeout", 10000);
 			let promise = new Promise((resolve, reject) => {
 				waitInfo["resolve"] = resolve;
 				waitInfo["reject"] = reject;
@@ -119,11 +119,11 @@ export default class RollCallPerk extends BM.Perk
 
 		let entry = RollCallPerk.#__records[name];
 
-		if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
+		if (Util.safeGet(options, "waitForDOMContentLoaded"))
 		{
 			await unit.get("inventory", "promise.documentReady");
 		}
-		if (BM.Util.safeGet(options, "waitForAttendance"))
+		if (Util.safeGet(options, "waitForAttendance"))
 		{
 			await entry.waitInfo.promise;
 		}

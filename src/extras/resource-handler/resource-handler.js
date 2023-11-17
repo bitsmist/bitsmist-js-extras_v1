@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Util, Store} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Resource Handler class
@@ -34,7 +34,7 @@ export default class ResourceHandler
 
 		this._resourceName = resourceName;
 		this._unit = unit;
-		this._options = new BM.Store({"items":options});
+		this._options = new Store({"items":options});
 		this._data = {};
 		this._items = [];
 		this._target = {};
@@ -169,7 +169,7 @@ export default class ResourceHandler
 		return Promise.resolve().then(() => {
 			return this._load(id, parameters);
 		}).then((data) => {
-//			BM.Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._unit.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+//			Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._unit.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 			this.data = data;
 
@@ -354,7 +354,7 @@ export default class ResourceHandler
 
 		// Get items
 		let itemsField = this._options.get("fieldOptions.items");
-		let items = ( itemsField ? BM.Util.safeGet(data, itemsField) : data );
+		let items = ( itemsField ? Util.safeGet(data, itemsField) : data );
 
 		// Reshape
 		if (this._options.get("reshapeOptions.load.reshape"))

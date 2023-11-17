@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Dialog Perk class
 // =============================================================================
 
-export default class DialogPerk extends BM.Perk
+export default class DialogPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -122,13 +122,13 @@ export default class DialogPerk extends BM.Perk
 			}
 
 			// Setup
-			if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
+			if (Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
 			{
 				await unit.cast("basic.setup", options);
 			}
 
 			// Refresh
-			if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
+			if (Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
 			{
 				await unit.cast("basic.refresh", options);
 			}
@@ -251,7 +251,7 @@ export default class DialogPerk extends BM.Perk
 				{
 					// Transition/Animation
 					DialogPerk.#__backdrop.addEventListener(`${effect}end`, () => {
-						if (BM.Util.safeGet(options, "closeOnClick", true))
+						if (Util.safeGet(options, "closeOnClick", true))
 						{
 							DialogPerk.#__installCloseOnClickHandler(unit);
 						}
@@ -261,7 +261,7 @@ export default class DialogPerk extends BM.Perk
 				else
 				{
 					// No Transition/Animation
-					if (BM.Util.safeGet(options, "closeOnClick", true))
+					if (Util.safeGet(options, "closeOnClick", true))
 					{
 						DialogPerk.#__installCloseOnClickHandler(unit);
 					}
@@ -270,7 +270,7 @@ export default class DialogPerk extends BM.Perk
 				}
 			});
 
-			let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
+			let sync =Util.safeGet(options, "showOptions.sync", Util.safeGet(options, "sync"));
 			if (sync)
 			{
 				return DialogPerk.#__vault.get(unit)["backdropPromise"];
@@ -311,7 +311,7 @@ export default class DialogPerk extends BM.Perk
 				}
 			});
 
-			let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
+			let sync = Util.safeGet(options, "hideOptions.sync", Util.safeGet(options, "sync"));
 			if (sync)
 			{
 				return DialogPerk.#__vault.get(unit)["backdropPromise"];

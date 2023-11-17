@@ -8,14 +8,14 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ObservableStore from "../store/observable-store.js";
+import {Unit} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Locale Server Class
 // =============================================================================
 
-export default class LocaleServer extends BM.Unit
+export default class LocaleServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -44,7 +44,7 @@ export default class LocaleServer extends BM.Unit
 			"locale": {
 				"handlers": {
 					"default": {
-						"handlerClassName":			"BITSMIST.v1.LocaleHandler",
+						"handlerClassName":			"LocaleHandler",
 					}
 				}
 			},

@@ -8,13 +8,13 @@
  */
 // =============================================================================
 
-import BM from "../bm";
+import {Perk} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Alias Perk Class
 // =============================================================================
 
-export default class AliasPerk extends BM.Perk
+export default class AliasPerk extends Perk
 {
 
 	// -------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export default class AliasPerk extends BM.Perk
 		"order":			330,
 	};
 	static #__skills = {
-		"resolve":			AliasPerk.#_resolve(...args),
+		"resolve":			AliasPerk.#_resolve,
 	};
 
 	// -------------------------------------------------------------------------

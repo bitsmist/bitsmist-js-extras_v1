@@ -8,9 +8,9 @@
  */
 // =============================================================================
 
-import BM from "../bm";
 import ArrayStore from "../store/array-store.js";
 import ValueUtil from "../util/value-util.js";
+import {Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Bindable store class
@@ -30,7 +30,7 @@ export default class BindableArrayStore extends ArrayStore
 		super(Object.assign(defaults, options));
 
 		this._elems = {};
-		this._valueHandler = BM.Util.safeGet(options, "valueHandler", ValueUtil);
+		this._valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
 
 	}
 
