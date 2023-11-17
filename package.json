@@ -1,24 +1,38 @@
 {
   "name": "bitsmist-js-extras_v1",
-  "version": "0.9.12",
-  "description": "BitsmistJS Extras v1",
-  "private": true,
+  "version": "0.12.0",
+  "description": "Extra Components for BitsmistJS",
+  "main": "dist/bitsmist-js-extras_v1.esm.min.js",
   "type": "module",
   "dependencies": {
     "path-to-regexp": "^6.2.1"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.4.0",
-    "jest": "^29.4.3",
-    "jest-environment-jsdom": "^29.4.3",
-    "msw": "^1.0.1",
-    "rollup": "^3.16.0",
-    "xmlhttprequest": "^1.8.0"
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.4.1"
   },
   "scripts": {
     "watch": "npx rollup -c -w",
     "build": "npx rollup -c"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitsmist/bitsmist-js-extras_v1.git"
+  },
+  "keywords": [
+    "Javascript",
+    "Framework",
+    "Web Components"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "Masaki Yasutake <my17560@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bitsmist/bitsmist-js-extras_v1/issues"
+  },
+  "homepage": "https://bitsmist.com"
 }

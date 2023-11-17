@@ -1,4 +1,4 @@
-import { Store, Util, Perk, AjaxUtil, Unit as Unit$1, URLUtil, ChainableStore } from '@bitsmist-js_v1/core';
+import { Store, Util, Perk, AjaxUtil, Unit, URLUtil, ChainableStore } from '@bitsmist-js_v1/core';
 
 // =============================================================================
 /**
@@ -383,7 +383,7 @@ class ObservableStore extends Store
 
 		if (holder && typeof holder === "object")
 		{
-			this.__deepMerge(holder, value, changedItem);
+			this.#__deepMerge(holder, value, changedItem);
 		}
 		else
 		{
@@ -425,7 +425,7 @@ class ObservableStore extends Store
     {
 
         this._items = {};
-        this.__deepMerge(this._items, value);
+        this.#__deepMerge(this._items, value);
 
         let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this._options, "notifyOnChange"));
         if (notify)
@@ -588,12 +588,12 @@ class ObservableStore extends Store
 	 *
 	 * @return  {Object}		Merged array.
 	 */
-	__deepMerge(obj1, obj2, changedItem)
+	#__deepMerge(obj1, obj2, changedItem)
 	{
 
 		changedItem = changedItem || {};
 
-		Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+		Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.#__deepMerge(): Parameters must be an object.", TypeError);
 
 		Object.keys(obj2).forEach((key) => {
 			if (Array.isArray(obj1[key]))
@@ -4104,7 +4104,7 @@ class DatabindingPerk extends Perk
 //	Locale Server Class
 // =============================================================================
 
-class LocaleServer extends Unit$1
+class LocaleServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -4198,7 +4198,7 @@ class LocaleServer extends Unit$1
 
 		this._store.subscribe(
 			`${unit.tagName}_${unit.uniqueId}`,
-			this.__triggerEvent.bind(unit),
+			this.#__triggerEvent.bind(unit),
 		);
 
 	}
@@ -4215,7 +4215,7 @@ class LocaleServer extends Unit$1
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	__triggerEvent(conditions, observerInfo, options)
+	#__triggerEvent(conditions, observerInfo, options)
 	{
 
 		return this.cast("locale.apply", {"localeName":options.localeName});
@@ -6735,256 +6735,6 @@ class RoutePerk extends Perk
 
 
 // =============================================================================
-//	Alias Perk Class
-// =============================================================================
-
-class AliasPerk extends Perk
-{
-
-	// -------------------------------------------------------------------------
-	//  Private Variables
-	// -------------------------------------------------------------------------
-
-	static #__records = {};
-	static #__info = {
-		"sectionName":		"alias",
-		"order":			330,
-	};
-	static #__skills = {
-		"resolve":			AliasPerk.#_resolve,
-	};
-
-	// -------------------------------------------------------------------------
-	//  Properties
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return AliasPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return AliasPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Skills
-	// -------------------------------------------------------------------------
-
-	static #_resolve(unit, target)
-	{
-
-		return unit.get("setting", `alias.${target}`, {});
-
-	}
-
-}
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
-//	RollCall Perk Class
-// =============================================================================
-
-class RollCallPerk extends Perk
-{
-
-	// -------------------------------------------------------------------------
-	//  Private Variables
-	// -------------------------------------------------------------------------
-
-	static #__records = {};
-	static #__info = {
-		"sectionName":		"rollcall",
-		"order":			330,
-	};
-	static #__skills = {
-		"register":			RollCallPerk.#_register,
-	};
-	static #__spells = {
-		"call":				RollCallPerk.#_call,
-	};
-
-	// -------------------------------------------------------------------------
-	//  Properties
-	// -------------------------------------------------------------------------
-
-	static get info()
-	{
-
-		return RollCallPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return RollcallPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return RollcallPerk.#__spells;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	static init(unit, options)
-	{
-
-		// Add event handlers
-		unit.use("event.add", "doApplySettings", {"handler":RollCallPerk.#RollCallPerk_onDoApplySettings, "order":RollCallPerk.info["order"]});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event Handlers (Unit)
-	// -------------------------------------------------------------------------
-
-	static #RollCallPerk_onDoApplySettings(sender, e, ex)
-	{
-
-		Object.entries(Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
-			let name = sectionValue["name"] || sectionName;
-			RollCallPerk.#_register(this, name, sectionValue);
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Skills (Unit)
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Call unit.
-	 *
-	 * @param	{Unit}			unit				Compoent to register.
-	 * @param	{Object}		optios				Options.
-	 */
-	static async #_call(unit, name, options)
-	{
-
-		if (!RollCallPerk.#__records[name])
-		{
-			let waitInfo = {};
-			let timeout = Unit.get("setting", "system.status.options.waitForTimeout", 10000);
-			let promise = new Promise((resolve, reject) => {
-				waitInfo["resolve"] = resolve;
-				waitInfo["reject"] = reject;
-				waitInfo["timer"] = setTimeout(() => {
-					reject(`RollCallPerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
-				}, timeout);
-			});
-			waitInfo["promise"] = promise;
-
-			RollCallPerk.#__createEntry(name, null, waitInfo);
-		}
-
-		let entry = RollCallPerk.#__records[name];
-
-		if (Util.safeGet(options, "waitForDOMContentLoaded"))
-		{
-			await unit.get("inventory", "promise.documentReady");
-		}
-		if (Util.safeGet(options, "waitForAttendance"))
-		{
-			await entry.waitInfo.promise;
-		}
-
-		return entry.object;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Register unit.
-	 *
-	 * @param	{Unit}			unit				Compoent to register.
-	 * @param	{String}		name				Register as this name.
-	 */
-	static #_register(unit, name)
-	{
-
-		if (!RollCallPerk.#__records[name])
-		{
-			RollCallPerk.#__createEntry(name);
-		}
-
-		let entry = RollCallPerk.#__records[name];
-		entry.object = unit;
-		entry.waitInfo.resolve();
-		if (entry.waitInfo["timer"])
-		{
-			clearTimeout(entry.waitInfo["timer"]);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	// 	Privates
-	// -------------------------------------------------------------------------
-
-	static #__createEntry(name, unit, waitInfo)
-	{
-
-		waitInfo = waitInfo || {
-			"promise":	Promise.resolve(),
-			"resolve":	()=>{}, // dummy function
-			"reject":	()=>{}, // dummy function
-			"timer":	null,
-		};
-
-		let record = {
-			"object":	 	unit,
-			"waitInfo":		waitInfo,
-		};
-
-		RollCallPerk.#__records[name] = record;
-
-		return record;
-
-	}
-
-}
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
 //	Resource Handler class
 // =============================================================================
 
@@ -7071,7 +6821,7 @@ class ResourceHandler
 	{
 
 		this._data = value;
-		this._items = this.__reshapeItems(value);
+		this._items = this.#__reshapeItems(value);
 
 	}
 
@@ -7183,7 +6933,7 @@ class ResourceHandler
 	add(id, data, parameters)
 	{
 
-		return this._add(id, this.__reshapeData(data), parameters);
+		return this._add(id, this.#__reshapeData(data), parameters);
 
 	}
 
@@ -7201,7 +6951,7 @@ class ResourceHandler
 	update(id, data, parameters)
 	{
 
-		return this._update(id, this.__reshapeData(data), parameters);
+		return this._update(id, this.#__reshapeData(data), parameters);
 
 	}
 
@@ -7323,7 +7073,7 @@ class ResourceHandler
 	 *
 	 * @return  {Object}		Reshaped items.
 	 */
-	__reshapeItems(data)
+	#__reshapeItems(data)
 	{
 
 		// Get items
@@ -7333,7 +7083,7 @@ class ResourceHandler
 		// Reshape
 		if (this._options.get("reshapeOptions.load.reshape"))
 		{
-			let reshaper = this._options.get("reshapeOptions.load.reshaper", this.__reshaper_load.bind(this));
+			let reshaper = this._options.get("reshapeOptions.load.reshaper", this.#__reshaper_load.bind(this));
 			items = reshaper(items);
 		}
 
@@ -7350,7 +7100,7 @@ class ResourceHandler
 	 *
 	 * @return  {Object}		Reshaped data.
 	 */
-	__reshapeData(data)
+	#__reshapeData(data)
 	{
 
 		if (this._options.get("reshapeOptions.update.reshape"))
@@ -7372,7 +7122,7 @@ class ResourceHandler
 	 *
 	 * @return  {Object}		Master object.
      */
-	__reshaper_load(target)
+	#__reshaper_load(target)
 	{
 
 		let items;
@@ -7433,7 +7183,7 @@ class CookieResourceHandler extends ResourceHandler
 	_load(id, parameters)
 	{
 
-		return this.__getCookie(this._cookieName);
+		return this.#__getCookie(this._cookieName);
 
 	}
 
@@ -7442,7 +7192,7 @@ class CookieResourceHandler extends ResourceHandler
 	_add(id, data, parameters)
 	{
 
-		this.__setCookie(this._cookieName, data);
+		this.#__setCookie(this._cookieName, data);
 
 	}
 
@@ -7451,7 +7201,7 @@ class CookieResourceHandler extends ResourceHandler
 	_update(id, data, parameters)
 	{
 
-		this.__setCookie(this._cookieName, data);
+		this.#__setCookie(this._cookieName, data);
 
 	}
 
@@ -7464,7 +7214,7 @@ class CookieResourceHandler extends ResourceHandler
 	*
 	* @param	{String}		key					Key.
 	*/
-	__getCookie(key)
+	#__getCookie(key)
 	{
 
 		let decoded = document.cookie.split(';').reduce((result, current) => {
@@ -7489,7 +7239,7 @@ class CookieResourceHandler extends ResourceHandler
 	* @param	{String}		key					Key.
 	* @param	{Object}		value				Value.
 	*/
-	__setCookie(key, value)
+	#__setCookie(key, value)
 	{
 
 		let cookie = key + `=${encodeURIComponent(JSON.stringify(value))}; `;
@@ -8095,7 +7845,6 @@ class LocaleValueUtil extends ValueUtil
  */
 // =============================================================================
 
-//import {Util, AjaxUtil, URLUtil, Store, ChainableStore} from "../import";
 
 // =============================================================================
 //	Locale Handler class
@@ -8176,7 +7925,7 @@ class LocaleHandler
 
 		// Get messages from settings
 		if (options["messages"]) {
-			let messages = Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
+			let messages = Util.getObject(options["messages"], {"format":this.#__getMessageFormat(this._unit)});
 			this._messages.merge(messages);
 		}
 
@@ -8260,11 +8009,11 @@ class LocaleHandler
 			return promise;
 		}
 
-		if (this.__hasExternalMessages(this._unit))
+		if (this.#__hasExternalMessages(this._unit))
 		{
-			let url = this.__getMessageURL(this._unit, localeName);
+			let url = this.#__getMessageURL(this._unit, localeName);
 			promise = AjaxUtil.loadJSON(url, options).then((messages) => {
-				localeInfo["messages"] = Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
+				localeInfo["messages"] = Util.getObject(messages, {"format":this.#__getMessageFormat(this._unit)});
 				localeInfo["status"] = "loaded";
 				this._messages.merge(messages);
 				this._localeInfo[localeName] = localeInfo;
@@ -8286,7 +8035,7 @@ class LocaleHandler
 	 *
 	 * @return  {Boolean}		True if the unit has the external messages file.
 	 */
-	__hasExternalMessages(unit)
+	#__hasExternalMessages(unit)
 	{
 
 		let ret = false;
@@ -8310,7 +8059,7 @@ class LocaleHandler
 	 *
 	 * @return  {String}		URL.
 	 */
-	__getMessageURL(unit, localeName)
+	#__getMessageURL(unit, localeName)
 	{
 
 		let path;
@@ -8334,7 +8083,7 @@ class LocaleHandler
 					unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 				]);
 			fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
-			let ext = this.__getMessageFormat(unit);
+			let ext = this.#__getMessageFormat(unit);
 			query = unit.get("setting", "unit.options.query");
 
 			// Split Locale
@@ -8359,7 +8108,7 @@ class LocaleHandler
 	 *
 	 * @return  {String}            "js" or "json".
 	 */
-	__getMessageFormat(unit)
+	#__getMessageFormat(unit)
 	{
 
 		return this._options.get("messageFormat",
@@ -9047,978 +8796,10 @@ class ObjectValidationHandler extends ValidationHandler
 
 
 // =============================================================================
-//	Chained Select Class
-// =============================================================================
-
-class ChainedSelect extends Unit$1
-{
-
-	// -------------------------------------------------------------------------
-	//	Settings
-	// -------------------------------------------------------------------------
-
-	_getSettings()
-	{
-
-		return {
-			"options": {
-				"autoClear":					true,
-				"autoSubmit":					true,
-				"useDefaultInput":				true,
-				"rootNodes": {
-					"newitem": 					".btn-newitem",
-					"removeitem":				".btn-removeitem",
-					"edititem":					".btn-edititem",
-					"select":					"select"
-				},
-			},
-			"event": {
-				"events": {
-					"this": {
-						"handlers": {
-							"beforeStart":		["ChainedSelect_onBeforeStart"],
-							"afterTransform":	["ChainedSelect_onAfterTransform"],
-							"doClear":			["ChainedSelect_onDoClear"],
-							"doFill":			["ChainedSelect_onDoFill"],
-						}
-					},
-					"cmb-item": {
-						"selector":				"select",
-						"handlers": {
-							"change": 			["ChainedSelect_onCmbItemChange"],
-						}
-					},
-					"btn-newitem": {
-						"selector":				".btn-newitem",
-						"handlers": {
-							"click":			["ChainedSelect_onBtnNewItemClick"],
-						}
-					},
-					"btn-edititem": {
-						"selector":				".btn-edititem",
-						"handlers": {
-							"click":			["ChainedSelect_onBtnEditItemClick"],
-						}
-					},
-					"btn-removeitem": {
-						"selector":				".btn-removeitem",
-						"handlers": {
-							"click": 			["ChainedSelect_onBtnRemoveItemClick"],
-						}
-					}
-				}
-			},
-			"validation": {
-			}
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Setter/Getter
-	// -------------------------------------------------------------------------
-
-	/**
-	* Items.
-	*
-	* @type	{Number}
-	*/
-	get items()
-	{
-
-		let length = 0;
-		let level = 1;
-
-		while (this.querySelector(`:scope .item[data-level='${level}'] select`))
-		{
-			level++;
-			length++;
-		}
-
-		return length;
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event Handlers
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBeforeStart(sender, e, ex)
-	{
-
-		this.rootNodes = this.get("setting", "options.rootNodes");
-
-		if (this.get("setting", "options.useDefaultInput", true))
-		{
-			this.use("event.add", "beforeAdd", "ChainedSelect_onBeforeAdd");
-			this.use("event.add", "doAdd", "ChainedSelect_onDoAdd");
-			this.use("event.add", "beforeEdit", "ChainedSelect_onBeforeEdit");
-			this.use("event.add", "doEdit", "ChainedSelect_onDoEdit");
-			this.use("event.add", "beforeRemove", "ChainedSelect_onBeforeRemove");
-			this.use("event.add", "doRemove", "ChainedSelect_onDoRemove");
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onAfterTransform(sender, e, ex)
-	{
-
-		// Init select elements (disable all)
-		this.cast("basic.clear", {"fromLevel":1, "toLevel":this.length});
-
-		if (!this.get("setting", "options.isAddable", true))
-		{
-			this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
-				element.style.display = "none";
-			});
-		}
-
-		if (!this.get("setting", "options.isEditable", true))
-		{
-			this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
-				element.style.display = "none";
-			});
-		}
-
-		if (!this.get("setting", "options.isRemovable", true))
-		{
-			this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
-				element.style.display = "none";
-			});
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onDoClear(sender, e, ex)
-	{
-
-		let fromLevel = Util.safeGet(e.detail, "fromLevel", 1);
-		let toLevel = Util.safeGet(e.detail, "toLevel", this.length);
-
-		for (let i = fromLevel; i <= toLevel; i++)
-		{
-			if (this.get("setting", "options.autoClear")) {
-				this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
-			}
-			this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
-			this._initElement("select", i);
-			this._initElement("newitem", i);
-			this._initElement("edititem", i);
-			this._initElement("removeitem", i);
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onDoFill(sender, e, ex)
-	{
-
-		let level = Util.safeGet(e.detail, "level", 1);
-		this.assignItems(level, this.items);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onCmbItemChange(sender, e, ex)
-	{
-
-		return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBtnNewItemClick(sender, e, ex)
-	{
-
-		if (sender.classList.contains("disabled")) {
-			return;
-		}
-
-		let level = sender.parentNode.getAttribute("data-level");
-		this.set("inventory", "dialog.modalResult.result", false);
-		let options = {
-			"level":level,
-			"validatorName": "",
-		};
-
-		return this.use("event.trigger", "beforeAdd", options).then(() => {
-			if (this.get("inventory", "dialog.modalResult.result"))
-			{
-				return this.validate(options).then(() => {
-					if(this.get("inventory", "validation.validationResult.result"))
-					{
-						return Promise.resolve().then(() => {
-							return this.use("event.trigger", "doAdd", options);
-						}).then(() => {
-							return this.use("event.trigger", "afterAdd", options);
-						}).then(() => {
-							if (this.get("setting", "options.autoSubmit", true))
-							{
-								return this.use("form.submit", options);
-							}
-						});
-					}
-				});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBtnEditItemClick(sender, e, ex)
-	{
-
-		if (sender.classList.contains("disabled")) {
-			return;
-		}
-
-		let level = sender.parentNode.getAttribute("data-level");
-		this.set("inventory", "dialog.modalResult.result", false);
-		let options = {
-			"level":level,
-			"validatorName": "",
-		};
-
-		return this.use("event.trigger", "beforeEdit", options).then(() => {
-			if (this.get("inventory", "dialog.modalResult.result"))
-			{
-				return this.validate(options).then(() => {
-					if(this.get("inventory", "validation.validationResult.result"))
-					{
-						return Promise.resolve().then(() => {
-							return this.use("event.trigger", "doEdit", options);
-						}).then(() => {
-							return this.use("event.trigger", "afterEdit", options);
-						}).then(() => {
-							if (this.get("setting", "options.autoSubmit", true))
-							{
-								return this.use("form.submit", options);
-							}
-						});
-					}
-				});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	onChainedSelect_onBtnRemoveItemClick(sender, e, ex)
-	{
-
-		if (sender.classList.contains("disabled")) {
-			return;
-		}
-
-		let level = sender.parentNode.getAttribute("data-level");
-		this.set("inventory", "dialog.modalResult.result", false);
-		let options = {
-			"level":level,
-			"validatorName": "",
-		};
-
-		return this.cast("event.trigger", "beforeRemove", options).then(() => {
-			if (this.get("inventory", "dialog.modalResult.result"))
-			{
-				return this.validate(options).then(() => {
-					if(this.get("inventory", "validation.validationResult.result"))
-					{
-						return Promise.resolve().then(() => {
-							return this.cast("event.trigger", "doRemove", options);
-						}).then(() => {
-							return this.cast("event.trigger", "afterRemove", options);
-						}).then(() => {
-							if (this.get("setting", "options.autoSubmit", true))
-							{
-								return this.cast("form.submit", options);
-							}
-						});
-					}
-				});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBeforeAdd(sender, e, ex)
-	{
-
-		return new Promise((resolve, reject) => {
-			let text = window.prompt("アイテム名を入力してください", "");
-			if (text)
-			{
-				this.set("inventory", "dialog.modalResult.text", text);
-				this.set("inventory", "dialog.modalResult.value", text);
-				this.set("inventory", "dialog.modalResult.result", true);
-			}
-			resolve();
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onDoAdd(sender, e, ex)
-	{
-
-		return this.newItem(e.detail.level, this.get("inventory", "dialog.modalResult.text"), this.get("inventory", "dialog.modalResult.value"));
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBeforeEdit(sender, e, ex)
-	{
-
-		let level = parseInt(Util.safeGet(e.detail, "level", 1));
-		let selectBox = this.getSelect(level);
-
-		return new Promise((resolve, reject) => {
-			let text = window.prompt("アイテム名を入力してください", "");
-			if (text)
-			{
-				this.set("inventory", "dialog.modalResult.old", {
-					"text": selectBox.options[selectBox.selectedIndex].text,
-					"value": selectBox.value
-				});
-				this.set("inventory", "dialog.modalResult.new", {
-					"text": text,
-					"value": text
-				});
-				this.set("inventory", "dialog.modalResult.result", true);
-			}
-			resolve();
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onDoEdit(sender, e, ex)
-	{
-
-		return this.editItem(e.detail.level, this.get("inventory", "dialog.modalResult.new.text"), this.get("inventory", "dialog.modalResult.new.value"));
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onBeforeRemove(sender, e, ex)
-	{
-
-		return new Promise((resolve, reject) => {
-			if (window.confirm("削除しますか？"))
-			{
-				let level = parseInt(Util.safeGet(e.detail, "level", 1));
-				let selectBox = this.getSelect(level);
-
-				this.set("inventory", "dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
-				this.set("inventory", "dialog.modalResult.value", selectBox.value);
-				this.set("inventory", "dialog.modalResult.result", true);
-			}
-			resolve();
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	ChainedSelect_onDoRemove(sender, e, ex)
-	{
-
-		return this.removeItem(e.detail.level);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 *  Get the specified level select element.
-	 *
-	 * @param	{Number}		level				Level to retrieve.
-	 */
-	getSelect(level)
-	{
-
-		return this.querySelector(`:scope [data-level='${level}'] ${this.rootNodes["select"]}`);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Assign objects to the select element.
-	 *
-	 * @param	{Number}		level				Level.
-	 * @param	{Object}		parentObject		Parent object.
-	 */
-	assignItems(level, items)
-	{
-
-		// Prerequisite check
-		let selectBox = this.querySelector(`:scope [data-level='${level}'] > select`);
-		Util.assert(selectBox, () => `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-		items = items || {};
-
-		if (Array.isArray(items))
-		{
-			// items is an array
-			for (let i = 0; i < items.length; i++)
-			{
-				let item = document.createElement("option");
-				if (typeof(items[i] === "object"))
-				{
-					item.value = Util.safeGet(items[i], "value", items[i]);
-					item.text = Util.safeGet(items[i], "text", items[i]);
-					let css = Util.safeGet(items[i], "css");
-					if (css) {
-						Object.keys(css).forEach((style) => {
-							item.css[style] = css[style];
-						});
-					}
-				}
-				else
-				{
-					item.value = items[i];
-					item.text = items[i];
-				}
-				selectBox.add(item);
-			}
-		}
-		else
-		{
-			// items is an object
-			Object.keys(items).forEach((key) => {
-				let item = document.createElement("option");
-				item.value = Util.safeGet(items[key], "value", key);
-				item.text = Util.safeGet(items[key], "text", key);
-				let css = Util.safeGet(items[key], "css");
-				if (css) {
-					Object.keys(css).forEach((style) => {
-						item.css[style] = css[style];
-					});
-				}
-				selectBox.add(item);
-			});
-		}
-
-		selectBox.value = "";
-
-		this._initElement("select", level, true);
-		this._initElement("newitem", level, true);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Select an item.
-	 *
-	 * @param	{Number}		level				Level.
-	 * @param	{String}		itemId				Item id.
-	 */
-	selectItem(level, itemId)
-	{
-
-		// Prerequisite check
-		let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-		Util.assert(selectBox, () => `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-		selectBox.value = itemId;
-
-		this._initElement("edititem", level, true);
-		this._initElement("removeitem", level, true);
-
-		// Clear children
-		this.cast("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
-
-		// Refresh the child select element
-		return Promise.resolve().then(() => {
-			level++;
-			let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-			if (nextSelectBox) {
-				this._initElement("newitem", level);
-				return this.cast("basic.refresh", {"level":level, "value":itemId});
-			}
-		});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Create a new item.
-	 *
-	 * @param	{Number}		level				Level.
-	 * @param	{String}		itemName			Item name set as select's text.
-	 * @param	{String}		itemId				Item id set as select's value.
-	 */
-	newItem(level, itemName, itemId)
-	{
-
-		// Prerequisite check
-		let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-		Util.assert(selectBox, () => `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-		// Backup current index since it changes after an option is added when select has no option.
-		let curIndex = selectBox.selectedIndex;
-
-		let item = document.createElement("option");
-		item.value = (itemId ? itemId : itemName);
-		item.text = itemName;
-		selectBox.add(item);
-
-		// Restore index
-		selectBox.selectedIndex = curIndex;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Edit an item.
-	 *
-	 * @param	{Number}		level				Level.
-	 * @param	{String}		itemName			Item name set as select's text.
-	 * @param	{String}		itemId				Item id set as select's value.
-	 */
-	editItem(level, itemName, itemId)
-	{
-
-		// Prerequisite check
-		let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-		Util.assert(selectBox, () => `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-		// Edit the selectbox
-		selectBox.options[selectBox.selectedIndex].text = itemName;
-		selectBox.options[selectBox.selectedIndex].value = (itemId ? itemId : itemName);
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Remove an item.
-	 *
-	 * @param	{Number}		level				Level.
-	 */
-	removeItem(level)
-	{
-
-		// Prerequisite check
-		let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-		Util.assert(selectBox, () => `ChainedSelect.removeItem(): select not found. name=${this.tagName}, level=${level}`);
-
-		// Remove from the select element
-		selectBox.remove(selectBox.selectedIndex);
-		selectBox.value = "";
-		this._initElement("edititem", level);
-		this._initElement("removeitem", level);
-
-		// Reset children select elements
-		this.cast("basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Protected
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Init an element.
-	 *
-	 * @param	{String}		type				CSS Selector of the element to init.
-	 * @param	{Number}		level				Level.
-	 * @param	{Boolean}		enable				Enable an element when true. Disable otherwise.
-	 */
-	_initElement(type, level, enable)
-	{
-
-		type = this.rootNodes[type];
-
-		if (enable)
-		{
-			this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = false;
-			this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.remove("disabled");
-		}
-		else
-		{
-			this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = true;
-			this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.add("disabled");
-		}
-
-	}
-
-}
-
-customElements.define("bm-chainedselect", ChainedSelect);
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
-//	Tab Index Class
-// =============================================================================
-
-class Tab extends Unit$1
-{
-
-	// -------------------------------------------------------------------------
-	//	Settings
-	// -------------------------------------------------------------------------
-
-	_getSettings()
-	{
-
-		return {
-			"skin": {
-				"options": {
-					//"skinRef":						false,
-				},
-				"skins": {
-					"default": {
-						"type": "inline"
-					}
-				}
-			},
-			"style": {
-				"options": {
-					"hasStyle":						false,
-					"styleRef":						false,
-				}
-			},
-			"event": {
-				"events": {
-					"tab-indices": {
-						"selector": 				"[data-tabindex]",
-						"handlers": {
-							"click": 				["Tab_onTabIndexClick"]
-						}
-					},
-				}
-			},
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event Handlers
-	// -------------------------------------------------------------------------
-
-	Tab_onTabIndexClick(sender, e, ex)
-	{
-
-		if (sender.classList.contains("active")) {
-			return;
-		}
-
-		this.switchIndex(sender);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Switch to the specified index.
-	 *
-	 * @param	{String}		index				Index.
-	 */
-	switchIndex(tab)
-	{
-
-		this.use("basic.scan", ".tabindex [data-tabindex].active").classList.remove("active");
-		tab.classList.add("active");
-
-		this.switchContent(tab.getAttribute("data-tabindex"));
-		/*
-		let container = this.use("basic.scan", ".tabcontent");
-		if (container) {
-			container.switchContent(tab.getAttribute("data-tabindex"));
-		} else {
-			console.log("@@@no pair");
-		}
-		*/
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Switch to the specified content.
-	 *
-	 * @param	{String}		index				Index.
-	 */
-	switchContent(index)
-	{
-
-		// Deactivate current active content
-		this.use("basic.scan", ".tabcontent .active").classList.remove("active");
-
-		// Activate specified content
-		this.use("basic.scan", `.tabcontent > [data-tabindex='${index}']`).classList.add("active");
-		this.use("basic.scan", `.tabcontent > [data-tabindex='${index}']`).focus();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the current active index.
-	 *
-	 * @return  {HTMLElement}	Current active element.
-	 */
-	getActiveIndex()
-	{
-
-		return this.use("basic.scan", ":scope .active");
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the current active content.
-	 *
-	 * @return  {HTMLElement}	Current active element.
-	 */
-	getActiveContent()
-	{
-
-		return this.use("basic.scan", ":scope .active");
-
-	}
-
-}
-
-customElements.define("bm-tab", Tab);
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
-//	Tab Index Class
-// =============================================================================
-
-class TabIndex extends Unit$1
-{
-
-	// -------------------------------------------------------------------------
-	//	Settings
-	// -------------------------------------------------------------------------
-
-	_getSettings()
-	{
-
-		return {
-			"skin": {
-				"options": {
-					"hasSkin":						false,
-				}
-			},
-			"style": {
-				"options": {
-					"hasStyle":						false,
-				}
-			},
-			"event": {
-				"events": {
-					"tab-indices": {
-						"selector": 				"[data-tabindex]",
-						"handlers": {
-							"click": 				["TabIndex_onTabIndexClick"]
-						}
-					},
-				}
-			},
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Event Handlers
-	// -------------------------------------------------------------------------
-
-	TabIndex_onTabIndexClick(sender, e, ex)
-	{
-
-		if (sender.classList.contains("active")) {
-			return;
-		}
-
-		this.switchIndex(sender.getAttribute("data-tabindex"));
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Switch to the specified index.
-	 *
-	 * @param	{String}		index				Index.
-	 */
-	switchIndex(index)
-	{
-
-		this.use("basic.scan", ":scope [data-tabindex].active").classList.remove("active");
-		let tabIndex = this.use("basic.scan", `:scope [data-tabindex='${index}']`);
-		tabIndex.classList.add("active");
-
-		let container = document.querySelector(this.getAttribute("data-pair"));
-		if (container) {
-			container.switchContent(index);
-		} else {
-			console.log("@@@no pair");
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the current active index.
-	 *
-	 * @return  {HTMLElement}	Current active element.
-	 */
-	getActiveIndex()
-	{
-
-		return this.use("basic.scan", ":scope .active");
-
-	}
-
-}
-
-customElements.define("bm-tabindex", TabIndex);
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
-//	Tab Content Class
-// =============================================================================
-
-class TabContent extends Unit$1
-{
-
-	// -------------------------------------------------------------------------
-	//	Settings
-	// -------------------------------------------------------------------------
-
-	_getSettings()
-	{
-
-		return {
-			"skin": {
-				"options": {
-					"hasSkin":						false,
-				}
-			},
-			"style": {
-				"options": {
-					"hasStyle":						false,
-				}
-			},
-		}
-
-	}
-
-	// -------------------------------------------------------------------------
-	//	Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Switch to the specified content.
-	 *
-	 * @param	{String}		index				Index.
-	 */
-	switchContent(index)
-	{
-
-		// Deactivate current active content
-		this.querySelector(":scope > .active").classList.remove("active");
-
-		// Activate specified content
-		this.querySelector(`:scope > [data-tabindex='${index}']`).classList.add("active");
-		this.querySelector(`:scope > [data-tabindex='${index}']`).focus();
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Get the current active content.
-	 *
-	 * @return  {HTMLElement}	Current active element.
-	 */
-	getActiveContent()
-	{
-
-		return this.querySelector(":scope .active");
-
-	}
-
-}
-
-customElements.define("bm-tabcontent", TabContent);
-
-// =============================================================================
-/**
- * BitsmistJS - Javascript Web Client Framework
- *
- * @copyright		Masaki Yasutake
- * @link			https://bitsmist.com/
- * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
- */
-// =============================================================================
-
-
-// =============================================================================
 //	Preference Server Class
 // =============================================================================
 
-class PreferenceServer extends Unit$1
+class PreferenceServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -10243,7 +9024,7 @@ customElements.define("bm-preference", PreferenceServer);
 //	Error Server class
 // =============================================================================
 
-class ErrorServer extends Unit$1
+class ErrorServer extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -10289,10 +9070,10 @@ class ErrorServer extends Unit$1
 	ErrorServer_onBeforeStart(sender, e, ex)
 	{
 
-		this._observers = new ObservableStore({"filter":this.__filter});
+		this._observers = new ObservableStore({"filter":this.#__filter});
 
 		// Install error listner
-		this.__initListeners();
+		this.#__initListeners();
 
 	}
 
@@ -10306,7 +9087,7 @@ class ErrorServer extends Unit$1
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		observerInfo		Observer info.
 	 */
-	__filter(conditions, observerInfo, ...args)
+	#__filter(conditions, observerInfo, ...args)
 	{
 
 		let result = false;
@@ -10331,11 +9112,11 @@ class ErrorServer extends Unit$1
 	/**
 	 * Init error handling listeners.
 	 */
-	__initListeners()
+	#__initListeners()
 	{
 
-		window.addEventListener("unhandledrejection", this.__rejectionHandler.bind(this));
-		window.addEventListener("error", this.__errorHandler.bind(this));
+		window.addEventListener("unhandledrejection", this.#__rejectionHandler.bind(this));
+		window.addEventListener("error", this.#__errorHandler.bind(this));
 
 	}
 
@@ -10346,7 +9127,7 @@ class ErrorServer extends Unit$1
 	 *
 	 * @param	{Error}			error				Error object.
 	 */
-	__rejectionHandler(error)
+	#__rejectionHandler(error)
 	{
 
 		let e = {};
@@ -10372,7 +9153,7 @@ class ErrorServer extends Unit$1
 				e.message = error;
 			}
 			e.type = error.type;
-			e.name = this.__getErrorName(error);
+			e.name = this.#__getErrorName(error);
 			e.filename = "";
 			e.funcname = "";
 			e.lineno = "";
@@ -10380,7 +9161,7 @@ class ErrorServer extends Unit$1
 			// e.stack = error.reason.stack;
 			// e.object = error.reason;
 			//
-			this.__handleException(e);
+			this.#__handleException(e);
 		}
 		catch(e)
 		{
@@ -10402,7 +9183,7 @@ class ErrorServer extends Unit$1
 	 * @param	{Number}		line				Line no.
 	 * @param	{Number}		col					Col no.
 	 */
-	__errorHandler(error, file, line, col)
+	#__errorHandler(error, file, line, col)
 	{
 
 		let e = {};
@@ -10410,7 +9191,7 @@ class ErrorServer extends Unit$1
 		try
 		{
 			e.type = "error";
-			e.name = this.__getErrorName(error);
+			e.name = this.#__getErrorName(error);
 			e.message = error.message;
 			e.file = error.filename;
 			e.line = error.lineno;
@@ -10421,7 +9202,7 @@ class ErrorServer extends Unit$1
 				e.object = error.error;
 			}
 
-			this.__handleException(e);
+			this.#__handleException(e);
 		}
 		catch(e)
 		{
@@ -10442,7 +9223,7 @@ class ErrorServer extends Unit$1
 	 *
 	 * @return  {String}		Error name.
 	 */
-	__getErrorName(error)
+	#__getErrorName(error)
 	{
 
 		let name;
@@ -10482,7 +9263,7 @@ class ErrorServer extends Unit$1
 	 *
 	 * @param	{Object}		e					Error object.
 	 */
-	__handleException(e)
+	#__handleException(e)
 	{
 
 		//window.stop();
@@ -10535,7 +9316,7 @@ customElements.define("bm-error", ErrorServer);
 //	Router Class
 // =============================================================================
 
-class Router extends Unit$1
+class Router extends Unit
 {
 
 	// -------------------------------------------------------------------------
@@ -10598,8 +9379,6 @@ Perk.registerPerk(ChainPerk);
 Perk.registerPerk(DialogPerk$1);
 Perk.registerPerk(PreferencePerk);
 Perk.registerPerk(RoutePerk);
-Perk.registerPerk(AliasPerk);
-Perk.registerPerk(RollCallPerk);
 Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
 Perk.registerHandler(APIResourceHandler, "ResourcePerk");
 Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
@@ -10610,27 +9389,6 @@ Perk.registerHandler(LocaleServerHandler, "LocalePerk");
 Perk.registerHandler(ValidationHandler, "ValidationPerk");
 Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
 Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
-/*
-globalThis.BITSMIST.v1.Extras = {
-	Router,
-	BindableArrayStore,
-	BindableStore,
-	ObservableStore,
-	MultiStore,
-	ArrayStore,
-	ValueUtil,
-	FormatterUtil,
-	LocaleFormatterUtil,
-	LocaleValueUtil,
-	BmTabcontent,
-	ChainedSelect,
-	BmTab,
-	BmTabindex,
-	PreferenceServer,
-	LocaleServer,
-	ErrorServer,
-}
-*/
 
-export { ArrayStore, BindableArrayStore, BindableStore, Tab as BmTab, TabContent as BmTabcontent, TabIndex as BmTabindex, ChainedSelect, ErrorServer, FormatterUtil, LocaleFormatterUtil, LocaleServer, LocaleValueUtil, MultiStore, ObservableStore, PreferenceServer, Router, ValueUtil };
+export { ArrayStore, BindableArrayStore, BindableStore, ErrorServer, FormatterUtil, LocaleFormatterUtil, LocaleServer, LocaleValueUtil, MultiStore, ObservableStore, PreferenceServer, Router, ValueUtil };
 //# sourceMappingURL=bitsmist-js-extras_v1.esm.js.map

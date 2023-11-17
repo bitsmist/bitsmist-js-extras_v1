@@ -1,20 +1,25 @@
-(function () {
-	'use strict';
-
-	if (!window.BITSMIST || !window.BITSMIST.v1 || !window.BITSMIST.v1.Unit)
-	{
-		throw new ReferenceError("Bitsmist Core Library does not exist.");
-	}
-
-	var BM = window.BITSMIST.v1;
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@bitsmist-js_v1/core')) :
+	typeof define === 'function' && define.amd ? define(['exports', '@bitsmist-js_v1/core'], factory) :
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.BITSMIST = global.BITSMIST || {}, global.BITSMIST.V1 = global.BITSMIST.V1 || {}, global.BITSMIST.V1.$EXTRAS = {}), global.BITSMIST.V1.$CORE));
+})(this, (function (exports, core) { 'use strict';
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Multi Chainable store class
 	// =============================================================================
 
-	class MultiStore extends BM.Store
+	class MultiStore extends core.Store
 	{
 
 		// -------------------------------------------------------------------------
@@ -65,7 +70,7 @@
 
 			for (let i = 0; i < this._stores.length; i++)
 			{
-				BM.Util.deepMerge(items, this._stores[i].items);
+				core.Util.deepMerge(items, this._stores[i].items);
 			}
 
 			return items;
@@ -144,12 +149,21 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Array Store class
 	// =============================================================================
 
-	class ArrayStore extends BM.Store
+	class ArrayStore extends core.Store
 	{
 
 		// -------------------------------------------------------------------------
@@ -167,7 +181,7 @@
 			let defaults = {};
 			super(Object.assign(defaults, options));
 
-			this.items = BM.Util.safeGet(this._options, "items", []);
+			this.items = core.Util.safeGet(this._options, "items", []);
 
 		}
 
@@ -190,7 +204,7 @@
 		set items(value)
 		{
 
-			BM.Util.assert(Array.isArray(value), `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
+			core.Util.assert(Array.isArray(value), () => `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
 
 			this._items = value;
 
@@ -220,7 +234,7 @@
 		clone()
 		{
 
-			return BM.Util.deepMerge([], this._items);
+			return core.Util.deepMerge([], this._items);
 
 		}
 
@@ -237,7 +251,7 @@
 		get(index, key, defaultValue)
 		{
 
-			return BM.Util.safeGet(this._items[index], key, defaultValue);
+			return core.Util.safeGet(this._items[index], key, defaultValue);
 
 		}
 
@@ -254,11 +268,11 @@
 
 			if (options && options["merge"])
 			{
-				return BM.Util.safeMerge(this._items[index], key, defaultValue);
+				return core.Util.safeMerge(this._items[index], key, defaultValue);
 			}
 			else
 			{
-				BM.Util.safeSet(this._items[index], key, value);
+				core.Util.safeSet(this._items[index], key, value);
 			}
 
 		}
@@ -273,7 +287,7 @@
 		remove(index, key)
 		{
 
-			BM.Util.safeRemove(this._items[i], key);
+			core.Util.safeRemove(this._items[i], key);
 
 		}
 
@@ -289,19 +303,28 @@
 		has(index, key)
 		{
 
-			return BM.Util.safeHas(this._items[index], key);
+			return core.Util.safeHas(this._items[index], key);
 
 		}
 
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Observable store class
 	// =============================================================================
 
-	class ObservableStore extends BM.Store
+	class ObservableStore extends core.Store
 	{
 
 		// -------------------------------------------------------------------------
@@ -317,7 +340,7 @@
 			this._filter;
 			this._observers = [];
 
-			this.filter = BM.Util.safeGet(this._options, "filter", () => { return true; } );
+			this.filter = core.Util.safeGet(this._options, "filter", () => { return true; } );
 
 		}
 
@@ -340,7 +363,7 @@
 		set filter(value)
 		{
 
-			BM.Util.assert(typeof value === "function", `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
+			core.Util.assert(typeof value === "function", () => `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
 			this._filter = value;
 
@@ -364,18 +387,18 @@
 
 			if (holder && typeof holder === "object")
 			{
-				this.__deepMerge(holder, value, changedItem);
+				this.#__deepMerge(holder, value, changedItem);
 			}
 			else
 			{
 				if (this.get(key) !== value)
 				{
-					BM.Util.safeSet(this._items, key, value);
+					core.Util.safeSet(this._items, key, value);
 					changedItem[key] = value;
 				}
 			}
 
-			let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
+			let notify = core.Util.safeGet(options, "notifyOnChange", core.Util.safeGet(this._options, "notifyOnChange"));
 			if (notify && Object.keys(changedItem).length > 0)
 			{
 				return this.notify(changedItem, ...args);
@@ -406,9 +429,9 @@
 	    {
 
 	        this._items = {};
-	        this.__deepMerge(this._items, value);
+	        this.#__deepMerge(this._items, value);
 
-	        let notify = BM.Util.safeGet(options, "notifyOnChange", BM.Util.safeGet(this._options, "notifyOnChange"));
+	        let notify = core.Util.safeGet(options, "notifyOnChange", core.Util.safeGet(this._options, "notifyOnChange"));
 	        if (notify)
 	        {
 	            return this.notify(value, ...args);
@@ -428,7 +451,7 @@
 		subscribe(id, handler, options)
 		{
 
-			BM.Util.assert(typeof handler === "function", `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
+			core.Util.assert(typeof handler === "function", () => `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
 			this._observers.push({"id":id, "handler":handler, "options":options});
 
@@ -468,7 +491,7 @@
 		notify(conditions, ...args)
 		{
 
-			if (BM.Util.safeGet(this._options, "async", false))
+			if (core.Util.safeGet(this._options, "async", false))
 			{
 				return this.notifyAsync(conditions, ...args);
 			}
@@ -569,12 +592,12 @@
 		 *
 		 * @return  {Object}		Merged array.
 		 */
-		__deepMerge(obj1, obj2, changedItem)
+		#__deepMerge(obj1, obj2, changedItem)
 		{
 
 			changedItem = changedItem || {};
 
-			BM.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", "ObservableStore.__deepMerge(): Parameters must be an object.", TypeError);
+			core.Util.assert(obj1 && typeof obj1 === "object" && obj2 && typeof obj2 === "object", () => "ObservableStore.#__deepMerge(): Parameters must be an object.", TypeError);
 
 			Object.keys(obj2).forEach((key) => {
 				if (Array.isArray(obj1[key]))
@@ -589,7 +612,7 @@
 					!(obj1[key] instanceof HTMLElement)
 				)
 				{
-					Util.deepMerge(obj1[key], obj2[key]);
+					core.Util.deepMerge(obj1[key], obj2[key]);
 				}
 				else
 				{
@@ -643,7 +666,7 @@
 			options = options || {};
 			let ret = value;
 
-			let tokens = this.__bisect(format, "-");
+			let tokens = FormatterUtil.#__bisect(format, "-");
 			let type = tokens[0];
 			let typeOption = (tokens.length > 1 ? tokens[1] : "");
 
@@ -957,7 +980,7 @@
 			if (parameters && format.indexOf("${") > -1)
 			{
 				ret = ret.replace(/\$\{(.+)\}/g, (_, name) => {
-					let tokens = this.__bisect(name, ":");
+					let tokens = FormatterUtil.#__bisect(name, ":");
 					let value = parameters[tokens[0]];
 
 					if (!value)
@@ -996,7 +1019,7 @@
 			if (format.indexOf("${value") > -1)
 			{
 				ret = ret.replace(/\$\{value(.*)\}/g, (_, name) => {
-					let tokens = this.__bisect(name, ":");
+					let tokens = FormatterUtil.#__bisect(name, ":");
 					let tmp = value;
 
 					if (tokens.length > 1)
@@ -1035,7 +1058,7 @@
 					let arr = name.split(".");
 					let resourceName = arr[0];
 					let key = arr[1];
-					return this.__getResourceValue(resources, resourceName, value, key) || "";
+					return FormatterUtil.#__getResourceValue(resources, resourceName, value, key) || "";
 				});
 			}
 
@@ -1057,7 +1080,7 @@
 		 *
 		 * @return  {String}		Resource value.
 		 */
-		static __getResourceValue(resources, resourceName, value, key)
+		static #__getResourceValue(resources, resourceName, value, key)
 		{
 
 			let ret = value;
@@ -1085,7 +1108,7 @@
 		 *
 		 * @return  {Arry}			Splitted string.
 		 */
-		static __bisect(target, delimiter)
+		static #__bisect(target, delimiter)
 		{
 
 			let ret = [];
@@ -1108,6 +1131,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Value Util Class
@@ -1118,20 +1150,6 @@
 
 		// -------------------------------------------------------------------------
 		//  Setter/Getter
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Class name.
-		 *
-		 * @type	{String}
-		 */
-		static get name()
-		{
-
-			return "ValueUtil";
-
-		}
-
 		// -------------------------------------------------------------------------
 
 		/**
@@ -1176,7 +1194,7 @@
 		{
 
 			// Get elements with the attribute
-			let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
+			let elements = core.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 			if (rootNode.matches(`[${this.attributeName}]`))
 			{
 				elements.push(rootNode);
@@ -1190,7 +1208,7 @@
 				}
 				else
 				{
-					value = BM.Util.safeGet(items, element.getAttribute(this.attributeName));
+					value = core.Util.safeGet(items, element.getAttribute(this.attributeName));
 				}
 
 				// Set
@@ -1217,7 +1235,7 @@
 			let item = {};
 
 			// Get elements with the attribute
-			let elements = BM.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
+			let elements = core.Util.scopedSelectorAll(rootNode, `[${this.attributeName}]`);
 			if (rootNode.matches(`[${this.attributeName}]`))
 			{
 				elements.push(rootNode);
@@ -1270,16 +1288,16 @@
 		static clearFields(rootNode, options)
 		{
 
-			let target = BM.Util.safeGet(options, "target", "");
+			let target = core.Util.safeGet(options, "target", "");
 
 			// Clear input elements
-			let elements = BM.Util.scopedSelectorAll(rootNode, `${target} input`, options);
+			let elements = core.Util.scopedSelectorAll(rootNode, `${target} input`, options);
 			elements.forEach((element) => {
 				this.clearValue(element, options);
 			});
 
 			// Clear select elements
-			elements = BM.Util.scopedSelectorAll(rootNode, `${target} select`, options);
+			elements = core.Util.scopedSelectorAll(rootNode, `${target} select`, options);
 			elements.forEach((element) => {
 				this.clearValue(element, options);
 			});
@@ -1298,7 +1316,8 @@
 		{
 
 			options = options || {};
-			let result = ( value === undefined || value === null ? "" : String(value) );
+			//let result = ( value === undefined || value === null ? "" : String(value) );
+			let result = ( value === undefined || value === null ? "" : value );
 
 			// Format
 			if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
@@ -1308,7 +1327,7 @@
 			}
 
 			// Interpolate
-			if (result.charAt(0) === "`")
+			if (typeof(result) === "string" && result.charAt(0) === "`")
 			{
 				result = this.formatter.interpolateResources(result, value, options);
 				result = this.formatter.interpolate(result, options);
@@ -1509,7 +1528,7 @@
 						element.value = value;
 						break;
 					case "checkbox":
-						element.checked = ( value ? true : false );
+						element.checked = ( value && value != "0" ? true : false );
 						break;
 					case "radio":
 						if (element.value === value)
@@ -1579,7 +1598,11 @@
 				case "checkbox":
 					if (element.checked)
 					{
-						ret = ( element.hasAttribute("value") ? element.getAttribute("value") : element.checked );
+						ret = ( element.hasAttribute("value") ? element.getAttribute("value") : true );
+					}
+					else
+					{
+						ret = false;
 					}
 					break;
 				default:
@@ -1610,12 +1633,21 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Bindable store class
 	// =============================================================================
 
-	class BindableStore extends BM.Store
+	class BindableStore extends core.Store
 	{
 
 		// -------------------------------------------------------------------------
@@ -1629,7 +1661,7 @@
 			super(Object.assign(defaults, options));
 
 			this._elems = {};
-			this._valueHandler = BM.Util.safeGet(options, "valueHandler", ValueUtil);
+			this._valueHandler = core.Util.safeGet(options, "valueHandler", ValueUtil);
 
 		}
 
@@ -1781,6 +1813,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Bindable store class
@@ -1800,7 +1841,7 @@
 			super(Object.assign(defaults, options));
 
 			this._elems = {};
-			this._valueHandler = BM.Util.safeGet(options, "valueHandler", ValueUtil);
+			this._valueHandler = core.Util.safeGet(options, "valueHandler", ValueUtil);
 
 		}
 
@@ -1961,13 +2002,31 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	File Perk class
 	// =============================================================================
 
-	class FilePerk extends BM.Perk
+	class FilePerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__info = {
+			"sectionName":	"file",
+			"order":		110,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -1976,10 +2035,7 @@
 		static get info()
 		{
 
-			return {
-				"section":		"file",
-				"order":		110,
-			};
+			return FilePerk.#__info;
 
 		}
 
@@ -1990,22 +2046,22 @@
 		static init(unit, options)
 		{
 
-			// Upgrade unit
-			this.upgrade(unit, "event", "doApplySettings", FilePerk.FilePerk_onDoApplySettings);
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":FilePerk.#FilePerk_onDoApplySettings, "order":FilePerk.info["order"]});
 
 		}
 
 		// -----------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -----------------------------------------------------------------------------
 
-		static FilePerk_onDoApplySettings(sender, e, ex)
+		static #FilePerk_onDoApplySettings(sender, e, ex)
 		{
 
 			let promises = [];
 
-			Object.entries(BM.Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
-				promises.push(BM.AjaxUtil.loadScript(sectionValue["href"]));
+			Object.entries(core.Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
+				promises.push(core.AjaxUtil.loadScript(sectionValue["href"]));
 			});
 
 			return Promise.all(promises);
@@ -2015,13 +2071,32 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Error Perk class
 	// =============================================================================
 
-	class ErrorPerk extends BM.Perk
+	class ErrorPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":	"error",
+			"order":		120,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -2030,27 +2105,24 @@
 		static get info()
 		{
 
-			return {
-				"section":		"error",
-				"order":		120,
-			};
+			return ErrorPerk.#__info;
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static ErrorPerk_onDoStart(sender, e, ex)
+		static #ErrorPerk_onDoStart(sender, e, ex)
 		{
 
-			let serverNode = this.get("setting", "locale.options.errorServer", this.get("setting", "system.errorServer"));
+			let serverNode = this.get("setting", "error.options.errorServer", this.get("setting", "system.error.options.errorServer"));
 			serverNode = ( serverNode === true ? "bm-error" : serverNode );
 
-			return this.use("spell", "status.wait", [serverNode]).then(() => {
+			return this.cast("status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
-				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.error"));
-				this.set("vault", "error.server", server);
+				server.subscribe(this, core.Util.safeGet(e.detail, "settings.error"));
+				DialogPerk.#__vault.get(unit)["server"] = server;
 			});
 
 		}
@@ -2058,6 +2130,15 @@
 	}
 
 	//// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Form util class
@@ -2079,12 +2160,12 @@
 	{
 
 		// Get elements with bm-visible attribute
-		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+		let elements = core.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 		// Show elements
 		elements.forEach((element) => {
 			let condition = element.getAttribute("bm-visible");
-			if (BM.Util.safeEval(condition, item))
+			if (core.Util.safeEval(condition, item))
 			{
 				element.style.removeProperty("display");
 			}
@@ -2107,7 +2188,7 @@
 	{
 
 		// Get elements with bm-visible attribute
-		let elements = BM.Util.scopedSelectorAll(rootNode, "[bm-visible]");
+		let elements = core.Util.scopedSelectorAll(rootNode, "[bm-visible]");
 
 		// Hide elements
 		elements.forEach((element) => {
@@ -2210,13 +2291,32 @@
 	};
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Element Perk class
 	// =============================================================================
 
-	class ElementPerk extends BM.Perk
+	class ElementPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":	"element",
+			"order":		220,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -2225,10 +2325,7 @@
 		static get info()
 		{
 
-			return {
-				"section":		"element",
-				"order":		220,
-			};
+			return ElementPerk.#__info;
 
 		}
 
@@ -2239,24 +2336,28 @@
 		static init(unit, options)
 		{
 
-			// Upgrade unit
-			this.upgrade(unit, "vault", "element.overlay", );
-			this.upgrade(unit, "vault", "element.overlayPromise", Promise.resolve());
-			this.upgrade(unit, "event", "doApplySettings", ElementPerk.ElementPerk_onDoApplySettings);
+			// Init unit vault
+			ElementPerk.#__vault.set(unit, {
+				"overlay":			null,
+				"overlayPromise":	Promise.resolve(),
+			});
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":ElementPerk.#ElementPerk_onDoApplySettings, "order":ElementPerk.info["order"]});
 
 		}
 
 		// -----------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -----------------------------------------------------------------------------
 
-		static ElementPerk_onDoApplySettings(sender, e, ex)
+		static #ElementPerk_onDoApplySettings(sender, e, ex)
 		{
 
 			let order = ElementPerk.info["order"];
 
-			Object.entries(BM.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
-				this.use("skill", "event.add", sectionName, {
+			Object.entries(core.Util.safeGet(e.detail, "settings.element.targets", {})).forEach(([sectionName, sectionValue]) => {
+				this.use("event.add", sectionName, {
 					"handler":	ElementPerk.ElementPerk_onDoProcess,
 					"order":	order,
 					"options":	{"attrs":sectionValue}
@@ -2274,7 +2375,7 @@
 			let promises = [];
 
 			Object.keys(settings).forEach((elementName) => {
-				promises = promises.concat(ElementPerk.__initElements(this, e, elementName, settings[elementName]));
+				promises = promises.concat(ElementPerk.#__initElements(this, e, elementName, settings[elementName]));
 			});
 
 			return Promise.all(promises);
@@ -2294,20 +2395,20 @@
 		 *
 	 	 * @return  {Array}			HTML elements.
 		 */
-		static __getTargetElements(unit, elementName, elementInfo)
+		static #__getTargetElements(unit, elementName, elementInfo)
 		{
 
 			let elements;
 
-			if (elementInfo["rootNode"])
+			if (elementInfo["selector"])
 			{
-				if (elementInfo["rootNode"] === "this" || elementInfo["rootNode"] === unit.tagName.toLowerCase())
+				if (elementInfo["selector"] === "this" || elementInfo["selector"] === unit.tagName.toLowerCase())
 				{
 					elements = [unit];
 				}
 				else
 				{
-					elements = BM.Util.scopedSelectorAll(unit, elementInfo["rootNode"]);
+					elements = core.Util.scopedSelectorAll(unit, elementInfo["selector"]);
 				}
 			}
 			else if (elementName === "this" || elementName === unit.tagName.toLowerCase())
@@ -2316,7 +2417,7 @@
 			}
 			else
 			{
-				elements = BM.Util.scopedSelectorAll(unit, `#${elementName}`);
+				elements = core.Util.scopedSelectorAll(unit, `#${elementName}`);
 			}
 
 			return elements;
@@ -2333,11 +2434,11 @@
 		 * @param	{String}		elementName			Element name.
 		 * @param	{Object}		elementInfo			Element info.
 		 */
-		static __initElements(unit, eventInfo, elementName, elementInfo)
+		static #__initElements(unit, eventInfo, elementName, elementInfo)
 		{
 
 			let ret = [];
-			let elements = ElementPerk.__getTargetElements(unit, elementName, elementInfo);
+			let elements = ElementPerk.#__getTargetElements(unit, elementName, elementInfo);
 
 			for (let i = 0; i < elements.length; i++)
 			{
@@ -2350,22 +2451,22 @@
 						elements[i].scrollTo(elementInfo[key]);
 						break;
 					case "showLoader":
-						ElementPerk.__showOverlay(unit, elementInfo[key]);
-						waitForElement = unit.get("vault", "element.overlay");
+						ElementPerk.#__showOverlay(unit, elementInfo[key]);
+						waitForElement = ElementPerk.#__vault.get(unit)["overlay"];
 						break;
 					case "hideLoader":
-						ElementPerk.__hideOverlay(unit, elementInfo[key]);
-						waitForElement = unit.get("vault", "element.overlay");
+						ElementPerk.#__hideOverlay(unit, elementInfo[key]);
+						waitForElement = ElementPerk.#__vault.get(unit)["overlay"];
 						break;
 					case "build":
 						let resourceName = elementInfo[key]["resourceName"];
 						FormUtil.build(elements[i], unit.get("inventory", `resource.resources.${resourceName}`).items, elementInfo[key]);
 						break;
 					case "attribute":
-						ElementPerk.__setAttributes(elements[i], elementInfo[key]);
+						ElementPerk.#__setAttributes(elements[i], elementInfo[key]);
 						break;
 					case "class":
-						ElementPerk.__setClasses(elements[i], elementInfo[key]);
+						ElementPerk.#__setClasses(elements[i], elementInfo[key]);
 						break;
 					case "style":
 						Object.keys(elementInfo[key]).forEach((styleName) => {
@@ -2380,11 +2481,11 @@
 					case "autoFocus":
 						elements[i].focus();
 						break;
-					case "rootNode":
+					case "selector":
 					case "waitFor":
 						break;
 					default:
-						console.warn(`ElementPerk.__initAttr(): Invalid type. name=${unit.tagName}, eventName=${eventInfo.type}, type=${key}`);
+						console.warn(`ElementPerk.#__initAttr(): Invalid type. name=${unit.tagName}, eventName=${eventInfo.type}, type=${key}`);
 						break;
 					}
 				});
@@ -2392,7 +2493,7 @@
 				// Wait for transition/animation to finish
 				if (elementInfo["waitFor"])
 				{
-					ret.push(ElementPerk.__waitFor(unit, eventInfo, elementName, elementInfo, waitForElement));
+					ret.push(ElementPerk.#__waitFor(unit, eventInfo, elementName, elementInfo, waitForElement));
 				}
 			}
 
@@ -2413,7 +2514,7 @@
 		 *
 	 	 * @return  {Promise}		Promise.
 		 */
-		static __waitFor(unit, eventInfo, elementName, elementInfo, element)
+		static #__waitFor(unit, eventInfo, elementName, elementInfo, element)
 		{
 
 			let inTransition = false;
@@ -2427,17 +2528,17 @@
 				inTransition = (window.getComputedStyle(element).getPropertyValue('animation-name') !== "none");
 				break;
 			default:
-				console.warn(`ElementPerk.__initAttr(): Invalid waitFor. name=${unit.tagName}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
+				console.warn(`ElementPerk.#__initAttr(): Invalid waitFor. name=${unit.tagName}, eventName=${eventInfo.type}, waitFor=${elementInfo["waitFor"]}`);
 				break;
 			}
 
-			BM.Util.warn(inTransition, `ElementPerk.__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
+			core.Util.warn(inTransition, `ElementPerk.#__initAttr(): Element not in ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
 
 			return new Promise((resolve, reject) => {
 				// Timeout timer
 				let timer = setTimeout(() => {
-					reject(`ElementPerk.__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
-				}, BM.Unit.get("setting", "system.waitForTimeout", 10000));
+					reject(`ElementPerk.#__initAttr(): Timed out waiting for ${elementInfo["waitFor"]}. name=${unit.tagName}, eventName=${eventInfo.type}, elementName=${elementName}`);
+				}, unit.get("setting", "status.options.waitForTimeout", unit.get("setting", "system.status.options.waitForTimeout", 10000)));
 
 				// Resolve when finished
 				element.addEventListener(`${elementInfo["waitFor"]}end`, () => {
@@ -2456,7 +2557,7 @@
 		 * @param	{HTMLElement}	element				Element to set classes.
 		 * @param	{Object}		options				Options.
 		 */
-		static __setAttributes(element, options)
+		static #__setAttributes(element, options)
 		{
 
 			Object.keys(options).forEach((mode) => {
@@ -2473,7 +2574,7 @@
 						element.removeAttribute(options[mode][i]);
 					}				break;
 				default:
-					console.warn(`ElementPerk.__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
+					console.warn(`ElementPerk.#__setAttributes(): Invalid command. element=${element.tagName}, command=${mode}`);
 					break;
 				}
 			});
@@ -2489,7 +2590,7 @@
 		 * @param	{HTMLElement}	element				Element to set classes.
 		 * @param	{Object}		options				Options.
 		 */
-		static __setClasses(element, options)
+		static #__setClasses(element, options)
 		{
 
 			setTimeout(() => {
@@ -2506,7 +2607,7 @@
 						element.setAttribute("class", options[mode]);
 						break;
 					default:
-						console.warn(`ElementPerk.__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
+						console.warn(`ElementPerk.#__setClasses(): Invalid command. element=${element.tagName}, command=${mode}`);
 						break;
 					}
 				});
@@ -2522,17 +2623,17 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __createOverlay(unit, options)
+		static #__createOverlay(unit, options)
 		{
 
-			let overlay = unit.get("vault", "element.overlay");
+			let overlay = ElementPerk.#__vault.get(unit)["overlay"];
 
 			if (!overlay)
 			{
 				overlay = document.createElement("div");
 				overlay.classList.add("overlay");
-				unit.unitRoot.appendChild(overlay);
-				unit.set("vault", "element.overlay", overlay);
+				unit.get("inventory", "basic.unitRoot").appendChild(overlay);
+				ElementPerk.#__vault.get(unit)["overlay"] = overlay;
 			}
 
 			return overlay
@@ -2547,10 +2648,10 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __closeOnClick(unit, options)
+		static #__closeOnClick(unit, options)
 		{
 
-			unit.get("vault", "element.overlay").addEventListener("click", (e) => {
+			ElementPerk.#__vault.get(unit)["overlay"].addEventListener("click", (e) => {
 				if (e.target === e.currentTarget && typeof unit.close === "function")
 				{
 					unit.close({"reason":"cancel"});
@@ -2568,7 +2669,7 @@
 		 *
 		 * @return 	{String}		Effect ("transition" or "animation").
 		 */
-		static __getEffect(overlay)
+		static #__getEffect(overlay)
 		{
 
 			let effect = "";
@@ -2594,32 +2695,32 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __showOverlay(unit, options)
+		static #__showOverlay(unit, options)
 		{
 
-			let overlay = ElementPerk.__createOverlay(unit);
+			let overlay = ElementPerk.#__createOverlay(unit);
 
 			// Add close on click event handler
-			if (BM.Util.safeGet(options, "closeOnClick"))
+			if (core.Util.safeGet(options, "closeOnClick"))
 			{
-				ElementPerk.__closeOnClick(unit);
+				ElementPerk.#__closeOnClick(unit);
 			}
 
 			window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
-			let addClasses = ["show"].concat(BM.Util.safeGet(options, "addClasses", []));
+			let addClasses = ["show"].concat(core.Util.safeGet(options, "addClasses", []));
 			overlay.classList.add(...addClasses);
-			overlay.classList.remove(...BM.Util.safeGet(options, "removeClasses", []));
+			overlay.classList.remove(...core.Util.safeGet(options, "removeClasses", []));
 
-			let effect = ElementPerk.__getEffect(overlay);
+			let effect = ElementPerk.#__getEffect(overlay);
 			if (effect)
 			{
-				unit.get("vault", "element.overlayPromise").then(() => {
-					unit.set("vault", "element.overlayPromise", new Promise((resolve, reject) => {
+				ElementPerk.#__vault.get(unit)["overlayPromise"].then(() => {
+					ElementPerk.#__vault.get(unit)["overlayPromise"] = new Promise((resolve, reject) => {
 						overlay.addEventListener(`${effect}end`, () => {
 							resolve();
 						}, {"once":true});
-					}));
+					});
 				});
 			}
 			else
@@ -2637,30 +2738,51 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __hideOverlay(unit, options)
+		static #__hideOverlay(unit, options)
 		{
 
-			let overlay = unit.get("vault", "element.overlay");
+			let overlay = ElementPerk.#__vault.get(unit)["overlay"];
 
-			unit.get("vault", "element.overlayPromise").then(() => {
+			ElementPerk.#__vault.get(unit)["overlayPromise"].then(() => {
 				window.getComputedStyle(overlay).getPropertyValue("visibility"); // Recalc styles
 
-				let removeClasses = ["show"].concat(BM.Util.safeGet(options, "removeClasses", []));
+				let removeClasses = ["show"].concat(core.Util.safeGet(options, "removeClasses", []));
 				overlay.classList.remove(...removeClasses);
-				overlay.classList.add(...BM.Util.safeGet(options, "addClasses", []));
+				overlay.classList.add(...core.Util.safeGet(options, "addClasses", []));
 			});
 		}
 
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Resource Perk class
 	// =============================================================================
 
-	class ResourcePerk extends BM.Perk
+	class ResourcePerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__info = {
+			"sectionName":		"resource",
+			"order":			300,
+		};
+		static #__spells = {
+			"addHandler":		ResourcePerk.#_addHandler,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -2669,10 +2791,16 @@
 		static get info()
 		{
 
-			return {
-				"section":		"resource",
-				"order":		300,
-			};
+			return ResourcePerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return ResourcePerk.#__spells;
 
 		}
 
@@ -2684,25 +2812,26 @@
 		{
 
 			// Upgrade unit
-			this.upgrade(unit, "spell", "resource.addHandler", function(...args) { return ResourcePerk._addHandler(...args); });
-			this.upgrade(unit, "inventory", "resource.resources", {});
-			this.upgrade(unit, "event", "doApplySettings", ResourcePerk.ResourcePerk_onDoApplySettings);
-			this.upgrade(unit, "event", "doFetch", ResourcePerk.ResourcePerk_onDoFetch);
-			this.upgrade(unit, "event", "doSubmit", ResourcePerk.ResourcePerk_onDoSubmit);
+			unit.upgrade("inventory", "resource.resources", {});
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":ResourcePerk.#ResourcePerk_onDoApplySettings, "order":ResourcePerk.info["order"]});
+			unit.use("event.add", "doFetch", {"handler":ResourcePerk.#ResourcePerk_onDoFetch, "order":ResourcePerk.info["order"]});
+			unit.use("event.add", "doSubmit", {"handler":ResourcePerk.#ResourcePerk_onDoSubmit, "order":ResourcePerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static ResourcePerk_onDoApplySettings(sender, e, ex)
+		static #ResourcePerk_onDoApplySettings(sender, e, ex)
 		{
 
 			let promises = [];
 
-			Object.entries(BM.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
-				promises.push(ResourcePerk._addHandler(this, sectionName, sectionValue));
+			Object.entries(core.Util.safeGet(e.detail, "settings.resource.handlers", {})).forEach(([sectionName, sectionValue]) => {
+				promises.push(ResourcePerk.#_addHandler(this, sectionName, sectionValue));
 			});
 
 			return Promise.all(promises);
@@ -2711,7 +2840,7 @@
 
 		// -------------------------------------------------------------------------
 
-		static ResourcePerk_onDoFetch(sender, e, ex)
+		static #ResourcePerk_onDoFetch(sender, e, ex)
 		{
 
 			let promises = [];
@@ -2720,8 +2849,8 @@
 				let resource = this.get("inventory", `resource.resources.${resourceName}`);
 				if (resource.options.get("autoFetch", true))
 				{
-					resource.target["id"] = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-					resource.target["parameters"] = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+					resource.target["id"] = core.Util.safeGet(e.detail, "id", resource.target["id"]);
+					resource.target["parameters"] = core.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 					promises.push(resource.load(resource.target["id"], resource.target["parameters"]).then(() => {
 						e.detail.items = resource.items;
@@ -2735,18 +2864,18 @@
 
 		// -------------------------------------------------------------------------
 
-		static ResourcePerk_onDoSubmit(sender, e, ex)
+		static #ResourcePerk_onDoSubmit(sender, e, ex)
 		{
 
 			let promises = [];
-			let submitItem = BM.Util.safeGet(e.detail, "items");
+			let submitItem = core.Util.safeGet(e.detail, "items");
 
 			Object.keys(this.get("inventory", "resource.resources")).forEach((resourceName) => {
 				let resource = this.get("inventory", `resource.resources.${resourceName}`);
 				if (resource.options.get("autoSubmit", true)) {
-					let method = BM.Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
-					let id = BM.Util.safeGet(e.detail, "id", resource.target["id"]);
-					let parameters = BM.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
+					let method = core.Util.safeGet(e.detail, "method", resource.target["method"] || "update"); // Default is "update"
+					let id = core.Util.safeGet(e.detail, "id", resource.target["id"]);
+					let parameters = core.Util.safeGet(e.detail, "parameters", resource.target["parameters"]);
 
 					promises.push(this.get("inventory", `resource.resources.${resourceName}`)[method](id, submitItem, parameters));
 				}
@@ -2757,7 +2886,7 @@
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -2769,17 +2898,17 @@
 		 *
 		 * @return 	{Promise}		Promise.
 	     */
-		static _addHandler(unit, handlerName, options)
+		static #_addHandler(unit, handlerName, options)
 		{
 
-			BM.Util.assert(options["handlerClassName"], `ResourcePerk._addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
+			core.Util.assert(options["handlerClassName"], () => `ResourcePerk.#_addHandler(): handler class name not specified. name=${unit.tagName}, handlerName=${handlerName}`);
 
 			let promise = Promise.resolve();
 			let handler = unit.get("inventory", `resource.resources.${handlerName}`);
 
 			if (!handler)
 			{
-				handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+				handler = this.createHandler(options["handlerClassName"], unit, handlerName, options);
 				unit.set("inventory", `resource.resources.${handlerName}`, handler);
 
 				promise = handler.init(options);
@@ -2792,13 +2921,35 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Validation Perk Class
 	// =============================================================================
 
-	class ValidationPerk extends BM.Perk
+	class ValidationPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__info = {
+			"sectionName":		"validation",
+			"order":			310,
+		};
+		static #__spells = {
+			"addHandler":		ValidationPerk._addHandler,
+			"validate":			ValidationPerk._validate,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -2807,10 +2958,16 @@
 		static get info()
 		{
 
-			return {
-				"section":		"validation",
-				"order":		310,
-			};
+			return ValidationPerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return ValidationPerk.#__spells;
 
 		}
 
@@ -2822,19 +2979,18 @@
 		{
 
 			// Upgrade unit
-			this.upgrade(unit, "spell", "validation.addHandler", function(...args) { return ValidationPerk._addHandler(...args); });
-			this.upgrade(unit, "spell", "validation.validate", function(...args) { return ValidationPerk._validate(...args); });
-			this.upgrade(unit, "inventory", "validation.validators", {});
-			this.upgrade(unit, "state", "validation.validationResult", {});
-			this.upgrade(unit, "state", "validation.validationResult", {});
-			this.upgrade(unit, "event", "doApplySettings", ValidationPerk.ValidationPerk_onDoApplySettings);
-			this.upgrade(unit, "event", "doValidate", ValidationPerk.ValidationPerk_onDoValidate);
-			this.upgrade(unit, "event", "doReportValidity", ValidationPerk.ValidationPerk_onDoReportValidity);
+			unit.upgrade("inventory", "validation.validators", {});
+			unit.upgrade("inventory", "validation.validationResult", {});
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":ValidationPerk.info["order"]});
+			unit.use("event.add", "doValidate", {"handler":ValidationPerk.ValidationPerk_onDoValidate, "order":ValidationPerk.info["order"]});
+			unit.use("event.add", "doReportValidity", {"handler":ValidationPerk.ValidationPerk_onDoReportValidity, "order":ValidationPerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
 		static ValidationPerk_onDoApplySettings(sender, e, ex)
@@ -2842,7 +2998,7 @@
 
 			let promises = [];
 
-			Object.entries(BM.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
+			Object.entries(core.Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
 				promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
 			});
 
@@ -2858,9 +3014,9 @@
 			let validatorName = e.detail.validatorName;
 			if (validatorName)
 			{
-				BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+				core.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), () => `ValidationPerk.ValidationPerk_onDoValidate(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
-				let items = BM.Util.safeGet(e.detail, "items");
+				let items = core.Util.safeGet(e.detail, "items");
 				let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
 				let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
 
@@ -2877,9 +3033,9 @@
 			let validatorName = e.detail.validatorName;
 			if (validatorName)
 			{
-				BM.Util.assert(this.get("inventory", `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
+				core.Util.assert(this.get("inventory", () => `validation.validators.${validatorName}`), `ValidationPerk.ValidationPerk_onDoReportValidity(): Validator not found. name=${this.tagName}, validatorName=${validatorName}`);
 
-				let items = BM.Util.safeGet(e.detail, "items");
+				let items = core.Util.safeGet(e.detail, "items");
 				let rules = this.get("setting", `validation.handlers.${validatorName}.rules`);
 				let options = this.get("setting", `validation.handlers.${validatorName}.handlerOptions`);
 
@@ -2889,7 +3045,7 @@
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -2907,7 +3063,7 @@
 
 			if (options["handlerClassName"] && !handler)
 			{
-				handler = BM.ClassUtil.createObject(options["handlerClassName"], unit, handlerName, options);
+				handler = this.createHandler(options["handlerClassName"], unit, handlerName, options);
 				unit.set("inventory", `validation.validators.${handlerName}`, handler);
 
 				promise = handler.init(options);
@@ -2931,31 +3087,31 @@
 		{
 
 			options = options || {};
-			unit.set("state", "validation.validationResult.result", true);
+			unit.set("inventory", "validation.validationResult.result", true);
 
 			return Promise.resolve().then(() => {
-				console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.id}`);
-				return unit.use("spell", "event.trigger", "beforeValidate", options);
+				console.debug(`ValidationPerk._validate(): Validating unit. name=${unit.tagName}, id=${unit.uniqueId}`);
+				return unit.cast("event.trigger", "beforeValidate", options);
 			}).then(() => {
-				return unit.use("spell", "event.trigger", "doValidate", options);
+				return unit.cast("event.trigger", "doValidate", options);
 			}).then(() => {
-				if (unit.get("state", "validation.validationResult.result"))
+				if (unit.get("inventory", "validation.validationResult.result"))
 				{
-					console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.id}`);
-					return unit.use("spell", "event.trigger", "doValidateSuccess", options);
+					console.debug(`ValidationPerk._validate(): Validation Success. name=${unit.tagName}, id=${unit.uniqueId}`);
+					return unit.cast("event.trigger", "doValidateSuccess", options);
 				}
 				else
 				{
-					console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.id}`);
-					return unit.use("spell", "event.trigger", "doValidateFail", options);
+					console.debug(`ValidationPerk._validate(): Validation Failed. name=${unit.tagName}, id=${unit.uniqueId}`);
+					return unit.cast("event.trigger", "doValidateFail", options);
 				}
 			}).then(() => {
-				if (!unit.get("state", "validation.validationResult.result"))
+				if (!unit.get("inventory", "validation.validationResult.result"))
 				{
-					return unit.use("spell", "event.trigger", "doReportValidity", options);
+					return unit.cast("event.trigger", "doReportValidity", options);
 				}
 			}).then(() => {
-				return unit.use("spell", "event.trigger", "afterValidate", options);
+				return unit.cast("event.trigger", "afterValidate", options);
 			});
 
 		}
@@ -2963,13 +3119,39 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Form Perk Class
 	// =============================================================================
 
-	class FormPerk extends BM.Perk
+	class FormPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"form",
+			"order":			310,
+			"depends":			"ValidationPerk",
+		};
+		static #__skills = {
+			"build":			FormPerk.#_build,
+		};
+		static #__spells = {
+			"submit":				FormPerk.#_submit,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -2978,19 +3160,58 @@
 		static get info()
 		{
 
-			return {
-				"section":		"form",
-				"order":		310,
-				"depends":		"ValidationPerk",
-			};
+			return FormPerk.#__info;
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+
+		static get skills()
+		{
+
+			return FormPerk.#__skills;
+
+		}
+
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onAfterTransform(sender, e, ex)
+		static get spells()
+		{
+
+			return FormPerk.#__spells;
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Methods
+		// -------------------------------------------------------------------------
+
+		static init(unit, options)
+		{
+
+			// Init unit vault
+			FormPerk.#__vault.set(unit, {
+				"lastItems":	{},
+			});
+
+			// Upgrade unit
+			unit.upgrade("inventory", "form.cancelSubmit", false);
+
+			// Add event handlers
+			unit.use("event.add", "afterTransform", {"handler":FormPerk.#FormPerk_onAfterTransform, "order":FormPerk.info["order"]});
+			unit.use("event.add", "doClear", {"handler":FormPerk.#FormPerk_onDoClear, "order":FormPerk.info["order"]});
+			unit.use("event.add", "beforeFill", {"handler":FormPerk.#FormPerk_onBeforeFill, "order":FormPerk.info["order"]});
+			unit.use("event.add", "doFill", {"handler":FormPerk.#FormPerk_onDoFill, "order":FormPerk.info["order"]});
+			unit.use("event.add", "doCollect", {"handler":FormPerk.#FormPerk_onDoCollect, "order":FormPerk.info["order"]});
+			unit.use("event.add", "afterCollect", {"handler":FormPerk.#FormPerk_onAfterCollect, "order":FormPerk.info["order"]});
+
+		}
+
+		// -------------------------------------------------------------------------
+		//	Event Handlers (Unit)
+		// -------------------------------------------------------------------------
+
+		static #FormPerk_onAfterTransform(sender, e, ex)
 		{
 
 			FormUtil.hideConditionalElements(this);
@@ -2999,12 +3220,12 @@
 
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onDoClear(sender, e, ex)
+		static #FormPerk_onDoClear(sender, e, ex)
 		{
 
 			if (this.get("setting", "form.options.autoClear", true))
 			{
-				let target = BM.Util.safeGet(e.detail, "target", "");
+				let target = core.Util.safeGet(e.detail, "target", "");
 				let options = Object.assign({"target":target, "triggerEvent":"change"}, e.detail.options);
 
 				ValueUtil.clearFields(this, options);
@@ -3014,35 +3235,35 @@
 
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onBeforeFill(sender, e, ex)
+		static #FormPerk_onBeforeFill(sender, e, ex)
 		{
 
 			if (e.detail.refill)
 			{
-				e.detail.items = this.get("vault", "form.lastItems");
+				e.detail.items = FormPerk.#__vault.get(this)["lastItems"];
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onDoFill(sender, e, ex)
+		static #FormPerk_onDoFill(sender, e, ex)
 		{
 
 			if (this.get("setting", "form.options.autoFill", true))
 			{
-				let rootNode = ( e.detail && "rootNode" in e.detail ? BM.Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
+				let rootNode = ( e.detail && "selector" in e.detail ? core.Util.scopedSelectorAll(this, e.detail.rootNode)[0] : this );
 				ValueUtil.setFields(rootNode, e.detail.items, {"resources":this.get("inventory", "resource.resources"), "triggerEvent":true});
 				FormUtil.showConditionalElements(this, e.detail.items);
 			}
 
-			this.set("vault", "form.lastItems", e.detail.items);
+			FormPerk.#__vault.get(this)["lastItems"] = e.detail.items;
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onDoCollect(sender, e, ex)
+		static #FormPerk_onDoCollect(sender, e, ex)
 		{
 
 			if (this.get("setting", "form.options.autoCollect", true))
@@ -3054,40 +3275,19 @@
 
 		// -------------------------------------------------------------------------
 
-		static FormPerk_onAfterCollect(sender, e, ex)
+		static #FormPerk_onAfterCollect(sender, e, ex)
 		{
 
 			// Collect only submittable data
 			if (this.get("setting", "form.options.autoCrop", true))
 			{
-				e.detail.items = FormPerk.__collectData(this, e.detail.items);
+				e.detail.items = FormPerk.#__collectData(this, e.detail.items);
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Methods
-		// -------------------------------------------------------------------------
-
-		static init(unit, options)
-		{
-
-			// Upgrade unit
-			this.upgrade(unit, "skill", "form.build", function(...args) { return FormPerk._build(...args); });
-			this.upgrade(unit, "spell", "form.submit", function(...args) { return FormPerk._submit(...args); });
-			this.upgrade(unit, "state", "form.cancelSubmit", false);
-			this.upgrade(unit, "vault", "form.lastItems", {});
-			this.upgrade(unit, "event", "afterTransform", FormPerk.FormPerk_onAfterTransform);
-			this.upgrade(unit, "event", "doClear", FormPerk.FormPerk_onDoClear);
-			this.upgrade(unit, "event", "beforeFill", FormPerk.FormPerk_onBeforeFill);
-			this.upgrade(unit, "event", "doFill", FormPerk.FormPerk_onDoFill);
-			this.upgrade(unit, "event", "doCollect", FormPerk.FormPerk_onDoCollect);
-			this.upgrade(unit, "event", "afterCollect", FormPerk.FormPerk_onAfterCollect);
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -3099,13 +3299,15 @@
 		 * @param	{Object}		items				Items to fill elements.
 		 * @param	{Object}		options				Options.
 		 */
-		static _build(unit, element, items, options)
+		static #_build(unit, element, items, options)
 		{
 
 			FormUtil.build(element, items, options);
 
 		}
 
+		// -------------------------------------------------------------------------
+		//  Spells (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -3116,42 +3318,34 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _submit(unit, options)
+		static async #_submit(unit, options)
 		{
 
 			options = options || {};
-			unit.set("state", "form.cancelSubmit", false);
+			unit.set("inventory", "form.cancelSubmit", false);
 
-			return Promise.resolve().then(() => {
-				// Collect values
-				return FormPerk.__collect(unit, options);
-			}).then(() => {
-				// Validate values
-				if (unit.get("setting", "form.options.autoValidate", true))
+			// Collect values
+			await FormPerk.#__collect(unit, options);
+
+			// Validate values
+			if (unit.get("setting", "form.options.autoValidate", true))
+			{
+				options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
+				await unit.cast("validation.validate", options);
+				if (!unit.get("inventory", "validation.validationResult.result"))
 				{
-					options["validatorName"] = options["validatorName"] || unit.get("setting", "form.options.validatorName");
-					return unit.use("spell", "validation.validate", options).then(() => {
-						if (!unit.get("state", "validation.validationResult.result"))
-						{
-							unit.set("state", "form.cancelSubmit", true);
-						}
-					});
+					unit.set("inventory", "form.cancelSubmit", true);
 				}
-			}).then(() => {
-				// Submit values
-				console.debug(`FormPerk._submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
-				return unit.use("spell", "event.trigger", "beforeSubmit", options).then(() => {
-					if (!unit.get("state", "form.cancelSubmit"))
-					{
-						return Promise.resolve().then(() => {
-							return unit.use("spell", "event.trigger", "doSubmit", options);
-						}).then(() => {
-							console.debug(`FormPerk._submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
-							return unit.use("spell", "event.trigger", "afterSubmit", options);
-						});
-					}
-				});
-			});
+			}
+			// Submit values
+			console.debug(`FormPerk.#_submit(): Submitting unit. name=${unit.tagName}, id=${unit.id}`);
+			await unit.cast("event.trigger", "beforeSubmit", options);
+			if (!unit.get("inventory", "form.cancelSubmit"))
+			{
+				await unit.cast("event.trigger", "doSubmit", options);
+				console.debug(`FormPerk.#_submit(): Submitted unit. name=${unit.tagName}, id=${unit.id}`);
+				await unit.cast("event.trigger", "afterSubmit", options);
+			}
 
 		}
 
@@ -3167,18 +3361,14 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static __collect(unit, options)
+		static async #__collect(unit, options)
 		{
 
-			return Promise.resolve().then(() => {
-				console.debug(`FormPerk.__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "beforeCollect", options);
-			}).then(() => {
-				return unit.use("spell", "event.trigger", "doCollect", options);
-			}).then(() => {
-				console.debug(`FormPerk.__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "afterCollect", options);
-			});
+			console.debug(`FormPerk.#__collect(): Collecting data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			await unit.cast("event.trigger", "beforeCollect", options);
+			await unit.cast("event.trigger", "doCollect", options);
+			console.debug(`FormPerk.#__collect(): Collected data. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			await unit.cast("event.trigger", "afterCollect", options);
 
 		}
 
@@ -3192,13 +3382,13 @@
 		 *
 		 * @return  {Object}		Collected data.
 		 */
-		static __collectData(unit, items)
+		static #__collectData(unit, items)
 		{
 
 			let submitItem = {};
 
 			// Collect values only from nodes that has [bm-submit] attribute.
-			let nodes = BM.Util.scopedSelectorAll(unit, "[bm-submit]");
+			let nodes = core.Util.scopedSelectorAll(unit, "[bm-submit]");
 			nodes = Array.prototype.slice.call(nodes, 0);
 			nodes.forEach((elem) => {
 				let key = elem.getAttribute("bm-bind");
@@ -3212,13 +3402,41 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	List Perk Class
 	// =============================================================================
 
-	class ListPerk extends BM.Perk
+	class ListPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"list",
+			"order":			310,
+		};
+		static #__skills = {
+			"get":				ListPerk.#_getItems,
+			"update":			ListPerk.#_updateRow,
+			"add":				ListPerk.#_addRow,
+	//		"remove":			ListPerk.#_removeRow,
+		};
+		static #__spells = {
+			"transformRow":		ListPerk.#_transformRow,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -3227,10 +3445,25 @@
 		static get info()
 		{
 
-			return {
-				"section":		"list",
-				"order":		310,
-			};
+			return ListPerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get skills()
+		{
+
+			return ListPerk.#__skills;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return ListPerk.#__spells;
 
 		}
 
@@ -3241,66 +3474,181 @@
 		static init(unit, options)
 		{
 
+			// Init unit vault
+			ListPerk.#__vault.set(unit, {
+				"lastItems":	{},
+				"listRootNode":	null,
+			});
+
 			// Upgrade unit
-			this.upgrade(unit, "spell", "list.transformRow", function(...args) { return ListPerk._transformRow(...args); });
-			this.upgrade(unit, "vault", "list.lastItems", {});
-			this.upgrade(unit, "state", "list.active.skinName", "");
-			this.upgrade(unit, "event", "afterTransform", ListPerk.ListPerk_onAfterTransform);
-			this.upgrade(unit, "event", "beforeFill", ListPerk.ListPerk_onBeforeFill);
-			this.upgrade(unit, "event", "doFill", ListPerk.ListPerk_onDoFill);
+			unit.upgrade("inventory", "list.active.skinName", "");
+
+			// Add event handlers
+			unit.use("event.add", "afterTransform", {"handler":ListPerk.#ListPerk_onAfterTransform, "order":ListPerk.info["order"]});
+			unit.use("event.add", "doClear", {"handler":ListPerk.#ListPerk_onDoClear, "order":ListPerk.info["order"]});
+			unit.use("event.add", "beforeFill", {"handler":ListPerk.#ListPerk_onBeforeFill, "order":ListPerk.info["order"]});
+			unit.use("event.add", "doFill", {"handler":ListPerk.#ListPerk_onDoFill, "order":ListPerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static ListPerk_onAfterTransform(sender, e, ex)
+		static #ListPerk_onAfterTransform(sender, e, ex)
 		{
 
 			let rootNode = this.get("setting", "list.options.listRootNode");
-			this._listRootNode = ( rootNode ? BM.Util.scopedSelectorAll(this.unitRoot, rootNode)[0] : this.unitRoot );
-			BM.Util.assert(this._listRootNode, `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.get("setting", "setting.listRootNode")}`);
+			let unitRoot = this.get("inventory", "basic.unitRoot");
+			ListPerk.#__vault.get(this)["listRootNode"] = ( rootNode ? core.Util.scopedSelectorAll(unitRoot, rootNode)[0] : unitRoot );
+			core.Util.assert(ListPerk.#__vault.get(this)["listRootNode"], () => `List.ListPerk_onAfterTransform(): List root node not found. name=${this.tagName}, listRootNode=${this.get("setting", "setting.listRootNode")}`);
 
-			return ListPerk._transformRow(this, this.get("setting", "list.options.rowSkinName", "row"));
+			return ListPerk.#_transformRow(this, this.get("setting", "list.options.rowSkinName", "row"));
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static ListPerk_onBeforeFill(sender, e, ex)
+		static #ListPerk_onDoClear(sender, e, ex)
+		{
+
+			ListPerk.#__vault.get(this)["listRootNode"].innerHTML = "";
+			this.set("inventory", "list.rows", []);
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static #ListPerk_onBeforeFill(sender, e, ex)
 		{
 
 			if (e.detail.refill)
 			{
-				e.detail.items = this.get("vault", "list.lastItems");
+				e.detail.items = ListPerk.#__vault.get(this)["lastItems"];
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static ListPerk_onDoFill(sender, e, ex)
+		static async #ListPerk_onDoFill(sender, e, ex)
 		{
 
-			let builder = ( BM.Util.safeGet(e.detail.options, "async", this.get("setting", "list.options.async", true)) ? ListPerk.__buildAsync : ListPerk.__buildSync );
+			let builder = ( core.Util.safeGet(e.detail.options, "async", this.get("setting", "list.options.async", true)) ? ListPerk.#__buildAsync : ListPerk.#__buildSync );
 			let fragment = document.createDocumentFragment();
+			this.set("inventory", "list.rows", []);
 
-			return Promise.resolve().then(() => {
-				return this.use("spell", "event.trigger", "beforeBuildRows");
-			}).then(() => {
-				return builder(this, fragment, e.detail.items, e.detail);
-			}).then(() => {
-				this._listRootNode.replaceChildren(fragment);
-				this.set("vault", "list.lastItems", e.detail.items);
+			await this.cast("event.trigger", "beforeBuildRows");
 
-				return this.use("spell", "event.trigger", "afterBuildRows");
-			});
+			await builder(this, fragment, e.detail.items, e.detail);
+			ListPerk.#__vault.get(this)["listRootNode"].replaceChildren(fragment);
+			ListPerk.#__vault.get(this)["lastItems"] = e.detail.items;
+
+			await this.cast("event.trigger", "afterBuildRows");
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Units)
+		// -------------------------------------------------------------------------
+
+		static #_addRow(unit, items, options)
+		{
+
+			let builder = (unit.get("setting", "list.options.async", true) ? ListPerk.#__buildAsync : ListPerk.#__buildSync);
+			builder(unit, ListPerk.#__vault.get(unit)["listRootNode"], items, options);
+			/*
+			console.log("@@@add", options);
+
+			let activeRowSkinName = unit.get("inventory", "list.active.skinName");
+			let skinInfo = unit.get("inventory", "skin.skins");
+			let skin = skinInfo[activeRowSkinName].HTML;
+			let rowEvents = unit.get("setting", "list.rowevents");
+
+			// Install row element event handlers
+			if (rowEvents)
+			{
+				Object.keys(rowEvents).forEach((elementName) => {
+					unit.use("event.init", elementName, rowEvents[elementName], element);
+				});
+			}
+
+			// Call event handlers
+			unit.use("event.triggerSync", "beforeFillRow", options);
+			FormUtil.showConditionalElements(element, options["item"]);
+			if (unit.get("setting", "list.options.autoFill", true))
+			{
+				ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "resource.resources")});
+			}
+			unit.use("event.triggerSync", "doFillRow", options);
+			unit.use("event.triggerSync", "afterFillRow", options);
+
+			let element = ListPerk.#__createRow(skin);
+	//		this._listRootNode.appendChild(element);
+			ListPerk.#__vault.get(unit)["listRootNode"].appendChild(element);
+			*/
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static async #_updateRow(unit, index, item)
+		{
+
+			let options = {
+				"no":		index,
+				"item":		item,
+			};
+			let rows = unit.get("inventory", "list.rows");
+			let element = rows[index];
+
+			if (unit.get("setting", "list.options.async", true))
+			{
+				// Async
+				await unit.cast("event.trigger", "beforeFillRow", options);
+				FormUtil.showConditionalElements(element, item);
+				if (unit.get("setting", "list.options.autoFill", true))
+				{
+					ValueUtil.setFields(element, item, {"resources":unit.get("inventory", "inventory", "resource.resources")});
+				}
+				await unit.cast("event.trigger", "doFillRow", options);
+				await unit.cast("event.trigger", "afterFillRow", options);
+			} else {
+				// Sync
+				unit.use("event.triggerSync", "beforeFillRow", options);
+				FormUtil.showConditionalElements(element, item);
+				if (unit.get("setting", "list.options.autoFill", true))
+				{
+					ValueUtil.setFields(element, item, {"resources":unit.get("inventory", "resource.resources")});
+				}
+				unit.use("event.triggerSync", "doFillRow", options);
+				unit.use("event.triggerSync", "afterFillRow", options);
+			}
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static #_getItems(unit, options)
+		{
+
+			let items = [];
+			let rows = unit.get("inventory", "list.rows");
+			let shaper = (options && options["shaper"]) || ((item) => {return item});
+
+			for (let i = 0; i < rows.length; i++)
+			{
+				let item = ValueUtil.getFields(rows[i]);
+				shaper(item);
+				items.push(item);
+			}
+
+			return items;
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Spells (Units)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -3312,26 +3660,21 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _transformRow(unit, skinName, options)
+		static async #_transformRow(unit, skinName, options)
 		{
 
 			options = options || {};
 
-			if (unit.get("state", "list.active.skinName") === skinName)
+			if (unit.get("inventory", "list.active.skinName") === skinName)
 			{
 				return Promise.resolve();
 			}
 
-			return Promise.resolve().then(() => {
-				console.debug(`ListPerk._transformRow(): Switching the row skin. name=${unit.tagName}, rowSkinName=${skinName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-				return unit.use("spell", "skin.summon", skinName);
-			}).then(() => {
-				unit.set("state", "list.active.skinName", skinName);
-			}).then(() => {
-				return unit.use("spell", "event.trigger", "afterTransformRow", options);
-			}).then(() => {
-				console.debug(`ListPerk._transformRow(): Switched the row skin. name=${unit.tagName}, rowSkinName=${skinName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-			});
+			console.debug(`ListPerk.#_transformRow(): Switching the row skin. name=${unit.tagName}, rowSkinName=${skinName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			await unit.cast("skin.summon", skinName);
+			unit.set("inventory", "list.active.skinName", skinName);
+			await unit.cast("event.trigger", "afterTransformRow", options);
+			console.debug(`ListPerk.#_transformRow(): Switched the row skin. name=${unit.tagName}, rowSkinName=${skinName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
 
 		}
 
@@ -3349,13 +3692,14 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static __buildSync(unit, fragment, items, options)
+		static #__buildSync(unit, fragment, items, options)
 		{
 
-			let skinInfo = unit.get("inventory", "inventory", "skin.skins");
-			let activeRowSkinName = unit.get("state", "list.active.skinName");
+			let skinInfo = unit.get("inventory", "skin.skins");
+			let activeRowSkinName = unit.get("inventory", "list.active.skinName");
+			let rows = unit.get("inventory", "list.rows", []);
 
-			BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildSync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
+			core.Util.assert(skinInfo[activeRowSkinName], () => `List.#__buildSync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
 			let rowEvents = unit.get("setting", "list.rowevents");
 			let skin = skinInfo[activeRowSkinName].HTML;
@@ -3363,38 +3707,40 @@
 			let chain = Promise.resolve();
 			for (let i = 0; i < items.length; i++)
 			{
-				chain = chain.then(() => {
+				chain = chain.then(async () => {
 					options["no"] = i;
 					options["item"] = items[i];
 
 					// Append a row
-					let element = ListPerk.__createRow(skin);
+					let element = ListPerk.#__createRow(skin);
 					fragment.appendChild(element);
 					options["element"] = element;
+					rows.push(element);
 
 					// Install row element event handlers
 					if (rowEvents)
 					{
 						Object.keys(rowEvents).forEach((elementName) => {
-							unit.use("skill", "event.init", elementName, rowEvents[elementName], element);
+							unit.use("event.init", elementName, rowEvents[elementName], element);
 						});
 					}
 
-					return unit.use("spell", "event.trigger", "beforeFillRow", options).then(() => {
-						if (unit.get("setting", "list.options.autoFill", true))
-						{
-							// Fill fields
-							FormUtil.showConditionalElements(element, options["item"]);
-							ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "inventory", "resource.resources")});
-						}
-						return unit.use("spell", "event.trigger", "doFillRow", options);
-					}).then(() => {
-						return unit.use("spell", "event.trigger", "afterFillRow", options);
-					});
+					await unit.cast("event.trigger", "beforeFillRow", options);
+					if (unit.get("setting", "list.options.autoFill", true))
+					{
+						// Fill fields
+						FormUtil.showConditionalElements(element, options["item"]);
+						ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "inventory", "resource.resources")});
+					}
+					await unit.cast("event.trigger", "doFillRow", options);
+					await unit.cast("event.trigger", "afterFillRow", options);
 				});
 			}
 
+
 			return chain.then(() => {
+				unit.set("inventory", "list.rows", rows);
+
 				delete options["no"];
 				delete options["item"];
 				delete options["element"];
@@ -3409,13 +3755,16 @@
 		 *
 		 * @param	{DocumentFragment}	fragment		Document fragment.
 		 */
-		static __buildAsync(unit, fragment, items, options)
+		static #__buildAsync(unit, fragment, items, options)
 		{
 
+			options = options || {};
+			items = items || [];
 			let skinInfo = unit.get("inventory", "skin.skins");
-			let activeRowSkinName = unit.get("state", "list.active.skinName");
+			let activeRowSkinName = unit.get("inventory", "list.active.skinName");
+			let rows = unit.get("inventory", "list.rows", []);
 
-			BM.Util.assert(skinInfo[activeRowSkinName], `List.__buildAsync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
+			core.Util.assert(skinInfo[activeRowSkinName], () => `List.#__buildAsync(): Row skin not loaded yet. name=${unit.tagName}, rowSkinName=${activeRowSkinName}`);
 
 			let rowEvents = unit.get("setting", "list.rowevents");
 			let skin = skinInfo[activeRowSkinName].HTML;
@@ -3426,28 +3775,31 @@
 				options["item"] = items[i];
 
 				// Append a row
-				let element = ListPerk.__createRow(skin);
+				let element = ListPerk.#__createRow(skin);
 				fragment.appendChild(element);
 				options["element"] = element;
+				rows.push(element);
 
 				// Install row element event handlers
 				if (rowEvents)
 				{
 					Object.keys(rowEvents).forEach((elementName) => {
-						unit.use("skill", "event.init", elementName, rowEvents[elementName], element);
+						unit.use("event.init", elementName, rowEvents[elementName], element);
 					});
 				}
 
 				// Call event handlers
-				unit.use("skill", "event.triggerSync", "beforeFillRow", options);
+				unit.use("event.triggerSync", "beforeFillRow", options);
 				FormUtil.showConditionalElements(element, options["item"]);
 				if (unit.get("setting", "list.options.autoFill", true))
 				{
 					ValueUtil.setFields(element, options["item"], {"resources":unit.get("inventory", "resource.resources")});
 				}
-				unit.use("skill", "event.triggerSync", "doFillRow", options);
-				unit.use("skill", "event.triggerSync", "afterFillRow", options);
+				unit.use("event.triggerSync", "doFillRow", options);
+				unit.use("event.triggerSync", "afterFillRow", options);
 			}
+
+			unit.set("inventory", "list.rows", rows);
 
 			delete options["no"];
 			delete options["item"];
@@ -3464,7 +3816,7 @@
 		 *
 		 * @return  {HTMLElement}	Row element.
 		 */
-		static __createRow(skin)
+		static #__createRow(skin)
 		{
 
 			let ele = document.createElement("tbody");
@@ -3476,16 +3828,61 @@
 
 		}
 
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Collect submittable data.
+		 *
+	     * @param	{Unit}			unit				Unit.
+		 *
+		 * @return  {Object}		Collected data.
+		 */
+		static #__collectData(unit)
+		{
+
+			let nodes = core.Util.scopedSelectorAll(unit, "[bm-bind]");
+			nodes = Array.prototype.slice.call(nodes, 0);
+			nodes.forEach((elem) => {
+				let key = elem.getAttribute("bm-bind");
+				items[key];
+			});
+
+			return submitItem;
+
+		}
+
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Databinding Perk class
 	// =============================================================================
 
-	class DatabindingPerk extends BM.Perk
+	class DatabindingPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"databinding",
+			"order":			320,
+		};
+		static #__skills = {
+		};
+
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -3494,10 +3891,7 @@
 		static get info()
 		{
 
-			return {
-				"section":		"databinding",
-				"order":		320,
-			};
+			return DatabindingPerk.#__info;
 
 		}
 
@@ -3510,60 +3904,70 @@
 
 			if (unit.get("setting", "databinding.options.dataType", "single") === "single")
 			{
+				// Init unit vault
+				DatabindingPerk.#__vault.set(unit, {"store": new BindableStore({
+						"resources":	unit.get("inventory", "resource.resources"),
+						"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
+					})
+				});
+
 				// Upgrade unit (single)
-				this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindData(...args); });
-				this.upgrade(unit, "vault", "databinding.store", new BindableStore({
-					"resources":	unit.get("inventory", "resource.resources"),
-					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
-				}));
-				this.upgrade(unit, "event", "beforeTransform", DatabindingPerk.DatabindingPerk_onBeforeTransform);
-				this.upgrade(unit, "event", "doFill", DatabindingPerk.DatabindingPerk_onDoFill);
+				DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindData;
+
+				// Add event handlers
+				unit.use("event.add", "beforeTransform", {"handler":DatabindingPerk.#DatabindingPerk_onBeforeTransform, "order":DatabindingPerk.info["order"]});
+				unit.use("event.add", "doFill", {"handler":DatabindingPerk.#DatabindingPerk_onDoFill, "order":DatabindingPerk.info["order"]});
 			}
 			else
 			{
+				// Init unit vault
+				DatabindingPerk.#__vault.set(unit, {"store": new BindableArrayStore({
+						"resources":	unit.get("inventory", "resource.resources"),
+						"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
+					})
+				});
+
 				// Upgrade unit (multiple)
-				this.upgrade(unit, "skill", "databinding.bindData", function(...args) { return DatabindingPerk._bindDataArray(...args); });
-				this.upgrade(unit, "vault", "databinding.store", new BindableArrayStore({
-					"resources":	unit.resources,
-					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
-				}));
-				this.upgrade(unit, "event", "doFillRow", DatabindingPerk.DatabindingPerk_onDoFillRow);
+				DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindDataArray;
+
+				// Add event handlers
+				unit.use("event.add", "doFillRow", {"handler":DatabindingPerk.#DatabindingPerk_onDoFillRow, "order":DatabindingPerk.info["order"]});
 			}
 
-			// Upgrade unit
-			this.upgrade(unit, "event", "doClear", DatabindingPerk.DatabindingPerk_onDoClear);
-			this.upgrade(unit, "event", "doCollect", DatabindingPerk.DatabindingPerk_onDoCollect);
+			// Add event handlers
+			unit.use("event.add", "doClear", {"handler":DatabindingPerk.#DatabindingPerk_onDoClear, "order":DatabindingPerk.info["order"]});
+			unit.use("event.add", "doCollect", {"handler":DatabindingPerk.#DatabindingPerk_onDoCollect, "order":DatabindingPerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static DatabindingPerk_onBeforeTransform(sender, e, ex)
+		static #DatabindingPerk_onBeforeTransform(sender, e, ex)
 		{
 
-			DatabindingPerk._bindData(this);
+			DatabindingPerk.#_bindData(this);
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static DatabindingPerk_onDoClear(sender, e, ex)
+		static #DatabindingPerk_onDoClear(sender, e, ex)
 		{
 
-			this.get("vault", "databinding.store").clear();
+			DatabindingPerk.#__vault.get(this)["store"].clear();
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static DatabindingPerk_onDoFill(sender, e, ex)
+		static #DatabindingPerk_onDoFill(sender, e, ex)
 		{
 
 			if (e.detail.items)
 			{
-				this.get("vault", "databinding.store").replace(e.detail.items);
+				DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.items);
 				FormUtil.showConditionalElements(this, e.detail.items);
 			}
 
@@ -3571,30 +3975,28 @@
 
 		// -------------------------------------------------------------------------
 
-		static DatabindingPerk_onDoFillRow(sender, e, ex)
+		static #DatabindingPerk_onDoFillRow(sender, e, ex)
 		{
 
-			console.log("%c@@@DatabindingPerk_onDoFillRow", "color:white;background-color:green", this.tagName, e.detail.no);
-
-			DatabindingPerk._bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
-			this.get("vault", "databinding.store").replace(e.detail.no, e.detail.item);
+			DatabindingPerk.#_bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
+			DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.no, e.detail.item);
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static DatabindingPerk_onDoCollect(sender, e, ex)
+		static #DatabindingPerk_onDoCollect(sender, e, ex)
 		{
 
 			if (this.get("setting", "databinding.options.autoCollect", true))
 			{
-				e.detail.items = this.get("vault", "databinding.store").items;
+				e.detail.items = DatabindingPerk.#__vault.get(this)["store"].items;
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -3603,12 +4005,12 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{HTMLElement}	rootNode			Root node.
 		 */
-		static _bindData(unit, rootNode)
+		static #_bindData(unit, rootNode)
 		{
 
 			rootNode = ( rootNode ? rootNode : unit );
 
-			let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+			let nodes = core.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 			nodes = Array.prototype.slice.call(nodes, 0);
 			if (rootNode.matches("[bm-bind]"))
 			{
@@ -3618,10 +4020,10 @@
 			nodes.forEach(elem => {
 				// Get the callback function from settings
 				let key = elem.getAttribute("bm-bind");
-				let callback = DatabindingPerk.__getCallback(unit, key);
+				let callback = DatabindingPerk.#__getCallback(unit, key);
 
 				// Bind
-				unit.get("vault", "databinding.store").bindTo(key, elem, callback);
+				DatabindingPerk.#__vault.get(unit)["store"].bindTo(key, elem, callback);
 			});
 
 		}
@@ -3635,12 +4037,12 @@
 		 * @param	{Integer}		index				Array index.
 		 * @param	{HTMLElement}	rootNode			Root node.
 		 */
-		static _bindDataArray(unit, index, rootNode)
+		static #_bindDataArray(unit, index, rootNode)
 		{
 
 			rootNode = ( rootNode ? rootNode : unit );
 
-			let nodes = BM.Util.scopedSelectorAll(rootNode, "[bm-bind]");
+			let nodes = core.Util.scopedSelectorAll(rootNode, "[bm-bind]");
 			nodes = Array.prototype.slice.call(nodes, 0);
 			if (rootNode.matches("[bm-bind]"))
 			{
@@ -3650,10 +4052,10 @@
 			nodes.forEach(elem => {
 				// Get the callback function from settings
 				let key = elem.getAttribute("bm-bind");
-				let callback = DatabindingPerk.__getCallback(unit, key);
+				let callback = DatabindingPerk.#__getCallback(unit, key);
 
 				// Bind
-				unit.get("vault", "databinding.store").bindTo(index, key, elem, callback);
+				DatabindingPerk.#__vault.get(unit)["store"].bindTo(index, key, elem, callback);
 			});
 
 		}
@@ -3668,7 +4070,7 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{String}		key					Field name.
 		 */
-		static __getCallback(unit, key)
+		static #__getCallback(unit, key)
 		{
 
 			let callback;
@@ -3692,12 +4094,21 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Locale Server Class
 	// =============================================================================
 
-	class LocaleServer extends BM.Unit
+	class LocaleServer extends core.Unit
 	{
 
 		// -------------------------------------------------------------------------
@@ -3710,15 +4121,15 @@
 			return {
 				"basic": {
 					"options": {
-						"autoRefresh":				false,
+						"autoRefresh":					false,
 					}
 				},
 				"event": {
 					"events": {
 						"this": {
 							"handlers": {
-								"beforeStart":		["LocaleServer_onBeforeStart"],
-								"doApplyLocale":	["LocaleServer_onDoApplyLocale"],
+								"beforeStart":			["LocaleServer_onBeforeStart"],
+								"doApplyLocale":		["LocaleServer_onDoApplyLocale"],
 							}
 						}
 					}
@@ -3726,17 +4137,18 @@
 				"locale": {
 					"handlers": {
 						"default": {
-							"handlerClassName":		"BITSMIST.v1.LocaleHandler",
+							"handlerClassName":			"LocaleHandler",
 						}
 					}
 				},
 				"skin": {
 					"options": {
-						"skinRef":					false,
+						"hasSkin":						false,
 					}
 				},
 				"style": {
 					"options": {
+						"hasStyle":					false,
 						"styleRef":					false,
 					}
 				},
@@ -3767,7 +4179,7 @@
 				let targetElement = ( rootNode ? document.querySelector(rootNode) : document.body );
 				let attribName = this.get("setting", "options.autoAttribute.attributeName", "data-locale");
 
-				targetElement.setAttribute(attribName, this.get("state", "locale.active.localeName"));
+				targetElement.setAttribute(attribName, this.get("inventory", "locale.active.localeName"));
 			}
 
 			// Notify locale change to clients
@@ -3790,7 +4202,7 @@
 
 			this._store.subscribe(
 				`${unit.tagName}_${unit.uniqueId}`,
-				this.__triggerEvent.bind(unit),
+				this.#__triggerEvent.bind(unit),
 			);
 
 		}
@@ -3807,10 +4219,10 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		__triggerEvent(conditions, observerInfo, options)
+		#__triggerEvent(conditions, observerInfo, options)
 		{
 
-			return this.use("spell", "locale.apply", {"localeName":options.localeName});
+			return this.cast("locale.apply", {"localeName":options.localeName});
 
 		}
 
@@ -3819,13 +4231,41 @@
 	customElements.define("bm-locale", LocaleServer);
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Locale Perk Class
 	// =============================================================================
 
-	class LocalePerk extends BM.Perk
+	class LocalePerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"locale",
+			"order":			215,
+		};
+		static #__skills = {
+			"localize":			LocalePerk.#_localize,
+			"translate":		LocalePerk.#_getLocaleMessage,
+		};
+		static #__spells = {
+			"apply":			LocalePerk.#_applyLocale,
+			"summon":			LocalePerk.#_loadMessages,
+			"addHandler":		LocalePerk.#_addHandler,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -3834,10 +4274,25 @@
 		static get info()
 		{
 
-			return {
-				"section":		"locale",
-				"order":		215,
-			};
+			return LocalePerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get skills()
+		{
+
+			return LocalePerk.#__skills;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return LocalePerk.#__spells;
 
 		}
 
@@ -3848,42 +4303,45 @@
 		static init(unit, options)
 		{
 
+			// Init unit vault
+			LocalePerk.#__vault.set(unit, {
+				"server":	null,
+			});
+
 			// Upgrade unit
-			this.upgrade(unit, "skill", "locale.localize", function(...args) { return LocalePerk._localize(...args); });
-			this.upgrade(unit, "skill", "locale.translate", function(...args) { return LocalePerk._getLocaleMessage(...args); });
-			this.upgrade(unit, "spell", "locale.apply", function(...args) { return LocalePerk._applyLocale(...args); });
-			this.upgrade(unit, "spell", "locale.summon", function(...args) { return LocalePerk._loadMessages(...args); });
-			this.upgrade(unit, "spell", "locale.addHandler", function(...args) { return LocalePerk._addHandler(...args); });
-			this.upgrade(unit, "inventory", "locale.localizers", {});
-			this.upgrade(unit, "inventory", "locale.messages", new MultiStore());
-			this.upgrade(unit, "state", "locale.active", {
+			unit.upgrade("inventory", "locale.localizers", {});
+			unit.upgrade("inventory", "locale.messages", new MultiStore());
+			unit.upgrade("inventory", "locale.active", {
 				"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language.substring(0, 2))),
 				"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 				"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 			});
-			this.upgrade(unit, "event", "doApplySettings", LocalePerk.LocalePerk_onDoApplySettings);
-			this.upgrade(unit, "event", "doSetup", LocalePerk.LocalePerk_onDoSetup);
-			this.upgrade(unit, "event", "beforeApplyLocale", LocalePerk.LocalePerk_onBeforeApplyLocale);
-			this.upgrade(unit, "event", "doApplyLocale", LocalePerk.LocalePerk_onDoApplyLocale);
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":LocalePerk.info["order"]});
+			unit.use("event.add", "doSetup", {"handler":LocalePerk.#LocalePerk_onDoSetup, "order":LocalePerk.info["order"]});
+			unit.use("event.add", "beforeApplyLocale", {"handler":LocalePerk.#LocalePerk_onBeforeApplyLocale, "order":LocalePerk.info["order"]});
+			unit.use("event.add", "doApplyLocale", {"handler":LocalePerk.#LocalePerk_onDoApplyLocale, "order":LocalePerk.info["order"]});
+
 			if (unit.get("setting", "locale.options.autoLocalizeRows"))
 			{
-				this.upgrade(unit, "event", "afterFillRow", LocalePerk.LocalePerk_onAfterFillRow);
+				unit.use("event.add", "afterFillRow", {"handler":LocalePerk.#LocalePerk_onAfterFillRow, "order":LocalePerk.info["order"]});
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static LocalePerk_onDoApplySettings(sender, e, ex)
+		static #LocalePerk_onDoApplySettings(sender, e, ex)
 		{
 
 			let promises = [];
 
 			// Add locale handlers
-			Object.entries(BM.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
-				promises.push(LocalePerk._addHandler(this, sectionName, sectionValue));
+			Object.entries(core.Util.safeGet(e.detail, "settings.locale.handlers", {})).forEach(([sectionName, sectionValue]) => {
+				promises.push(LocalePerk.#_addHandler(this, sectionName, sectionValue));
 			});
 
 			// Connect to the locale server if specified
@@ -3892,16 +4350,16 @@
 
 			if (serverNode && !(this instanceof LocaleServer))
 			{
-				promises.push(this.use("spell", "status.wait", [serverNode]).then(() => {
+				promises.push(this.cast("status.wait", [serverNode]).then(() => {
 					let server = document.querySelector(serverNode);
 					server.subscribe(this);
-					this.set("vault", "locale.server", server);
+					LocalePerk.#__vault.get(this)["server"] = server;
 
 					// Synchronize to the server's locales
-					let localeSettings = server.get("state", "locale.active");
-					this.set("state", "locale.active.localeName", localeSettings["localeName"]);
-					this.set("state", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-					this.set("state", "locale.active.currencyName", localeSettings["currencyName"]);
+					let localeSettings = server.get("inventory", "locale.active");
+					this.set("inventory", "locale.active.localeName", localeSettings["localeName"]);
+					this.set("inventory", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+					this.set("inventory", "locale.active.currencyName", localeSettings["currencyName"]);
 				}));
 			}
 
@@ -3911,50 +4369,101 @@
 
 		// -------------------------------------------------------------------------
 
-		static LocalePerk_onDoSetup(sender, e, ex)
+		static #LocalePerk_onDoSetup(sender, e, ex)
 		{
 
-			return LocalePerk._applyLocale(this, {"localeName":this.get("state", "locale.active.localeName")});
+			return LocalePerk.#_applyLocale(this, {"localeName":this.get("inventory", "locale.active.localeName")});
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static LocalePerk_onBeforeApplyLocale(sender, e, ex)
+		static #LocalePerk_onBeforeApplyLocale(sender, e, ex)
 		{
 
-			return this.use("spell", "locale.summon", e.detail.localeName);
+			return this.cast("locale.summon", e.detail.localeName);
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static LocalePerk_onDoApplyLocale(sender, e, ex)
+		static #LocalePerk_onDoApplyLocale(sender, e, ex)
 		{
 
 			// Localize
-			LocalePerk._localize(this, this);
+			LocalePerk.#_localize(this, this);
 
 			// Refill (Do not refill when starting)
-			if (this.get("state", "status.status") === "ready")
+			if (this.get("inventory", "status.status") === "ready")
 			{
-				return this.use("spell", "basic.fill", {"refill":true});
+				return this.cast("basic.fill", {"refill":true});
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static LocalePerk_onAfterFillRow(sender, e, ex)
+		static #LocalePerk_onAfterFillRow(sender, e, ex)
 		{
 
 			// Localize a row
-			LocalePerk._localize(this, e.detail.element, e.detail.item);
+			LocalePerk.#_localize(this, e.detail.element, e.detail.item);
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Localize all the bm-locale fields with i18 messages using each handler.
+		 *
+	     * @param	{Unit}			unit				Unit.
+		 * @param	{HTMLElement}	rootNode			Target root node to localize.
+		 * @param	{Object}		interpolation		Interpolation parameters.
+		 */
+		static #_localize(unit, rootNode, interpolation)
+		{
+
+			rootNode = rootNode || unit;
+
+			Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
+				unit.get("inventory", `locale.localizers.${handlerName}`).localize(
+					rootNode,
+					Object.assign({"interpolation":interpolation}, unit.get("inventory", "locale.active"))
+				);
+			});
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Get the locale message.
+		 *
+		 * @param	{Unit}			unit				Unit.
+		 * @param	{String}		key					Key.
+		 * @param	{String}		localeName			Locale name.
+		 *
+		 * @return  {Promise}		Promise.
+		 */
+		static #_getLocaleMessage(unit, key, localeName)
+		{
+
+			localeName = localeName || unit.get("inventory", "locale.active.localeName");
+
+			let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
+			if (value === undefined)
+			{
+				value = unit.get("inventory", "locale.messages").get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
+			}
+
+			return value;
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -3966,15 +4475,15 @@
 		 *
 		 * @return 	{Promise}		Promise.
 	     */
-		static _addHandler(unit, handlerName, options)
+		static #_addHandler(unit, handlerName, options)
 		{
 
 			let promise = Promise.resolve();
 
 			if (!unit.get("inventory", `locale.localizers.${handlerName}`))
 			{
-				let handlerClassName = BM.Util.safeGet(options, "handlerClassName", "BITSMIST.v1.LocaleHandler");
-				let handler = BM.ClassUtil.createObject(handlerClassName, unit, options);
+				let handlerClassName = core.Util.safeGet(options, "handlerClassName", "LocaleHandler");
+				let handler = this.createHandler(handlerClassName, unit, options);
 				unit.set("inventory", `locale.localizers.${handlerName}`, handler);
 
 				promise = handler.init(options);
@@ -3992,42 +4501,15 @@
 	     * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static _applyLocale(unit, options)
+		static async #_applyLocale(unit, options)
 		{
 
-			return Promise.resolve().then(() => {
-				console.debug(`LocalePerk._applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-				return unit.use("spell", "event.trigger", "beforeApplyLocale", options);
-			}).then(() => {
-				unit.set("state", "locale.active.localeName", options["localeName"]);
-				return unit.use("spell", "event.trigger", "doApplyLocale", options);
-			}).then(() => {
-				console.debug(`LocalePerk._applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
-				return unit.use("spell", "event.trigger", "afterApplyLocale", options);
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Localize all the bm-locale fields with i18 messages using each handler.
-		 *
-	     * @param	{Unit}			unit				Unit.
-		 * @param	{HTMLElement}	rootNode			Target root node to localize.
-		 * @param	{Object}		interpolation		Interpolation parameters.
-		 */
-		static _localize(unit, rootNode, interpolation)
-		{
-
-			rootNode = rootNode || unit;
-
-			Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
-				unit.get("inventory", `locale.localizers.${handlerName}`).localize(
-					rootNode,
-					Object.assign({"interpolation":interpolation}, unit.get("state", "locale.active"))
-				);
-			});
+			console.debug(`LocalePerk.#_applyLocale(): Applying locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
+			await unit.cast("event.trigger", "beforeApplyLocale", options);
+			unit.set("inventory", "locale.active.localeName", options["localeName"]);
+			await unit.cast("event.trigger", "doApplyLocale", options);
+			console.debug(`LocalePerk.#_applyLocale(): Applied locale. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}, localeName=${options["localeName"]}`);
+			await unit.cast("event.trigger", "afterApplyLocale", options);
 
 		}
 
@@ -4042,7 +4524,7 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _loadMessages(unit, localeName, options)
+		static #_loadMessages(unit, localeName, options)
 		{
 
 			let promises = [];
@@ -4055,42 +4537,35 @@
 
 		}
 
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Get the locale message.
-		 *
-		 * @param	{Unit}			unit				Unit.
-		 * @param	{String}		key					Key.
-		 * @param	{String}		localeName			Locale name.
-		 *
-		 * @return  {Promise}		Promise.
-		 */
-		static _getLocaleMessage(unit, key, localeName)
-		{
-
-			localeName = localeName || unit.get("state", "locale.active.localeName");
-
-			let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
-			if (value === undefined)
-			{
-				value = unit.get("inventory", "locale.messages").get(`${unit.get("state", "locale.fallbackLocaleName")}.${key}`);
-			}
-
-			return value;
-
-		}
-
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Key Perk class
 	// =============================================================================
 
-	class KeyPerk extends BM.Perk
+	class KeyPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		//static #__isComposing = false;
+		static #__info = {
+			"sectionName":	"key",
+			"order":		800,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -4099,10 +4574,7 @@
 		static get info()
 		{
 
-			return {
-				"section":		"key",
-				"order":		800,
-			};
+			return KeyPerk.#__info;
 
 		}
 
@@ -4114,31 +4586,33 @@
 		{
 
 			// Upgrade unit
-			this.upgrade(unit, "state", "key.isComposing", false);
-			this.upgrade(unit, "event", "afterTransform", KeyPerk.KeyPerk_onAfterTransform);
+			unit.upgrade("inventory", "key.isComposing", false);
+
+			// Add event handlers
+			unit.use("event.add", "afterTransform", {"handler":KeyPerk.#KeyPerk_onAfterTransform, "order":KeyPerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static KeyPerk_onAfterTransform(sender, e, ex)
+		static #KeyPerk_onAfterTransform(sender, e, ex)
 		{
 
 			let keys = this.get("setting", "key.keys");
 			if (keys)
 			{
 				// Init keys
-				let actions = KeyPerk.__getActions(keys);
-				this.addEventListener("keydown", function(e){KeyPerk.KeyPerk_onKeyDown.call(this, e, this);});
-				this.addEventListener("keyup", function(e){KeyPerk.KeyPerk_onKeyUp.call(this, e, this, keys, actions);});
+				let actions = KeyPerk.#__getActions(keys);
+				this.addEventListener("keydown", function(e){KeyPerk.#KeyPerk_onKeyDown.call(this, e, this);});
+				this.addEventListener("keyup", function(e){KeyPerk.#KeyPerk_onKeyUp.call(this, e, this, keys, actions);});
 				//this.addEventListener("compositionstart", function(e){KeyPerk.onCompositionStart.call(this, e, this, keys);});
 				//this.addEventListener("compositionend", function(e){KeyPerk.onCompositionEnd.call(this, e, this, keys);});
 
 				// Init buttons
 				Object.entries(keys).forEach(([sectionName, sectionValue]) => {
-					KeyPerk.__initButtons(this, sectionName, sectionValue);
+					KeyPerk.#__initButtons(this, sectionName, sectionValue);
 				});
 			}
 
@@ -4152,10 +4626,10 @@
 		 * @param	{Object}		e					Event info.
 		 * @param	{Unit}			unit				Unit.
 		 */
-		static KeyPerk_onKeyDown(e, unit)
+		static #KeyPerk_onKeyDown(e, unit)
 		{
 
-			unit.set("state", "key.isComposing", ( e.keyCode === 229 ? true : false ));
+			unit.set("inventory", "key.isComposing", ( e.keyCode === 229 ? true : false ));
 
 		}
 
@@ -4169,16 +4643,16 @@
 		 * @param	{Object}		options				Options.
 		 * @param	{Object}		actions				Action info.
 		 */
-		static KeyPerk_onKeyUp(e, unit, options, actions)
+		static #KeyPerk_onKeyUp(e, unit, options, actions)
 		{
 
 			// Ignore all key input when composing.
-			if (unit.get("state", "key.isComposing"))
+			if (unit.get("inventory", "key.isComposing"))
 			{
 				return;
 			}
 
-			let key  = ( e.key ? e.key : KeyPerk.__getKeyfromKeyCode(e.keyCode) );
+			let key  = ( e.key ? e.key : KeyPerk.#__getKeyfromKeyCode(e.keyCode) );
 			switch (key)
 			{
 				case "Esc":		key = "Escape";		break;
@@ -4207,10 +4681,10 @@
 		 * @param	{Object}		options				Options.
 		 */
 		/*
-		static onCompositionStart(e, unit, options)
+		static #onCompositionStart(e, unit, options)
 		{
 
-			unit.__isComposing = true;
+			unit.#__isComposing = true;
 
 		}
 		*/
@@ -4225,10 +4699,10 @@
 		 * @param	{Object}		options				Options.
 		 */
 		/*
-		static onCompositionEnd(e, unit, options)
+		static #onCompositionEnd(e, unit, options)
 		{
 
-			unit.__isComposing = false;
+			unit.#__isComposing = false;
 
 		}
 		*/
@@ -4244,25 +4718,25 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __defaultSubmit(e, unit, options)
+		static async #__defaultSubmit(e, unit, options)
 		{
 
-			return unit.use("spell", "form.submit").then(() => {
-				if (!unit.get("state", "form.cancelSubmit"))
-				{
-					// Modal result
-					if (unit.get("state", "dialog.isModal"))
-					{
-						unit.set("state", "dialog.modalResult.result", true);
-					}
+			await unit.cast("form.submit");
 
-					// Auto close
-					if (options && options["autoClose"])
-					{
-						return unit.use("spell", "dialog.close", {"reason":"submit"});
-					}
+			if (!unit.get("inventory", "form.cancelSubmit"))
+			{
+				// Modal result
+				if (unit.get("inventory", "dialog.isModal"))
+				{
+					unit.set("inventory", "dialog.modalResult.result", true);
 				}
-			});
+
+				// Auto close
+				if (options && options["autoClose"])
+				{
+					await unit.cast("dialog.close", {"reason":"submit"});
+				}
+			}
 
 		}
 
@@ -4275,10 +4749,10 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __defaultCancel(e, unit, options)
+		static #__defaultCancel(e, unit, options)
 		{
 
-			return unit.use("spell", "dialog.close", {"reason":"cancel"});
+			return unit.cast("dialog.close", {"reason":"cancel"});
 
 		}
 
@@ -4291,7 +4765,7 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __defaultClear(e, unit, options)
+		static #__defaultClear(e, unit, options)
 		{
 
 			let target = "";
@@ -4301,7 +4775,7 @@
 				target = this.getAttribute("bm-cleartarget");
 			}
 
-			return unit.use("spell", "basic.clear", {"target":target, "options":options["options"]});
+			return unit.cast("basic.clear", {"target":target, "options":options["options"]});
 
 		}
 
@@ -4312,7 +4786,7 @@
 		 *
 		 * @param	{Integer}		code				Key code.
 		 */
-		static __getKeyfromKeyCode(code)
+		static #__getKeyfromKeyCode(code)
 		{
 
 			let ret;
@@ -4340,13 +4814,13 @@
 		 * @param	{String}		action				Action.
 		 * @param	{Object}		options				Options.
 		 */
-		static __initButtons(unit, action, options)
+		static #__initButtons(unit, action, options)
 		{
 
-			if (options && options["rootNode"])
+			if (options && options["selector"])
 			{
-				let handler = ( options["handler"] ? options["handler"] : KeyPerk.__getDefaultHandler(action) );
-				let elements = BM.Util.scopedSelectorAll(unit, options["rootNode"]);
+				let handler = ( options["handler"] ? options["handler"] : KeyPerk.#__getDefaultHandler(action) );
+				let elements = core.Util.scopedSelectorAll(unit, options["selector"]);
 
 				elements.forEach((element) => {
 					element.addEventListener("click", function(e){handler.call(this, e, unit, options);});
@@ -4364,7 +4838,7 @@
 		 *
 		 * @return 	{Object}		Action info.
 		 */
-		static __getActions(settings)
+		static #__getActions(settings)
 		{
 
 			let actions = {};
@@ -4376,7 +4850,7 @@
 				{
 					actions[keys[i]] = {};
 					actions[keys[i]]["type"] = key;
-					actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyPerk.__getDefaultHandler(key) );
+					actions[keys[i]]["handler"] = ( settings[key]["handler"] ? settings[key]["handler"] : KeyPerk.#__getDefaultHandler(key) );
 					actions[keys[i]]["option"] = settings[key];
 				}
 			});
@@ -4394,7 +4868,7 @@
 		 *
 		 * @return 	{Function}		Handler.
 		 */
-		static __getDefaultHandler(action)
+		static #__getDefaultHandler(action)
 		{
 
 			let handler;
@@ -4402,13 +4876,13 @@
 			switch (action)
 			{
 			case "submit":
-				handler = KeyPerk.__defaultSubmit;
+				handler = KeyPerk.#__defaultSubmit;
 				break;
 			case "clear":
-				handler = KeyPerk.__defaultClear;
+				handler = KeyPerk.#__defaultClear;
 				break;
 			case "cancel":
-				handler = KeyPerk.__defaultCancel;
+				handler = KeyPerk.#__defaultCancel;
 				break;
 			}
 
@@ -4419,13 +4893,31 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Chain Perk class
 	// =============================================================================
 
-	class ChainPerk extends BM.Perk
+	class ChainPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__info = {
+			"sectionName":	"chain",
+			"order":		800,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -4434,10 +4926,7 @@
 		static get info()
 		{
 
-			return {
-				"section":		"chain",
-				"order":		800,
-			};
+			return ChainPerk.#__info;
 
 		}
 
@@ -4448,8 +4937,8 @@
 		static init(unit, options)
 		{
 
-			// Upgrade unit
-			this.upgrade(unit, "event", "doApplySettings", ChainPerk.onDoApplySettings);
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":ChainPerk.#ChainPerk_onDoApplySettings, "order":ChainPerk.info["order"]});
 
 		}
 
@@ -4462,26 +4951,26 @@
 			if (chains)
 			{
 				Object.keys(chains).forEach((eventName) => {
-					unit.removeEventHandler(eventName, {"handler":ChainPerk.onDoApplySettings, "options":chains[eventName]});
+					unit.removeEventHandler(eventName, {"handler":ChainPerk.#ChainPerk_onDoApplySettings, "options":chains[eventName]});
 				});
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
-		//	Event handlers
+		//	Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static onDoApplySettings(sender, e, ex)
+		static #ChainPerk_onDoApplySettings(sender, e, ex)
 		{
 
 			let order = ChainPerk.info["order"];
 
-			Object.entries(BM.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
-				this.use("skill", "event.add", sectionName, {
-					"handler":ChainPerk.onDoProcess,
+			Object.entries(core.Util.safeGet(e.detail, "settings.chain.targets", {})).forEach(([sectionName, sectionValue]) => {
+				this.use("event.add", sectionName, {
+					"handler":	ChainPerk.#ChainPerk_onDoProcess,
 					"order":	order,
-					"options":sectionValue
+					"options":	sectionValue
 				});
 			});
 
@@ -4489,7 +4978,7 @@
 
 		// -----------------------------------------------------------------------------
 
-		static onDoProcess(sender, e, ex)
+		static #ChainPerk_onDoProcess(sender, e, ex)
 		{
 
 			let targets = ex.options;
@@ -4502,18 +4991,18 @@
 				let status = targets[i]["status"] || "ready";
 				let sync = targets[i]["sync"];
 
-				let nodes = this.use("skill", "basic.locateAll", targets[i]);
-				BM.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`);
+				let nodes = this.use("basic.locateAll", targets[i]);
+				core.Util.warn(nodes.length > 0, `ChainPerk.onDoProcess(): Node not found. name=${this.tagName}, eventName=${e.type}, rootNode=${JSON.stringify(targets[i])}, method=${method}`);
 
 				if (sync)
 				{
 					chain = chain.then(() => {
-						return ChainPerk.__execTarget(this, nodes, method, status);
+						return ChainPerk.#__execTarget(this, nodes, method, status);
 					});
 				}
 				else
 				{
-					chain = ChainPerk.__execTarget(this, nodes, method, status);
+					chain = ChainPerk.#__execTarget(this, nodes, method, status);
 				}
 				promises.push(chain);
 			}
@@ -4536,14 +5025,14 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static __execTarget(unit, nodes, skillName, status)
+		static #__execTarget(unit, nodes, skillName, status)
 		{
 
 			let promises = [];
 
 			nodes.forEach((element) => {
-				let promise = unit.use("spell", "status.wait", [{"object":element, "status":status}]).then(() => {
-					return element.use("spell", skillName, {"sender":unit});
+				let promise = unit.cast("status.wait", [{"object":element, "status":status}]).then(() => {
+					return element.cast(skillName, {"sender":unit});
 				});
 				promises.push(promise);
 			});
@@ -4555,13 +5044,38 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Dialog Perk class
 	// =============================================================================
 
-	class DialogPerk extends BM.Perk
+	let DialogPerk$1 = class DialogPerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__backdrop;
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"dialog",
+			"order":			800,
+		};
+		static #__spells = {
+			"open":				DialogPerk.#_open,
+			"openModal":		DialogPerk.#_openModal,
+			"close":			DialogPerk.#_close,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -4570,10 +5084,16 @@
 		static get info()
 		{
 
-			return {
-				"section":		"dialog",
-				"order":		800,
-			};
+			return DialogPerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return DialogPerk.#__spells;
 
 		}
 
@@ -4584,38 +5104,42 @@
 		static init(unit, options)
 		{
 
+			// Init unit vault
+			DialogPerk.#__vault.set(unit, {
+				"backdrop":			null,
+				"backdropPromise":	Promise.resolve(),
+				"modalPromise":		null,
+			});
+
 			// Upgrade unit
-			this.upgrade(unit, "spell", "dialog.open", function(...args) { return DialogPerk._open(...args); });
-			this.upgrade(unit, "spell", "dialog.openModal", function(...args) { return DialogPerk._openModal(...args); });
-			this.upgrade(unit, "spell", "dialog.close", function(...args) { return DialogPerk._close(...args); });
-			this.upgrade(unit, "inventory", "dialog.cancelClose");
-			this.upgrade(unit, "vault", "dialog.modalPromise");
-			this.upgrade(unit, "vault", "dialog.backdrop");
-			this.upgrade(unit, "vault", "dialog.backdropPromise", Promise.resolve());
-			this.upgrade(unit, "state", "dialog.isModal", false);
-			this.upgrade(unit, "state", "dialog.modalResult", {});
-			this.upgrade(unit, "event", "afterReady", DialogPerk.DialogPerk_onAfterReady);
+			unit.upgrade("inventory", "dialog.cancelClose");
+			unit.upgrade("inventory", "dialog.isModal", false);
+			unit.upgrade("inventory", "dialog.modalResult", {});
+			unit.upgrade("inventory", "dialog.options");
+
+			// Add event handlers
+			unit.use("event.add", "afterReady", {"handler":DialogPerk.#DialogPerk_onAfterReady, "order":DialogPerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event Handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static DialogPerk_onAfterReady(sender, e, ex)
+		static #DialogPerk_onAfterReady(sender, e, ex)
 		{
 
 			if (this.get("setting", "dialog.options.autoOpen"))
 			{
 				console.debug(`DialogPerk.DialogPerk_onAfterReady(): Automatically opening unit. name=${this.tagName}, id=${this.id}`);
 
-				return this.use("spell", "dialog.open");
+				return this.cast("dialog.open");
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Spells (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -4625,42 +5149,38 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _open(unit, options)
+		static async #_open(unit, options)
 		{
 
 			options = options || {};
-			unit.set("vault", "dialog.options", options);
+			unit.set("inventory", "dialog.options", options);
 
-			console.debug(`DialogPerk._open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
-			return unit.use("spell", "event.trigger", "beforeOpen", options).then(() => {
-				if (!unit.get("inventory", "dialog.cancelOpen"))
+			console.debug(`DialogPerk.#_open(): Opening unit. name=${unit.tagName}, id=${unit.id}`);
+			await unit.cast("event.trigger", "beforeOpen", options);
+			if (!unit.get("inventory", "dialog.cancelOpen"))
+			{
+				// Show backdrop
+				if (unit.get("setting", "dialog.options.showBackdrop"))
 				{
-					return Promise.resolve().then(() => {
-						// Show backdrop
-						if (unit.get("setting", "dialog.options.showBackdrop"))
-						{
-							return DialogPerk.__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
-						}
-					}).then(() => {
-						// Setup
-						if (BM.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
-						{
-							return unit.use("spell", "basic.setup", options);
-						}
-					}).then(() => {
-						// Refresh
-						if (BM.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
-						{
-							return unit.use("spell", "basic.refresh", options);
-						}
-					}).then(() => {
-						return unit.use("spell", "event.trigger", "doOpen", options);
-					}).then(() => {
-						console.debug(`DialogPerk._open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
-						return unit.use("spell", "event.trigger", "afterOpen", options);
-					});
+					await DialogPerk.#__showBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 				}
-			});
+
+				// Setup
+				if (core.Util.safeGet(options, "autoSetupOnOpen", unit.get("setting", "dialog.options.autoSetupOnOpen", false)))
+				{
+					await unit.cast("basic.setup", options);
+				}
+
+				// Refresh
+				if (core.Util.safeGet(options, "autoRefreshOnOpen", unit.get("setting", "dialog.options.autoRefreshOnOpen", true)))
+				{
+					await unit.cast("basic.refresh", options);
+				}
+
+				await unit.cast("event.trigger", "doOpen", options);
+				console.debug(`DialogPerk.#_open(): Opened unit. name=${unit.tagName}, id=${unit.id}`);
+				await unit.cast("event.trigger", "afterOpen", options);
+			}
 
 		}
 
@@ -4673,16 +5193,17 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _openModal(unit, options)
+		static #_openModal(unit, options)
 		{
 
-			console.debug(`DialogPerk._openModal(): Opening unit modal. name=${unit.tagName}, id=${unit.id}`);
+			console.debug(`DialogPerk.#_openModal(): Opening unit modal. name=${unit.tagName}, id=${unit.id}`);
 
 			return new Promise((resolve, reject) => {
-				unit.set("state", "dialog.isModal", true);
-				unit.set("state", "dialog.modalResult", {"result":false});
-				unit.set("vault", "dialog.modalPromise", {"resolve":resolve,"reject":reject});
-				return DialogPerk._open(unit, options);
+				unit.set("inventory", "dialog.isModal", true);
+				unit.set("inventory", "dialog.modalResult", {"result":false});
+				DialogPerk.#__vault.get(unit)["modalPromise"] = {"resolve":resolve,"reject":reject};
+
+				return DialogPerk.#_open(unit, options);
 			});
 
 		}
@@ -4696,34 +5217,33 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _close(unit, options)
+		static async #_close(unit, options)
 		{
 
 			options = options || {};
 			unit.set("inventory", "dialog.cancelClose", false);
 
-			console.debug(`DialogPerk._close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
-			return unit.use("spell", "event.trigger", "beforeClose", options).then(() => {
-				if (!unit.get("inventory", "dialog.cancelClose"))
-				{
-					return unit.use("spell", "event.trigger", "doClose", options).then(() => {
-						// Hide backdrop
-						if (unit.get("setting", "dialog.options.showBackdrop"))
-						{
-							DialogPerk.__removeCloseOnClickHandlers();
-							return DialogPerk.__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
-						}
-					}).then(() => {
-						if (unit.get("state", "dialog.isModal"))
-						{
-							unit.get("vault", "dialog.modalPromise").resolve(unit.get("state", "dialog.modalResult"));
-						}
-						console.debug(`DialogPerk._close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
+			console.debug(`DialogPerk.#_close(): Closing unit. name=${unit.tagName}, id=${unit.id}`);
+			await unit.cast("event.trigger", "beforeClose", options);
+			if (!unit.get("inventory", "dialog.cancelClose"))
+			{
+				await unit.cast("event.trigger", "doClose", options);
 
-						return unit.use("spell", "event.trigger", "afterClose", options);
-					});
+				// Hide backdrop
+				if (unit.get("setting", "dialog.options.showBackdrop"))
+				{
+					DialogPerk.#__removeCloseOnClickHandlers();
+					await DialogPerk.#__hideBackdrop(unit, unit.get("setting", "dialog.backdropOptions"));
 				}
-			});
+
+				if (unit.get("inventory", "dialog.isModal"))
+				{
+					DialogPerk.#__vault.get(unit)["modalPromise"].resolve(unit.get("inventory", "dialog.modalResult"));
+				}
+				console.debug(`DialogPerk.#_close(): Closed unit. name=${unit.tagName}, id=${unit.id}`);
+
+				await unit.cast("event.trigger", "afterClose", options);
+			}
 
 		}
 
@@ -4737,14 +5257,14 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __createBackdrop(unit, options)
+		static #__createBackdrop(unit, options)
 		{
 
-			if (!DialogPerk._backdrop)
+			if (!DialogPerk.#__backdrop)
 			{
 				// Create the backdrop
 				document.body.insertAdjacentHTML('afterbegin', '<div class="backdrop"></div>');
-				DialogPerk._backdrop = document.body.firstElementChild;
+				DialogPerk.#__backdrop = document.body.firstElementChild;
 			}
 
 		}
@@ -4757,27 +5277,27 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __showBackdrop(unit, options)
+		static #__showBackdrop(unit, options)
 		{
 
-			DialogPerk.__createBackdrop(unit);
+			DialogPerk.#__createBackdrop(unit);
 
-			return unit.get("vault", "dialog.backdropPromise").then(() => {
-				unit.set("vault", "dialog.backdropPromise", new Promise((resolve, reject) => {
-					window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
+			return DialogPerk.#__vault.get(unit)["backdropPromise"].then(() => {
+				DialogPerk.#__vault.get(unit)["backdropPromise"] = new Promise((resolve, reject) => {
+					window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 					let addClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.showOptions.addClasses", []));
-					DialogPerk._backdrop.classList.add(...addClasses);
-					DialogPerk._backdrop.classList.remove(...unit.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
+					DialogPerk.#__backdrop.classList.add(...addClasses);
+					DialogPerk.#__backdrop.classList.remove(...unit.get("setting", "dialog.backdropOptions.showOptions.removeClasses", []));
 
-					let effect = DialogPerk.__getEffect();
+					let effect = DialogPerk.#__getEffect();
 					if (effect)
 					{
 						// Transition/Animation
-						DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
-							if (BM.Util.safeGet(options, "closeOnClick", true))
+						DialogPerk.#__backdrop.addEventListener(`${effect}end`, () => {
+							if (core.Util.safeGet(options, "closeOnClick", true))
 							{
-								DialogPerk.__installCloseOnClickHandler(unit);
+								DialogPerk.#__installCloseOnClickHandler(unit);
 							}
 							resolve();
 						}, {"once":true});
@@ -4785,19 +5305,19 @@
 					else
 					{
 						// No Transition/Animation
-						if (BM.Util.safeGet(options, "closeOnClick", true))
+						if (core.Util.safeGet(options, "closeOnClick", true))
 						{
-							DialogPerk.__installCloseOnClickHandler(unit);
+							DialogPerk.#__installCloseOnClickHandler(unit);
 						}
 
 						resolve();
 					}
-				}));
+				});
 
-				let sync =BM.Util.safeGet(options, "showOptions.sync", BM.Util.safeGet(options, "sync"));
+				let sync =core.Util.safeGet(options, "showOptions.sync", core.Util.safeGet(options, "sync"));
 				if (sync)
 				{
-					return unit.get("vault", "dialog.backdropPromise");
+					return DialogPerk.#__vault.get(unit)["backdropPromise"];
 				}
 			});
 
@@ -4811,21 +5331,21 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __hideBackdrop(unit, options)
+		static #__hideBackdrop(unit, options)
 		{
 
-			return unit.get("vault", "dialog.backdropPromise").then(() => {
-				unit.set("vault", "dialog.backdropPromise",  new Promise((resolve, reject) => {
-					window.getComputedStyle(DialogPerk._backdrop).getPropertyValue("visibility"); // Recalc styles
+			return DialogPerk.#__vault.get(unit)["backdropPromise"].then(() => {
+				DialogPerk.#__vault.get(unit)["backdropPromise"] = new Promise((resolve, reject) => {
+					window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue("visibility"); // Recalc styles
 
 					let removeClasses = ["show"].concat(unit.get("setting", "dialog.backdropOptions.hideOptions.removeClasses", []));
-					DialogPerk._backdrop.classList.remove(...removeClasses);
-					DialogPerk._backdrop.classList.add(...unit.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
+					DialogPerk.#__backdrop.classList.remove(...removeClasses);
+					DialogPerk.#__backdrop.classList.add(...unit.get("setting", "dialog.backdropOptions.hideOptions.addClasses", []));
 
-					let effect = DialogPerk.__getEffect();
+					let effect = DialogPerk.#__getEffect();
 					if (effect)
 					{
-						DialogPerk._backdrop.addEventListener(`${effect}end`, () => {
+						DialogPerk.#__backdrop.addEventListener(`${effect}end`, () => {
 							resolve();
 						}, {"once":true});
 					}
@@ -4833,12 +5353,12 @@
 					{
 						resolve();
 					}
-				}));
+				});
 
-				let sync =BM.Util.safeGet(options, "hideOptions.sync", BM.Util.safeGet(options, "sync"));
+				let sync = core.Util.safeGet(options, "hideOptions.sync", core.Util.safeGet(options, "sync"));
 				if (sync)
 				{
-					return unit.get("vault", "dialog.backdropPromise");
+					return DialogPerk.#__vault.get(unit)["backdropPromise"];
 				}
 			});
 
@@ -4852,13 +5372,13 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __installCloseOnClickHandler(unit, options)
+		static #__installCloseOnClickHandler(unit, options)
 		{
 
-			DialogPerk._backdrop.onclick = (e) => {
+			DialogPerk.#__backdrop.onclick = (e) => {
 				if (e.target === e.currentTarget)
 				{
-					DialogPerk._close(unit, {"reason":"cancel"});
+					DialogPerk.#_close(unit, {"reason":"cancel"});
 				}
 			};
 
@@ -4872,10 +5392,10 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		options				Options.
 		 */
-		static __removeCloseOnClickHandlers()
+		static #__removeCloseOnClickHandlers()
 		{
 
-			DialogPerk._backdrop.onclick = null;
+			DialogPerk.#__backdrop.onclick = null;
 
 		}
 
@@ -4886,16 +5406,16 @@
 		 *
 		 * @return 	{String}		Effect ("transition" or "animation").
 		 */
-		static __getEffect()
+		static #__getEffect()
 		{
 
 			let effect = "";
 
-			if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('transition-duration') !== "0s")
+			if (window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue('transition-duration') !== "0s")
 			{
 				effect = "transition";
 			}
-			else if (window.getComputedStyle(DialogPerk._backdrop).getPropertyValue('animation-name') !== "none")
+			else if (window.getComputedStyle(DialogPerk.#__backdrop).getPropertyValue('animation-name') !== "none")
 			{
 				effect = "animation";
 			}
@@ -4904,16 +5424,42 @@
 
 		}
 
-	}
+	};
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Preference Perk class
 	// =============================================================================
 
-	class PreferencePerk extends BM.Perk
+	class PreferencePerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"preference",
+			"order":			900,
+		};
+		static #__skills = {
+			"get":				PreferencePerk.#_getPreferences,
+		};
+		static #__spells = {
+			"set":				PreferencePerk.#_setPreferences,
+			"apply":			PreferencePerk.#_applyPreferences,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -4922,10 +5468,25 @@
 		static get info()
 		{
 
-			return {
-				"section":		"preference",
-				"order":		900,
-			};
+			return PreferencePerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get skills()
+		{
+
+			return PreferencePerk.#__skills;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return PreferencePerk.#__spells;
 
 		}
 
@@ -4936,70 +5497,48 @@
 		static init(unit, options)
 		{
 
-			// Upgrade unit
-			this.upgrade(unit, "skill", "preference.get", function(...args) { return PreferencePerk._getPreferences(...args); });
-			this.upgrade(unit, "spell", "preference.set", function(...args) { return PreferencePerk._setPreferences(...args); });
-			this.upgrade(unit, "spell", "preference.apply", function(...args) { return PreferencePerk._applyPreferences(...args); });
-			this.upgrade(unit, "vault", "preference.server");
-			this.upgrade(unit, "event", "doApplySettings", PreferencePerk.PreferencePerk_onDoApplySettings);
-			this.upgrade(unit, "event", "doSetup", PreferencePerk.PreferencePerk_onDoSetup);
+			// Init unit vault
+			PreferencePerk.#__vault.set(unit, {
+				"server":	null,
+			});
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":PreferencePerk.#PreferencePerk_onDoApplySettings, "order":PreferencePerk.info["order"]});
+			unit.use("event.add", "doSetup", {"handler":PreferencePerk.#PreferencePerk_onDoSetup, "order":PreferencePerk.info["order"]});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static PreferencePerk_onDoApplySettings(sender, e, ex)
+		static #PreferencePerk_onDoApplySettings(sender, e, ex)
 		{
 
-			let serverNode = this.get("setting", "locale.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
+			let serverNode = this.get("setting", "preference.options.preferenceServer", this.get("setting", "system.preference.options.preferenceServer"));
 			serverNode = ( serverNode === true ? "bm-preference" : serverNode );
 
-			BM.Util.assert(serverNode, `Preference Server node not specified in settings. name=${this.tagName}`);
+			core.Util.assert(serverNode, () => `Preference Server node not specified in settings. name=${this.tagName}`);
 
-			return this.use("spell", "status.wait", [serverNode]).then(() => {
+			return this.cast("status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
-				server.subscribe(this, BM.Util.safeGet(e.detail, "settings.preference"));
-				this.set("vault", "preference.server", server);
+				server.subscribe(this, core.Util.safeGet(e.detail, "settings.preference"));
+				PreferencePerk.#__vault.get(this)["server"] = server;
 			});
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static PreferencePerk_onDoSetup(sender, e, ex)
+		static #PreferencePerk_onDoSetup(sender, e, ex)
 		{
 
-			return this.use("spell", "preference.apply", {"preferences":this.get("vault", "preference.server").items});
+			return this.cast("preference.apply", {"preferences":PreferencePerk.#__vault.get(this)["server"].items});
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Apply preferences.
-		 *
-	     * @param	{Unit}			unit				Unit.
-		 * @param	{Object}		options				Options.
-		 */
-		static _applyPreferences(unit, options)
-		{
-
-			return Promise.resolve().then(() => {
-				console.debug(`PreferencePerk._applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "beforeApplyPreferences", options);
-			}).then(() => {
-				return unit.use("spell", "event.trigger", "doApplyPreferences", options);
-			}).then(() => {
-				console.debug(`PreferencePerk._applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
-				return unit.use("spell", "event.trigger", "afterApplyPreferences", options);
-			});
-
-		}
-
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -5009,17 +5548,38 @@
 		 * @param	{String}		target				Preference name to get.
 		 * @param	{*}				defaultValue		Value returned when key is not found.
 		 */
-		static _getPreferences(unit, key, defaultValue)
+		static #_getPreferences(unit, key, defaultValue)
 		{
 
 			if (key)
 			{
-				return unit.get("vault", "preference.server").getPreference(key, defaultValue);
+				return PreferencePerk.#__vault.get(unit)["server"].getPreference(key, defaultValue);
 			}
 			else
 			{
-				return unit.get("vault", "preference.server").items;
+				return PreferencePerk.#__vault.get(unit)["server"].items;
 			}
+
+		}
+
+		// -------------------------------------------------------------------------
+		//  Spells (Unit)
+		// -------------------------------------------------------------------------
+
+		/**
+		 * Apply preferences.
+		 *
+	     * @param	{Unit}			unit				Unit.
+		 * @param	{Object}		options				Options.
+		 */
+		static async #_applyPreferences(unit, options)
+		{
+
+			console.debug(`PreferencePerk.#_applyPreferences(): Applying preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			await unit.cast("event.trigger", "beforeApplyPreferences", options);
+			await unit.cast("event.trigger", "doApplyPreferences", options);
+			console.debug(`PreferencePerk.#_applyPreferences(): Applied preferences. name=${unit.tagName}, id=${unit.id}, uniqueId=${unit.uniqueId}`);
+			await unit.cast("event.trigger", "afterApplyPreferences", options);
 
 		}
 
@@ -5032,10 +5592,10 @@
 		 * @param	{Object}		preferences 		Preferences to set.
 		 * @param	{Object}		options				Options.
 		 */
-		static _setPreferences(unit, preferences, options)
+		static #_setPreferences(unit, preferences, options)
 		{
 
-			return unit.get("vault", "preference.server").setPreference(preferences, options, {"sender":unit});
+			return PreferencePerk.#__vault.get(unit)["server"].setPreference(preferences, options, {"sender":unit});
 
 		}
 
@@ -5339,13 +5899,46 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Route Perk class
 	// =============================================================================
 
-	class RoutePerk extends BM.Perk
+	class RoutePerk extends core.Perk
 	{
+
+		// -------------------------------------------------------------------------
+		//  Private Variables
+		// -------------------------------------------------------------------------
+
+		static #__vault = new WeakMap();
+		static #__info = {
+			"sectionName":		"routing",
+			"order":			900,
+			"depends":			"ValidationPerk",
+		};
+		static #__skills = {
+			"addRoute":			RoutePerk.#_addRoute,
+			"jumpRoute":		RoutePerk.#_jumpRoute,
+			"refreshRoute":		RoutePerk.#_refreshRoute,
+			"replaceRoute":		RoutePerk.#_replaceRoute,
+		};
+		static #__spells = {
+			"switch":			RoutePerk.#_switchRoute,
+			"openRoute":		RoutePerk.#_open,
+			"updateRoute":		RoutePerk.#_updateRoute,
+			"refreshRoute":		RoutePerk.#_refreshRoute,
+			"normalizeRoute":	RoutePerk.#_normalizeRoute,
+		};
 
 		// -------------------------------------------------------------------------
 		//  Properties
@@ -5354,11 +5947,25 @@
 		static get info()
 		{
 
-			return {
-				"section":		"routing",
-				"order":		900,
-				"depends":		"ValidationPerk",
-			};
+			return RoutePerk.#__info;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get skills()
+		{
+
+			return RoutePerk.#__skills;
+
+		}
+
+		// -------------------------------------------------------------------------
+
+		static get spells()
+		{
+
+			return RoutePerk.#__spells;
 
 		}
 
@@ -5370,7 +5977,7 @@
 		{
 
 			// Set state on the first page
-			history.replaceState(RoutePerk.__getState("connect"), null, null);
+			history.replaceState(RoutePerk.#__getState("connect"), null, null);
 
 		}
 
@@ -5379,59 +5986,56 @@
 		static init(unit, options)
 		{
 
+			// Init unit vault
+			RoutePerk.#__vault.set(unit, {
+				"routes":	[],
+			});
+
 			// Upgrade unit
-			this.upgrade(unit, "skill", "routing.addRoute", function(...args) { return RoutePerk._addRoute(...args); });
-			this.upgrade(unit, "skill", "routing.jumpRoute", function(...args) { return RoutePerk._jumpRoute(...args); });
-			this.upgrade(unit, "skill", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-			this.upgrade(unit, "skill", "routing.replaceRoute", function(...args) { return RoutePerk._replaceRoute(...args); });
-			this.upgrade(unit, "spell", "routing.switch", function(...args) { return RoutePerk._switchRoute(...args); });
-			this.upgrade(unit, "spell", "routing.openRoute", function(...args) { return RoutePerk._open(...args); });
-			this.upgrade(unit, "spell", "routing.updateRoute", function(...args) { return RoutePerk._updateRoute(...args); });
-			this.upgrade(unit, "spell", "routing.refreshRoute", function(...args) { return RoutePerk._refreshRoute(...args); });
-			this.upgrade(unit, "spell", "routing.normalizeRoute", function(...args) { return RoutePerk._normalizeROute(...args); });
-			this.upgrade(unit, "vault", "routing.routes", []);
-			this.upgrade(unit, "state", "routing.routeInfo", {});
-			this.upgrade(unit, "event", "doApplySettings", RoutePerk.RoutePerk_onDoApplySettings);
-			this.upgrade(unit, "event", "doStart", RoutePerk.RoutePerk_onDoStart);
-			this.upgrade(unit, "event", "afterReady", RoutePerk.RoutePerk_onAfterReady);
-			this.upgrade(unit, "event", "doValidateFail", RoutePerk.RoutePerk_onDoValidateFail);
-			this.upgrade(unit, "event", "doReportValidity", RoutePerk.RoutePerk_onDoReportValidity);
+			unit.upgrade("inventory", "routing.routeInfo", {});
+
+			// Add event handlers
+			unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":RoutePerk.info["order"]});
+			unit.use("event.add", "doStart", {"handler":RoutePerk.#RoutePerk_onDoStart, "order":RoutePerk.info["order"]});
+			unit.use("event.add", "afterReady", {"handler":RoutePerk.#RoutePerk_onAfterReady, "order":RoutePerk.info["order"]});
+			unit.use("event.add", "doValidateFail", {"handler":RoutePerk.#RoutePerk_onDoValidateFail, "order":RoutePerk.info["order"]});
+			unit.use("event.add", "doReportValidity", {"handler":RoutePerk.#RoutePerk_onDoReportValidity, "order":RoutePerk.info["order"]});
 
 			// Init popstate handler
-			RoutePerk.__initPopState(unit);
+			RoutePerk.#__initPopState(unit);
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Event handlers
+		//  Event Handlers (Unit)
 		// -------------------------------------------------------------------------
 
-		static RoutePerk_onDoApplySettings(sender, e, ex)
+		static #RoutePerk_onDoApplySettings(sender, e, ex)
 		{
 
 			// Routings
-			Object.entries(BM.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
-				RoutePerk._addRoute(this, sectionName, sectionValue);
+			Object.entries(core.Util.safeGet(e.detail, "settings.routing.routes", {})).forEach(([sectionName, sectionValue]) => {
+				RoutePerk.#_addRoute(this, sectionName, sectionValue);
 			});
 
 			// Set current route info.
-			this.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(this, window.location.href));
+			this.set("inventory", "routing.routeInfo", RoutePerk.#__loadRouteInfo(this, window.location.href));
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static RoutePerk_onDoStart(sender, e, ex)
+		static #RoutePerk_onDoStart(sender, e, ex)
 		{
 
-			let routeName = this.get("state", "routing.routeInfo.name");
+			let routeName = this.get("inventory", "routing.routeInfo.name");
 			if (routeName)
 			{
 				let options = {
 					"query": this.get("setting", "unit.options.query")
 				};
 
-				return this.use("spell", "routing.switch", routeName, options);
+				return this.cast("routing.switch", routeName, options);
 			}
 			else
 			{
@@ -5442,39 +6046,39 @@
 
 		// -------------------------------------------------------------------------
 
-		static RoutePerk_onAfterReady(sender, e, ex)
+		static #RoutePerk_onAfterReady(sender, e, ex)
 		{
 
-			return this.use("spell", "routing.openRoute");
+			return this.cast("routing.openRoute");
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static RoutePerk_onDoValidateFail(sender, e, ex)
+		static #RoutePerk_onDoValidateFail(sender, e, ex)
 		{
 
 			// Try to fix URL when validation failed
 			if (this.get("setting", "routing.options.autoFix"))
 			{
-				RoutePerk.__fixRoute(this, e.detail.url);
+				RoutePerk.#__fixRoute(this, e.detail.url);
 			}
 
 		}
 
 		// -------------------------------------------------------------------------
 
-		static RoutePerk_onDoReportValidity(sender, e, ex)
+		static #RoutePerk_onDoReportValidity(sender, e, ex)
 		{
 
 			// Dump errors when validation failed
-			RoutePerk.__dumpValidationErrors(this);
+			RoutePerk.#__dumpValidationErrors(this);
 			throw new URIError("URL validation failed.");
 
 		}
 
 		// -------------------------------------------------------------------------
-		//  Skills
+		//  Skills (Unit)
 		// -------------------------------------------------------------------------
 
 		/**
@@ -5485,7 +6089,7 @@
 		 * @param	{Object}		routeInfo			Route info.
 		 * @param	{Boolean}		first				Add to top when true.
 		 */
-		static _addRoute(unit, title, routeInfo, first)
+		static #_addRoute(unit, title, routeInfo, first)
 		{
 
 			let keys = [];
@@ -5499,11 +6103,11 @@
 				"extenderRef":	routeInfo["extenderRef"],
 				"extender":		routeInfo["extender"],
 				"routeOptions":	routeInfo["routeOptions"],
-				"_re": 			pathToRegexp(routeInfo["path"], keys),
-				"_keys":		keys,
+				"__re": 			pathToRegexp(routeInfo["path"], keys),
+				"__keys":		keys,
 			};
 
-			let routes = unit.get("vault", "routing.routes");
+			let routes = RoutePerk.#__vault.get(unit)["routes"];
 			if (first)
 			{
 				routes.unshift(route);
@@ -5512,7 +6116,6 @@
 			{
 				routes.push(route);
 			}
-			unit.set("vault", "routing.routes", routes);
 
 		}
 
@@ -5527,12 +6130,11 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _loadSettings(unit, routeName, options)
+		static async #_loadSettings(unit, routeName, options)
 		{
 
-			return BM.AjaxUtil.loadJSON(RoutePerk.__getSettingsURL(unit, routeName), Object.assign({"bindTo":this._unit}, options)).then((settings) => {
-				unit.set("state", "routing.routeInfo.settings", settings);
-			});
+			let settings = await core.AjaxUtil.loadJSON(RoutePerk.#__getSettingsURL(unit, routeName), Object.assign({"bindTo":unit}, options));
+			unit.set("inventory", "routing.routeInfo.settings", settings);
 
 		}
 
@@ -5547,23 +6149,19 @@
 		 *
 		 * @return  {Promise}		Promise.
 		 */
-		static _loadExtender(unit, routeName, options)
+		static async #_loadExtender(unit, routeName, options)
 		{
 
-			return Promise.resolve().then(() => {
-				if (!unit.get("state", "routing.routeInfo.extender"))
-				{
-					return BM.AjaxUtil.loadText(RoutePerk.__getExtenderURL(unit, routeName)).then((extender) => {
-						unit.set("state", "routing.routeInfo.extender", extender);
-					});
-				}
-			}).then(() => {
-				let extender = unit.get("state", "routing.routeInfo.extender");
-				if (extender)
-				{
-					new Function(`"use strict";${extender}`)();
-				}
-			});
+			if (!unit.get("inventory", "routing.routeInfo.extender"))
+			{
+				let extender = await core.AjaxUtil.loadText(RoutePerk.#__getExtenderURL(unit, routeName));
+				unit.set("inventory", "routing.routeInfo.extender", extender);
+			}
+			let extender = unit.get("inventory", "routing.routeInfo.extender");
+			if (extender)
+			{
+				new Function(`"use strict";${extender}`)();
+			}
 
 		}
 
@@ -5578,28 +6176,32 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static _switchRoute(unit, routeName, options)
+		static async #_switchRoute(unit, routeName, options)
 		{
 
-			BM.Util.assert(routeName, "RoutePerk._switchRoute(): A route name not specified.", TypeError);
+			core.Util.assert(routeName, () => "RoutePerk.#_switchRoute(): A route name not specified.", TypeError);
 
 			let newSettings;
-			return Promise.resolve().then(() => {
-				if (RoutePerk.__hasExternalSettings(unit, routeName))
-				{
-					return RoutePerk._loadSettings(unit, routeName);
-				}
-			}).then(() => {
-				if (RoutePerk.__hasExternalExtender(unit, routeName))
-				{
-					return RoutePerk._loadExtender(unit);
-				}
-			}).then(() => {
-				newSettings = unit.get("state", "routing.routeInfo.settings");
-				unit.use("skill", "setting.merge", newSettings);
 
-				return unit.use("spell", "setting.apply", {"settings":newSettings});
-			});
+			// Load extra settings
+			if (RoutePerk.#__hasExternalSettings(unit, routeName))
+			{
+				await RoutePerk.#_loadSettings(unit, routeName);
+			}
+
+			// Load extra codes
+			if (RoutePerk.#__hasExternalExtender(unit, routeName))
+			{
+				await RoutePerk.#_loadExtender(unit);
+			}
+
+			// Merge & apply new settings
+			newSettings = unit.get("inventory", "routing.routeInfo.settings");
+			unit.use("setting.merge", newSettings);
+			await unit.cast("setting.apply", {"settings":newSettings});
+
+			// Cast trasform to load & apply CSS
+			await unit.cast("basic.transform");
 
 		}
 
@@ -5614,20 +6216,20 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static _open(unit, routeInfo, options)
+		static async #_open(unit, routeInfo, options)
 		{
 
 			options = Object.assign({}, options);
 
 			// Current route info
-			let curRouteInfo = unit.get("state", "routing.routeInfo");
+			let curRouteInfo = unit.get("inventory", "routing.routeInfo");
 
 			let newURL;
 			let newRouteInfo;
 			if (routeInfo)
 			{
-				newURL = BM.URLUtil.buildURL(routeInfo, options);
-				newRouteInfo = RoutePerk.__loadRouteInfo(unit, newURL);
+				newURL = core.URLUtil.buildURL(routeInfo, options);
+				newRouteInfo = RoutePerk.#__loadRouteInfo(unit, newURL);
 			}
 			else
 			{
@@ -5637,48 +6239,47 @@
 
 			// Jump to another page
 			if (options["jump"] || !newRouteInfo["name"]
-					|| ( curRouteInfo["name"] != newRouteInfo["name"]) // <--- remove this when _update() is ready.
+					|| ( curRouteInfo["name"] != newRouteInfo["name"]) // <--- remove this when #_update() is ready.
 			)
 			{
 				window.location.href = newURL;
-				//RoutePerk._jumpRoute(unit, {"URL":newURL});
+				//RoutePerk.#_jumpRoute(unit, {"URL":newURL});
 				return;
 			}
 
-			return Promise.resolve().then(() => {
-				// Replace URL
-				let pushState = BM.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
-				if (pushState)
-				{
-					history.pushState(RoutePerk.__getState("_open.pushState"), null, newURL);
-				}
-				unit.set("state", "routing.routeInfo", newRouteInfo);
-				/*
-			}).then(() => {
-				// Load other unit when new route name is different from the current route name.
-				if (curRouteInfo["name"] != newRouteInfo["name"])
-				{
-					return RoutePerk._updateRoute(unit, curRouteInfo, newRouteInfo, options);
-				}
-				*/
-			}).then(() => {
-				// Validate URL
-				if (unit.get("setting", "routing.options.autoValidate"))
-				{
-					let validateOptions = {
-						"validatorName":	unit.get("setting", "routing.options.validatorName"),
-						"items":			BM.URLUtil.loadParameters(newURL),
-						"url":				newURL,
-					};
-					return unit.use("spell", "validation.validate", validateOptions);
-				}
-			}).then(() => {
-				// Refresh
-				return RoutePerk._refreshRoute(unit, newRouteInfo, options);
-			}).then(() => {
-				// Normalize URL
-				return RoutePerk._normalizeRoute(unit, window.location.href);
-			});
+			// Replace URL
+			let pushState = core.Util.safeGet(options, "pushState", ( routeInfo ? true : false ));
+			if (pushState)
+			{
+				history.pushState(RoutePerk.#__getState("_open.pushState"), null, newURL);
+			}
+			unit.set("inventory", "routing.routeInfo", newRouteInfo);
+
+			/*
+			// Update route
+			// Load other unit when new route name is different from the current route name.
+			if (curRouteInfo["name"] != newRouteInfo["name"])
+			{
+				await RoutePerk.#_updateRoute(unit, curRouteInfo, newRouteInfo, options);
+			}
+			*/
+
+			// Validate URL
+			if (unit.get("setting", "routing.options.autoValidate"))
+			{
+				let validateOptions = {
+					"validatorName":	unit.get("setting", "routing.options.validatorName"),
+					"items":			core.URLUtil.loadParameters(newURL),
+					"url":				newURL,
+				};
+				await unit.cast("validation.validate", validateOptions);
+			}
+
+			// Refresh
+			await RoutePerk.#_refreshRoute(unit, newRouteInfo, options);
+
+			// Normalize URL
+			await RoutePerk.#_normalizeRoute(unit, window.location.href);
 
 		}
 
@@ -5691,10 +6292,10 @@
 		 * @param	{Object}		routeInfo			Route information.
 		 * @param	{Object}		options				Options.
 		 */
-		static _jumpRoute(unit, routeInfo, options)
+		static #_jumpRoute(unit, routeInfo, options)
 		{
 
-			let url = BM.URLUtil.buildURL(routeInfo, options);
+			let url = core.URLUtil.buildURL(routeInfo, options);
 			window.location.href = url;
 
 		}
@@ -5710,10 +6311,10 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static _updateRoute(unit, curRouteInfo, newRouteInfo, options)
+		static #_updateRoute(unit, curRouteInfo, newRouteInfo, options)
 		{
 
-			return RoutePerk._switchRoute(unit, newRouteInfo["name"]);
+			return RoutePerk.#_switchRoute(unit, newRouteInfo["name"]);
 
 		}
 
@@ -5728,10 +6329,10 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static _refreshRoute(unit, routeInfo, options)
+		static #_refreshRoute(unit, routeInfo, options)
 		{
 
-			return unit.use("spell", "basic.refresh", options);
+			return unit.cast("basic.refresh", options);
 
 		}
 
@@ -5744,11 +6345,11 @@
 		 * @param	{Object}		routeInfo			Route information.
 		 * @param	{Object}		options				Options.
 		 */
-		static _replaceRoute(unit, routeInfo, options)
+		static #_replaceRoute(unit, routeInfo, options)
 		{
 
-			history.replaceState(RoutePerk.__getState("replaceRoute", window.history.state), null, BM.URLUtil.buildURL(routeInfo, options));
-			unit.set("state", "routing.routeInfo", RoutePerk.__loadRouteInfo(unit, window.location.href));
+			history.replaceState(RoutePerk.#__getState("replaceRoute", window.history.state), null, core.URLUtil.buildURL(routeInfo, options));
+			unit.set("inventory", "routing.routeInfo", RoutePerk.#__loadRouteInfo(unit, window.location.href));
 
 		}
 
@@ -5762,16 +6363,12 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static _normalizeRoute(unit, url)
+		static async #_normalizeRoute(unit, url)
 		{
 
-			return Promise.resolve().then(() => {
-				return unit.use("spell", "event.trigger", "beforeNormalizeURL");
-			}).then(() => {
-				return unit.use("spell", "event.trigger", "doNormalizeURL");
-			}).then(() => {
-				return unit.use("spell", "event.trigger", "afterNormalizeURL");
-			});
+			await unit.cast("event.trigger", "beforeNormalizeURL");
+			await unit.cast("event.trigger", "doNormalizeURL");
+			await unit.cast("event.trigger", "afterNormalizeURL");
 
 		}
 
@@ -5787,12 +6384,12 @@
 		 *
 		 * @return  {Boolean}		True if the unit has the external settings file.
 		 */
-		static __hasExternalSettings(unit, routeName)
+		static #__hasExternalSettings(unit, routeName)
 		{
 
 			let ret = false;
 
-			if (!unit.get("state", "routing.routeInfo.settings"))
+			if (!unit.get("inventory", "routing.routeInfo.settings"))
 			{
 				ret = true;
 			}
@@ -5811,18 +6408,18 @@
 		 *
 		 * @return  {String}		URL.
 		 */
-		static __getSettingsURL(unit, routeName)
+		static #__getSettingsURL(unit, routeName)
 		{
 
 			let path;
 			let fileName;
 			let query;
 
-			let settingsRef = unit.get("state", "routing.routeInfo.settingsRef");
+			let settingsRef = unit.get("inventory", "routing.routeInfo.settingsRef");
 			if (settingsRef && settingsRef !== true)
 			{
 				// If URL is specified in ref, use it
-				let url = BM.URLUtil.parseURL(settingsRef);
+				let url = core.URLUtil.parseURL(settingsRef);
 				fileName = url.filename;
 				path = url.path;
 				query = url.query;
@@ -5830,16 +6427,16 @@
 			else
 			{
 				// Use default path and filename
-				path = BM.Util.concatPath([
+				path = core.Util.concatPath([
 						unit.get("setting", "system.unit.options.path", ""),
 						unit.get("setting", "unit.options.path", ""),
 					]);
-				let ext = RoutePerk.__getSettingFormat(unit);
+				let ext = RoutePerk.#__getSettingFormat(unit);
 				fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
 	  			query = unit.get("setting", "unit.options.query");
 			}
 
-			return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+			return core.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 		}
 
@@ -5853,12 +6450,12 @@
 		 *
 		 * @return  {Boolean}		True if the unit has the external extender file.
 		 */
-		static __hasExternalExtender(unit, routeName)
+		static #__hasExternalExtender(unit, routeName)
 		{
 
 			let ret = false;
 
-			if (unit.get("state", "routing.routeInfo.extenderRef") || unit.get("state", "routing.routeInfo.extender"))
+			if (unit.get("inventory", "routing.routeInfo.extenderRef") || unit.get("inventory", "routing.routeInfo.extender"))
 			{
 				ret = true;
 			}
@@ -5877,18 +6474,18 @@
 		 *
 		 * @return  {String}		URL.
 		 */
-		static __getExtenderURL(unit, routeName)
+		static #__getExtenderURL(unit, routeName)
 		{
 
 			let path;
 			let fileName;
 			let query;
 
-			let extenderRef = unit.get("state", "routing.routeInfo.extenderRef");
+			let extenderRef = unit.get("inventory", "routing.routeInfo.extenderRef");
 			if (extenderRef && extenderRef !== true)
 			{
 				// If URL is specified in ref, use it
-				let url = BM.URLUtil.parseURL(extenderRef);
+				let url = core.URLUtil.parseURL(extenderRef);
 				path = url.path;
 				fileName = url.filename;
 				query = url.query;
@@ -5896,7 +6493,7 @@
 			else
 			{
 				// Use default path and filename
-				path = path || BM.Util.concatPath([
+				path = path || core.Util.concatPath([
 						unit.get("setting", "system.unit.options.path", ""),
 						unit.get("setting", "unit.options.path", ""),
 					]);
@@ -5904,7 +6501,7 @@
 				query = unit.get("setting", "unit.options.query");
 			}
 
-			return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+			return core.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 		}
 
@@ -5918,7 +6515,7 @@
 		 *
 		 * @return  {Object}		Route info.
 		 */
-		static __loadRouteInfo(unit, url)
+		static #__loadRouteInfo(unit, url)
 		{
 
 			let parsedURL = new URL(url, window.location.href);
@@ -5927,11 +6524,11 @@
 				"path":				parsedURL.pathname,
 				"query":			parsedURL.search,
 				"parsedURL":		parsedURL,
-				"queryParameters":	BM.URLUtil.loadParameters(url),
+				"queryParameters":	core.URLUtil.loadParameters(url),
 			};
 
 			// Find the matching route
-			let routes = unit.get("vault", "routing.routes");
+			let routes = RoutePerk.#__vault.get(unit)["routes"];
 			for (let i = routes.length - 1; i >= 0; i--)
 			{
 				// Check origin
@@ -5941,24 +6538,24 @@
 				}
 
 				// Check path
-				let result = (!routes[i]["path"] ? [] : routes[i]._re.exec(parsedURL.pathname));
+				let result = (!routes[i]["path"] ? [] : routes[i].__re.exec(parsedURL.pathname));
 				if (result)
 				{
 					let params = {};
 					for (let j = 0; j < result.length - 1; j++)
 					{
-						params[routes[i]._keys[j].name] = result[j + 1];
+						params[routes[i].__keys[j].name] = result[j + 1];
 					}
 					routeInfo["title"] = routes[i].title;
-					let routeName = RoutePerk.__interpolate(routes[i].name, params);
+					let routeName = RoutePerk.#__interpolate(routes[i].name, params);
 					routeInfo["name"] = routeName;
-					let settingsRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
-					routeInfo["settingsRef"] = RoutePerk.__interpolate(settingsRef, params);
-					let settings = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
-					routeInfo["settings"] = BM.Util.getObject(settings, {"format":RoutePerk.__getSettingFormat(unit)});
-					let extenderRef = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
-					routeInfo["extenderRef"] = RoutePerk.__interpolate(extenderRef, params);
-					routeInfo["extender"] = BM.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
+					let settingsRef = core.Util.safeGet(routes[i], `routeOptions.${routeName}.settingsRef`, routes[i].settingsRef);
+					routeInfo["settingsRef"] = RoutePerk.#__interpolate(settingsRef, params);
+					let settings = core.Util.safeGet(routes[i], `routeOptions.${routeName}.settings`, routes[i].settings);
+					routeInfo["settings"] = core.Util.getObject(settings, {"format":RoutePerk.#__getSettingFormat(unit)});
+					let extenderRef = core.Util.safeGet(routes[i], `routeOptions.${routeName}.extenderRef`, routes[i].extenderRef);
+					routeInfo["extenderRef"] = RoutePerk.#__interpolate(extenderRef, params);
+					routeInfo["extender"] = core.Util.safeGet(routes[i], `routeOptions.${routeName}.extender`, routes[i].extender);
 					routeInfo["routeParameters"] = params;
 					break;
 				}
@@ -5978,7 +6575,7 @@
 		 *
 		 * @return  {Object}		Replaced value.
 		 */
-		static __interpolate(target, params)
+		static #__interpolate(target, params)
 		{
 
 			let ret = target;
@@ -6003,17 +6600,13 @@
 		 *
 		 * @param	{Unit}			unit				Unit.
 		 */
-		static __initPopState(unit)
+		static #__initPopState(unit)
 		{
 
-			window.addEventListener("popstate", (e) => {
-				return Promise.resolve().then(() => {
-					return unit.use("spell", "event.trigger", "beforePopState");
-				}).then(() => {
-					return RoutePerk._open(unit, {"url":window.location.href}, {"pushState":false});
-				}).then(() => {
-					return unit.use("spell", "event.trigger", "afterPopState");
-				});
+			window.addEventListener("popstate", async (e) => {
+				await unit.cast("event.trigger", "beforePopState");
+				await RoutePerk.#_open(unit, {"url":window.location.href}, {"pushState":false});
+				await unit.cast("event.trigger", "afterPopState");
 			});
 
 		}
@@ -6028,7 +6621,7 @@
 		 *
 		 * @return	{String}		State.
 		 */
-		static __getState(msg, options)
+		static #__getState(msg, options)
 		{
 
 			let newState = {
@@ -6037,7 +6630,7 @@
 
 			if (options)
 			{
-				newState = BM.Util.deepMerge(BM.Util.deepClone(options), newState);
+				newState = core.Util.deepMerge(core.Util.deepClone(options), newState);
 			}
 
 			return newState;
@@ -6054,15 +6647,15 @@
 		 *
 		 * @return 	{Promise}		Promise.
 		 */
-		static __fixRoute(unit, url)
+		static #__fixRoute(unit, url)
 		{
 
 			let isOk = true;
-			let newParams = BM.URLUtil.loadParameters(url);
+			let newParams = core.URLUtil.loadParameters(url);
 
 			// Fix invalid paramters
-			Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
-				let item = unit.get("state", `validation.validationResult.invalids.${key}`);
+			Object.keys(unit.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+				let item = unit.get("inventory", `validation.validationResult.invalids.${key}`);
 
 				if (item["fix"] !== undefined)
 				{
@@ -6081,10 +6674,10 @@
 			if (isOk)
 			{
 				// Replace URL
-				RoutePerk._replaceRoute(unit, {"queryParameters":newParams});
+				RoutePerk.#_replaceRoute(unit, {"queryParameters":newParams});
 
 				// Fixed
-				unit.set("state", "validation.validationResult.result", true);
+				unit.set("inventory", "validation.validationResult.result", true);
 			}
 
 		}
@@ -6096,17 +6689,17 @@
 		 *
 		 * @param	{Unit}			unit				Unit.
 		 */
-		static __dumpValidationErrors(unit)
+		static #__dumpValidationErrors(unit)
 		{
 
-			Object.keys(unit.get("state", "validation.validationResult.invalids")).forEach((key) => {
-				let item = unit.get("state", `validation.validationResult.invalids.${key}`);
+			Object.keys(unit.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+				let item = unit.get("inventory", `validation.validationResult.invalids.${key}`);
 
 				if (item.failed)
 				{
 					for (let i = 0; i < item.failed.length; i++)
 					{
-						console.warn("RoutePerk.__dumpValidationErrors(): URL validation failed.",
+						console.warn("RoutePerk.#__dumpValidationErrors(): URL validation failed.",
 							`key=${item.key}, value=${item.value}, rule=${item.failed[i].rule}, validity=${item.failed[i].validity}`);
 					}
 				}
@@ -6123,7 +6716,7 @@
 		 *
 		 * @return  {String}		"js" or "json".
 		 */
-		static __getSettingFormat(unit)
+		static #__getSettingFormat(unit)
 		{
 
 			return unit.get("setting", "routing.options.settingFormat",
@@ -6135,225 +6728,15 @@
 	}
 
 	// =============================================================================
-
-	// =============================================================================
-	//	Alias Perk Class
-	// =============================================================================
-
-	class AliasPerk extends BM.Perk
-	{
-
-		// -------------------------------------------------------------------------
-		//  Properties
-		// -------------------------------------------------------------------------
-
-		static get info()
-		{
-
-			return {
-				"section":		"alias",
-				"order":		330,
-			};
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Methods
-		// -------------------------------------------------------------------------
-
-		static globalInit()
-		{
-
-			// Init vars
-			AliasPerk._records = {};
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		static init(unit, options)
-		{
-
-			// Upgrade unit
-			this.upgrade(unit, "skill", "alias.resolve", function(...args) { return AliasPerk._resolve(...args); });
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Skills
-		// -------------------------------------------------------------------------
-
-		static _resolve(unit, target)
-		{
-
-			return unit.get("setting", `alias.${target}`, {});
-
-		}
-
-	}
-
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
 	// =============================================================================
 
-	// =============================================================================
-	//	RollCall Perk Class
-	// =============================================================================
-
-	class RollCallPerk extends BM.Perk
-	{
-
-		// -------------------------------------------------------------------------
-		//  Properties
-		// -------------------------------------------------------------------------
-
-		static get info()
-		{
-
-			return {
-				"section":		"rollcall",
-				"order":		330,
-			};
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Methods
-		// -------------------------------------------------------------------------
-
-		static globalInit()
-		{
-
-			// Init vars
-			RollCallPerk._records = {};
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		static init(unit, options)
-		{
-
-			// Upgrade unit
-			this.upgrade(unit, "skill", "rollcall.register", function(...args) { return RollCallPerk._register(...args); });
-			this.upgrade(unit, "spell", "rollcall.call", function(...args) { return RollCallPerk._call(...args); });
-			this.upgrade(unit, "event", "doApplySettings", RollCallPerk.RollCallPerk_onDoApplySettings);
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Event handlers
-		// -------------------------------------------------------------------------
-
-		static RollCallPerk_onDoApplySettings(sender, e, ex)
-		{
-
-			Object.entries(BM.Util.safeGet(e.detail, "settings.rollcall.members", {})).forEach(([sectionName, sectionValue]) => {
-				let name = sectionValue["name"] || sectionName;
-				RollCallPerk._register(this, name, sectionValue);
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Skills
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Call unit.
-		 *
-		 * @param	{Unit}			unit				Compoent to register.
-		 * @param	{Object}		optios				Options.
-		 */
-		static _call(unit, name, options)
-		{
-
-			if (!RollCallPerk._records[name])
-			{
-				let waitInfo = {};
-				let timeout = BITSMIST.v1.Unit.get("setting", "system.waitForTimeout", 10000);
-				let promise = new Promise((resolve, reject) => {
-						waitInfo["resolve"] = resolve;
-						waitInfo["reject"] = reject;
-						waitInfo["timer"] = setTimeout(() => {
-							reject(`RollCallPerk.call(): Timed out after ${timeout} milliseconds waiting for ${name}`);
-						}, timeout);
-					});
-				waitInfo["promise"] = promise;
-
-				RollCallPerk.__createEntry(name, null, waitInfo);
-			}
-
-			let entry = RollCallPerk._records[name];
-
-			return Promise.resolve().then(() => {
-				if (BM.Util.safeGet(options, "waitForDOMContentLoaded"))
-				{
-					return this.get("inventory", "promise.documentReady");
-				}
-			}).then(() => {
-				if (BM.Util.safeGet(options, "waitForAttendance"))
-				{
-					return entry.waitInfo.promise;
-				}
-			}).then(() => {
-				return entry.object;
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Register unit.
-		 *
-		 * @param	{Unit}			unit				Compoent to register.
-		 * @param	{String}		name				Register as this name.
-		 */
-		static _register(unit, name)
-		{
-
-			if (!RollCallPerk._records[name])
-			{
-				RollCallPerk.__createEntry(name);
-			}
-
-			let entry = RollCallPerk._records[name];
-			entry.object = unit;
-			entry.waitInfo.resolve();
-			if (entry.waitInfo["timer"])
-			{
-				clearTimeout(entry.waitInfo["timer"]);
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-		// 	Privates
-		// -------------------------------------------------------------------------
-
-		static __createEntry(name, unit, waitInfo)
-		{
-
-			waitInfo = waitInfo || {
-				"promise":	Promise.resolve(),
-				"resolve":	()=>{}, // dummy function
-				"reject":	()=>{}, // dummy function
-				"timer":	null,
-			};
-
-			let record = {
-				"object":	 	unit,
-				"waitInfo":		waitInfo,
-			};
-
-			RollCallPerk._records[name] = record;
-
-			return record;
-
-		}
-
-	}
-
-	// =============================================================================
 
 	// =============================================================================
 	//	Resource Handler class
@@ -6379,7 +6762,7 @@
 
 			this._resourceName = resourceName;
 			this._unit = unit;
-			this._options = new BM.Store({"items":options});
+			this._options = new core.Store({"items":options});
 			this._data = {};
 			this._items = [];
 			this._target = {};
@@ -6442,7 +6825,7 @@
 		{
 
 			this._data = value;
-			this._items = this.__reshapeItems(value);
+			this._items = this.#__reshapeItems(value);
 
 		}
 
@@ -6514,7 +6897,7 @@
 			return Promise.resolve().then(() => {
 				return this._load(id, parameters);
 			}).then((data) => {
-	//			BM.Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._unit.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
+	//			Util.warn(data, `ResourceHandler.load(): No data returned. name=${this._unit.tagName}, handlerName=${this._name}, resourceName=${this._resourceName}`);
 
 				this.data = data;
 
@@ -6554,7 +6937,7 @@
 		add(id, data, parameters)
 		{
 
-			return this._add(id, this.__reshapeData(data), parameters);
+			return this._add(id, this.#__reshapeData(data), parameters);
 
 		}
 
@@ -6572,7 +6955,7 @@
 		update(id, data, parameters)
 		{
 
-			return this._update(id, this.__reshapeData(data), parameters);
+			return this._update(id, this.#__reshapeData(data), parameters);
 
 		}
 
@@ -6694,17 +7077,17 @@
 		 *
 		 * @return  {Object}		Reshaped items.
 		 */
-		__reshapeItems(data)
+		#__reshapeItems(data)
 		{
 
 			// Get items
 			let itemsField = this._options.get("fieldOptions.items");
-			let items = ( itemsField ? BM.Util.safeGet(data, itemsField) : data );
+			let items = ( itemsField ? core.Util.safeGet(data, itemsField) : data );
 
 			// Reshape
 			if (this._options.get("reshapeOptions.load.reshape"))
 			{
-				let reshaper = this._options.get("reshapeOptions.load.reshaper", this.__reshaper_load.bind(this));
+				let reshaper = this._options.get("reshapeOptions.load.reshaper", this.#__reshaper_load.bind(this));
 				items = reshaper(items);
 			}
 
@@ -6721,7 +7104,7 @@
 		 *
 		 * @return  {Object}		Reshaped data.
 		 */
-		__reshapeData(data)
+		#__reshapeData(data)
 		{
 
 			if (this._options.get("reshapeOptions.update.reshape"))
@@ -6743,7 +7126,7 @@
 		 *
 		 * @return  {Object}		Master object.
 	     */
-		__reshaper_load(target)
+		#__reshaper_load(target)
 		{
 
 			let items;
@@ -6766,6 +7149,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Cookie resource handler class
@@ -6784,7 +7176,7 @@
 			let defaults = {"autoLoad":true, "autoFetch":false};
 			super(unit, resourceName, Object.assign(defaults, options));
 
-			this._cookieName = BM.Util.safeGet(options, "cookieOptions.name", "preferences");
+			this._cookieName = core.Util.safeGet(options, "cookieOptions.name", "preferences");
 
 		}
 
@@ -6795,7 +7187,7 @@
 		_load(id, parameters)
 		{
 
-			return this.__getCookie(this._cookieName);
+			return this.#__getCookie(this._cookieName);
 
 		}
 
@@ -6804,7 +7196,7 @@
 		_add(id, data, parameters)
 		{
 
-			this.__setCookie(this._cookieName, data);
+			this.#__setCookie(this._cookieName, data);
 
 		}
 
@@ -6813,7 +7205,7 @@
 		_update(id, data, parameters)
 		{
 
-			this.__setCookie(this._cookieName, data);
+			this.#__setCookie(this._cookieName, data);
 
 		}
 
@@ -6826,7 +7218,7 @@
 		*
 		* @param	{String}		key					Key.
 		*/
-		__getCookie(key)
+		#__getCookie(key)
 		{
 
 			let decoded = document.cookie.split(';').reduce((result, current) => {
@@ -6851,7 +7243,7 @@
 		* @param	{String}		key					Key.
 		* @param	{Object}		value				Value.
 		*/
-		__setCookie(key, value)
+		#__setCookie(key, value)
 		{
 
 			let cookie = key + `=${encodeURIComponent(JSON.stringify(value))}; `;
@@ -6870,6 +7262,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	API Resource Handler class
@@ -6893,7 +7294,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options}).then((xhr) => {
+			return core.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options}).then((xhr) => {
 				return this._convertResponseData(xhr.responseText, dataType);
 			});
 
@@ -6912,7 +7313,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options});
+			return core.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options});
 
 		}
 
@@ -6929,7 +7330,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+			return core.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 		}
 
@@ -6946,7 +7347,7 @@
 
 			let url = this._buildApiUrl(this._resourceName, id, parameters, urlOptions);
 
-			return BM.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
+			return core.AjaxUtil.ajaxRequest({URL:url, method:method, headers:headers, options:options, data:this._convertRequestData(data, dataType)});
 
 		}
 
@@ -7059,7 +7460,7 @@
 						replace("@resource@", resourceName).
 						replace("@id@", id).
 						replace("@dataType@", dataType).
-						replace("@query@", BM.URLUtil.buildQuery(parameters)).
+						replace("@query@", core.URLUtil.buildQuery(parameters)).
 						replace("@version@", version);
 
 			return url
@@ -7069,6 +7470,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Object Resource Handler class
@@ -7117,6 +7527,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Linked Resource Handler class
@@ -7194,10 +7613,10 @@
 		_load(id, parameters)
 		{
 
-			let rootNode = this._options.get("rootNode");
+			let rootNode = this._options.get("selector");
 			let resourceName = this._options.get("resourceName") || this._resourceName;
 
-			return this._unit.use("spell", "status.wait", [rootNode]).then(() => {
+			return this._unit.cast("status.wait", [rootNode]).then(() => {
 				this._ref = document.querySelector(rootNode).get("inventory", "resource.resources")[resourceName];
 				return this._ref;
 			});
@@ -7238,6 +7657,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Web Storage handler class
@@ -7294,6 +7722,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Locale Formatter util class
@@ -7353,6 +7790,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Locale Value Util Class
@@ -7363,20 +7809,6 @@
 
 		// -------------------------------------------------------------------------
 		//  Setter/Getter
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Class name.
-		 *
-		 * @type	{String}
-		 */
-		static get name()
-		{
-
-			return "LocaleValueUtil";
-
-		}
-
 		// -------------------------------------------------------------------------
 
 		/**
@@ -7408,6 +7840,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Locale Handler class
@@ -7432,8 +7873,8 @@
 			options = options || {};
 
 			this._unit = unit;
-			this._options = new BM.Store({"items":options});
-			this._messages = new BM.ChainableStore();
+			this._options = new core.Store({"items":options});
+			this._messages = new core.ChainableStore();
 			this._valueHandler = this.options.get("valueHandler", LocaleValueUtil);
 			this._localeInfo = {};
 
@@ -7488,7 +7929,7 @@
 
 			// Get messages from settings
 			if (options["messages"]) {
-				let messages = BM.Util.getObject(options["messages"], {"format":this.__getMessageFormat(this._unit)});
+				let messages = core.Util.getObject(options["messages"], {"format":this.#__getMessageFormat(this._unit)});
 				this._messages.merge(messages);
 			}
 
@@ -7559,7 +8000,7 @@
 		loadMessages(localeName, options)
 		{
 
-			let splitMessages = BM.Util.safeGet(options, "splitLocale",
+			let splitMessages = core.Util.safeGet(options, "splitLocale",
 									this._options.get("handlerOptions.splitLocale",
 										this._unit.get("setting", "system.locale.options.splitLocale")));
 			localeName = ( splitMessages ? localeName : "" );
@@ -7572,11 +8013,11 @@
 				return promise;
 			}
 
-			if (this.__hasExternalMessages(this._unit))
+			if (this.#__hasExternalMessages(this._unit))
 			{
-				let url = this.__getMessageURL(this._unit, localeName);
-				promise = BM.AjaxUtil.loadJSON(url, options).then((messages) => {
-					localeInfo["messages"] = BM.Util.getObject(messages, {"format":this.__getMessageFormat(this._unit)});
+				let url = this.#__getMessageURL(this._unit, localeName);
+				promise = core.AjaxUtil.loadJSON(url, options).then((messages) => {
+					localeInfo["messages"] = core.Util.getObject(messages, {"format":this.#__getMessageFormat(this._unit)});
 					localeInfo["status"] = "loaded";
 					this._messages.merge(messages);
 					this._localeInfo[localeName] = localeInfo;
@@ -7598,7 +8039,7 @@
 		 *
 		 * @return  {Boolean}		True if the unit has the external messages file.
 		 */
-		__hasExternalMessages(unit)
+		#__hasExternalMessages(unit)
 		{
 
 			let ret = false;
@@ -7622,7 +8063,7 @@
 		 *
 		 * @return  {String}		URL.
 		 */
-		__getMessageURL(unit, localeName)
+		#__getMessageURL(unit, localeName)
 		{
 
 			let path;
@@ -7633,7 +8074,7 @@
 			if (localeRef && localeRef !== true)
 			{
 				// If URL is specified in ref, use it
-				let url = BM.URLUtil.parseURL(localeRef);
+				let url = core.URLUtil.parseURL(localeRef);
 				fileName = url.filename;
 				path = url.path;
 				query = url.query;
@@ -7641,12 +8082,12 @@
 			else
 			{
 				// Use default path and filename
-				path = BM.Util.concatPath([
+				path = core.Util.concatPath([
 						unit.get("setting", "system.locale.options.path", unit.get("setting", "system.unit.options.path", "")),
 						unit.get("setting", "locale.options.path", unit.get("setting", "unit.options.path", "")),
 					]);
 				fileName = this._options.get("handlerOptions.fileName", unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()));
-				let ext = this.__getMessageFormat(unit);
+				let ext = this.#__getMessageFormat(unit);
 				query = unit.get("setting", "unit.options.query");
 
 				// Split Locale
@@ -7658,7 +8099,7 @@
 				fileName = `${fileName}.messages.${ext}`;
 			}
 
-			return BM.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+			return core.Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 
 		}
 
@@ -7671,7 +8112,7 @@
 		 *
 		 * @return  {String}            "js" or "json".
 		 */
-		__getMessageFormat(unit)
+		#__getMessageFormat(unit)
 		{
 
 			return this._options.get("messageFormat",
@@ -7684,6 +8125,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	LocaleServer Handler class
@@ -7702,9 +8152,9 @@
 			let serverNode = this._unit.get("setting", "locale.options.localeServer", this._unit.get("setting", "system.locale.options.localeServer"));
 			serverNode = ( serverNode === true ? "bm-locale" : serverNode );
 
-			BM.Util.assert(serverNode, `Locale Server node not specified in settings. name=${this._unit.tagName}`);
+			core.Util.assert(serverNode, () => `Locale Server node not specified in settings. name=${this._unit.tagName}`);
 
-			return this._unit.use("spell", "status.wait", [serverNode]).then(() => {
+			return this._unit.cast("status.wait", [serverNode]).then(() => {
 				let server = document.querySelector(serverNode);
 				this._messages.chain(server.get("inventory", "locale.messages"));
 			});
@@ -7720,6 +8170,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Validation Handler class
@@ -7744,7 +8203,7 @@
 			options = options || {};
 
 			this._unit = unit;
-			this._options = new BM.Store({"items":options});
+			this._options = new core.Store({"items":options});
 
 		}
 
@@ -7939,6 +8398,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	HTML5 Form validation Handler class
@@ -7969,7 +8437,7 @@
 
 			let invalids1 = {};
 			let invalids2;
-			let form = BM.Util.scopedSelectorAll(this._unit, "form")[0];
+			let form = core.Util.scopedSelectorAll(this._unit, "form")[0];
 			if (rules || options)
 			{
 				// Check allow/disallow list
@@ -7977,10 +8445,10 @@
 				invalids1 = super._validate(values, rules, options);
 			}
 			invalids2 = this._validate(form, rules);
-			let invalids = BM.Util.deepMerge(invalids1, invalids2);
+			let invalids = core.Util.deepMerge(invalids1, invalids2);
 
-			this._unit.set("state", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
-			this._unit.set("state", "validation.validationResult.invalids", invalids);
+			this._unit.set("inventory", "validation.validationResult.result", (Object.keys(invalids).length > 0 ? false : true ));
+			this._unit.set("inventory", "validation.validationResult.invalids", invalids);
 
 		}
 
@@ -7989,10 +8457,10 @@
 		reportValidity(values, rules)
 		{
 
-			let form = BM.Util.scopedSelectorAll(this._unit, "form")[0];
+			let form = core.Util.scopedSelectorAll(this._unit, "form")[0];
 
-			BM.Util.assert(form, `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
-			BM.Util.assert(form.reportValidity, `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
+			core.Util.assert(form, () => `FormValidationHandler.reportValidity(): Form tag does not exist.`, TypeError);
+			core.Util.assert(form.reportValidity, () => `FormValidationHandler.reportValidity(): Report validity not supported.`, TypeError);
 
 			form.reportValidity();
 
@@ -8007,10 +8475,10 @@
 
 			let invalids = {};
 
-			BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-			BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+			core.Util.assert(form, () => `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+			core.Util.assert(form.checkValidity, () => `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
-			let elements = BM.Util.scopedSelectorAll(form, "input:not([novalidate])");
+			let elements = core.Util.scopedSelectorAll(form, "input:not([novalidate])");
 			elements.forEach((element) => {
 				let key = element.getAttribute("bm-bind");
 				let value = this._valueHandler.getValue(element);
@@ -8034,8 +8502,8 @@
 
 			let invalids = [];
 
-			BM.Util.assert(form, `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
-			BM.Util.assert(form.checkValidity, `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
+			Util.assert(form, () => `FormValidationHandler.checkValidity(): Form tag does not exist.`, TypeError);
+			Util.assert(form.checkValidity, () => `FormValidationHandler.checkValidity(): check validity not supported.`, TypeError);
 
 			if (!form.checkValidity())
 			{
@@ -8085,6 +8553,15 @@
 	}
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Object validation Handler class
@@ -8102,10 +8579,10 @@
 
 			let invalids1 = super._validate(values, rules, options); // Check allow/disallow/required
 			let invalids2 = this._validate(values, rules);
-			let invalids = BM.Util.deepMerge(invalids1, invalids2);
+			let invalids = core.Util.deepMerge(invalids1, invalids2);
 
-			this._unit.set("state", "validation.validationResult.result", ( Object.keys(invalids).length > 0 ? false : true ));
-			this._unit.set("state", "validation.validationResult.invalids", invalids);
+			this._unit.set("inventory", "validation.validationResult.result", ( Object.keys(invalids).length > 0 ? false : true ));
+			this._unit.set("inventory", "validation.validationResult.invalids", invalids);
 
 		}
 
@@ -8312,796 +8789,21 @@
 	}
 
 	// =============================================================================
-
-	// =============================================================================
-	//	Chained Select Class
-	// =============================================================================
-
-	class ChainedSelect extends BM.Unit
-	{
-
-		// -------------------------------------------------------------------------
-		//	Settings
-		// -------------------------------------------------------------------------
-
-		_getSettings()
-		{
-
-			return {
-				"setting": {
-					"autoClear":					true,
-					"autoSubmit":					true,
-					"useDefaultInput":				true,
-					"rootNodes": {
-						"newitem": 					".btn-newitem",
-						"removeitem":				".btn-removeitem",
-						"edititem":					".btn-edititem",
-						"select":					"select"
-					},
-				},
-				"event": {
-					"events": {
-						"this": {
-							"handlers": {
-								"beforeStart":		["ChainedSelect_onBeforeStart"],
-								"afterTransform":	["ChainedSelect_onAfterTransform"],
-								"doClear":			["ChainedSelect_onDoClear"],
-								"doFill":			["ChainedSelect_onDoFill"],
-							}
-						},
-						"cmb-item": {
-							"rootNode":				"select",
-							"handlers": {
-								"change": 			["ChainedSelect_onCmbItemChange"],
-							}
-						},
-						"btn-newitem": {
-							"rootNode":				".btn-newitem",
-							"handlers": {
-								"click":			["ChainedSelect_onBtnNewItemClick"],
-							}
-						},
-						"btn-edititem": {
-							"rootNode":				".btn-edititem",
-							"handlers": {
-								"click":			["ChainedSelect_onBtnEditItemClick"],
-							}
-						},
-						"btn-removeitem": {
-							"rootNode":				".btn-removeitem",
-							"handlers": {
-								"click": 			["ChainedSelect_onBtnRemoveItemClick"],
-							}
-						}
-					}
-				},
-				"validation": {
-				}
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-		//  Setter/Getter
-		// -------------------------------------------------------------------------
-
-		/**
-		* Items.
-		*
-		* @type	{Number}
-		*/
-		get items()
-		{
-
-			let length = 0;
-			let level = 1;
-
-			while (this.querySelector(`:scope .item[data-level='${level}'] select`))
-			{
-				level++;
-				length++;
-			}
-
-			return length;
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Event Handlers
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBeforeStart(sender, e, ex)
-		{
-
-			this.rootNodes = this.get("setting", "options.rootNodes");
-
-			if (this.get("setting", "options.useDefaultInput", true))
-			{
-				this.use("skills", "event.add", "beforeAdd", "ChainedSelect_onBeforeAdd");
-				this.use("skills", "event.add", "doAdd", "ChainedSelect_onDoAdd");
-				this.use("skills", "event.add", "beforeEdit", "ChainedSelect_onBeforeEdit");
-				this.use("skills", "event.add", "doEdit", "ChainedSelect_onDoEdit");
-				this.use("skills", "event.add", "beforeRemove", "ChainedSelect_onBeforeRemove");
-				this.use("skills", "event.add", "doRemove", "ChainedSelect_onDoRemove");
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onAfterTransform(sender, e, ex)
-		{
-
-			// Init select elements (disable all)
-			this.use("skills", "basic.clear", {"fromLevel":1, "toLevel":this.length});
-
-			if (!this.get("setting", "options.isAddable", true))
-			{
-				this.querySelectorAll(`:scope ${this.rootNodes["newitem"]}`).forEach((element) => {
-					element.style.display = "none";
-				});
-			}
-
-			if (!this.get("setting", "options.isEditable", true))
-			{
-				this.querySelectorAll(`:scope ${this.rootNodes["edititem"]}`).forEach((element) => {
-					element.style.display = "none";
-				});
-			}
-
-			if (!this.get("setting", "options.isRemovable", true))
-			{
-				this.querySelectorAll(`:scope ${this.rootNodes["removeitem"]}`).forEach((element) => {
-					element.style.display = "none";
-				});
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onDoClear(sender, e, ex)
-		{
-
-			let fromLevel = BM.Util.safeGet(e.detail, "fromLevel", 1);
-			let toLevel = BM.Util.safeGet(e.detail, "toLevel", this.length);
-
-			for (let i = fromLevel; i <= toLevel; i++)
-			{
-				if (this.get("setting", "options.autoClear")) {
-					this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).options.length = 0;
-				}
-				this.querySelector(`:scope .item[data-level='${i}'] ${this.rootNodes["select"]}`).selectedIndex = -1;
-				this._initElement("select", i);
-				this._initElement("newitem", i);
-				this._initElement("edititem", i);
-				this._initElement("removeitem", i);
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onDoFill(sender, e, ex)
-		{
-
-			let level = BM.Util.safeGet(e.detail, "level", 1);
-			this.assignItems(level, this.items);
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onCmbItemChange(sender, e, ex)
-		{
-
-			return this.selectItem(sender.parentNode.getAttribute("data-level"), sender.value);
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBtnNewItemClick(sender, e, ex)
-		{
-
-			if (sender.classList.contains("disabled")) {
-				return;
-			}
-
-			let level = sender.parentNode.getAttribute("data-level");
-			this.set("state", "dialog.modalResult.result", false);
-			let options = {
-				"level":level,
-				"validatorName": "",
-			};
-
-			return this.use("skills", "event.trigger", "beforeAdd", options).then(() => {
-				if (this.get("state", "dialog.modalResult.result"))
-				{
-					return this.validate(options).then(() => {
-						if(this.get("state", "validation.validationResult.result"))
-						{
-							return Promise.resolve().then(() => {
-								return this.use("skills", "event.trigger", "doAdd", options);
-							}).then(() => {
-								return this.use("skills", "event.trigger", "afterAdd", options);
-							}).then(() => {
-								if (this.get("setting", "options.autoSubmit", true))
-								{
-									return this.use("skills", "form.submit", options);
-								}
-							});
-						}
-					});
-				}
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBtnEditItemClick(sender, e, ex)
-		{
-
-			if (sender.classList.contains("disabled")) {
-				return;
-			}
-
-			let level = sender.parentNode.getAttribute("data-level");
-			this.set("state", "dialog.modalResult.result", false);
-			let options = {
-				"level":level,
-				"validatorName": "",
-			};
-
-			return this.use("skills", "event.trigger", "beforeEdit", options).then(() => {
-				if (this.get("state", "dialog.modalResult.result"))
-				{
-					return this.validate(options).then(() => {
-						if(this.get("state", "validation.validationResult.result"))
-						{
-							return Promise.resolve().then(() => {
-								return this.use("skills", "event.trigger", "doEdit", options);
-							}).then(() => {
-								return this.use("skills", "event.trigger", "afterEdit", options);
-							}).then(() => {
-								if (this.get("setting", "options.autoSubmit", true))
-								{
-									return this.use("skills", "form.submit", options);
-								}
-							});
-						}
-					});
-				}
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		onChainedSelect_onBtnRemoveItemClick(sender, e, ex)
-		{
-
-			if (sender.classList.contains("disabled")) {
-				return;
-			}
-
-			let level = sender.parentNode.getAttribute("data-level");
-			this.set("state", "dialog.modalResult.result", false);
-			let options = {
-				"level":level,
-				"validatorName": "",
-			};
-
-			return this.use("spell", "event.trigger", "beforeRemove", options).then(() => {
-				if (this.get("state", "dialog.modalResult.result"))
-				{
-					return this.validate(options).then(() => {
-						if(this.get("state", "validation.validationResult.result"))
-						{
-							return Promise.resolve().then(() => {
-								return this.use("spell", "event.trigger", "doRemove", options);
-							}).then(() => {
-								return this.use("spell", "event.trigger", "afterRemove", options);
-							}).then(() => {
-								if (this.get("setting", "options.autoSubmit", true))
-								{
-									return this.use("spell", "form.submit", options);
-								}
-							});
-						}
-					});
-				}
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBeforeAdd(sender, e, ex)
-		{
-
-			return new Promise((resolve, reject) => {
-				let text = window.prompt("アイテム名を入力してください", "");
-				if (text)
-				{
-					this.set("state", "dialog.modalResult.text", text);
-					this.set("state", "dialog.modalResult.value", text);
-					this.set("state", "dialog.modalResult.result", true);
-				}
-				resolve();
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onDoAdd(sender, e, ex)
-		{
-
-			return this.newItem(e.detail.level, this.get("state", "dialog.modalResult.text"), this.get("state", "dialog.modalResult.value"));
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBeforeEdit(sender, e, ex)
-		{
-
-			let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
-			let selectBox = this.getSelect(level);
-
-			return new Promise((resolve, reject) => {
-				let text = window.prompt("アイテム名を入力してください", "");
-				if (text)
-				{
-					this.set("state", "dialog.modalResult.old", {
-						"text": selectBox.options[selectBox.selectedIndex].text,
-						"value": selectBox.value
-					});
-					this.set("state", "dialog.modalResult.new", {
-						"text": text,
-						"value": text
-					});
-					this.set("state", "dialog.modalResult.result", true);
-				}
-				resolve();
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onDoEdit(sender, e, ex)
-		{
-
-			return this.editItem(e.detail.level, this.get("state", "dialog.modalResult.new.text"), this.get("state", "dialog.modalResult.new.value"));
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onBeforeRemove(sender, e, ex)
-		{
-
-			return new Promise((resolve, reject) => {
-				if (window.confirm("削除しますか？"))
-				{
-					let level = parseInt(BM.Util.safeGet(e.detail, "level", 1));
-					let selectBox = this.getSelect(level);
-
-					this.set("state", "dialog.modalResult.text", selectBox.options[selectBox.selectedIndex].text);
-					this.set("state", "dialog.modalResult.value", selectBox.value);
-					this.set("state", "dialog.modalResult.result", true);
-				}
-				resolve();
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		ChainedSelect_onDoRemove(sender, e, ex)
-		{
-
-			return this.removeItem(e.detail.level);
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Methods
-		// -------------------------------------------------------------------------
-
-		/**
-		 *  Get the specified level select element.
-		 *
-		 * @param	{Number}		level				Level to retrieve.
-		 */
-		getSelect(level)
-		{
-
-			return this.querySelector(`:scope [data-level='${level}'] ${this.rootNodes["select"]}`);
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Assign objects to the select element.
-		 *
-		 * @param	{Number}		level				Level.
-		 * @param	{Object}		parentObject		Parent object.
-		 */
-		assignItems(level, items)
-		{
-
-			// Prerequisite check
-			let selectBox = this.querySelector(`:scope [data-level='${level}'] > select`);
-			BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-			items = items || {};
-
-			if (Array.isArray(items))
-			{
-				// items is an array
-				for (let i = 0; i < items.length; i++)
-				{
-					let item = document.createElement("option");
-					if (typeof(items[i] === "object"))
-					{
-						item.value = BM.Util.safeGet(items[i], "value", items[i]);
-						item.text = BM.Util.safeGet(items[i], "text", items[i]);
-						let css = BM.Util.safeGet(items[i], "css");
-						if (css) {
-							Object.keys(css).forEach((style) => {
-								item.css[style] = css[style];
-							});
-						}
-					}
-					else
-					{
-						item.value = items[i];
-						item.text = items[i];
-					}
-					selectBox.add(item);
-				}
-			}
-			else
-			{
-				// items is an object
-				Object.keys(items).forEach((key) => {
-					let item = document.createElement("option");
-					item.value = BM.Util.safeGet(items[key], "value", key);
-					item.text = BM.Util.safeGet(items[key], "text", key);
-					let css = BM.Util.safeGet(items[key], "css");
-					if (css) {
-						Object.keys(css).forEach((style) => {
-							item.css[style] = css[style];
-						});
-					}
-					selectBox.add(item);
-				});
-			}
-
-			selectBox.value = "";
-
-			this._initElement("select", level, true);
-			this._initElement("newitem", level, true);
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Select an item.
-		 *
-		 * @param	{Number}		level				Level.
-		 * @param	{String}		itemId				Item id.
-		 */
-		selectItem(level, itemId)
-		{
-
-			// Prerequisite check
-			let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-			BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-			selectBox.value = itemId;
-
-			this._initElement("edititem", level, true);
-			this._initElement("removeitem", level, true);
-
-			// Clear children
-			this.use("spell", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
-
-			// Refresh the child select element
-			return Promise.resolve().then(() => {
-				level++;
-				let nextSelectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-				if (nextSelectBox) {
-					this._initElement("newitem", level);
-					return this.use("spell", "basic.refresh", {"level":level, "value":itemId});
-				}
-			});
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Create a new item.
-		 *
-		 * @param	{Number}		level				Level.
-		 * @param	{String}		itemName			Item name set as select's text.
-		 * @param	{String}		itemId				Item id set as select's value.
-		 */
-		newItem(level, itemName, itemId)
-		{
-
-			// Prerequisite check
-			let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-			BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-			// Backup current index since it changes after an option is added when select has no option.
-			let curIndex = selectBox.selectedIndex;
-
-			let item = document.createElement("option");
-			item.value = (itemId ? itemId : itemName);
-			item.text = itemName;
-			selectBox.add(item);
-
-			// Restore index
-			selectBox.selectedIndex = curIndex;
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Edit an item.
-		 *
-		 * @param	{Number}		level				Level.
-		 * @param	{String}		itemName			Item name set as select's text.
-		 * @param	{String}		itemId				Item id set as select's value.
-		 */
-		editItem(level, itemName, itemId)
-		{
-
-			// Prerequisite check
-			let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-			BM.Util.assert(selectBox, `ChainedSelect.editItem(): select not found. name=${this.tagName}, level=${level}`);
-
-			// Edit the selectbox
-			selectBox.options[selectBox.selectedIndex].text = itemName;
-			selectBox.options[selectBox.selectedIndex].value = (itemId ? itemId : itemName);
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Remove an item.
-		 *
-		 * @param	{Number}		level				Level.
-		 */
-		removeItem(level)
-		{
-
-			// Prerequisite check
-			let selectBox = this.querySelector(`:scope .item[data-level='${level}'] select`);
-			BM.Util.assert(selectBox, `ChainedSelect.removeItem(): select not found. name=${this.tagName}, level=${level}`);
-
-			// Remove from the select element
-			selectBox.remove(selectBox.selectedIndex);
-			selectBox.value = "";
-			this._initElement("edititem", level);
-			this._initElement("removeitem", level);
-
-			// Reset children select elements
-			this.use("spell", "basic.clear", {"fromLevel":parseInt(level) + 1, "toLevel":this.length});
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Protected
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Init an element.
-		 *
-		 * @param	{String}		type				CSS Selector of the element to init.
-		 * @param	{Number}		level				Level.
-		 * @param	{Boolean}		enable				Enable an element when true. Disable otherwise.
-		 */
-		_initElement(type, level, enable)
-		{
-
-			type = this.rootNodes[type];
-
-			if (enable)
-			{
-				this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = false;
-				this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.remove("disabled");
-			}
-			else
-			{
-				this.querySelector(`:scope .item[data-level='${level}'] ${type}`).disabled = true;
-				this.querySelector(`:scope .item[data-level='${level}'] ${type}`).classList.add("disabled");
-			}
-
-		}
-
-	}
-
-	customElements.define("bm-chainedselect", ChainedSelect);
-
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
 	// =============================================================================
 
-	// =============================================================================
-	//	Tab Index Class
-	// =============================================================================
-
-	class TabIndex extends BM.Unit
-	{
-
-		// -------------------------------------------------------------------------
-		//	Settings
-		// -------------------------------------------------------------------------
-
-		_getSettings()
-		{
-
-			return {
-				"basic": {
-					"options": {
-						"autoTransform":			false,
-					}
-				},
-				"event": {
-					"events": {
-						"tab-indices": {
-							"rootNode": 			"[data-tabindex]",
-							"handlers": {
-								"click": 			["TabIndex_onTabIndexClick"]
-							}
-						},
-					}
-				},
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Event Handlers
-		// -------------------------------------------------------------------------
-
-		TabIndex_onTabIndexClick(sender, e, ex)
-		{
-
-			if (sender.classList.contains("active")) {
-				return;
-			}
-
-			this.switchIndex(sender.getAttribute("data-tabindex"));
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Methods
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Switch to the specified index.
-		 *
-		 * @param	{String}		index				Index.
-		 */
-		switchIndex(index)
-		{
-
-			this.querySelector(":scope [data-tabindex].active").classList.remove("active");
-			let tabIndex = this.querySelector(`:scope [data-tabindex='${index}']`);
-			tabIndex.classList.add("active");
-
-			let container = document.querySelector(this.getAttribute("data-pair"));
-			if (container) {
-				container.switchContent(index);
-			} else {
-				console.log("@@@no pair");
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Get the current active index.
-		 *
-		 * @return  {HTMLElement}	Current active element.
-		 */
-		getActiveIndex()
-		{
-
-			return this.querySelector(":scope .active");
-
-		}
-
-	}
-
-	customElements.define("bm-tabindex", TabIndex);
-
-	// =============================================================================
-
-	// =============================================================================
-	//	Tab Content Class
-	// =============================================================================
-
-	class TabContent extends BM.Unit
-	{
-
-		// -------------------------------------------------------------------------
-		//	Settings
-		// -------------------------------------------------------------------------
-
-		_getSettings()
-		{
-
-			return {
-				"basic": {
-					"options": {
-						"autoTransform":			false,
-					}
-				},
-			}
-
-		}
-
-		// -------------------------------------------------------------------------
-		//	Methods
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Switch to the specified content.
-		 *
-		 * @param	{String}		index				Index.
-		 */
-		switchContent(index)
-		{
-
-			// Deactivate current active content
-			this.querySelector(":scope > .active").classList.remove("active");
-
-			// Activate specified content
-			this.querySelector(`:scope > [data-tabindex='${index}']`).classList.add("active");
-			this.querySelector(`:scope > [data-tabindex='${index}']`).focus();
-		//		this.querySelector(`:scope nth-child(${index})`).classList.add("active");
-		//		this.querySelector(`:scope > [data-index='${index}']`).focus();
-
-		}
-
-		// -------------------------------------------------------------------------
-
-		/**
-		 * Get the current active content.
-		 *
-		 * @return  {HTMLElement}	Current active element.
-		 */
-		getActiveContent()
-		{
-
-			return this.querySelector(":scope .active");
-
-		}
-
-	}
-
-	customElements.define("bm-tabcontent", TabContent);
-
-	// =============================================================================
 
 	// =============================================================================
 	//	Preference Server Class
 	// =============================================================================
 
-	class PreferenceServer extends BM.Unit
+	class PreferenceServer extends core.Unit
 	{
 
 		// -------------------------------------------------------------------------
@@ -9114,34 +8816,34 @@
 			return {
 				"basic": {
 					"options": {
-						"autoRefresh":				false,
+						"autoRefresh":					false,
 					}
 				},
 				"event": {
 					"events": {
 						"this": {
 							"handlers": {
-								"beforeStart":		["PreferenceServer_onBeforeStart"],
-								"beforeSubmit":		["PreferenceServer_onBeforeSubmit"],
-								"doReportValidity":	["PreferenceServer_onDoReportValidity"]
+								"beforeStart":			["PreferenceServer_onBeforeStart"],
+								"beforeSubmit":			["PreferenceServer_onBeforeSubmit"],
+								"doReportValidity":		["PreferenceServer_onDoReportValidity"]
 							}
 						}
 					}
 				},
 				"form": {
 					"options": {
-						"autoCollect":				false,
-						"autoCrop":					false,
+						"autoCollect":					false,
+						"autoCrop":						false,
 					}
 				},
 				"skin": {
 					"options": {
-						"skinRef":					false,
+						"hasSkin":						false,
 					}
 				},
 				"style": {
 					"options": {
-						"styleRef":					false,
+						"hasStyle":						false,
 					}
 				},
 			}
@@ -9197,8 +8899,8 @@
 		{
 
 			let msg = `Invalid preference value. name=${this.tagName}`;
-			Object.keys(this.get("state", "validation.validationResult.invalids")).forEach((key) => {
-				msg += "\n\tkey=" + this.get("state", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("state", `validation.validationResult.invalids.${key}.value`);
+			Object.keys(this.get("inventory", "validation.validationResult.invalids")).forEach((key) => {
+				msg += "\n\tkey=" + this.get("inventory", `validation.validationResult.invalids.${key}.key`) + ", value=" + this.get("inventory", `validation.validationResult.invalids.${key}.value`);
 			});
 			console.error(msg);
 
@@ -9255,7 +8957,7 @@
 
 			let validatorName = this.get("setting", "options.validatorName");
 
-			return this.use("spell", "form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
+			return this.cast("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
 
 		}
 
@@ -9273,9 +8975,9 @@
 		_triggerEvent(changedItems, observerInfo, options)
 		{
 
-			let sender = BM.Util.safeGet(options, "sender", this);
+			let sender = core.Util.safeGet(options, "sender", this);
 
-			return this.use("spell", "preference.apply", {"sender":sender, "preferences":changedItems});
+			return this.cast("preference.apply", {"sender":sender, "preferences":changedItems});
 
 		}
 
@@ -9312,12 +9014,21 @@
 	customElements.define("bm-preference", PreferenceServer);
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Error Server class
 	// =============================================================================
 
-	class ErrorServer extends BM.Unit
+	class ErrorServer extends core.Unit
 	{
 
 		// -------------------------------------------------------------------------
@@ -9330,26 +9041,26 @@
 			return {
 				"basic": {
 					"options": {
-						"autoRefresh":				false,
+						"autoRefresh":					false,
 					}
 				},
 				"event": {
 					"events": {
 						"this": {
 							"handlers": {
-								"beforeStart":		["ErrorServer_onBeforeStart"],
+								"beforeStart":			["ErrorServer_onBeforeStart"],
 							}
 						}
 					}
 				},
 				"skin": {
 					"options": {
-						"skinRef":					false,
+						"hasSkin":						false,
 					}
 				},
 				"style": {
 					"options": {
-						"styleRef":					false,
+						"hasStyle":						false,
 					}
 				},
 			}
@@ -9363,10 +9074,10 @@
 		ErrorServer_onBeforeStart(sender, e, ex)
 		{
 
-			this._observers = new BM.ObservableStore({"filter":this.__filter});
+			this._observers = new ObservableStore({"filter":this.#__filter});
 
 			// Install error listner
-			this.__initListeners();
+			this.#__initListeners();
 
 		}
 
@@ -9380,7 +9091,7 @@
 		 * @param	{Unit}			unit				Unit.
 		 * @param	{Object}		observerInfo		Observer info.
 		 */
-		__filter(conditions, observerInfo, ...args)
+		#__filter(conditions, observerInfo, ...args)
 		{
 
 			let result = false;
@@ -9405,11 +9116,11 @@
 		/**
 		 * Init error handling listeners.
 		 */
-		__initListeners()
+		#__initListeners()
 		{
 
-			window.addEventListener("unhandledrejection", this.__rejectionHandler.bind(this));
-			window.addEventListener("error", this.__errorHandler.bind(this));
+			window.addEventListener("unhandledrejection", this.#__rejectionHandler.bind(this));
+			window.addEventListener("error", this.#__errorHandler.bind(this));
 
 		}
 
@@ -9420,7 +9131,7 @@
 		 *
 		 * @param	{Error}			error				Error object.
 		 */
-		__rejectionHandler(error)
+		#__rejectionHandler(error)
 		{
 
 			let e = {};
@@ -9446,7 +9157,7 @@
 					e.message = error;
 				}
 				e.type = error.type;
-				e.name = this.__getErrorName(error);
+				e.name = this.#__getErrorName(error);
 				e.filename = "";
 				e.funcname = "";
 				e.lineno = "";
@@ -9454,7 +9165,7 @@
 				// e.stack = error.reason.stack;
 				// e.object = error.reason;
 				//
-				this.__handleException(e);
+				this.#__handleException(e);
 			}
 			catch(e)
 			{
@@ -9476,7 +9187,7 @@
 		 * @param	{Number}		line				Line no.
 		 * @param	{Number}		col					Col no.
 		 */
-		__errorHandler(error, file, line, col)
+		#__errorHandler(error, file, line, col)
 		{
 
 			let e = {};
@@ -9484,7 +9195,7 @@
 			try
 			{
 				e.type = "error";
-				e.name = this.__getErrorName(error);
+				e.name = this.#__getErrorName(error);
 				e.message = error.message;
 				e.file = error.filename;
 				e.line = error.lineno;
@@ -9495,7 +9206,7 @@
 					e.object = error.error;
 				}
 
-				this.__handleException(e);
+				this.#__handleException(e);
 			}
 			catch(e)
 			{
@@ -9516,7 +9227,7 @@
 		 *
 		 * @return  {String}		Error name.
 		 */
-		__getErrorName(error)
+		#__getErrorName(error)
 		{
 
 			let name;
@@ -9556,7 +9267,7 @@
 		 *
 		 * @param	{Object}		e					Error object.
 		 */
-		__handleException(e)
+		#__handleException(e)
 		{
 
 			//window.stop();
@@ -9575,10 +9286,10 @@
 							Object.keys(routeInfo["queryParameters"]).forEach((key) => {
 								routeInfo["queryParameters"][key] = routeInfo["queryParameters"][key].replace("@URL@", location.href);
 							});
-							window.location.href = BM.URLUtil.buildURL(routeInfo);
+							window.location.href = core.URLUtil.buildURL(routeInfo);
 							/*
-							let tagName = options["rootNode"] || "bm-router";
-							document.querySelector(tagName).use("spell", "routing.openRoute", routeInfo, {"jump":true});
+							let tagName = options["selector"] || "bm-router";
+							document.querySelector(tagName).cast("routing.openRoute", routeInfo, {"jump":true});
 							*/
 							break;
 						}
@@ -9595,12 +9306,21 @@
 	customElements.define("bm-error", ErrorServer);
 
 	// =============================================================================
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
+
 
 	// =============================================================================
 	//	Router Class
 	// =============================================================================
 
-	class Router extends BM.Unit
+	class Router extends core.Unit
 	{
 
 		// -------------------------------------------------------------------------
@@ -9613,20 +9333,20 @@
 			return {
 				"basic": {
 					"options": {
-						"autoRefresh":				false,
-						"autoFetch":				false,
-						"autoClear":				false,
-						"autoFill":					false,
+						"autoRefresh":					false,
+						"autoFetch":					false,
+						"autoClear":					false,
+						"autoFill":						false,
 					}
 				},
 				"skin": {
 					"options": {
-						"skinRef":					false,
+						"hasSkin":						false,
 					}
 				},
 				"style": {
 					"options": {
-						"styleRef":					false,
+						"hasStyle":						false,
 					}
 				},
 				"routing": {
@@ -9640,48 +9360,53 @@
 	customElements.define("bm-router", Router);
 
 	// =============================================================================
-	window.BITSMIST.v1.MultiStore = MultiStore;
-	window.BITSMIST.v1.ArrayStore = ArrayStore;
-	window.BITSMIST.v1.ObservableStore = ObservableStore;
-	window.BITSMIST.v1.BindableStore = BindableStore;
-	window.BITSMIST.v1.BindableArrayStore = BindableArrayStore;
-	BM.PerkPerk.register(FilePerk);
-	BM.PerkPerk.register(ErrorPerk);
-	BM.PerkPerk.register(ElementPerk);
-	BM.PerkPerk.register(ResourcePerk);
-	BM.PerkPerk.register(ValidationPerk);
-	BM.PerkPerk.register(FormPerk);
-	BM.PerkPerk.register(ListPerk);
-	BM.PerkPerk.register(DatabindingPerk);
-	BM.PerkPerk.register(LocalePerk);
-	BM.PerkPerk.register(KeyPerk);
-	BM.PerkPerk.register(ChainPerk);
-	BM.PerkPerk.register(DialogPerk);
-	BM.PerkPerk.register(PreferencePerk);
-	BM.PerkPerk.register(RoutePerk);
-	BM.PerkPerk.register(AliasPerk);
-	BM.PerkPerk.register(RollCallPerk);
-	window.BITSMIST.v1.CookieResourceHandler = CookieResourceHandler;
-	window.BITSMIST.v1.APIResourceHandler = APIResourceHandler;
-	window.BITSMIST.v1.ObjectResourceHandler = ObjectResourceHandler;
-	window.BITSMIST.v1.LinkedResourceHandler = LinkedResourceHandler;
-	window.BITSMIST.v1.WebStorageResourceHandler = WebStorageResourceHandler;
-	window.BITSMIST.v1.LocaleHandler = LocaleHandler;
-	window.BITSMIST.v1.LocaleServerHandler = LocaleServerHandler;
-	window.BITSMIST.v1.ValidationHandler = ValidationHandler;
-	window.BITSMIST.v1.HTML5FormValidationHandler = HTML5FormValidationHandler;
-	window.BITSMIST.v1.ObjectValidationHandler = ObjectValidationHandler;
-	window.BITSMIST.v1.FormatterUtil = FormatterUtil;
-	window.BITSMIST.v1.LocaleFormatterUtil = LocaleFormatterUtil;
-	window.BITSMIST.v1.ValueUtil = ValueUtil;
-	window.BITSMIST.v1.LocaleValueUtil = LocaleValueUtil;
-	window.BITSMIST.v1.ChainedSelect = ChainedSelect;
-	window.BITSMIST.v1.BmTabindex  = TabIndex;
-	window.BITSMIST.v1.BmTabcontent = TabContent;
-	window.BITSMIST.v1.PreferenceServer = PreferenceServer;
-	window.BITSMIST.v1.LocaleServer = LocaleServer;
-	window.BITSMIST.v1.ErrorServer = ErrorServer;
-	window.BITSMIST.v1.Router = Router;
+	/**
+	 * BitsmistJS - Javascript Web Client Framework
+	 *
+	 * @copyright		Masaki Yasutake
+	 * @link			https://bitsmist.com/
+	 * @license			https://github.com/bitsmist/bitsmist/blob/master/LICENSE
+	 */
+	// =============================================================================
 
-})();
+	core.Perk.registerPerk(FilePerk);
+	core.Perk.registerPerk(ErrorPerk);
+	core.Perk.registerPerk(ElementPerk);
+	core.Perk.registerPerk(ResourcePerk);
+	core.Perk.registerPerk(ValidationPerk);
+	core.Perk.registerPerk(FormPerk);
+	core.Perk.registerPerk(ListPerk);
+	core.Perk.registerPerk(DatabindingPerk);
+	core.Perk.registerPerk(LocalePerk);
+	core.Perk.registerPerk(KeyPerk);
+	core.Perk.registerPerk(ChainPerk);
+	core.Perk.registerPerk(DialogPerk$1);
+	core.Perk.registerPerk(PreferencePerk);
+	core.Perk.registerPerk(RoutePerk);
+	core.Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
+	core.Perk.registerHandler(APIResourceHandler, "ResourcePerk");
+	core.Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
+	core.Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
+	core.Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
+	core.Perk.registerHandler(LocaleHandler, "LocalePerk");
+	core.Perk.registerHandler(LocaleServerHandler, "LocalePerk");
+	core.Perk.registerHandler(ValidationHandler, "ValidationPerk");
+	core.Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
+	core.Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
+
+	exports.ArrayStore = ArrayStore;
+	exports.BindableArrayStore = BindableArrayStore;
+	exports.BindableStore = BindableStore;
+	exports.ErrorServer = ErrorServer;
+	exports.FormatterUtil = FormatterUtil;
+	exports.LocaleFormatterUtil = LocaleFormatterUtil;
+	exports.LocaleServer = LocaleServer;
+	exports.LocaleValueUtil = LocaleValueUtil;
+	exports.MultiStore = MultiStore;
+	exports.ObservableStore = ObservableStore;
+	exports.PreferenceServer = PreferenceServer;
+	exports.Router = Router;
+	exports.ValueUtil = ValueUtil;
+
+}));
 //# sourceMappingURL=bitsmist-js-extras_v1.js.map
