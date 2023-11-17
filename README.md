@@ -1,1 +1,5 @@
-# bitsmist-webview-extras_v1
+# BitsmistJS Extras
+
+## Introduction
+
+BitsmistJS Extras is the extra components for BitsmistJS.
