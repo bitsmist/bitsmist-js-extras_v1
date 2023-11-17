@@ -46,10 +46,6 @@ import PreferencePerk from "./perk/preference-perk.js";
 Perk.registerPerk(PreferencePerk);
 import RoutePerk from "./perk/route-perk.js";
 Perk.registerPerk(RoutePerk);
-import AliasPerk from "./perk/alias-perk.js";
-Perk.registerPerk(AliasPerk);
-import RollCallPerk from "./perk/rollcall-perk.js";
-Perk.registerPerk(RollCallPerk);
 
 // Resource handler
 import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
@@ -84,10 +80,6 @@ import ValueUtil from "./util/value-util.js";
 import LocaleValueUtil from "./util/locale-value-util.js";
 
 // Unit
-import ChainedSelect from "./unit/bm-chainedselect.js";
-import BmTab from "./unit/bm-tab.js";
-import BmTabindex from "./unit/bm-tabindex.js";
-import BmTabcontent from "./unit/bm-tabcontent.js";
 import PreferenceServer from "./unit/bm-preference.js";
 import LocaleServer from "./unit/bm-locale.js";
 import ErrorServer from "./unit/bm-error.js";
@@ -105,10 +97,6 @@ export {
 	FormatterUtil,
 	LocaleFormatterUtil,
 	LocaleValueUtil,
-	BmTabcontent,
-	ChainedSelect,
-	BmTab,
-	BmTabindex,
 	PreferenceServer,
 	LocaleServer,
 	ErrorServer,
