@@ -8,7 +8,32 @@ export default [
 		output: [
 			{
 				file: 'dist/bitsmist-js-extras_v1.min.js',
-				format: 'iife',
+				name: 'BITSMIST.v1.$Extras',
+				format: 'umd',
+				sourcemap: false,
+				plugins: [
+					terser({
+						format:				{comments:false},
+						compress:			{drop_console:true},
+						keep_classnames:	true,
+					})
+				],
+				globals: {
+					"@bitsmist-js_v1/core": "BITSMIST.v1"
+				}
+			},
+			{
+				file: 'dist/bitsmist-js-extras_v1.js',
+				name: 'BITSMIST.v1.$Extras',
+				format: 'umd',
+				sourcemap: true,
+				globals: {
+					"@bitsmist-js_v1/core": "BITSMIST.v1"
+				}
+			},
+			{
+				file: 'dist/bitsmist-js-extras_v1.esm.min.js',
+				format: 'es',
 				sourcemap: false,
 				plugins: [
 					terser({
@@ -19,14 +44,17 @@ export default [
 				],
 			},
 			{
-				file: 'dist/bitsmist-js-extras_v1.js',
-				format: 'iife',
-				sourcemap: true
+				file: 'dist/bitsmist-js-extras_v1.esm.js',
+				format: 'es',
+				sourcemap: true,
 			}
 		],
 		plugins: [
 			nodeResolve(),
 			commonjs()
+		],
+		external: [
+			"@bitsmist-js_v1/core"
 		]
 	},
 ]
