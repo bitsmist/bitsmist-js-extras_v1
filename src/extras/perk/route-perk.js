@@ -513,32 +513,29 @@ export default class RoutePerk extends Perk
 	static #__getSettingsURL(unit, routeName)
 	{
 
-		let path;
-		let fileName;
-		let query;
-
+		let url;
 		let settingsRef = unit.get("inventory", "routing.routeInfo.settingsRef");
+
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = URLUtil.parseURL(settingsRef);
-			fileName = url.filename;
-			path = url.path;
-			query = url.query;
+			url = settingsRef;
 		}
 		else
 		{
 			// Use default path and filename
-			path = Util.concatPath([
+			let path = Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
 			let ext = RoutePerk.#__getSettingFormat(unit);
-			fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
-  			query = unit.get("setting", "unit.options.query");
+			let fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			let query = unit.get("setting", "unit.options.query");
+
+			 url = Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 		}
 
-		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return url;
 
 	}
 
@@ -579,31 +576,28 @@ export default class RoutePerk extends Perk
 	static #__getExtenderURL(unit, routeName)
 	{
 
-		let path;
-		let fileName;
 		let query;
-
 		let extenderRef = unit.get("inventory", "routing.routeInfo.extenderRef");
+
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = URLUtil.parseURL(extenderRef);
-			path = url.path;
-			fileName = url.filename;
-			query = url.query;
+			url = settingsRef;
 		}
 		else
 		{
 			// Use default path and filename
-			path = path || Util.concatPath([
+			let path = path || Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
-			fileName = fileName || unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = unit.get("setting", "unit.options.query");
+			let fileName = fileName || unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
+			let query = unit.get("setting", "unit.options.query");
+
+			url = Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 		}
 
-		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return url;
 
 	}
 
