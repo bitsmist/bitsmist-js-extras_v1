@@ -1,4 +1,3 @@
-import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve';
 import terser from "@rollup/plugin-terser";
 
@@ -11,16 +10,16 @@ export default [
 				name: 'BITSMIST.V1.$EXTRAS',
 				format: 'umd',
 				sourcemap: false,
-				plugins: [
-					terser({
-						format:				{comments:false},
-						compress:			{drop_console:true},
-						keep_classnames:	true,
-					})
-				],
 				globals: {
 					"@bitsmist-js_v1/core": "BITSMIST.V1.$CORE"
-				}
+				},
+				plugins: [
+					terser({
+						format: {comments:false},
+						compress: {drop_console:true},
+						keep_classnames: true,
+					})
+				],
 			},
 			{
 				file: 'dist/bitsmist-js-extras_v1.js',
@@ -37,9 +36,9 @@ export default [
 				sourcemap: false,
 				plugins: [
 					terser({
-						format:				{comments:false},
-						compress:			{drop_console:true},
-						keep_classnames:	true,
+						format: {comments:false},
+						compress: {drop_console:true},
+						keep_classnames: true,
 					})
 				],
 			},
@@ -49,12 +48,11 @@ export default [
 				sourcemap: true,
 			}
 		],
-		plugins: [
-			nodeResolve(),
-			commonjs()
-		],
 		external: [
 			"@bitsmist-js_v1/core"
-		]
+		],
+		plugins: [
+			nodeResolve(),
+		],
 	},
 ]
