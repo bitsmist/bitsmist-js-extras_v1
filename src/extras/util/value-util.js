@@ -257,7 +257,7 @@ export default class ValueUtil
 		// Deformat
 		if (element.hasAttribute(`${this.attributeName}-format`))
 		{
-			ret = this.formatter.deformat(element.getAttribute(`${this.attribueName}-format`), ret);
+			ret = this.formatter.deformat(element.getAttribute(`${this.attributeName}-format`), ret);
 		}
 
 		return ret;
