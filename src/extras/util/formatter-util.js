@@ -197,10 +197,14 @@ export default class FormatterUtil
 
 		let ret = value;
 
+
 		switch (format)
 		{
-		case "yyyy/mm/dd":
-			ret = this.deformatDate(format, value);
+		case "date-YYYY-MM-DD":
+			ret = value.replace(/-/g, "");
+			break;
+		case "date-YYYY/MM/DD":
+			ret = value.replace(/\//g, "");
 			break;
 		case "price":
 			ret = this.deformatPrice(format, value);
