@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import {Perk, Util, AjaxUtil} from "@bitsmist-js_v1/core";
+import {Unit, Perk, Util, AjaxUtil} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	File Perk class
@@ -59,7 +59,9 @@ export default class FilePerk extends Perk
 		let promises = [];
 
 		Object.entries(Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(AjaxUtil.loadScript(sectionValue["href"]));
+			let options = {};
+			options["type"] = Unit.get("setting", "system.options.type", "text/javascript");
+			promises.push(AjaxUtil.loadScript(sectionValue["href"], options));
 		});
 
 		return Promise.all(promises);
