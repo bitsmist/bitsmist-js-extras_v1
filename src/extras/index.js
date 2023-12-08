@@ -8,7 +8,7 @@
  */
 // =============================================================================
 
-import {Perk} from "@bitsmist-js_v1/core";
+import {Perk, Unit} from "@bitsmist-js_v1/core";
 
 // Store
 import MultiStore from "./store/multi-store.js";
@@ -19,59 +19,35 @@ import BindableArrayStore from "./store/bindable-array-store.js";
 
 // Perk
 import FilePerk from "./perk/file-perk.js";
-Perk.registerPerk(FilePerk);
 import ErrorPerk from "./perk/error-perk.js";
-Perk.registerPerk(ErrorPerk);
 import ElementPerk from "./perk/element-perk.js";
-Perk.registerPerk(ElementPerk);
 import ResourcePerk from "./perk/resource-perk.js";
-Perk.registerPerk(ResourcePerk);
 import ValidationPerk from "./perk/validation-perk.js";
-Perk.registerPerk(ValidationPerk);
 import FormPerk from "./perk/form-perk.js";
-Perk.registerPerk(FormPerk);
 import ListPerk from "./perk/list-perk.js";
-Perk.registerPerk(ListPerk);
 import DatabindingPerk from "./perk/databinding-perk.js";
-Perk.registerPerk(DatabindingPerk);
 import LocalePerk from "./perk/locale-perk.js";
-Perk.registerPerk(LocalePerk);
 import KeyPerk from "./perk/key-perk.js";
-Perk.registerPerk(KeyPerk);
 import ChainPerk from "./perk/chain-perk.js";
-Perk.registerPerk(ChainPerk);
 import DialogPerk from "./perk/dialog-perk.js";
-Perk.registerPerk(DialogPerk);
 import PreferencePerk from "./perk/preference-perk.js";
-Perk.registerPerk(PreferencePerk);
 import RoutePerk from "./perk/route-perk.js";
-Perk.registerPerk(RoutePerk);
 
 // Resource handler
 import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
-Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
 import APIResourceHandler from "./resource-handler/api-resource-handler.js";
-Perk.registerHandler(APIResourceHandler, "ResourcePerk");
 import ObjectResourceHandler from "./resource-handler/object-resource-handler.js";
-Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
 import LinkedResourceHandler from "./resource-handler/linked-resource-handler.js";
-Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
 import WebStorageResourceHandler from "./resource-handler/webstorage-resource-handler.js";
-Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
 
 // Locale Handler
 import LocaleHandler from "./locale-handler/locale-handler.js";
-Perk.registerHandler(LocaleHandler, "LocalePerk");
 import LocaleServerHandler from "./locale-handler/localeserver-handler.js";
-Perk.registerHandler(LocaleServerHandler, "LocalePerk");
 
 // Validation handler
 import ValidationHandler from "./validation-handler/validation-handler.js";
-Perk.registerHandler(ValidationHandler, "ValidationPerk");
 import HTML5FormValidationHandler from "./validation-handler/html5form-validation-handler.js";
-Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
 import ObjectValidationHandler from "./validation-handler/object-validation-handler.js";
-Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
 
 // Util
 import FormatterUtil from "./util/formatter-util.js";
@@ -84,6 +60,50 @@ import PreferenceServer from "./unit/bm-preference.js";
 import LocaleServer from "./unit/bm-locale.js";
 import ErrorServer from "./unit/bm-error.js";
 import Router from "./unit/bm-router.js";
+
+// Export to global BITSMIST.V1
+if (!globalThis.BITSMIST.V1.EXTRAS)
+{
+	globalThis.BITSMIST.V1.$EXTRAS = {};
+	globalThis.BITSMIST.V1.$EXTRAS.Router = Router;
+	globalThis.BITSMIST.V1.$EXTRAS.BindableArrayStore = BindableArrayStore;
+	globalThis.BITSMIST.V1.$EXTRAS.BindableStore = BindableStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ObservableStore = ObservableStore;
+	globalThis.BITSMIST.V1.$EXTRAS.MultiStore = MultiStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ArrayStore = ArrayStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ValueUtil = ValueUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.FormatterUtil = FormatterUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleFormatterUtil = LocaleFormatterUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleValueUtil = LocaleValueUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.PreferenceServer = PreferenceServer;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleServer = LocaleServer;
+	globalThis.BITSMIST.V1.$EXTRAS.ErrorServer = ErrorServer;
+}
+
+Perk.registerPerk(FilePerk);
+Perk.registerPerk(ErrorPerk);
+Perk.registerPerk(ElementPerk);
+Perk.registerPerk(ResourcePerk);
+Perk.registerPerk(ValidationPerk);
+Perk.registerPerk(FormPerk);
+Perk.registerPerk(ListPerk);
+Perk.registerPerk(DatabindingPerk);
+Perk.registerPerk(LocalePerk);
+Perk.registerPerk(KeyPerk);
+Perk.registerPerk(ChainPerk);
+Perk.registerPerk(DialogPerk);
+Perk.registerPerk(PreferencePerk);
+Perk.registerPerk(RoutePerk);
+Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
+Perk.registerHandler(APIResourceHandler, "ResourcePerk");
+Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
+Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
+Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
+Perk.registerHandler(LocaleHandler, "LocalePerk");
+Perk.registerHandler(LocaleServerHandler, "LocalePerk");
+Perk.registerHandler(ValidationHandler, "ValidationPerk");
+Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
+Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
 
 // Export
 export {
