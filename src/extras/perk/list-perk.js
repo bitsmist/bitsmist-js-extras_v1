@@ -158,8 +158,6 @@ export default class ListPerk extends Perk
 		let builder = (unit.get("setting", "list.options.async", true) ? ListPerk.#__buildAsync : ListPerk.#__buildSync);
 		builder(unit, ListPerk.#__vault.get(unit)["listRootNode"], items, options);
 		/*
-		console.log("@@@add", options);
-
 		let activeRowSkinName = unit.get("inventory", "list.active.skinName");
 		let skinInfo = unit.get("inventory", "skin.skins");
 		let skin = skinInfo[activeRowSkinName].HTML;
