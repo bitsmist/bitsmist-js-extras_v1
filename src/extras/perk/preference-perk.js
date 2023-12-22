@@ -26,13 +26,6 @@ export default class PreferencePerk extends Perk
 		"sectionName":		"preference",
 		"order":			900,
 	};
-	static #__skills = {
-		"get":				PreferencePerk.#_getPreferences,
-	};
-	static #__spells = {
-		"set":				PreferencePerk.#_setPreferences,
-		"apply":			PreferencePerk.#_applyPreferences,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -42,24 +35,6 @@ export default class PreferencePerk extends Perk
 	{
 
 		return PreferencePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return PreferencePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return PreferencePerk.#__spells;
 
 	}
 
@@ -74,6 +49,11 @@ export default class PreferencePerk extends Perk
 		PreferencePerk.#__vault.set(unit, {
 			"server":	null,
 		});
+
+		// Upgrade unit
+		unit.upgrade("skill", "preference.get", PreferencePerk.#_getPreferences);
+		unit.upgrade("spell", "preference.set", PreferencePerk.#_setPreferences);
+		unit.upgrade("spell", "preference.apply", PreferencePerk.#_applyPreferences);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":PreferencePerk.#PreferencePerk_onDoApplySettings, "order":PreferencePerk.info["order"]});

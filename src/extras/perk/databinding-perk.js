@@ -29,9 +29,6 @@ export default class DatabindingPerk extends Perk
 		"sectionName":		"databinding",
 		"order":			320,
 	};
-	static #__skills = {
-	};
-
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -61,7 +58,7 @@ export default class DatabindingPerk extends Perk
 			});
 
 			// Upgrade unit (single)
-			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindData;
+			unit.upgrade("skill", "databinding.bindData", DatabindingPerk.#_bindData);
 
 			// Add event handlers
 			unit.use("event.add", "beforeTransform", {"handler":DatabindingPerk.#DatabindingPerk_onBeforeTransform, "order":DatabindingPerk.info["order"]});
@@ -77,7 +74,7 @@ export default class DatabindingPerk extends Perk
 			});
 
 			// Upgrade unit (multiple)
-			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindDataArray;
+			unit.upgrade("skill", "databinding.bindData", DatabindingPerk.#_bindDataArray);
 
 			// Add event handlers
 			unit.use("event.add", "doFillRow", {"handler":DatabindingPerk.#DatabindingPerk_onDoFillRow, "order":DatabindingPerk.info["order"]});

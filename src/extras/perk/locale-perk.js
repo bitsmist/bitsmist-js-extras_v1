@@ -28,15 +28,6 @@ export default class LocalePerk extends Perk
 		"sectionName":		"locale",
 		"order":			215,
 	};
-	static #__skills = {
-		"localize":			LocalePerk.#_localize,
-		"translate":		LocalePerk.#_getLocaleMessage,
-	};
-	static #__spells = {
-		"apply":			LocalePerk.#_applyLocale,
-		"summon":			LocalePerk.#_loadMessages,
-		"addHandler":		LocalePerk.#_addHandler,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -46,24 +37,6 @@ export default class LocalePerk extends Perk
 	{
 
 		return LocalePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return LocalePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return LocalePerk.#__spells;
 
 	}
 
@@ -87,6 +60,11 @@ export default class LocalePerk extends Perk
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
+		unit.upgrade("skill", "locale.localize", LocalePerk.#_localize);
+		unit.upgrade("skill", "locale.translate", LocalePerk.#_getLocaleMessage);
+		unit.upgrade("spell", "locale.apply", LocalePerk.#_applyLocale);
+		unit.upgrade("spell", "locale.summon", LocalePerk.#_loadMessages);
+		unit.upgrade("spell", "locale.addHandler", LocalePerk.#_addHandler);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":LocalePerk.info["order"]});

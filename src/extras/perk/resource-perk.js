@@ -25,9 +25,6 @@ export default class ResourcePerk extends Perk
 		"sectionName":		"resource",
 		"order":			300,
 	};
-	static #__spells = {
-		"addHandler":		ResourcePerk.#_addHandler,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -41,15 +38,6 @@ export default class ResourcePerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ResourcePerk.#__spells;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -58,6 +46,7 @@ export default class ResourcePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "resource.resources", {});
+		unit.upgrade("spell", "resource.addHandler", ResourcePerk.#_addHandler);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":ResourcePerk.#ResourcePerk_onDoApplySettings, "order":ResourcePerk.info["order"]});

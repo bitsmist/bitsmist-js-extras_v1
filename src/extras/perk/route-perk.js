@@ -28,19 +28,6 @@ export default class RoutePerk extends Perk
 		"order":			900,
 		"depends":			"ValidationPerk",
 	};
-	static #__skills = {
-		"addRoute":			RoutePerk.#_addRoute,
-		"jumpRoute":		RoutePerk.#_jumpRoute,
-		"refreshRoute":		RoutePerk.#_refreshRoute,
-		"replaceRoute":		RoutePerk.#_replaceRoute,
-	};
-	static #__spells = {
-		"switch":			RoutePerk.#_switchRoute,
-		"openRoute":		RoutePerk.#_open,
-		"updateRoute":		RoutePerk.#_updateRoute,
-		"refreshRoute":		RoutePerk.#_refreshRoute,
-		"normalizeRoute":	RoutePerk.#_normalizeRoute,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -50,24 +37,6 @@ export default class RoutePerk extends Perk
 	{
 
 		return RoutePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return RoutePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return RoutePerk.#__spells;
 
 	}
 
@@ -95,6 +64,15 @@ export default class RoutePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "routing.routeInfo", {});
+		unit.upgrade("skill", "routing.addRoute", RoutePerk.#_addRoute);
+		unit.upgrade("skill", "routing.jumpRoute", RoutePerk.#_jumpRoute);
+		unit.upgrade("skill", "routing.refreshRoute", RoutePerk.#_refreshRoute);
+		unit.upgrade("skill", "routing.replaceRoute", RoutePerk.#_replaceRoute);
+		unit.upgrade("spell", "routing.switch", RoutePerk.#_switchRoute);
+		unit.upgrade("spell", "routing.openRoute", RoutePerk.#_open);
+		unit.upgrade("spell", "routing.updateRoute", RoutePerk.#_updateRoute);
+		unit.upgrade("spell", "routing.refreshRoute", RoutePerk.#_refreshRoute);
+		unit.upgrade("spell", "routing.normalizeRoute", RoutePerk.#_normalizeRoute);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":RoutePerk.info["order"]});

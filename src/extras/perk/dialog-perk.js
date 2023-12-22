@@ -27,11 +27,6 @@ export default class DialogPerk extends Perk
 		"sectionName":		"dialog",
 		"order":			800,
 	};
-	static #__spells = {
-		"open":				DialogPerk.#_open,
-		"openModal":		DialogPerk.#_openModal,
-		"close":			DialogPerk.#_close,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -41,15 +36,6 @@ export default class DialogPerk extends Perk
 	{
 
 		return DialogPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return DialogPerk.#__spells;
 
 	}
 
@@ -72,6 +58,9 @@ export default class DialogPerk extends Perk
 		unit.upgrade("inventory", "dialog.isModal", false);
 		unit.upgrade("inventory", "dialog.modalResult", {});
 		unit.upgrade("inventory", "dialog.options");
+		unit.upgrade("spell", "dialog.open", DialogPerk.#_open);
+		unit.upgrade("spell", "dialog.openModal", DialogPerk.#_openModal);
+		unit.upgrade("spell", "dialog.close", DialogPerk.#_close);
 
 		// Add event handlers
 		unit.use("event.add", "afterReady", {"handler":DialogPerk.#DialogPerk_onAfterReady, "order":DialogPerk.info["order"]});

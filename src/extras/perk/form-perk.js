@@ -29,12 +29,6 @@ export default class FormPerk extends Perk
 		"order":			310,
 		"depends":			"ValidationPerk",
 	};
-	static #__skills = {
-		"build":			FormPerk.#_build,
-	};
-	static #__spells = {
-		"submit":				FormPerk.#_submit,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -44,24 +38,6 @@ export default class FormPerk extends Perk
 	{
 
 		return FormPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return FormPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return FormPerk.#__spells;
 
 	}
 
@@ -79,6 +55,8 @@ export default class FormPerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "form.cancelSubmit", false);
+		unit.upgrade("skill", "form.build", FormPerk.#_build);
+		unit.upgrade("spell", "form.submit", FormPerk.#_submit);
 
 		// Add event handlers
 		unit.use("event.add", "afterTransform", {"handler":FormPerk.#FormPerk_onAfterTransform, "order":FormPerk.info["order"]});

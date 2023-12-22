@@ -28,15 +28,6 @@ export default class ListPerk extends Perk
 		"sectionName":		"list",
 		"order":			310,
 	};
-	static #__skills = {
-		"get":				ListPerk.#_getItems,
-		"update":			ListPerk.#_updateRow,
-		"add":				ListPerk.#_addRow,
-//		"remove":			ListPerk.#_removeRow,
-	};
-	static #__spells = {
-		"transformRow":		ListPerk.#_transformRow,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -46,24 +37,6 @@ export default class ListPerk extends Perk
 	{
 
 		return ListPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return ListPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ListPerk.#__spells;
 
 	}
 
@@ -82,6 +55,10 @@ export default class ListPerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "list.active.skinName", "");
+		unit.upgrade("skill", "list.get", ListPerk.#_getItems);
+		unit.upgrade("skill", "list.update", ListPerk.#_updateRow);
+		unit.upgrade("skill", "list.add", ListPerk.#_addRow);
+		unit.upgrade("spell", "list.transformRow", ListPerk.#_transformRow);
 
 		// Add event handlers
 		unit.use("event.add", "afterTransform", {"handler":ListPerk.#ListPerk_onAfterTransform, "order":ListPerk.info["order"]});

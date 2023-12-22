@@ -25,10 +25,6 @@ export default class ValidationPerk extends Perk
 		"sectionName":		"validation",
 		"order":			310,
 	};
-	static #__spells = {
-		"addHandler":		ValidationPerk._addHandler,
-		"validate":			ValidationPerk._validate,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -42,15 +38,6 @@ export default class ValidationPerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ValidationPerk.#__spells;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -60,6 +47,8 @@ export default class ValidationPerk extends Perk
 		// Upgrade unit
 		unit.upgrade("inventory", "validation.validators", {});
 		unit.upgrade("inventory", "validation.validationResult", {});
+		unit.upgrade("spell", "validation.addHandler", ValidationPerk.#_addHandler);
+		unit.upgrade("spell", "validation.validate", ValidationPerk.#_validate);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":ValidationPerk.info["order"]});
@@ -78,7 +67,7 @@ export default class ValidationPerk extends Perk
 		let promises = [];
 
 		Object.entries(Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
+			promises.push(ValidationPerk.#_addHandler(this, sectionName, sectionValue));
 		});
 
 		return Promise.all(promises);
@@ -124,7 +113,7 @@ export default class ValidationPerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills (Unit)
+	//  Spells (unit)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -134,7 +123,7 @@ export default class ValidationPerk extends Perk
      * @param	{string}		handlerName			Validation handler name.
      * @param	{array}			options				Options.
      */
-	static _addHandler(unit, handlerName, options)
+	static #_addHandler(unit, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
@@ -162,7 +151,7 @@ export default class ValidationPerk extends Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _validate(unit, options)
+	static #_validate(unit, options)
 	{
 
 		options = options || {};
