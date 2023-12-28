@@ -64,15 +64,14 @@ export default class RoutePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "routing.routeInfo", {});
-		unit.upgrade("skill", "routing.addRoute", RoutePerk.#_addRoute);
-		unit.upgrade("skill", "routing.jumpRoute", RoutePerk.#_jumpRoute);
-		unit.upgrade("skill", "routing.refreshRoute", RoutePerk.#_refreshRoute);
-		unit.upgrade("skill", "routing.replaceRoute", RoutePerk.#_replaceRoute);
+		unit.upgrade("skill", "routing.add", RoutePerk.#_addRoute);
+		unit.upgrade("skill", "routing.jump", RoutePerk.#_jumpRoute);
+		unit.upgrade("skill", "routing.replace", RoutePerk.#_replaceRoute);
 		unit.upgrade("spell", "routing.switch", RoutePerk.#_switchRoute);
-		unit.upgrade("spell", "routing.openRoute", RoutePerk.#_open);
-		unit.upgrade("spell", "routing.updateRoute", RoutePerk.#_updateRoute);
-		unit.upgrade("spell", "routing.refreshRoute", RoutePerk.#_refreshRoute);
-		unit.upgrade("spell", "routing.normalizeRoute", RoutePerk.#_normalizeRoute);
+		unit.upgrade("spell", "routing.open", RoutePerk.#_open);
+		unit.upgrade("spell", "routing.update", RoutePerk.#_updateRoute);
+		unit.upgrade("spell", "routing.refresh", RoutePerk.#_refreshRoute);
+		unit.upgrade("spell", "routing.normalize", RoutePerk.#_normalizeRoute);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":RoutePerk.info["order"]});
@@ -129,7 +128,7 @@ export default class RoutePerk extends Perk
 	static #RoutePerk_onAfterReady(sender, e, ex)
 	{
 
-		return this.cast("routing.openRoute");
+		return this.cast("routing.open");
 
 	}
 
