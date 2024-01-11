@@ -1,6 +1,6 @@
 {
   "name": "@bitsmist-js_v1/extras",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Extra Components for BitsmistJS",
   "main": "./src/extras/export.js",
   "type": "module",
