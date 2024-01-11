@@ -80,6 +80,7 @@ if (!globalThis.BITSMIST.V1.EXTRAS)
 	globalThis.BITSMIST.V1.$EXTRAS.ErrorServer = ErrorServer;
 }
 
+// Register Perks
 Perk.registerPerk(FilePerk);
 Perk.registerPerk(ErrorPerk);
 Perk.registerPerk(ElementPerk);
@@ -94,16 +95,18 @@ Perk.registerPerk(ChainPerk);
 Perk.registerPerk(DialogPerk);
 Perk.registerPerk(PreferencePerk);
 Perk.registerPerk(RoutePerk);
-Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
-Perk.registerHandler(APIResourceHandler, "ResourcePerk");
-Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
-Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
-Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
-Perk.registerHandler(LocaleHandler, "LocalePerk");
-Perk.registerHandler(LocaleServerHandler, "LocalePerk");
-Perk.registerHandler(ValidationHandler, "ValidationPerk");
-Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
-Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
+
+// Register Handlers
+ResourcePerk.registerHandler(CookieResourceHandler);
+ResourcePerk.registerHandler(APIResourceHandler);
+ResourcePerk.registerHandler(ObjectResourceHandler);
+ResourcePerk.registerHandler(LinkedResourceHandler);
+ResourcePerk.registerHandler(WebStorageResourceHandler);
+LocalePerk.registerHandler(LocaleHandler);
+LocalePerk.registerHandler(LocaleServerHandler);
+ValidationPerk.registerHandler(ValidationHandler);
+ValidationPerk.registerHandler(HTML5FormValidationHandler);
+ValidationPerk.registerHandler(ObjectValidationHandler);
 
 // Export
 export {
