@@ -1,4 +1,4 @@
-import { Store, Util, Perk, AjaxUtil, Unit, URLUtil, ChainableStore } from '@bitsmist-js_v1/core';
+import { Store, Util, Perk, Unit, AjaxUtil, URLUtil, ChainableStore } from '@bitsmist-js_v1/core';
 
 // =============================================================================
 /**
@@ -824,10 +824,14 @@ class FormatterUtil
 
 		let ret = value;
 
+
 		switch (format)
 		{
-		case "yyyy/mm/dd":
-			ret = this.deformatDate(format, value);
+		case "date-YYYY-MM-DD":
+			ret = value.replace(/-/g, "");
+			break;
+		case "date-YYYY/MM/DD":
+			ret = value.replace(/\//g, "");
 			break;
 		case "price":
 			ret = this.deformatPrice(format, value);
@@ -1383,7 +1387,7 @@ class ValueUtil
 		// Deformat
 		if (element.hasAttribute(`${this.attributeName}-format`))
 		{
-			ret = this.formatter.deformat(element.getAttribute(`${this.attribueName}-format`), ret);
+			ret = this.formatter.deformat(element.getAttribute(`${this.attributeName}-format`), ret);
 		}
 
 		return ret;
@@ -2057,7 +2061,9 @@ class FilePerk extends Perk
 		let promises = [];
 
 		Object.entries(Util.safeGet(e.detail, "settings.file.targets", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(AjaxUtil.loadScript(sectionValue["href"]));
+			let options = {};
+			options["type"] = Unit.get("setting", "system.options.type", "text/javascript");
+			promises.push(AjaxUtil.loadScript(sectionValue["href"], options));
 		});
 
 		return Promise.all(promises);
@@ -2776,9 +2782,6 @@ class ResourcePerk extends Perk
 		"sectionName":		"resource",
 		"order":			300,
 	};
-	static #__spells = {
-		"addHandler":		ResourcePerk.#_addHandler,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -2792,15 +2795,6 @@ class ResourcePerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ResourcePerk.#__spells;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -2809,6 +2803,7 @@ class ResourcePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "resource.resources", {});
+		unit.upgrade("spell", "resource.addHandler", ResourcePerk.#_addHandler);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":ResourcePerk.#ResourcePerk_onDoApplySettings, "order":ResourcePerk.info["order"]});
@@ -2942,10 +2937,6 @@ class ValidationPerk extends Perk
 		"sectionName":		"validation",
 		"order":			310,
 	};
-	static #__spells = {
-		"addHandler":		ValidationPerk._addHandler,
-		"validate":			ValidationPerk._validate,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -2959,15 +2950,6 @@ class ValidationPerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ValidationPerk.#__spells;
-
-	}
-
-	// -------------------------------------------------------------------------
 	//  Methods
 	// -------------------------------------------------------------------------
 
@@ -2977,6 +2959,8 @@ class ValidationPerk extends Perk
 		// Upgrade unit
 		unit.upgrade("inventory", "validation.validators", {});
 		unit.upgrade("inventory", "validation.validationResult", {});
+		unit.upgrade("spell", "validation.addHandler", ValidationPerk.#_addHandler);
+		unit.upgrade("spell", "validation.validate", ValidationPerk.#_validate);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":ValidationPerk.ValidationPerk_onDoApplySettings, "order":ValidationPerk.info["order"]});
@@ -2995,7 +2979,7 @@ class ValidationPerk extends Perk
 		let promises = [];
 
 		Object.entries(Util.safeGet(e.detail, "settings.validation.handlers", {})).forEach(([sectionName, sectionValue]) => {
-			promises.push(ValidationPerk._addHandler(this, sectionName, sectionValue));
+			promises.push(ValidationPerk.#_addHandler(this, sectionName, sectionValue));
 		});
 
 		return Promise.all(promises);
@@ -3041,7 +3025,7 @@ class ValidationPerk extends Perk
 	}
 
 	// -------------------------------------------------------------------------
-	//  Skills (Unit)
+	//  Spells (unit)
 	// -------------------------------------------------------------------------
 
 	/**
@@ -3051,7 +3035,7 @@ class ValidationPerk extends Perk
      * @param	{string}		handlerName			Validation handler name.
      * @param	{array}			options				Options.
      */
-	static _addHandler(unit, handlerName, options)
+	static #_addHandler(unit, handlerName, options)
 	{
 
 		let promise = Promise.resolve();
@@ -3079,7 +3063,7 @@ class ValidationPerk extends Perk
 	 *
 	 * @return  {Promise}		Promise.
 	 */
-	static _validate(unit, options)
+	static #_validate(unit, options)
 	{
 
 		options = options || {};
@@ -3142,12 +3126,6 @@ class FormPerk extends Perk
 		"order":			310,
 		"depends":			"ValidationPerk",
 	};
-	static #__skills = {
-		"build":			FormPerk.#_build,
-	};
-	static #__spells = {
-		"submit":				FormPerk.#_submit,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -3157,24 +3135,6 @@ class FormPerk extends Perk
 	{
 
 		return FormPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return FormPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return FormPerk.#__spells;
 
 	}
 
@@ -3192,6 +3152,8 @@ class FormPerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "form.cancelSubmit", false);
+		unit.upgrade("skill", "form.build", FormPerk.#_build);
+		unit.upgrade("spell", "form.submit", FormPerk.#_submit);
 
 		// Add event handlers
 		unit.use("event.add", "afterTransform", {"handler":FormPerk.#FormPerk_onAfterTransform, "order":FormPerk.info["order"]});
@@ -3424,15 +3386,6 @@ class ListPerk extends Perk
 		"sectionName":		"list",
 		"order":			310,
 	};
-	static #__skills = {
-		"get":				ListPerk.#_getItems,
-		"update":			ListPerk.#_updateRow,
-		"add":				ListPerk.#_addRow,
-//		"remove":			ListPerk.#_removeRow,
-	};
-	static #__spells = {
-		"transformRow":		ListPerk.#_transformRow,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -3442,24 +3395,6 @@ class ListPerk extends Perk
 	{
 
 		return ListPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return ListPerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return ListPerk.#__spells;
 
 	}
 
@@ -3478,6 +3413,10 @@ class ListPerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "list.active.skinName", "");
+		unit.upgrade("skill", "list.get", ListPerk.#_getItems);
+		unit.upgrade("skill", "list.update", ListPerk.#_updateRow);
+		unit.upgrade("skill", "list.add", ListPerk.#_addRow);
+		unit.upgrade("spell", "list.transformRow", ListPerk.#_transformRow);
 
 		// Add event handlers
 		unit.use("event.add", "afterTransform", {"handler":ListPerk.#ListPerk_onAfterTransform, "order":ListPerk.info["order"]});
@@ -3554,8 +3493,6 @@ class ListPerk extends Perk
 		let builder = (unit.get("setting", "list.options.async", true) ? ListPerk.#__buildAsync : ListPerk.#__buildSync);
 		builder(unit, ListPerk.#__vault.get(unit)["listRootNode"], items, options);
 		/*
-		console.log("@@@add", options);
-
 		let activeRowSkinName = unit.get("inventory", "list.active.skinName");
 		let skinInfo = unit.get("inventory", "skin.skins");
 		let skin = skinInfo[activeRowSkinName].HTML;
@@ -3876,9 +3813,6 @@ class DatabindingPerk extends Perk
 		"sectionName":		"databinding",
 		"order":			320,
 	};
-	static #__skills = {
-	};
-
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -3908,7 +3842,7 @@ class DatabindingPerk extends Perk
 			});
 
 			// Upgrade unit (single)
-			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindData;
+			unit.upgrade("skill", "databinding.bindData", DatabindingPerk.#_bindData);
 
 			// Add event handlers
 			unit.use("event.add", "beforeTransform", {"handler":DatabindingPerk.#DatabindingPerk_onBeforeTransform, "order":DatabindingPerk.info["order"]});
@@ -3924,7 +3858,7 @@ class DatabindingPerk extends Perk
 			});
 
 			// Upgrade unit (multiple)
-			DatabindingPerk.#__skills["bindData"] = DatabindingPerk.#_bindDataArray;
+			unit.upgrade("skill", "databinding.bindData", DatabindingPerk.#_bindDataArray);
 
 			// Add event handlers
 			unit.use("event.add", "doFillRow", {"handler":DatabindingPerk.#DatabindingPerk_onDoFillRow, "order":DatabindingPerk.info["order"]});
@@ -4253,15 +4187,6 @@ class LocalePerk extends Perk
 		"sectionName":		"locale",
 		"order":			215,
 	};
-	static #__skills = {
-		"localize":			LocalePerk.#_localize,
-		"translate":		LocalePerk.#_getLocaleMessage,
-	};
-	static #__spells = {
-		"apply":			LocalePerk.#_applyLocale,
-		"summon":			LocalePerk.#_loadMessages,
-		"addHandler":		LocalePerk.#_addHandler,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -4271,24 +4196,6 @@ class LocalePerk extends Perk
 	{
 
 		return LocalePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return LocalePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return LocalePerk.#__spells;
 
 	}
 
@@ -4312,6 +4219,11 @@ class LocalePerk extends Perk
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
 			"currencyName":			unit.get("setting", "locale.options.currencyName", unit.get("setting", "system.locale.options.currencyName", "USD")),
 		});
+		unit.upgrade("skill", "locale.localize", LocalePerk.#_localize);
+		unit.upgrade("skill", "locale.translate", LocalePerk.#_getLocaleMessage);
+		unit.upgrade("spell", "locale.apply", LocalePerk.#_applyLocale);
+		unit.upgrade("spell", "locale.summon", LocalePerk.#_loadMessages);
+		unit.upgrade("spell", "locale.addHandler", LocalePerk.#_addHandler);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":LocalePerk.info["order"]});
@@ -5067,11 +4979,6 @@ let DialogPerk$1 = class DialogPerk extends Perk
 		"sectionName":		"dialog",
 		"order":			800,
 	};
-	static #__spells = {
-		"open":				DialogPerk.#_open,
-		"openModal":		DialogPerk.#_openModal,
-		"close":			DialogPerk.#_close,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -5081,15 +4988,6 @@ let DialogPerk$1 = class DialogPerk extends Perk
 	{
 
 		return DialogPerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return DialogPerk.#__spells;
 
 	}
 
@@ -5112,6 +5010,9 @@ let DialogPerk$1 = class DialogPerk extends Perk
 		unit.upgrade("inventory", "dialog.isModal", false);
 		unit.upgrade("inventory", "dialog.modalResult", {});
 		unit.upgrade("inventory", "dialog.options");
+		unit.upgrade("spell", "dialog.open", DialogPerk.#_open);
+		unit.upgrade("spell", "dialog.openModal", DialogPerk.#_openModal);
+		unit.upgrade("spell", "dialog.close", DialogPerk.#_close);
 
 		// Add event handlers
 		unit.use("event.add", "afterReady", {"handler":DialogPerk.#DialogPerk_onAfterReady, "order":DialogPerk.info["order"]});
@@ -5449,13 +5350,6 @@ class PreferencePerk extends Perk
 		"sectionName":		"preference",
 		"order":			900,
 	};
-	static #__skills = {
-		"get":				PreferencePerk.#_getPreferences,
-	};
-	static #__spells = {
-		"set":				PreferencePerk.#_setPreferences,
-		"apply":			PreferencePerk.#_applyPreferences,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -5465,24 +5359,6 @@ class PreferencePerk extends Perk
 	{
 
 		return PreferencePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return PreferencePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return PreferencePerk.#__spells;
 
 	}
 
@@ -5497,6 +5373,11 @@ class PreferencePerk extends Perk
 		PreferencePerk.#__vault.set(unit, {
 			"server":	null,
 		});
+
+		// Upgrade unit
+		unit.upgrade("skill", "preference.get", PreferencePerk.#_getPreferences);
+		unit.upgrade("spell", "preference.set", PreferencePerk.#_setPreferences);
+		unit.upgrade("spell", "preference.apply", PreferencePerk.#_applyPreferences);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":PreferencePerk.#PreferencePerk_onDoApplySettings, "order":PreferencePerk.info["order"]});
@@ -5922,19 +5803,6 @@ class RoutePerk extends Perk
 		"order":			900,
 		"depends":			"ValidationPerk",
 	};
-	static #__skills = {
-		"addRoute":			RoutePerk.#_addRoute,
-		"jumpRoute":		RoutePerk.#_jumpRoute,
-		"refreshRoute":		RoutePerk.#_refreshRoute,
-		"replaceRoute":		RoutePerk.#_replaceRoute,
-	};
-	static #__spells = {
-		"switch":			RoutePerk.#_switchRoute,
-		"openRoute":		RoutePerk.#_open,
-		"updateRoute":		RoutePerk.#_updateRoute,
-		"refreshRoute":		RoutePerk.#_refreshRoute,
-		"normalizeRoute":	RoutePerk.#_normalizeRoute,
-	};
 
 	// -------------------------------------------------------------------------
 	//  Properties
@@ -5944,24 +5812,6 @@ class RoutePerk extends Perk
 	{
 
 		return RoutePerk.#__info;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get skills()
-	{
-
-		return RoutePerk.#__skills;
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	static get spells()
-	{
-
-		return RoutePerk.#__spells;
 
 	}
 
@@ -5989,6 +5839,14 @@ class RoutePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "routing.routeInfo", {});
+		unit.upgrade("skill", "routing.add", RoutePerk.#_addRoute);
+		unit.upgrade("skill", "routing.jump", RoutePerk.#_jumpRoute);
+		unit.upgrade("skill", "routing.replace", RoutePerk.#_replaceRoute);
+		unit.upgrade("spell", "routing.switch", RoutePerk.#_switchRoute);
+		unit.upgrade("spell", "routing.open", RoutePerk.#_open);
+		unit.upgrade("spell", "routing.update", RoutePerk.#_updateRoute);
+		unit.upgrade("spell", "routing.refresh", RoutePerk.#_refreshRoute);
+		unit.upgrade("spell", "routing.normalize", RoutePerk.#_normalizeRoute);
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":RoutePerk.#RoutePerk_onDoApplySettings, "order":RoutePerk.info["order"]});
@@ -6045,7 +5903,7 @@ class RoutePerk extends Perk
 	static #RoutePerk_onAfterReady(sender, e, ex)
 	{
 
-		return this.cast("routing.openRoute");
+		return this.cast("routing.open");
 
 	}
 
@@ -6407,32 +6265,29 @@ class RoutePerk extends Perk
 	static #__getSettingsURL(unit, routeName)
 	{
 
-		let path;
-		let fileName;
-		let query;
-
+		let url;
 		let settingsRef = unit.get("inventory", "routing.routeInfo.settingsRef");
+
 		if (settingsRef && settingsRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = URLUtil.parseURL(settingsRef);
-			fileName = url.filename;
-			path = url.path;
-			query = url.query;
+			url = settingsRef;
 		}
 		else
 		{
 			// Use default path and filename
-			path = Util.concatPath([
+			let path = Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
 			let ext = RoutePerk.#__getSettingFormat(unit);
-			fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
-  			query = unit.get("setting", "unit.options.query");
+			let fileName = unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".settings." + ext;
+  			let query = unit.get("setting", "unit.options.query");
+
+			 url = Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 		}
 
-		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return url;
 
 	}
 
@@ -6472,32 +6327,27 @@ class RoutePerk extends Perk
 	 */
 	static #__getExtenderURL(unit, routeName)
 	{
-
-		let path;
-		let fileName;
-		let query;
-
 		let extenderRef = unit.get("inventory", "routing.routeInfo.extenderRef");
+
 		if (extenderRef && extenderRef !== true)
 		{
 			// If URL is specified in ref, use it
-			let url = URLUtil.parseURL(extenderRef);
-			path = url.path;
-			fileName = url.filename;
-			query = url.query;
+			url = settingsRef;
 		}
 		else
 		{
 			// Use default path and filename
-			path = path || Util.concatPath([
+			let path = path || Util.concatPath([
 					unit.get("setting", "system.unit.options.path", ""),
 					unit.get("setting", "unit.options.path", ""),
 				]);
-			fileName = fileName || unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
-			query = unit.get("setting", "unit.options.query");
+			let fileName = fileName || unit.get("setting", "unit.options.fileName", unit.tagName.toLowerCase()) + "." + routeName + ".js";
+			let query = unit.get("setting", "unit.options.query");
+
+			url = Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
 		}
 
-		return Util.concatPath([path, fileName]) + (query ? `?${query}` : "");
+		return url;
 
 	}
 
@@ -9365,6 +9215,27 @@ customElements.define("bm-router", Router);
  */
 // =============================================================================
 
+
+// Export to global BITSMIST.V1
+if (!globalThis.BITSMIST.V1.EXTRAS)
+{
+	globalThis.BITSMIST.V1.$EXTRAS = {};
+	globalThis.BITSMIST.V1.$EXTRAS.Router = Router;
+	globalThis.BITSMIST.V1.$EXTRAS.BindableArrayStore = BindableArrayStore;
+	globalThis.BITSMIST.V1.$EXTRAS.BindableStore = BindableStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ObservableStore = ObservableStore;
+	globalThis.BITSMIST.V1.$EXTRAS.MultiStore = MultiStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ArrayStore = ArrayStore;
+	globalThis.BITSMIST.V1.$EXTRAS.ValueUtil = ValueUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.FormatterUtil = FormatterUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleFormatterUtil = LocaleFormatterUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleValueUtil = LocaleValueUtil;
+	globalThis.BITSMIST.V1.$EXTRAS.PreferenceServer = PreferenceServer;
+	globalThis.BITSMIST.V1.$EXTRAS.LocaleServer = LocaleServer;
+	globalThis.BITSMIST.V1.$EXTRAS.ErrorServer = ErrorServer;
+}
+
+// Register Perks
 Perk.registerPerk(FilePerk);
 Perk.registerPerk(ErrorPerk);
 Perk.registerPerk(ElementPerk);
@@ -9379,16 +9250,18 @@ Perk.registerPerk(ChainPerk);
 Perk.registerPerk(DialogPerk$1);
 Perk.registerPerk(PreferencePerk);
 Perk.registerPerk(RoutePerk);
-Perk.registerHandler(CookieResourceHandler, "ResourcePerk");
-Perk.registerHandler(APIResourceHandler, "ResourcePerk");
-Perk.registerHandler(ObjectResourceHandler, "ResourcePerk");
-Perk.registerHandler(LinkedResourceHandler, "ResourcePerk");
-Perk.registerHandler(WebStorageResourceHandler, "ResourcePerk");
-Perk.registerHandler(LocaleHandler, "LocalePerk");
-Perk.registerHandler(LocaleServerHandler, "LocalePerk");
-Perk.registerHandler(ValidationHandler, "ValidationPerk");
-Perk.registerHandler(HTML5FormValidationHandler, "ValidationPerk");
-Perk.registerHandler(ObjectValidationHandler, "ValidationPerk");
+
+// Register Handlers
+ResourcePerk.registerHandler(CookieResourceHandler);
+ResourcePerk.registerHandler(APIResourceHandler);
+ResourcePerk.registerHandler(ObjectResourceHandler);
+ResourcePerk.registerHandler(LinkedResourceHandler);
+ResourcePerk.registerHandler(WebStorageResourceHandler);
+LocalePerk.registerHandler(LocaleHandler);
+LocalePerk.registerHandler(LocaleServerHandler);
+ValidationPerk.registerHandler(ValidationHandler);
+ValidationPerk.registerHandler(HTML5FormValidationHandler);
+ValidationPerk.registerHandler(ObjectValidationHandler);
 
 export { ArrayStore, BindableArrayStore, BindableStore, ErrorServer, FormatterUtil, LocaleFormatterUtil, LocaleServer, LocaleValueUtil, MultiStore, ObservableStore, PreferenceServer, Router, ValueUtil };
 //# sourceMappingURL=bitsmist-js-extras_v1.esm.js.map
