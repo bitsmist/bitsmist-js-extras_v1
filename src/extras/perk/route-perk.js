@@ -171,6 +171,7 @@ export default class RoutePerk extends Perk
 	static #_addRoute(unit, title, routeInfo, first)
 	{
 
+		let path = new URL(routeInfo["path"], document.baseURI).pathname; // Take the base tag into account
 		let keys = [];
 		let route = {
 			"title":		title,
@@ -182,7 +183,7 @@ export default class RoutePerk extends Perk
 			"extenderRef":	routeInfo["extenderRef"],
 			"extender":		routeInfo["extender"],
 			"routeOptions":	routeInfo["routeOptions"],
-			"__re": 			pathToRegexp(routeInfo["path"], keys),
+			"__re": 		pathToRegexp(path, keys),
 			"__keys":		keys,
 		};
 
