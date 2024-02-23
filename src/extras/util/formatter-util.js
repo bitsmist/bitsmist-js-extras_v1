@@ -86,7 +86,7 @@ export default class FormatterUtil
 
 		if (value)
 		{
-			value = parseInt(value).toLocaleString(navigator.language);
+			result = parseInt(value).toLocaleString(navigator.language);
 		}
 
 		return result || "";
