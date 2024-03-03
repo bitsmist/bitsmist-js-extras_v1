@@ -32,7 +32,7 @@ export default class ArrayStore extends Store
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this.items = Util.safeGet(this._options, "items", []);
+		this.items = Util.safeGet(this.options, "items", []);
 
 	}
 
@@ -48,7 +48,8 @@ export default class ArrayStore extends Store
 	get items()
 	{
 
-		return this.clone();
+		//return this.clone();
+		return super.items;
 
 	}
 
@@ -57,7 +58,8 @@ export default class ArrayStore extends Store
 
 		Util.assert(Array.isArray(value), () => `ArrayStore.items(setter): Items is not an array. items=${value}`, TypeError);
 
-		this._items = value;
+		//this._items = value;
+		super.items = value;
 
 	}
 
@@ -71,7 +73,8 @@ export default class ArrayStore extends Store
 	clear()
 	{
 
-		this._items = [];
+		//this._items = [];
+		this.items = [];
 
 	}
 
@@ -85,7 +88,8 @@ export default class ArrayStore extends Store
 	clone()
 	{
 
-		return Util.deepMerge([], this._items);
+		//return Util.deepMerge([], this._items);
+		return Util.deepMerge([], this.items);
 
 	}
 
@@ -102,7 +106,8 @@ export default class ArrayStore extends Store
 	get(index, key, defaultValue)
 	{
 
-		return Util.safeGet(this._items[index], key, defaultValue);
+		//return Util.safeGet(this._items[index], key, defaultValue);
+		return Util.safeGet(this.items[index], key, defaultValue);
 
 	}
 
@@ -117,6 +122,7 @@ export default class ArrayStore extends Store
 	set(index, key, value, options)
 	{
 
+		/*
 		if (options && options["merge"])
 		{
 			return Util.safeMerge(this._items[index], key, defaultValue);
@@ -125,6 +131,9 @@ export default class ArrayStore extends Store
 		{
 			Util.safeSet(this._items[index], key, value);
 		}
+		*/
+		//Util.safeSet(this._items[index], key, value);
+		Util.safeSet(this.items[index], key, value);
 
 	}
 
@@ -138,7 +147,8 @@ export default class ArrayStore extends Store
 	remove(index, key)
 	{
 
-		Util.safeRemove(this._items[i], key);
+		//Util.safeRemove(this._items[index], key);
+		Util.safeRemove(this.items[index], key);
 
 	}
 
@@ -154,7 +164,8 @@ export default class ArrayStore extends Store
 	has(index, key)
 	{
 
-		return Util.safeHas(this._items[index], key);
+		//return Util.safeHas(this._items[index], key);
+		return Util.safeHas(this.items[index], key);
 
 	}
 

@@ -155,6 +155,7 @@ export default class LocalePerk extends Perk
 	static #LocalePerk_onAfterFillRow(sender, e, ex)
 	{
 
+//		console.log("@@@locale", e.detail.item);
 		// Localize a row
 		LocalePerk.#_localize(this, e.detail.element, e.detail.item);
 

@@ -11,6 +11,7 @@
 import BindableArrayStore from "../store/bindable-array-store.js";
 import BindableStore from "../store/bindable-store.js";
 import FormUtil from "../util/form-util.js";
+import ValueUtil from "../util/value-util.js";
 import {Perk, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
@@ -52,6 +53,7 @@ export default class DatabindingPerk extends Perk
 		{
 			// Init unit vault
 			DatabindingPerk.#__vault.set(unit, {"store": new BindableStore({
+//					"resources":	unit.getRef("inventory", "resource.resources"),
 					"resources":	unit.get("inventory", "resource.resources"),
 					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 				})
@@ -68,6 +70,7 @@ export default class DatabindingPerk extends Perk
 		{
 			// Init unit vault
 			DatabindingPerk.#__vault.set(unit, {"store": new BindableArrayStore({
+//					"resources":	unit.getRef("inventory", "resource.resources"),
 					"resources":	unit.get("inventory", "resource.resources"),
 					"direction":	unit.get("setting", "databinding.options.direction", "two-way"),
 				})
@@ -102,7 +105,15 @@ export default class DatabindingPerk extends Perk
 	static #DatabindingPerk_onDoClear(sender, e, ex)
 	{
 
-		DatabindingPerk.#__vault.get(this)["store"].clear();
+		if (this.get("setting", "databinding.options.autoClear", true))
+		{
+			DatabindingPerk.#__vault.get(this)["store"].clear();
+
+			let options = Object.assign({"triggerEvent":"change"}, e.detail.options);
+
+			//ValueUtil.clearFields(this, options);
+			ValueUtil.clearFields(this, {"triggerEvent":false});
+		}
 
 	}
 
@@ -114,6 +125,7 @@ export default class DatabindingPerk extends Perk
 		if (e.detail.items)
 		{
 			DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.items);
+			//DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.items, {"resources":this.get("inventory", "resource.resources")});
 			FormUtil.showConditionalElements(this, e.detail.items);
 		}
 
@@ -124,7 +136,10 @@ export default class DatabindingPerk extends Perk
 	static #DatabindingPerk_onDoFillRow(sender, e, ex)
 	{
 
+		//DatabindingPerk.#__vault.get(this)["store"].options["resources"] = this.get("inventory", "resource.resources");
+		//DatabindingPerk.#_bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
 		DatabindingPerk.#_bindDataArray(this, e.detail.no, e.detail.element, e.detail.callbacks);
+		//DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.no, e.detail.item, {"resources":this.get("inventory", "resource.resources")});
 		DatabindingPerk.#__vault.get(this)["store"].replace(e.detail.no, e.detail.item);
 
 	}

@@ -144,6 +144,7 @@ export default class LocaleHandler
 
 		let messages = (this.get(options["localeName"]) || this.get(options["fallbackLocaleName"]));
 
+//		console.log("@@@", this.constructor.name, rootNode,  messages, options);
 		this._valueHandler.setFields(rootNode, messages, options);
 
 	}

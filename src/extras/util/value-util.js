@@ -190,10 +190,11 @@ export default class ValueUtil
 		let result = ( value === undefined || value === null ? "" : value );
 
 		// Format
-		if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
+		//if (element.hasAttribute(`${this.attributeName}-format`) && !element.hasAttribute(`${this.attributeName}-formatted`))
+		if (element.hasAttribute(`${this.attributeName}-format`))
 		{
 			result = this.formatter.format(element.getAttribute(`${this.attributeName}-format`), value, options);
-			element.setAttribute(`${this.attributeName}-formatted`, "");
+//			element.setAttribute(`${this.attributeName}-formatted`, "");
 		}
 
 		// Interpolate
@@ -222,9 +223,10 @@ export default class ValueUtil
 		}
 
 		// Trigger change event
-		if (options["triggerEvent"])
+		let eventName = Util.safeGet(options, "triggerEvent", "change");
+		if (eventName)
 		{
-			let e = new CustomEvent("change", {"detail":options["triggerOptions"]});
+			let e = new CustomEvent(eventName, {"detail":options["triggerOptions"]});
 			element.dispatchEvent(e);
 		}
 
@@ -274,8 +276,6 @@ export default class ValueUtil
 	static clearValue(element, options)
 	{
 
-		let eventName = "change";
-
 		switch (element.type.toLowerCase())
 		{
 		case "select-one":
@@ -291,10 +291,13 @@ export default class ValueUtil
 			break;
 		}
 
+		element.removeAttribute(`${this.attributeName}-formatted`);
+
 		// Trigger change event
-		if (options && options["triggerEvent"])
+		let eventName = Util.safeGet(options, "triggerEvent", "change");
+		if (eventName)
 		{
-			let e = new CustomEvent("change", {"detail":options["triggerOptions"]});
+			let e = new CustomEvent(eventName, {"detail":options["triggerOptions"]});
 			element.dispatchEvent(e);
 		}
 

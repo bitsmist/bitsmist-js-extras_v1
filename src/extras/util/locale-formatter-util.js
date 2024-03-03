@@ -24,13 +24,19 @@ export default class LocaleFormatterUtil extends FormatterUtil
 	static formatPrice(type, typeOption, value, options)
 	{
 
+
 		let locale = ( options && options["localeName"] ? options["localeName"] : navigator.language );
 		let currency = ( options && options["currencyName"] ? options["currencyName"] : "USD" );
 
-		return new Intl.NumberFormat(locale, {
+		//return new Intl.NumberFormat(locale, {
+		let ret = new Intl.NumberFormat(locale, {
 			style:		"currency",
 			currency:	currency
 		}).format(value);
+
+		console.log("@@@format", this.constructor.name, type, typeOption, value, options, ret);
+
+		return ret;
 
 	}
 

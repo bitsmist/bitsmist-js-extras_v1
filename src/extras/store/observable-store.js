@@ -18,6 +18,13 @@ export default class ObservableStore extends Store
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	#__filter;
+	#__observers = [];
+
+	// -------------------------------------------------------------------------
 	//  Constructor
 	// -------------------------------------------------------------------------
 
@@ -27,10 +34,7 @@ export default class ObservableStore extends Store
 		let defaults = {"notifyOnChange":true, "async":true};
 		super(Object.assign(defaults, options));
 
-		this._filter;
-		this._observers = [];
-
-		this.filter = Util.safeGet(this._options, "filter", () => { return true; } );
+		this.filter = Util.safeGet(this.options, "filter", () => { return true; } );
 
 	}
 
@@ -46,7 +50,7 @@ export default class ObservableStore extends Store
 	get filter()
 	{
 
-		return this._filter;
+		return this.#__filter;
 
 	}
 
@@ -55,7 +59,7 @@ export default class ObservableStore extends Store
 
 		Util.assert(typeof value === "function", () => `Store.filter(setter): Filter is not a function. filter=${value}`, TypeError);
 
-		this._filter = value;
+		this.#__filter = value;
 
 	}
 
@@ -73,7 +77,8 @@ export default class ObservableStore extends Store
 	{
 
 		let changedItem = {};
-		let holder = ( key ? this.get(key) : this._items );
+		//let holder = ( key ? this.get(key) : this._items );
+		let holder = ( key ? this.get(key) : this.items );
 
 		if (holder && typeof holder === "object")
 		{
@@ -83,12 +88,13 @@ export default class ObservableStore extends Store
 		{
 			if (this.get(key) !== value)
 			{
-				Util.safeSet(this._items, key, value);
+				//Util.safeSet(this._items, key, value);
+				Util.safeSet(this.items, key, value);
 				changedItem[key] = value;
 			}
 		}
 
-		let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this._options, "notifyOnChange"));
+		let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this.options, "notifyOnChange"));
 		if (notify && Object.keys(changedItem).length > 0)
 		{
 			return this.notify(changedItem, ...args);
@@ -118,10 +124,12 @@ export default class ObservableStore extends Store
     replace(value, options, ...args)
     {
 
-        this._items = {};
-        this.#__deepMerge(this._items, value);
+        //this._items = {};
+        //this.#__deepMerge(this._items, value);
+        this.items = {};
+        this.#__deepMerge(this.items, value);
 
-        let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this._options, "notifyOnChange"));
+        let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this.options, "notifyOnChange"));
         if (notify)
         {
             return this.notify(value, ...args);
@@ -143,7 +151,7 @@ export default class ObservableStore extends Store
 
 		Util.assert(typeof handler === "function", () => `ObservableStore.subscribe(): Notification handler is not a function. id=${id}`, TypeError);
 
-		this._observers.push({"id":id, "handler":handler, "options":options});
+		this.#__observers.push({"id":id, "handler":handler, "options":options});
 
 	}
 
@@ -157,11 +165,11 @@ export default class ObservableStore extends Store
 	unsubscribe(id)
 	{
 
-		for (let i = 0; i < this._observers.length; i++)
+		for (let i = 0; i < this.#__observers.length; i++)
 		{
-			if (this._obvservers[i].id === id)
+			if (this.#__observers[i].id === id)
 			{
-				this._observers.splice(i, 1);
+				this.#__observers.splice(i, 1);
 				break;
 			}
 		}
@@ -181,7 +189,7 @@ export default class ObservableStore extends Store
 	notify(conditions, ...args)
 	{
 
-		if (Util.safeGet(this._options, "async", false))
+		if (Util.safeGet(this.options, "async", false))
 		{
 			return this.notifyAsync(conditions, ...args);
 		}
@@ -207,13 +215,13 @@ export default class ObservableStore extends Store
 
 		let chain = Promise.resolve();
 
-		for (let i = 0; i < this._observers.length; i++)
+		for (let i = 0; i < this.#__observers.length; i++)
 		{
 			chain = chain.then(() => {
-				if (this._filter(conditions, this._observers[i], ...args))
+				if (this.#__filter(conditions, this.#__observers[i], ...args))
 				{
-					console.debug(`ObservableStore.notifySync(): Notifying. conditions=${conditions}, observer=${this._observers[i].id}`);
-					return this._observers[i]["handler"](conditions, this._observers[i], ...args);
+					console.debug(`ObservableStore.notifySync(): Notifying. conditions=${conditions}, observer=${this.#__observers[i].id}`);
+					return this.#__observers[i]["handler"](conditions, this.#__observers[i], ...args);
 				}
 			});
 		}
@@ -235,12 +243,12 @@ export default class ObservableStore extends Store
 	notifyAsync(conditions, ...args)
 	{
 
-		for (let i = 0; i < this._observers.length; i++)
+		for (let i = 0; i < this.#__observers.length; i++)
 		{
-			if (this._filter(conditions, this._observers[i], ...args))
+			if (this.#__filter(conditions, this.#__observers[i], ...args))
 			{
-				console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this._observers[i].id}`);
-				this._observers[i]["handler"](conditions, this._observers[i], ...args);
+				console.debug(`ObservableStore.notifyAsync(): Notifying asynchronously. conditions=${conditions}, observer=${this.#__observers[i].id}`);
+				this.#__observers[i]["handler"](conditions, this.#__observers[i], ...args);
 			}
 		}
 
@@ -256,7 +264,7 @@ export default class ObservableStore extends Store
 	mute()
 	{
 
-		this._options["notifyOnChange"] = false;
+		this.options["notifyOnChange"] = false;
 
 	}
 
@@ -268,7 +276,7 @@ export default class ObservableStore extends Store
 	unmute()
 	{
 
-		this._options["notifyOnChange"] = true;
+		this.options["notifyOnChange"] = true;
 
 	}
 
