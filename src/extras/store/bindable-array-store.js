@@ -48,15 +48,15 @@ export default class BindableArrayStore extends ArrayStore
 	replace(index, value, ...args)
 	{
 
-		this._items[index] = value;
+		this.items[index] = value;
 
 		if (this.#__elems[index])
 		{
-			Object.keys(this._items[index]).forEach((key) => {
+			Object.keys(this.items[index]).forEach((key) => {
 				if (this.#__elems[index][key] && this.#__elems[index][key]["callback"])
 				{
-					let value = this._items[index][key];
-					this._items[index][key] = this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
+					let value = this.items[index][key];
+					this.items[index][key] = this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
 				}
 			});
 

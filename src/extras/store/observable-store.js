@@ -77,7 +77,7 @@ export default class ObservableStore extends Store
 	{
 
 		let changedItem = {};
-		let holder = ( key ? this.get(key) : this._items );
+		let holder = ( key ? this.get(key) : this.items );
 
 		if (holder && typeof holder === "object")
 		{
@@ -87,7 +87,7 @@ export default class ObservableStore extends Store
 		{
 			if (this.get(key) !== value)
 			{
-				Util.safeSet(this._items, key, value);
+				Util.safeSet(this.items, key, value);
 				changedItem[key] = value;
 			}
 		}
@@ -122,8 +122,8 @@ export default class ObservableStore extends Store
     replace(value, options, ...args)
     {
 
-        this._items = {};
-        this.#__deepMerge(this._items, value);
+        this.items = {};
+        this.#__deepMerge(this.items, value);
 
         let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this.options, "notifyOnChange"));
         if (notify)

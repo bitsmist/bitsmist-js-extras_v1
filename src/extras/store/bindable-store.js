@@ -58,13 +58,13 @@ export default class BindableStore extends Store
 	replace(value, ...args)
 	{
 
-		this._items = value;
+		this.items = value;
 
-		Object.keys(this._items).forEach((key) => {
+		Object.keys(this.items).forEach((key) => {
 			if (this.#__elems[key] && this.#__elems[key]["callback"])
 			{
-				let value = this._items[key];
-				this._items[key] = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
+				let value = this.items[key];
+				this.items[key] = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
 			}
 		});
 
