@@ -18,18 +18,10 @@ export default class MultiStore extends Store
 {
 
 	// -------------------------------------------------------------------------
-	//  Constructor
+	//  Private Variables
 	// -------------------------------------------------------------------------
 
-	constructor(options)
-	{
-
-		super(options);
-
-		// Init vars
-		this._stores = [];
-
-	}
+	#__stores = [];
 
 	// -------------------------------------------------------------------------
 	//  Method
@@ -43,7 +35,7 @@ export default class MultiStore extends Store
 	add(store)
 	{
 
-		this._stores.push(store);
+		this.#__stores.push(store);
 
 	}
 
@@ -52,7 +44,7 @@ export default class MultiStore extends Store
 	clear()
 	{
 
-		this._stores = [];
+		this.#__stores = [];
 
 	}
 
@@ -63,9 +55,9 @@ export default class MultiStore extends Store
 
 		let items = {};
 
-		for (let i = 0; i < this._stores.length; i++)
+		for (let i = 0; i < this.#__stores.length; i++)
 		{
-			Util.deepMerge(items, this._stores[i].items);
+			Util.deepMerge(items, this.#__stores[i].items);
 		}
 
 		return items;
@@ -80,11 +72,11 @@ export default class MultiStore extends Store
 		let isFound = false;
 		let value;
 
-		for (let i = 0; i < this._stores.length; i++)
+		for (let i = 0; i < this.#__stores.length; i++)
 		{
-			if (this._stores[i].has(key))
+			if (this.#__stores[i].has(key))
 			{
-				value = this._stores[i].get(key);
+				value = this.#__stores[i].get(key);
 				isFound = true;
 				break;
 			}
@@ -128,9 +120,9 @@ export default class MultiStore extends Store
 
 		let isFound = false;
 
-		for (let i = 0; i < this._stores.length; i++)
+		for (let i = 0; i < this.#__stores.length; i++)
 		{
-			if (this._stores[i].has(key))
+			if (this.#__stores[i].has(key))
 			{
 				isFound = true;
 				break;
