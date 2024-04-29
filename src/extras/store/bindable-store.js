@@ -19,6 +19,14 @@ export default class BindableStore extends Store
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	#__bindinfo = new WeakMap();
+	#__elems = {};
+	#__valueHandler;
+
+	// -------------------------------------------------------------------------
 	//  Constructor
 	// -------------------------------------------------------------------------
 
@@ -28,8 +36,7 @@ export default class BindableStore extends Store
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this._elems = {};
-		this._valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
+		this.#__valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
 
 	}
 
@@ -54,14 +61,14 @@ export default class BindableStore extends Store
 		this._items = value;
 
 		Object.keys(this._items).forEach((key) => {
-			if (this._elems[key] && this._elems[key]["callback"])
+			if (this.#__elems[key] && this.#__elems[key]["callback"])
 			{
 				let value = this._items[key];
 				this._items[key] = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
 			}
 		});
 
-		return this._notify(value);
+		return this._notify(value, ...args);
 
 	}
 
@@ -70,9 +77,9 @@ export default class BindableStore extends Store
 	set(key, value, options, ...args)
 	{
 
-		if (this._elems[key] && this._elems[key]["callback"])
+		if (this.#__elems[key] && this.#__elems[key]["callback"])
 		{
-			value = this._elems[key]["callback"](value, {"changedItem":{[key]:value}});
+			value = this.#__elems[key]["callback"](value, {"changedItem":{[key]:value}});
 		}
 
 		super.set(key, value);
@@ -93,27 +100,27 @@ export default class BindableStore extends Store
 	bindTo(key, elem, callback)
 	{
 
-		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
+		let bound = ( this.#__bindinfo.get(elem) && this.#__bindinfo.get(elem)["bound"] ? true : false );
 		if (!bound)
 		{
-			this._elems[key] = this._elems[key] || {"elements":[]};
-			this._elems[key]["elements"].push(elem);
-			this._elems[key]["callback"] = callback;
+			this.#__elems[key] = this.#__elems[key] || {"elements":[]};
+			this.#__elems[key]["elements"].push(elem);
+			this.#__elems[key]["callback"] = callback;
 
-			let direction = this._options["direction"];
+			let direction = this.options["direction"];
 			if (direction === "two-way" || direction === "one-way-reverse")
 			{
 				// Update store value when element's value changed
-				let eventName = this._options["eventName"] || "change";
+				let eventName = this.options["eventName"] || "change";
 				elem.addEventListener(eventName, ((e) => {
 					if (!e.detail || (e.detail && e.detail["triggeredBy"] !== "store"))
 					{
-						this.set(key, this._valueHandler.getValue(elem), null, elem);
+						this.set(key, this.#__valueHandler.getValue(elem));
 					}
 				}).bind(this));
 			}
 
-			elem.__bm_bindinfo = { "bound": true };
+			this.#__bindinfo.set(elem, {"bound": true});
 		}
 
 	}
@@ -133,7 +140,7 @@ export default class BindableStore extends Store
 	_notify(conditions, ...args)
 	{
 
-		if (this._options["direction"] !== "one-way-reverse" )
+		if (this.options["direction"] !== "one-way-reverse" )
 		{
 			return this._notifyAsync(conditions, ...args);
 		}
@@ -155,15 +162,15 @@ export default class BindableStore extends Store
 	{
 
 		Object.keys(conditions).forEach((key) => {
-			if (this._elems[key])
+			if (this.#__elems[key])
 			{
 				let value = this.get(key);
-				for (let i = 0; i < this._elems[key]["elements"].length; i++)
+				for (let i = 0; i < this.#__elems[key]["elements"].length; i++)
 				{
-					if (this._elems[key]["elements"][i] !== src)
+					if (this.#__elems[key]["elements"][i] !== src)
 					{
-						this._valueHandler.setValue(this._elems[key]["elements"][i], value, {
-							"resources":this._options["resources"],
+						this.#__valueHandler.setValue(this.#__elems[key]["elements"][i], value, {
+							"resources":this.options["resources"],
 							"triggerEvent": true,
 							"triggerOptions": {
 								"triggeredBy": "store",

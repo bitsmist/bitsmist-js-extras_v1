@@ -20,6 +20,14 @@ export default class BindableArrayStore extends ArrayStore
 {
 
 	// -------------------------------------------------------------------------
+	//  Private Variables
+	// -------------------------------------------------------------------------
+
+	#__bindinfo = new WeakMap();
+	#__elems = {};
+	#__valueHandler;
+
+	// -------------------------------------------------------------------------
 	//  Constructor
 	// -------------------------------------------------------------------------
 
@@ -29,8 +37,7 @@ export default class BindableArrayStore extends ArrayStore
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this._elems = {};
-		this._valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
+		this.#__valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
 
 	}
 
@@ -38,31 +45,22 @@ export default class BindableArrayStore extends ArrayStore
 	//  Method
 	// -------------------------------------------------------------------------
 
-	clear(index, ...args)
-	{
-
-		super.clear(...args);
-
-	}
-
-	// -------------------------------------------------------------------------
-
 	replace(index, value, ...args)
 	{
 
 		this._items[index] = value;
 
-		if (this._elems[index])
+		if (this.#__elems[index])
 		{
 			Object.keys(this._items[index]).forEach((key) => {
-				if (this._elems[index][key] && this._elems[index][key]["callback"])
+				if (this.#__elems[index][key] && this.#__elems[index][key]["callback"])
 				{
 					let value = this._items[index][key];
 					this._items[index][key] = this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
 				}
 			});
 
-			return this._notify({"index":index, "values":value});
+			return this._notify({"index":index, "values":value}, ...args);
 		}
 
 	}
@@ -72,9 +70,9 @@ export default class BindableArrayStore extends ArrayStore
 	set(index, key, value, options, ...args)
 	{
 
-		if (this._elems[index][key] && this._elems[index][key]["callback"])
+		if (this.#__elems[index][key] && this.#__elems[index][key]["callback"])
 		{
-			value = this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
+			value = this.#__elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
 		}
 
 		super.set(index, key, value);
@@ -98,20 +96,20 @@ export default class BindableArrayStore extends ArrayStore
 		let bound = ( elem.__bm_bindinfo && elem.__bm_bindinfo.bound ? true : false );
 		if (!bound)
 		{
-			if (!this._elems[index])
+			if (!this.#__elems[index])
 			{
-				this._elems[index] = {};
+				this.#__elems[index] = {};
 			}
-			let info = this._elems[index];
-			info[key] = this._elems[index][key] || {"elements":[]};
+			let info = this.#__elems[index];
+			info[key] = this.#__elems[index][key] || {"elements":[]};
 			info[key]["elements"].push(elem);
 			info[key]["callback"] = callback;
 
-			let direction = this._options["direction"];
+			let direction = this.options["direction"];
 			if (direction === "two-way" || direction === "one-way-reverse")
 			{
 				// Update store value when element's value changed
-				let eventName = this._options["eventName"] || "change";
+				let eventName = this.options["eventName"] || "change";
 				elem.addEventListener(eventName, ((e) => {
 					if (!e.detail || (e.detail && e.detail["triggeredBy"] !== "store"))
 					{
@@ -140,7 +138,7 @@ export default class BindableArrayStore extends ArrayStore
 	_notify(conditions, ...args)
 	{
 
-		if (this._options["direction"] !== "one-way-reverse" )
+		if (this.options["direction"] !== "one-way-reverse" )
 		{
 			return this._notifyAsync(conditions, ...args);
 		}
@@ -165,15 +163,15 @@ export default class BindableArrayStore extends ArrayStore
 		let values = conditions["values"];
 
 		Object.keys(values).forEach((key) => {
-			if (this._elems[index][key])
+			if (this.#__elems[index][key])
 			{
 				let value = this.get(index, key);
-				for (let i = 0; i < this._elems[index][key]["elements"].length; i++)
+				for (let i = 0; i < this.#__elems[index][key]["elements"].length; i++)
 				{
-					if (this._elems[index][key]["elements"][i] !== src)
+					if (this.#__elems[index][key]["elements"][i] !== src)
 					{
-						this._valueHandler.setValue(this._elems[index][key]["elements"][i], value, {
-							"resources":this._options["resources"],
+						this.#__valueHandler.setValue(this.#__elems[index][key]["elements"][i], value, {
+							"resources":this.options["resources"],
 							"triggerEvent": true,
 							"triggerOptions": {
 								"triggeredBy": "store",

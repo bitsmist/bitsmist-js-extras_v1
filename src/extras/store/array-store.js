@@ -117,14 +117,7 @@ export default class ArrayStore extends Store
 	set(index, key, value, options)
 	{
 
-		if (options && options["merge"])
-		{
-			return Util.safeMerge(this._items[index], key, defaultValue);
-		}
-		else
-		{
-			Util.safeSet(this._items[index], key, value);
-		}
+		Util.safeSet(this._items[index], key, value);
 
 	}
 
@@ -138,7 +131,7 @@ export default class ArrayStore extends Store
 	remove(index, key)
 	{
 
-		Util.safeRemove(this._items[i], key);
+		Util.safeRemove(this._items[index], key);
 
 	}
 
