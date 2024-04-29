@@ -32,7 +32,7 @@ export default class ArrayStore extends Store
 		let defaults = {};
 		super(Object.assign(defaults, options));
 
-		this.items = Util.safeGet(this._options, "items", []);
+		this.items = Util.safeGet(this.options, "items", []);
 
 	}
 

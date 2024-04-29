@@ -113,7 +113,7 @@ export default class BindableArrayStore extends ArrayStore
 				elem.addEventListener(eventName, ((e) => {
 					if (!e.detail || (e.detail && e.detail["triggeredBy"] !== "store"))
 					{
-						this.set(index, key, this._valueHandler.getValue(elem), null, elem);
+						this.set(index, key, this.#__valueHandler.getValue(elem), null, elem);
 					}
 				}).bind(this));
 			}
