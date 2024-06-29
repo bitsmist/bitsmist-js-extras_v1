@@ -25,6 +25,8 @@ export default class LocaleServerHandler extends LocaleHandler
 	init(options)
 	{
 
+		super.init(options);
+
 		let serverNode = this._unit.get("setting", "locale.options.localeServer", this._unit.get("setting", "system.locale.options.localeServer"));
 		serverNode = ( serverNode === true ? "bm-locale" : serverNode );
 
