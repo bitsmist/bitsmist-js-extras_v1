@@ -99,7 +99,7 @@ export default class LocaleServer extends Unit
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Subscribe to the Server. Get a notification when prefrence changed.
+	 * Subscribe to the Server. Get a notification when locale changed.
 	 *
 	 * @param	{Unit}			unit				Unit.
 	 * @param	{Object}		options				Options.
@@ -119,7 +119,7 @@ export default class LocaleServer extends Unit
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Trigger preference changed events.
+	 * Trigger locale changed events.
 	 *
 	 * @param	{String}		conditions			Notify conditions.
 	 * @param	{Object}		options				Options.
