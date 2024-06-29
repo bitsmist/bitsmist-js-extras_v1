@@ -122,8 +122,7 @@ export default class ObservableStore extends Store
     replace(value, options, ...args)
     {
 
-        this.items = {};
-        this.#__deepMerge(this.items, value);
+		super.replace(value);
 
         let notify = Util.safeGet(options, "notifyOnChange", Util.safeGet(this.options, "notifyOnChange"));
         if (notify)
