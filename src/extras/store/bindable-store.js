@@ -1,4 +1,4 @@
-// =============================================================================
+e/ =============================================================================
 /**
  * BitsmistJS - Javascript Web Client Framework
  *
@@ -58,7 +58,7 @@ export default class BindableStore extends Store
 	replace(value, ...args)
 	{
 
-		this.items = value;
+		super.replace(value);
 
 		Object.keys(this.items).forEach((key) => {
 			if (this.#__elems[key] && this.#__elems[key]["callback"])
