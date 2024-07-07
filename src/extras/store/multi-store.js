@@ -11,7 +11,7 @@
 import {Store, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
-//	Multi Chainable store class
+//	Multi Chainable Store Class
 // =============================================================================
 
 export default class MultiStore extends Store
