@@ -85,9 +85,6 @@ export default class LocaleHandler
 	init(options)
 	{
 
-		// Chain this handler's messages store to unit's locale.messages store
-		this._unit.get("inventory", "locale.messages").add(this._messages);
-
 		// Get messages from settings
 		if (options["messages"]) {
 			let messages = Util.getObject(options["messages"], {"format":this.#__getMessageFormat(this._unit)});

@@ -11,7 +11,6 @@
 import {Perk, Unit} from "@bitsmist-js_v1/core";
 
 // Store
-import MultiStore from "./store/multi-store.js";
 import ArrayStore from "./store/array-store.js";
 import ObservableStore from "./store/observable-store.js";
 import BindableStore from "./store/bindable-store.js";
@@ -42,7 +41,6 @@ import WebStorageResourceHandler from "./resource-handler/webstorage-resource-ha
 
 // Locale Handler
 import LocaleHandler from "./locale-handler/locale-handler.js";
-import LocaleServerHandler from "./locale-handler/localeserver-handler.js";
 
 // Validation handler
 import ValidationHandler from "./validation-handler/validation-handler.js";
@@ -69,7 +67,6 @@ if (!globalThis.BITSMIST.V1.EXTRAS)
 	globalThis.BITSMIST.V1.$EXTRAS.BindableArrayStore = BindableArrayStore;
 	globalThis.BITSMIST.V1.$EXTRAS.BindableStore = BindableStore;
 	globalThis.BITSMIST.V1.$EXTRAS.ObservableStore = ObservableStore;
-	globalThis.BITSMIST.V1.$EXTRAS.MultiStore = MultiStore;
 	globalThis.BITSMIST.V1.$EXTRAS.ArrayStore = ArrayStore;
 	globalThis.BITSMIST.V1.$EXTRAS.ValueUtil = ValueUtil;
 	globalThis.BITSMIST.V1.$EXTRAS.FormatterUtil = FormatterUtil;
@@ -103,7 +100,6 @@ ResourcePerk.registerHandler(ObjectResourceHandler);
 ResourcePerk.registerHandler(LinkedResourceHandler);
 ResourcePerk.registerHandler(WebStorageResourceHandler);
 LocalePerk.registerHandler(LocaleHandler);
-LocalePerk.registerHandler(LocaleServerHandler);
 ValidationPerk.registerHandler(ValidationHandler);
 ValidationPerk.registerHandler(HTML5FormValidationHandler);
 ValidationPerk.registerHandler(ObjectValidationHandler);
@@ -114,7 +110,6 @@ export {
 	BindableArrayStore,
 	BindableStore,
 	ObservableStore,
-	MultiStore,
 	ArrayStore,
 	ValueUtil,
 	FormatterUtil,

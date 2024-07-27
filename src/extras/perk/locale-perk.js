@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import MultiStore from "../store/multi-store.js";
 import LocaleServer from "../unit/bm-locale.js";
 import {Perk, Util} from "@bitsmist-js_v1/core";
 
@@ -54,7 +53,6 @@ export default class LocalePerk extends Perk
 
 		// Upgrade unit
 		unit.upgrade("inventory", "locale.localizers", {});
-		unit.upgrade("inventory", "locale.messages", new MultiStore());
 		unit.upgrade("inventory", "locale.active", {
 			"localeName":			unit.get("setting", "locale.options.localeName", unit.get("setting", "system.locale.options.localeName", navigator.language.substring(0, 2))),
 			"fallbackLocaleName":	unit.get("setting", "locale.options.fallbackLocaleName", unit.get("setting", "system.locale.options.fallbackLocaleName", "en")),
@@ -83,7 +81,7 @@ export default class LocalePerk extends Perk
 	//	Event Handlers (Unit)
 	// -------------------------------------------------------------------------
 
-	static #LocalePerk_onDoApplySettings(sender, e, ex)
+	static async #LocalePerk_onDoApplySettings(sender, e, ex)
 	{
 
 		let promises = [];
@@ -99,17 +97,21 @@ export default class LocalePerk extends Perk
 
 		if (serverNode && !(this instanceof LocaleServer))
 		{
-			promises.push(this.cast("status.wait", [serverNode]).then(() => {
-				let server = document.querySelector(serverNode);
-				server.subscribe(this);
-				LocalePerk.#__vault.get(this)["server"] = server;
+			await this.cast("status.wait", [serverNode]);
+			let server = document.querySelector(serverNode);
+			server.subscribe(this);
+			LocalePerk.#__vault.get(this)["server"] = server;
 
-				// Synchronize to the server's locales
-				let localeSettings = server.get("inventory", "locale.active");
-				this.set("inventory", "locale.active.localeName", localeSettings["localeName"]);
-				this.set("inventory", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
-				this.set("inventory", "locale.active.currencyName", localeSettings["currencyName"]);
-			}));
+			// Set the server to the handlers collection
+			Object.keys(server.get("inventory", "locale.localizers")).forEach((handlerName) => {
+				this.set("inventory", `locale.localizers.server_${handlerName}`, server.get("inventory", `locale.localizers.${handlerName}`));
+			});
+
+			// Synchronize to the server's locales
+			let localeSettings = server.get("inventory", "locale.active");
+			this.set("inventory", "locale.active.localeName", localeSettings["localeName"]);
+			this.set("inventory", "locale.active.fallbackLocaleName", localeSettings["fallbackLocaleName"]);
+			this.set("inventory", "locale.active.currencyName", localeSettings["currencyName"]);
 		}
 
 		return Promise.all(promises);
@@ -199,13 +201,18 @@ export default class LocalePerk extends Perk
 	static #_getLocaleMessage(unit, key, localeName)
 	{
 
-		localeName = localeName || unit.get("inventory", "locale.active.localeName");
+		let value = "";
+		Object.keys(unit.get("inventory", "locale.localizers")).forEach((handlerName) => {
+			localeName = localeName || unit.get("inventory", "locale.active.localeName");
 
-		let value = unit.get("inventory", "locale.messages").get(`${localeName}.${key}`);
-		if (value === undefined)
-		{
-			value = unit.get("inventory", "locale.messages").get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
-		}
+			let tmp = unit.get("inventory", `locale.localizers.${handlerName}`).get(localeName, key);
+			if (tmp === undefined)
+			{
+				tmp = unit.get("inventory", `locale.localizers.${handlerName}`).get(`${unit.get("inventory", "locale.fallbackLocaleName")}.${key}`);
+			}
+
+			value = ( tmp ? tmp : value );
+		});
 
 		return value;
 
