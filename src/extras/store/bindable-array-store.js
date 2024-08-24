@@ -8,15 +8,14 @@
  */
 // =============================================================================
 
-import ArrayStore from "../store/array-store.js";
 import ValueUtil from "../util/value-util.js";
-import {Util} from "@bitsmist-js_v1/core";
+import {Store, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Bindable store class
 // =============================================================================
 
-export default class BindableArrayStore extends ArrayStore
+export default class BindableArrayStore extends Store
 {
 
 	// -------------------------------------------------------------------------
@@ -34,8 +33,7 @@ export default class BindableArrayStore extends ArrayStore
 	constructor(options)
 	{
 
-		let defaults = {};
-		super(Object.assign(defaults, options));
+		super(options);
 
 		this.#__valueHandler = Util.safeGet(options, "valueHandler", ValueUtil);
 
@@ -45,23 +43,47 @@ export default class BindableArrayStore extends ArrayStore
 	//  Method
 	// -------------------------------------------------------------------------
 
+	/**
+     * Clear.
+     */
+	clear()
+	{
+
+		super.replace([]);
+		//this.items = [];
+
+	}
+
+	// -------------------------------------------------------------------------
+
 	replace(index, value, ...args)
 	{
 
-		this.items[index] = value;
+		super.set(index.toString(), value);
 
 		if (this.#__elems[index])
 		{
 			Object.keys(this.items[index]).forEach((key) => {
+				console.log("@@@", index, key, this.items[index][key]);
 				if (this.#__elems[index][key] && this.#__elems[index][key]["callback"])
 				{
 					let value = this.items[index][key];
-					this.items[index][key] = this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
+					super.set(`${index}.${key}`, this._elems[index][key]["callback"](value, {"changedItem":{[key]:value}}));
 				}
 			});
 
 			return this._notify({"index":index, "values":value}, ...args);
 		}
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	get(index, key, defaultValue)
+	{
+
+		return super.get(`${index}.${key}`, defaultValue);
+		//return Util.safeGet(this.items[index], key, defaultValue);
 
 	}
 
@@ -75,9 +97,29 @@ export default class BindableArrayStore extends ArrayStore
 			value = this.#__elems[index][key]["callback"](value, {"changedItem":{[key]:value}});
 		}
 
-		super.set(index, key, value);
+		super.set(index, key, value, options);
 
 		return this._notify({"index":index, "values":{[key]:value}}, ...args);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	remove(index, key)
+	{
+
+		super.remove(`${index}.${key}`);
+		//Util.safeRemove(this.items[index], key);
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	has(index, key)
+	{
+
+		return super.has(`${index}.${key}`);
+		//return Util.safeHas(this.items[index], key);
 
 	}
 
