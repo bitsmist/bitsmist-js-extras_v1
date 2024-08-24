@@ -11,8 +11,6 @@
 import {Perk, Unit} from "@bitsmist-js_v1/core";
 
 // Store
-import ArrayStore from "./store/array-store.js";
-import ObservableStore from "./store/observable-store.js";
 import BindableStore from "./store/bindable-store.js";
 import BindableArrayStore from "./store/bindable-array-store.js";
 
@@ -31,6 +29,7 @@ import ChainPerk from "./perk/chain-perk.js";
 import DialogPerk from "./perk/dialog-perk.js";
 import PreferencePerk from "./perk/preference-perk.js";
 import RoutePerk from "./perk/route-perk.js";
+import NotificationPerk from "./perk/notification-perk.js";
 
 // Resource handler
 import CookieResourceHandler from "./resource-handler/cookie-resource-handler.js";
@@ -66,8 +65,6 @@ if (!globalThis.BITSMIST.V1.EXTRAS)
 	globalThis.BITSMIST.V1.$EXTRAS.Router = Router;
 	globalThis.BITSMIST.V1.$EXTRAS.BindableArrayStore = BindableArrayStore;
 	globalThis.BITSMIST.V1.$EXTRAS.BindableStore = BindableStore;
-	globalThis.BITSMIST.V1.$EXTRAS.ObservableStore = ObservableStore;
-	globalThis.BITSMIST.V1.$EXTRAS.ArrayStore = ArrayStore;
 	globalThis.BITSMIST.V1.$EXTRAS.ValueUtil = ValueUtil;
 	globalThis.BITSMIST.V1.$EXTRAS.FormatterUtil = FormatterUtil;
 	globalThis.BITSMIST.V1.$EXTRAS.LocaleFormatterUtil = LocaleFormatterUtil;
@@ -92,6 +89,7 @@ Perk.registerPerk(ChainPerk);
 Perk.registerPerk(DialogPerk);
 Perk.registerPerk(PreferencePerk);
 Perk.registerPerk(RoutePerk);
+Perk.registerPerk(NotificationPerk);
 
 // Register Handlers
 ResourcePerk.registerHandler(CookieResourceHandler);
@@ -109,8 +107,6 @@ export {
 	Router,
 	BindableArrayStore,
 	BindableStore,
-	ObservableStore,
-	ArrayStore,
 	ValueUtil,
 	FormatterUtil,
 	LocaleFormatterUtil,
