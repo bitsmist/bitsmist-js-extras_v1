@@ -134,7 +134,6 @@ export default class NotificationPerk extends Perk
 			chain = chain.then(() => {
 				if (filter(conditions, observers[i], ...args))
 				{
-					console.log("@@@notify", unit.tagName, observers[i].unit.tagName, conditions);
 					console.debug(`NotificationPerk.#_notifyAsync(): Notifying asynchronously. name=${unit.tagName}, conditions=${conditions}, observer=${observers[i].id}`);
 					return observers[i]["handler"](conditions, observers[i], ...args);
 				}
