@@ -66,7 +66,7 @@ export default class LocalePerk extends Perk
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":LocalePerk.#LocalePerk_onDoApplySettings, "order":LocalePerk.info["order"]});
-		unit.use("event.add", "doSetup", {"handler":LocalePerk.#LocalePerk_onDoSetup, "order":LocalePerk.info["order"]});
+		unit.use("event.add", "afterTransform", {"handler":LocalePerk.#LocalePerk_onAfterTransform, "order":LocalePerk.info["order"]});
 		unit.use("event.add", "beforeApplyLocale", {"handler":LocalePerk.#LocalePerk_onBeforeApplyLocale, "order":LocalePerk.info["order"]});
 		unit.use("event.add", "doApplyLocale", {"handler":LocalePerk.#LocalePerk_onDoApplyLocale, "order":LocalePerk.info["order"]});
 
@@ -120,7 +120,7 @@ export default class LocalePerk extends Perk
 
 	// -------------------------------------------------------------------------
 
-	static #LocalePerk_onDoSetup(sender, e, ex)
+	static #LocalePerk_onAfterTransform(sender, e, ex)
 	{
 
 		return LocalePerk.#_applyLocale(this, {"localeName":this.get("inventory", "locale.active.localeName")});

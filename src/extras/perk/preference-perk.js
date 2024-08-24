@@ -57,7 +57,7 @@ export default class PreferencePerk extends Perk
 
 		// Add event handlers
 		unit.use("event.add", "doApplySettings", {"handler":PreferencePerk.#PreferencePerk_onDoApplySettings, "order":PreferencePerk.info["order"]});
-		unit.use("event.add", "doSetup", {"handler":PreferencePerk.#PreferencePerk_onDoSetup, "order":PreferencePerk.info["order"]});
+		unit.use("event.add", "afterTransform", {"handler":PreferencePerk.#PreferencePerk_onAfterTransform, "order":PreferencePerk.info["order"]});
 
 	}
 
@@ -83,7 +83,7 @@ export default class PreferencePerk extends Perk
 
 	// -------------------------------------------------------------------------
 
-	static #PreferencePerk_onDoSetup(sender, e, ex)
+	static #PreferencePerk_onAfterTransform(sender, e, ex)
 	{
 
 		return this.cast("preference.apply", {"preferences":PreferencePerk.#__vault.get(this)["server"].items});
