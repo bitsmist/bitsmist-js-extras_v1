@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import ObservableStore from "../store/observable-store.js";
 import {Unit, URLUtil} from "@bitsmist-js_v1/core";
 
 // =============================================================================
@@ -61,8 +60,6 @@ export default class ErrorServer extends Unit
 	ErrorServer_onBeforeStart(sender, e, ex)
 	{
 
-		this._observers = new ObservableStore({"filter":this.#__filter});
-
 		// Install error listner
 		this.#__initListeners();
 
@@ -70,34 +67,6 @@ export default class ErrorServer extends Unit
 
 	// -------------------------------------------------------------------------
 	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Filter target units to notify.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 * @param	{Object}		observerInfo		Observer info.
-	 */
-	#__filter(conditions, observerInfo, ...args)
-	{
-
-		let result = false;
-		let targets = observerInfo["options"]["unit"].get("setting", "errors.targets");
-		let e = args[0]["error"];
-
-		for (let i = 0; i < targets.length; i++)
-		{
-			if (e.name === targets[i] || targets[i] === "*")
-			{
-				result = true;
-				break;
-			}
-		}
-
-		return result;
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -257,8 +226,6 @@ export default class ErrorServer extends Unit
 	#__handleException(e)
 	{
 
-		//window.stop();
-
 		let statusCode = e.object.status;
 		let handlers = this.get("setting", "handlers");
 		Object.keys(handlers["statusCode"]).forEach((code) => {
@@ -283,8 +250,6 @@ export default class ErrorServer extends Unit
 				});
 			}
 		});
-
-		return this._observers.notifyAsync("error", {"sender":this, "error": e});
 
 	}
 

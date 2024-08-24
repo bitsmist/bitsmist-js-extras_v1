@@ -75,7 +75,7 @@ export default class PreferencePerk extends Perk
 
 		return this.cast("status.wait", [serverNode]).then(() => {
 			let server = document.querySelector(serverNode);
-			server.subscribe(this, Util.safeGet(e.detail, "settings.preference"));
+			server.use("notification.subscribe", this, {"settings": Util.safeGet(e.detail, "settings.preference")});
 			PreferencePerk.#__vault.get(this)["server"] = server;
 		});
 
@@ -148,7 +148,7 @@ export default class PreferencePerk extends Perk
 	static #_setPreferences(unit, preferences, options)
 	{
 
-		return PreferencePerk.#__vault.get(unit)["server"].setPreference(preferences, options, {"sender":unit});
+		return PreferencePerk.#__vault.get(unit)["server"].setPreference(preferences, {"sender":unit});
 
 	}
 

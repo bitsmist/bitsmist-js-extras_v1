@@ -8,8 +8,7 @@
  */
 // =============================================================================
 
-import ObservableStore from "../store/observable-store.js";
-import {Unit, Util} from "@bitsmist-js_v1/core";
+import {Store, Unit, Util} from "@bitsmist-js_v1/core";
 
 // =============================================================================
 //	Preference Server Class
@@ -37,6 +36,7 @@ export default class PreferenceServer extends Unit
 						"handlers": {
 							"beforeStart":			["PreferenceServer_onBeforeStart"],
 							"beforeSubmit":			["PreferenceServer_onBeforeSubmit"],
+							"afterSubmit":			["PreferenceServer_onAfterSubmit"],
 							"doReportValidity":		["PreferenceServer_onDoReportValidity"]
 						}
 					}
@@ -46,6 +46,12 @@ export default class PreferenceServer extends Unit
 				"options": {
 					"autoCollect":					false,
 					"autoCrop":						false,
+				}
+			},
+			"notification": {
+				"options": {
+					"filter":						PreferenceServer.#__filter,
+					"cast":							"preference.apply",
 				}
 			},
 			"skin": {
@@ -85,8 +91,10 @@ export default class PreferenceServer extends Unit
 	PreferenceServer_onBeforeStart = function(sender, e, ex)
 	{
 
-		this._store = new ObservableStore({"items":this.get("setting", "options.defaults"), "filter":this._filter, "async":true});
+		// Create a store to hold preferences
+		this._store = new Store({"items":this.get("setting", "options.defaults")});
 
+		// Merge preferences from resources
 		Object.keys(this.get("inventory", "resource.resources", {})).forEach((key) => {
 			this._store.merge(this.get("inventory", `resource.resources.${key}`).items);
 		});
@@ -95,13 +103,24 @@ export default class PreferenceServer extends Unit
 
 	// -------------------------------------------------------------------------
 
-	PreferenceServer_onBeforeSubmit = function(sender, e, ex)
+	PreferenceServer_onBeforeSubmit = async function(sender, e, ex)
 	{
 
-		this._store.set("", e.detail.items, e.detail.options, ...e.detail.args);
+		// Merge changed preferences to the store
+		this._store.merge(e.detail.changedItems);
 
-		// Pass items to the latter event handlers
+		// Pass all items to the latter event handlers to save them
 		e.detail.items = this._store.items;
+
+	}
+
+	// -------------------------------------------------------------------------
+
+	PreferenceServer_onAfterSubmit = async function(sender, e, ex)
+	{
+
+		// Notify the preference changes to subscribers, passing only changed items
+		await this.cast("notification.notify", {"sender":Util.safeGet(e.detail.options, "sender", this), "preferences":e.detail.changedItems});
 
 	}
 
@@ -120,25 +139,6 @@ export default class PreferenceServer extends Unit
 
 	// -------------------------------------------------------------------------
 	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Subscribe to the Server. Get a notification when prefrence changed.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 * @param	{Object}		options				Options.
-	 */
-	subscribe(unit, options)
-	{
-
-		this._store.subscribe(
-			`${unit.tagName}_${unit.uniqueId}`,
-			this._triggerEvent.bind(unit),
-			options,
-		);
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	/**
@@ -161,15 +161,18 @@ export default class PreferenceServer extends Unit
 	/**
 	 * Set the value to the store.
 	 *
-	 * @param	{Object}		values				Values to store.
+	 * @param	{Object}		preferences			New preferences.
 	 * @param	{Object}		options				Options.
 	 */
-	setPreference(values, options, ...args)
+	async setPreference(preferences, options)
 	{
 
-		let validatorName = this.get("setting", "options.validatorName");
-
-		return this.cast("form.submit", {"items":values, "options":options, "args":args, "validatorName":validatorName});
+		await this.cast("form.submit", {
+			"items":			preferences,
+			"changedItems":		preferences,
+			"options":			options,
+			"validatorName":	this.get("setting", "options.validatorName")
+		});
 
 	}
 
@@ -178,39 +181,21 @@ export default class PreferenceServer extends Unit
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Trigger preference changed events.
-	 *
-	 * @param	{Object}		items				Changed items.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	_triggerEvent(changedItems, observerInfo, options)
-	{
-
-		let sender = Util.safeGet(options, "sender", this);
-
-		return this.cast("preference.apply", {"sender":sender, "preferences":changedItems});
-
-	}
-
-	// -------------------------------------------------------------------------
-
-	/**
 	 * Check if it is the target.
 	 *
 	 * @param	{Object}		conditions			Conditions.
 	 * @param	{Object}		observerInfo		Observer info.
 	 */
-	_filter(conditions, observerInfo, ...args)
+	static #__filter(conditions, observerInfo, ...args)
 	{
 
 		let result = false;
-		let target = observerInfo["options"]["targets"];
+		let target = observerInfo["options"]["settings"]["targets"];
 		target = ( Array.isArray(target) ? target : [target] );
 
 		for (let i = 0; i < target.length; i++)
 		{
-			if (conditions[target[i]])
+			if (conditions["preferences"][target[i]])
 			{
 				result = true;
 				break;

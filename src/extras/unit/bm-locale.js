@@ -8,7 +8,6 @@
  */
 // =============================================================================
 
-import ObservableStore from "../store/observable-store.js";
 import {Unit} from "@bitsmist-js_v1/core";
 
 // =============================================================================
@@ -35,7 +34,6 @@ export default class LocaleServer extends Unit
 				"events": {
 					"this": {
 						"handlers": {
-							"beforeStart":			["LocaleServer_onBeforeStart"],
 							"doApplyLocale":		["LocaleServer_onDoApplyLocale"],
 						}
 					}
@@ -48,6 +46,11 @@ export default class LocaleServer extends Unit
 					}
 				}
 			},
+			"notification": {
+				"options": {
+					"cast":							"locale.apply",
+				}
+			},
 			"skin": {
 				"options": {
 					"hasSkin":						false,
@@ -55,8 +58,7 @@ export default class LocaleServer extends Unit
 			},
 			"style": {
 				"options": {
-					"hasStyle":					false,
-					"styleRef":					false,
+					"hasStyle":						false,
 				}
 			},
 		}
@@ -65,15 +67,6 @@ export default class LocaleServer extends Unit
 
 	// -------------------------------------------------------------------------
 	//  Event Handlers
-	// -------------------------------------------------------------------------
-
-	LocaleServer_onBeforeStart(sender, e, ex)
-	{
-
-		this._store = new ObservableStore({"async":true});
-
-	}
-
 	// -------------------------------------------------------------------------
 
 	LocaleServer_onDoApplyLocale(sender, e, ex)
@@ -90,46 +83,7 @@ export default class LocaleServer extends Unit
 		}
 
 		// Notify locale change to clients
-		return this._store.notify("*", e.detail);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Methods
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Subscribe to the Server. Get a notification when locale changed.
-	 *
-	 * @param	{Unit}			unit				Unit.
-	 * @param	{Object}		options				Options.
-	 */
-	subscribe(unit, options)
-	{
-
-		this._store.subscribe(
-			`${unit.tagName}_${unit.uniqueId}`,
-			this.#__triggerEvent.bind(unit),
-		);
-
-	}
-
-	// -------------------------------------------------------------------------
-	//  Privates
-	// -------------------------------------------------------------------------
-
-	/**
-	 * Trigger locale changed events.
-	 *
-	 * @param	{String}		conditions			Notify conditions.
-	 * @param	{Object}		options				Options.
-	 *
-	 * @return  {Promise}		Promise.
-	 */
-	#__triggerEvent(conditions, observerInfo, options)
-	{
-
-		return this.cast("locale.apply", {"localeName":options.localeName});
+		return this.cast("notification.notify", e.detail);
 
 	}
 

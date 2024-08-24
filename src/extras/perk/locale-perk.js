@@ -99,7 +99,7 @@ export default class LocalePerk extends Perk
 		{
 			await this.cast("status.wait", [serverNode]);
 			let server = document.querySelector(serverNode);
-			server.subscribe(this);
+			server.use("notification.subscribe", this, {"settings": Util.safeGet(e.detail, "settings.notification")});
 			LocalePerk.#__vault.get(this)["server"] = server;
 
 			// Set the server to the handlers collection
